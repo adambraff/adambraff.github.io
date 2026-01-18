@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Analytics Skill Self-Assessment</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Intro Section -->
+        <section id="intro-section">
+            <h1>Business Analytics Skill Self-Assessment</h1>
+
+            <div class="form-section intro-content">
+                <p>This is a low-stakes self-assessment. You are not being graded on the content of your answers to these questions (though, depending on the course through which you received the link, you may be graded on whether you complete the assessment on time). The goal is to establish a baseline for your abilities in the three skill areas that are necessary for business analytics, or data science as applied to business.</p>
+
+                <p>For background, read <a href="https://braff.co/advice/f/a-field-guide-to-the-birds-of-ai" target="_blank">The Birds of AI</a>. There is no one "bird type" that a person embodies for all purposes; there may be contexts where you have deep business knowledge but limited experience in data management, and other contexts where the opposite is true. Therefore, answer these questions with respect to your main vocation or job.</p>
+
+                <p><strong>For calibration</strong>, consider a 10 to be someone who is so skilled at this area that they exercise this skill professionally at an industry-leading level and can teach other people how to do it, while a 0 is someone who doesn't have the skill and may not even understand why it would be useful. General professional competence short of total mastery would fall in the 6–9 range.</p>
+
+                <p>Feel free to open another tab and look up definitions for any terms you don't understand. If you still don't get what a question is asking, put 0. If you think you understand the question but you have a quibble with the precise definitions of words in it, just make the best estimate you can, with a bias toward giving yourself lower scores in cases of uncertainty.</p>
+
+                <button type="button" id="start-btn" class="submit-btn">Begin Assessment</button>
+            </div>
+        </section>
+
+        <!-- Survey Section -->
+        <section id="survey-section" class="hidden">
+            <button id="back-to-intro-btn" class="back-btn">&larr; Back to Introduction</button>
+            <h1>Business Analytics Skill Self-Assessment</h1>
+            <p class="subtitle">Rate your skills on a 0-10 scale</p>
+
+            <form id="assessment-form">
+                <!-- Biographical Information -->
+                <div class="form-section">
+                    <h2>About You</h2>
+
+                    <div class="form-group">
+                        <label for="name">Name <span class="required">*</span></label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email <span class="required">*</span></label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="industry">Industry/Sector <span class="required">*</span></label>
+                        <input type="text" id="industry" name="industry" required placeholder="e.g., Health and Human Services">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="aspirations">Professional Aspirations (next 2 years) <span class="required">*</span></label>
+                        <textarea id="aspirations" name="aspirations" required placeholder="e.g., to be promoted to general manager, to switch careers into health-care marketing, to become a data scientist, to create a startup, etc."></textarea>
+                    </div>
+                </div>
+
+                <!-- Business Domain Knowledge -->
+                <div class="form-section">
+                    <h2>Business Domain Knowledge</h2>
+                    <p class="section-description">Rate your knowledge on a scale of 0-10</p>
+
+                    <div class="skill-question">
+                        <label>Knowing the company's KPIs</label>
+                        <p class="skill-detail">How well do you know your organization's most important metrics and targets?</p>
+                        <div class="scale-container">
+                            <input type="range" min="0" max="10" value="5" class="slider" name="bdk_kpis" id="bdk_kpis">
+                            <div class="scale-labels">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                            </div>
+                            <div class="scale-value"><span id="bdk_kpis_val">5</span></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-question">
+                        <label>Competitor performance</label>
+                        <p class="skill-detail">How well do you know competitor/peer performance on key metrics?</p>
+                        <div class="scale-container">
+                            <input type="range" min="0" max="10" value="5" class="slider" name="bdk_competitors" id="bdk_competitors">
+                            <div class="scale-labels">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                            </div>
+                            <div class="scale-value"><span id="bdk_competitors_val">5</span></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-question">
+                        <label>Performance improvement levers</label>
+                        <p class="skill-detail">How well do you know the available levers for hitting targets and their impact?</p>
+                        <div class="scale-container">
+                            <input type="range" min="0" max="10" value="5" class="slider" name="bdk_levers" id="bdk_levers">
+                            <div class="scale-labels">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                            </div>
+                            <div class="scale-value"><span id="bdk_levers_val">5</span></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-question">
+                        <label>Analytics levers</label>
+                        <p class="skill-detail">How well do you know data analytics applications for pursuing those levers?</p>
+                        <div class="scale-container">
+                            <input type="range" min="0" max="10" value="5" class="slider" name="bdk_analytics" id="bdk_analytics">
+                            <div class="scale-labels">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                            </div>
+                            <div class="scale-value"><span id="bdk_analytics_val">5</span></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-question">
+                        <label>Legal and compliance constraints</label>
+                        <p class="skill-detail">How well do you know legal/regulatory/compliance constraints on data use?</p>
+                        <div class="scale-container">
+                            <input type="range" min="0" max="10" value="5" class="slider" name="bdk_legal" id="bdk_legal">
+                            <div class="scale-labels">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                            </div>
+                            <div class="scale-value"><span id="bdk_legal_val">5</span></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-question">
+                        <label>Data and analytics strategy</label>
+                        <p class="skill-detail">How well do you know your organization's data and analytics strategy?</p>
+                        <div class="scale-container">
+                            <input type="range" min="0" max="10" value="5" class="slider" name="bdk_strategy" id="bdk_strategy">
+                            <div class="scale-labels">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                            </div>
+                            <div class="scale-value"><span id="bdk_strategy_val">5</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistical Acumen -->
+                <div class="form-section">
+                    <h2>Statistical Acumen</h2>
+                    <p class="section-description">Rate your knowledge on a scale of 0-10</p>
+
+                    <div class="skill-question">
+                        <label>Descriptive analytics</label>
+                        <p class="skill-detail">How well do you know descriptive analysis methodology?</p>
+                        <div class="scale-container">
+                            <input type="range" min="0" max="10" value="5" class="slider" name="sa_descriptive" id="sa_descriptive">
+                            <div class="scale-labels">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                            </div>
+                            <div class="scale-value"><span id="sa_descriptive_val">5</span></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-question">
+                        <label>Predictive analytics</label>
+                        <p class="skill-detail">How well do you know predictive modeling and testing?</p>
+                        <div class="scale-container">
+                            <input type="range" min="0" max="10" value="5" class="slider" name="sa_predictive" id="sa_predictive">
+                            <div class="scale-labels">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                            </div>
+                            <div class="scale-value"><span id="sa_predictive_val">5</span></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-question">
+                        <label>Critical thinking of others' analyses</label>
+                        <p class="skill-detail">How well can you identify analytical weaknesses in others' work?</p>
+                        <div class="scale-container">
+                            <input type="range" min="0" max="10" value="5" class="slider" name="sa_critical" id="sa_critical">
+                            <div class="scale-labels">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                            </div>
+                            <div class="scale-value"><span id="sa_critical_val">5</span></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-question">
+                        <label>Data visualization</label>
+                        <p class="skill-detail">How well do you know data visualization selection and execution?</p>
+                        <div class="scale-container">
+                            <input type="range" min="0" max="10" value="5" class="slider" name="sa_visualization" id="sa_visualization">
+                            <div class="scale-labels">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                            </div>
+                            <div class="scale-value"><span id="sa_visualization_val">5</span></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-question">
+                        <label>Randomized controlled trials</label>
+                        <p class="skill-detail">How well do you know controlled experimentation and analysis?</p>
+                        <div class="scale-container">
+                            <input type="range" min="0" max="10" value="5" class="slider" name="sa_rct" id="sa_rct">
+                            <div class="scale-labels">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                            </div>
+                            <div class="scale-value"><span id="sa_rct_val">5</span></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-question">
+                        <label>AI and ML</label>
+                        <p class="skill-detail">How well do you know AI/machine learning tools and techniques?</p>
+                        <div class="scale-container">
+                            <input type="range" min="0" max="10" value="5" class="slider" name="sa_aiml" id="sa_aiml">
+                            <div class="scale-labels">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                            </div>
+                            <div class="scale-value"><span id="sa_aiml_val">5</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Management -->
+                <div class="form-section">
+                    <h2>Data Management</h2>
+                    <p class="section-description">Rate your knowledge on a scale of 0-10</p>
+
+                    <div class="skill-question">
+                        <label>Internal data sources</label>
+                        <p class="skill-detail">How well do you know internal data sources and how to access them?</p>
+                        <div class="scale-container">
+                            <input type="range" min="0" max="10" value="5" class="slider" name="dm_internal" id="dm_internal">
+                            <div class="scale-labels">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                            </div>
+                            <div class="scale-value"><span id="dm_internal_val">5</span></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-question">
+                        <label>External and open data sources</label>
+                        <p class="skill-detail">How well do you know external data sources and acquisition?</p>
+                        <div class="scale-container">
+                            <input type="range" min="0" max="10" value="5" class="slider" name="dm_external" id="dm_external">
+                            <div class="scale-labels">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                            </div>
+                            <div class="scale-value"><span id="dm_external_val">5</span></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-question">
+                        <label>How to move and join data</label>
+                        <p class="skill-detail">How well do you know data downloading, cleaning, and joining?</p>
+                        <div class="scale-container">
+                            <input type="range" min="0" max="10" value="5" class="slider" name="dm_joining" id="dm_joining">
+                            <div class="scale-labels">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                            </div>
+                            <div class="scale-value"><span id="dm_joining_val">5</span></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-question">
+                        <label>Setting up a data pipeline</label>
+                        <p class="skill-detail">How well do you know data pipeline automation?</p>
+                        <div class="scale-container">
+                            <input type="range" min="0" max="10" value="5" class="slider" name="dm_pipeline" id="dm_pipeline">
+                            <div class="scale-labels">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                            </div>
+                            <div class="scale-value"><span id="dm_pipeline_val">5</span></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-question">
+                        <label>Developing BI dashboards</label>
+                        <p class="skill-detail">How well do you know how to create interactive dashboards/applications?</p>
+                        <div class="scale-container">
+                            <input type="range" min="0" max="10" value="5" class="slider" name="dm_dashboards" id="dm_dashboards">
+                            <div class="scale-labels">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                            </div>
+                            <div class="scale-value"><span id="dm_dashboards_val">5</span></div>
+                        </div>
+                    </div>
+
+                    <div class="skill-question">
+                        <label>Running data factory</label>
+                        <p class="skill-detail">How well do you know data factory operations and governance?</p>
+                        <div class="scale-container">
+                            <input type="range" min="0" max="10" value="5" class="slider" name="dm_factory" id="dm_factory">
+                            <div class="scale-labels">
+                                <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                            </div>
+                            <div class="scale-value"><span id="dm_factory_val">5</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Generate My Results</button>
+            </form>
+        </section>
+
+        <!-- Results Section -->
+        <section id="results-section" class="hidden">
+            <button id="back-btn" class="back-btn">&larr; Back to Survey</button>
+
+            <h1>Your Analytics Skills Assessment</h1>
+
+            <!-- Baseball Card -->
+            <div class="baseball-card">
+                <div class="card-header">
+                    <h2 id="result-name">Name</h2>
+                    <p id="result-industry">Industry</p>
+                </div>
+
+                <div class="card-body">
+                    <div class="category-section">
+                        <h3>Business Domain Knowledge</h3>
+                        <div class="category-avg">Average: <span id="bdk-avg">0</span>/10</div>
+                        <div class="skills-grid" id="bdk-skills"></div>
+                    </div>
+
+                    <div class="category-section">
+                        <h3>Statistical Acumen</h3>
+                        <div class="category-avg">Average: <span id="sa-avg">0</span>/10</div>
+                        <div class="skills-grid" id="sa-skills"></div>
+                    </div>
+
+                    <div class="category-section">
+                        <h3>Data Management</h3>
+                        <div class="category-avg">Average: <span id="dm-avg">0</span>/10</div>
+                        <div class="skills-grid" id="dm-skills"></div>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <div class="overall-score">
+                        <span class="label">Overall Average</span>
+                        <span class="score" id="overall-avg">0</span>
+                        <span class="max">/10</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aspirations Display -->
+            <div class="aspirations-box">
+                <h3>Professional Aspirations</h3>
+                <p id="result-aspirations"></p>
+            </div>
+
+            <!-- AI Prompts Section -->
+            <div class="prompts-section">
+                <h2>Get Personalized Recommendations</h2>
+                <p class="prompts-intro">Open <a href="https://chatgpt.com/g/g-lKZ65QN7I-ai-and-data-analytics-mentor-adam/" target="_blank">AI and Data Analytics Mentor (ADAM)</a> in a separate tab (or the AI chatbot of your choice) and paste the prompts below one at a time, waiting for a response before pasting the next one.</p>
+
+                <div class="prompt-card">
+                    <div class="prompt-header">
+                        <h3>Step 1: Introduction</h3>
+                        <button class="copy-btn" data-prompt="1">Copy to Clipboard</button>
+                    </div>
+                    <div class="prompt-content" id="prompt-1"></div>
+                </div>
+
+                <div class="prompt-card">
+                    <div class="prompt-header">
+                        <h3>Step 2: Professional Goals</h3>
+                        <button class="copy-btn" data-prompt="2">Copy to Clipboard</button>
+                    </div>
+                    <div class="prompt-content" id="prompt-2"></div>
+                </div>
+
+                <div class="prompt-card">
+                    <div class="prompt-header">
+                        <h3>Step 3: Your Scores & Target Setting</h3>
+                        <button class="copy-btn" data-prompt="3">Copy to Clipboard</button>
+                    </div>
+                    <div class="prompt-content" id="prompt-3"></div>
+                </div>
+
+                <div class="prompt-card">
+                    <div class="prompt-header">
+                        <h3>Step 4: Prioritized Skills List</h3>
+                        <button class="copy-btn" data-prompt="4">Copy to Clipboard</button>
+                    </div>
+                    <div class="prompt-content" id="prompt-4"></div>
+                </div>
+
+                <div class="prompt-card">
+                    <div class="prompt-header">
+                        <h3>Step 5: Action Plan</h3>
+                        <button class="copy-btn" data-prompt="5">Copy to Clipboard</button>
+                    </div>
+                    <div class="prompt-content" id="prompt-5"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
