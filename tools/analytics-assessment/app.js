@@ -12,14 +12,10 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Use URL-encoded form data (CORS-safe)
-        const params = new URLSearchParams();
-        params.append('data', JSON.stringify(formData));
-
         fetch(GOOGLE_SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
-            body: params
+            body: JSON.stringify(formData)
         })
         .then(() => {
             console.log('Data submitted to Google Sheets');
