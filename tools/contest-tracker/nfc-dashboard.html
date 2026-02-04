@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 Narcissist Forecasting Contest</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --bg: #1e3a5f; --card: #fff; --text: #1a1a1a; --muted: #666; --accent: #2563eb; --success: #16a34a; --border: #e5e5e5; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; padding: 20px; max-width: 1400px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid rgba(255,255,255,0.2); }
+        header h1 { font-size: 1.8rem; margin-bottom: 5px; color: #fff; }
+        header p { color: rgba(255,255,255,0.85); font-size: 0.95rem; }
+        header a { color: rgba(255,255,255,0.85); text-decoration: underline; }
+        header a:hover { color: #fff; }
+        .last-updated { font-size: 0.8rem; color: rgba(255,255,255,0.7); margin-top: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .card { background: var(--card); border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border); }
+        .card h2 { font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .card h2 .badge { font-size: 0.75rem; background: var(--accent); color: white; padding: 2px 8px; border-radius: 12px; font-weight: normal; }
+        .prop-list { list-style: none; }
+        .prop-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .prop-item:last-child { border-bottom: none; }
+        .prop-title { font-weight: 500; margin-bottom: 4px; }
+        .prop-meta { font-size: 0.85rem; color: var(--muted); display: flex; gap: 15px; flex-wrap: wrap; }
+        .outcome-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 500; }
+        .outcome-yes { background: #dcfce7; color: #166534; }
+        .outcome-no { background: #fee2e2; color: #991b1b; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { font-weight: 600; background: #f9fafb; }
+        tr:hover { background: #f9fafb; }
+        .rank { font-weight: 600; color: var(--accent); }
+        .brier { font-family: 'SF Mono', Monaco, monospace; }
+        .tabs { display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap; }
+        .tab { padding: 8px 16px; border: none; background: none; cursor: pointer; font-size: 0.9rem; color: var(--muted); border-radius: 6px; }
+        .tab.active { background: var(--accent); color: white; }
+        .tab:hover:not(.active) { background: #f3f4f6; }
+        .chart-container { position: relative; height: 300px; margin-top: 15px; }
+        .loading { text-align: center; padding: 40px; color: rgba(255,255,255,0.8); }
+        .error { background: #fee2e2; color: #991b1b; padding: 20px; border-radius: 8px; text-align: center; }
+        .full-width { grid-column: 1 / -1; }
+        .stats-row { display: flex; gap: 30px; margin-bottom: 20px; flex-wrap: wrap; background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px; justify-content: center; }
+        .stat { text-align: center; }
+        .stat-value { font-size: 2rem; font-weight: 700; color: #fff; }
+        .stat-label { font-size: 0.8rem; color: rgba(255,255,255,0.8); }
+        .autocomplete-wrapper { position: relative; }
+        .autocomplete-input { width: 100%; padding: 12px; font-size: 1rem; border: 2px solid var(--border); border-radius: 8px; outline: none; }
+        .autocomplete-input:focus { border-color: var(--accent); }
+        .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid var(--border); border-radius: 8px; max-height: 200px; overflow-y: auto; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .autocomplete-item { padding: 10px 12px; cursor: pointer; }
+        .autocomplete-item:hover { background: #f3f4f6; }
+        .forecaster-profile { margin-top: 20px; }
+        .profile-section { margin-bottom: 20px; }
+        .profile-section h3 { font-size: 1rem; margin-bottom: 10px; }
+        .comparison-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); }
+        .comparison-label { color: var(--muted); }
+        .comparison-value { font-weight: 500; }
+        .comparison-value.better { color: var(--success); }
+        .comparison-value.worse { color: #dc2626; }
+        .news-item { margin-bottom: 12px; padding: 12px; background: #f9fafb; border-radius: 6px; }
+        .news-summary { font-size: 0.85rem; color: var(--text); margin-top: 8px; padding: 8px; background: white; border-radius: 4px; border-left: 3px solid var(--accent); }
+        .news-direction { font-weight: 600; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; }
+        .news-up { background: #dcfce7; color: #166534; }
+        .news-down { background: #fee2e2; color: #991b1b; }
+        .news-neutral { background: #f3f4f6; color: #666; }
+        select { padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem; background: white; }
+        button.refresh-btn { padding: 8px 16px; background: var(--accent); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+        button.refresh-btn:hover { background: #1d4ed8; }
+        button.refresh-btn:disabled { background: #ccc; cursor: not-allowed; }
+        @media (max-width: 600px) {
+            body { padding: 12px; overflow-x: hidden; }
+            .grid { grid-template-columns: 1fr; gap: 15px; }
+            header h1 { font-size: 1.4rem; }
+            .stats-row { gap: 15px; padding: 15px; }
+            .stat-value { font-size: 1.5rem; }
+            .card { padding: 15px; overflow-x: auto; max-width: 100%; }
+            .card h2 { font-size: 1rem; flex-wrap: wrap; }
+            .prop-meta { flex-direction: column; gap: 8px; }
+            .prop-title { word-break: break-word; }
+            table { font-size: 0.8rem; display: block; overflow-x: auto; white-space: nowrap; }
+            th, td { padding: 8px 6px; }
+            .chart-container { height: 250px; }
+            .tabs { gap: 3px; }
+            .tab { padding: 6px 10px; font-size: 0.8rem; }
+            select { max-width: 100%; }
+            .news-item { overflow-x: hidden; }
+            .news-summary { word-break: break-word; }
+            .comparison-row { flex-wrap: wrap; gap: 4px; }
+            .forecaster-profile { overflow-x: hidden; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>2026 Narcissist Forecasting Contest</h1>
+        <p>Year 11 of <a href="https://braff.co/advice" target="_blank">Adam Braff's contest</a>, with pho on the line</p>
+        <div class="last-updated" id="lastUpdated">Loading...</div>
+    </header>
+    <div id="content"><div class="loading">Loading contest data...</div></div>
+
+    <script>
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0EwvfQ_8VR7eIAwIGNetdAgczW_5JGOEndJmfF3AoTMhP0vn4AwShe1-G_SINKcWZmg/exec';
+
+    let contestData = null;
+    let selectedForecaster = null;
+
+    async function init() {
+        try {
+            const response = await fetch(APPS_SCRIPT_URL);
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            contestData = await response.json();
+            render();
+        } catch (err) {
+            document.getElementById('content').innerHTML = '<div class="error"><h3>Error loading data</h3><p>' + err.message + '</p></div>';
+        }
+    }
+
+    // Filter to real 2026 forecasters only (rows 3-120 in Source data = 118 forecasters)
+    function getRealForecasters() {
+        return (contestData.forecasters || []).filter(function(f) {
+            var name = f['Name of forecaster (or team name)'];
+            if (!name || typeof name !== 'string') return false;
+            var nameLower = name.toLowerCase().trim();
+            if (!nameLower) return false;
+            // Exclude ensembles, averages, weighted, strategy, and "all-" benchmark rows
+            if (nameLower.indexOf('ensemble') > -1 ||
+                nameLower.indexOf('average') > -1 ||
+                nameLower.indexOf('weighted') > -1 ||
+                nameLower.indexOf('strategy') > -1 ||
+                nameLower.indexOf('all-') === 0 ||
+                nameLower.indexOf('benchmark') > -1) return false;
+
+            var ts = f['Timestamp'];
+            if (!ts) return false;
+            var tsStr = String(ts);
+            // Must be a 2026 timestamp - check multiple formats
+            if (tsStr.indexOf('2026') === -1 && tsStr.indexOf('/26') === -1) return false;
+
+            // Timely must be exactly 0 or 1 (handle string and number)
+            var timely = f['Timely submission'];
+            var timelyNum = Number(timely);
+            if (isNaN(timelyNum) || (timelyNum !== 0 && timelyNum !== 1)) return false;
+            return true;
+        });
+    }
+
+    function getTimelyForecasters() {
+        return getRealForecasters().filter(function(f) { return Number(f['Timely submission']) === 1; });
+    }
+
+    function getValidProps() {
+        return (contestData.propositions || []).filter(function(p) {
+            var prop = p['Proposition'];
+            return prop && /^\d+\./.test(prop);
+        });
+    }
+
+    function render() {
+        var props = getValidProps();
+        var now = new Date();
+        var twoWeeksAgo = new Date(now - 14 * 24 * 60 * 60 * 1000);
+        var oneMonthFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+        var recentlyResolved = props.filter(function(p) {
+            if (!p['Actual resolution date']) return false;
+            var resolved = new Date(p['Actual resolution date']);
+            return resolved >= twoWeeksAgo && resolved <= now;
+        });
+
+        var upcoming = props.filter(function(p) {
+            if (p['Actual resolution date']) return false;
+            var expected = new Date(p['Expected resolution date']);
+            return expected >= now && expected <= oneMonthFromNow;
+        });
+
+        var unresolved = props.filter(function(p) { return !p['Actual resolution date']; });
+        var resolvedCount = props.filter(function(p) { return p['Actual resolution date']; }).length;
+
+        var allForecasters = getRealForecasters();
+        var timelyForecasters = getTimelyForecasters();
+        var untimelyCount = allForecasters.length - timelyForecasters.length;
+
+        document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date(contestData.lastUpdated).toLocaleString();
+
+        document.getElementById('content').innerHTML =
+            '<div class="stats-row">' +
+                '<div class="stat"><div class="stat-value">' + timelyForecasters.length + '</div><div class="stat-label">Timely Forecasters</div></div>' +
+                '<div class="stat"><div class="stat-value">' + untimelyCount + '</div><div class="stat-label">Untimely</div></div>' +
+                '<div class="stat"><div class="stat-value">' + resolvedCount + '/' + props.length + '</div><div class="stat-label">Props Resolved</div></div>' +
+                '<div class="stat"><div class="stat-value">' + upcoming.length + '</div><div class="stat-label">Resolving Soon</div></div>' +
+            '</div>' +
+            '<div class="card full-width" style="margin-bottom: 20px;">' +
+                '<h2>🔍 Look Up Your Forecasts</h2>' +
+                '<div class="autocomplete-wrapper">' +
+                    '<input type="text" id="forecasterSearch" class="autocomplete-input" placeholder="Start typing your name..." oninput="handleSearch(this.value)" onfocus="handleSearch(this.value)">' +
+                    '<div id="autocompleteList" class="autocomplete-list" style="display:none;"></div>' +
+                '</div>' +
+                '<div id="forecasterProfile"></div>' +
+            '</div>' +
+            '<div class="grid">' +
+                '<div class="card"><h2>Recently Resolved <span class="badge">' + recentlyResolved.length + '</span></h2>' + renderRecentlyResolved(recentlyResolved) + '</div>' +
+                '<div class="card"><h2>Coming Up (Next Month) <span class="badge">' + upcoming.length + '</span></h2>' + renderUpcoming(upcoming) + '</div>' +
+                '<div class="card full-width"><h2>Leaderboards</h2>' +
+                    '<div class="tabs" id="lbTabs">' +
+                        '<button class="tab active" onclick="switchLeaderboard(\'resolved\')">Resolved Props</button>' +
+                        '<button class="tab" onclick="switchLeaderboard(\'market\')">Market Scenario</button>' +
+                    '</div>' +
+                    '<div id="leaderboardContent">' + renderLeaderboard('resolved') + '</div>' +
+                '</div>' +
+                '<div class="card full-width"><h2>Performance by Attribute</h2>' +
+                    '<div style="margin-bottom: 15px;"><select id="attrSelect" onchange="renderAttributeChart()">' +
+                        '<option value="bones">Bones Rating (0-3)</option>' +
+                        '<option value="ai">AI Usage (0=none, 1=low, 2=med, 3=high)</option>' +
+                        '<option value="extremist">Extremist Flag</option>' +
+                        '<option value="byself">By Self</option>' +
+                        '<option value="female">Female on Team</option>' +
+                        '<option value="quickly">Quickly</option>' +
+                        '<option value="casino">Casino Bet</option>' +
+                        '<option value="friend">Bet with Friend</option>' +
+                        '<option value="predmarket">Prediction Market User</option>' +
+                        '<option value="gambler">Gamblers Score</option>' +
+                        '<option value="confidence">Expects Better Than Average</option>' +
+                    '</select></div>' +
+                    '<div class="chart-container"><canvas id="attributeChart"></canvas></div>' +
+                '</div>' +
+                '<div class="card full-width"><h2>Forecast Distribution by Prop</h2>' +
+                    '<div style="margin-bottom: 15px;"><select id="propSelect" onchange="renderDistributionChart()">' + getPropOptions() + '</select></div>' +
+                    '<div class="chart-container"><canvas id="distributionChart"></canvas></div>' +
+                '</div>' +
+                '<div class="card full-width">' +
+                    '<h2>Unresolved Props & News <span class="badge">' + unresolved.length + '</span> ' +
+                        '<button class="refresh-btn" id="refreshNewsBtn" onclick="refreshNews()">🔄 Fetch AI News</button>' +
+                    '</h2>' +
+                    '<p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 15px;">Uses AI to assess probability impact from recent news</p>' +
+                    '<div id="unresolvedNews">' + renderUnresolved(unresolved) + '</div>' +
+                '</div>' +
+            '</div>';
+
+        setTimeout(function() { renderAttributeChart(); renderDistributionChart(); }, 100);
+        document.addEventListener('click', function(e) { if (!e.target.closest('.autocomplete-wrapper')) document.getElementById('autocompleteList').style.display = 'none'; });
+    }
+
+    function renderRecentlyResolved(props) {
+        if (props.length === 0) return '<p style="color: var(--muted); padding: 20px 0;">None in past 2 weeks</p>';
+        var html = '<ul class="prop-list">';
+        props.forEach(function(p) {
+            var outcome = p['Resolved outcome (blank, 0, 100)'];
+            var outcomeClass = outcome === 100 ? 'outcome-yes' : 'outcome-no';
+            var outcomeText = outcome === 100 ? 'YES' : 'NO';
+            var date = new Date(p['Actual resolution date']).toLocaleDateString();
+            var avgScore = p['Average score'] ? Number(p['Average score']).toFixed(1) + '%' : '';
+            html += '<li class="prop-item"><div class="prop-title">' + p['Proposition'] + '</div><div class="prop-meta">' +
+                '<span class="' + outcomeClass + ' outcome-tag">' + outcomeText + '</span>' +
+                '<span>📅 ' + date + '</span>' +
+                (avgScore ? '<span>📊 Crowd: ' + avgScore + '</span>' : '') +
+                '</div></li>';
+        });
+        return html + '</ul>';
+    }
+
+    function renderUpcoming(props) {
+        if (props.length === 0) return '<p style="color: var(--muted); padding: 20px 0;">None in next month</p>';
+        var html = '<ul class="prop-list">';
+        props.forEach(function(p) {
+            var expected = new Date(p['Expected resolution date']).toLocaleDateString();
+            var avgScore = p['Average score'] ? Number(p['Average score']).toFixed(1) + '%' : '';
+            var marketPrice = (p['Market price'] !== undefined && p['Market price'] !== '') ? Number(p['Market price']).toFixed(0) + '%' : '';
+            var url = p['Manifold prop URL'] || '';
+            html += '<li class="prop-item"><div class="prop-title">' + p['Proposition'] + '</div><div class="prop-meta">' +
+                '<span>📅 ' + expected + '</span>' +
+                (avgScore ? '<span>📊 Crowd: ' + avgScore + '</span>' : '') +
+                (marketPrice ? '<span>💹 Manifold: ' + marketPrice + '</span>' : '') +
+                (url ? '<span><a href="' + url + '" target="_blank" style="color: var(--accent);">Market →</a></span>' : '') +
+                '</div></li>';
+        });
+        return html + '</ul>';
+    }
+
+    function renderLeaderboard(type) {
+        var forecasters = getTimelyForecasters();
+        var scoreKey = type === 'resolved' ? 'Brier of resolved props' : 'Brier blended scenario';
+        var sorted = forecasters.filter(function(f) {
+            var score = f[scoreKey];
+            return score !== undefined && score !== null && score !== '' && !isNaN(score);
+        }).sort(function(a, b) { return a[scoreKey] - b[scoreKey]; }).slice(0, 25);
+
+        if (sorted.length === 0) return '<p style="color: var(--muted);">Leaderboard populates as props resolve</p>';
+
+        var html = '<table><thead><tr><th>Rank</th><th>Forecaster</th><th>Brier</th><th>Bones</th></tr></thead><tbody>';
+        sorted.forEach(function(f, i) {
+            var bones = f['Bones rating entering 2026'];
+            var bonesDisplay = '—';
+            if (bones !== undefined && bones !== null && !isNaN(bones) && bones >= 0 && bones <= 3) {
+                bonesDisplay = '';
+                for (var b = 0; b < Math.round(Number(bones)); b++) bonesDisplay += '🦴';
+                if (!bonesDisplay) bonesDisplay = '0';
+            }
+            html += '<tr><td class="rank">#' + (i + 1) + '</td><td>' + f['Name of forecaster (or team name)'] + '</td><td class="brier">' + Number(f[scoreKey]).toFixed(4) + '</td><td>' + bonesDisplay + '</td></tr>';
+        });
+        return html + '</tbody></table>';
+    }
+
+    function getPropOptions() {
+        return getValidProps().map(function(p, i) {
+            return '<option value="' + i + '">' + p['Proposition'].substring(0, 70) + '...</option>';
+        }).join('');
+    }
+
+    function renderDistributionChart() {
+        var canvas = document.getElementById('distributionChart');
+        if (!canvas) return;
+        var propIndex = parseInt(document.getElementById('propSelect').value) || 0;
+        var prop = getValidProps()[propIndex];
+        if (!prop) return;
+
+        var forecasts = getTimelyForecasters().map(function(f) { return f[prop['Proposition']]; })
+            .filter(function(v) { return v !== undefined && v !== null && !isNaN(v); });
+
+        var counts = [0,0,0,0,0,0,0,0,0,0];
+        forecasts.forEach(function(f) { counts[Math.min(Math.floor(f / 10), 9)]++; });
+
+        var ctx = canvas.getContext('2d');
+        if (window.distChart) window.distChart.destroy();
+        var avg = forecasts.length ? (forecasts.reduce(function(a,b){return a+b;},0) / forecasts.length).toFixed(1) : 0;
+
+        window.distChart = new Chart(ctx, {
+            type: 'bar',
+            data: { labels: ['0-10%','10-20%','20-30%','30-40%','40-50%','50-60%','60-70%','70-80%','80-90%','90-100%'],
+                datasets: [{ label: 'Forecasts', data: counts, backgroundColor: 'rgba(37,99,235,0.7)', borderColor: 'rgba(37,99,235,1)', borderWidth: 1 }] },
+            options: { responsive: true, maintainAspectRatio: false,
+                plugins: { title: { display: true, text: 'Distribution (n=' + forecasts.length + ', avg=' + avg + '%)' } },
+                scales: { y: { beginAtZero: true } } }
+        });
+    }
+
+    function renderAttributeChart() {
+        var canvas = document.getElementById('attributeChart');
+        if (!canvas) return;
+        var attr = document.getElementById('attrSelect').value;
+        var forecasters = getTimelyForecasters().filter(function(f) {
+            return f['Brier of resolved props'] !== undefined && !isNaN(f['Brier of resolved props']);
+        });
+
+        var groups = {};
+        var attrConfig = {
+            bones: { key: 'Bones rating entering 2026', label: 'Bones Rating', groupFn: function(v) {
+                if (v === undefined || v === null || v === '' || isNaN(v) || v < 0 || v > 3) return 'No rating';
+                return Math.round(Number(v)) + ' bones';
+            }},
+            ai: { key: 'AI use', label: 'AI Usage', groupFn: function(v) {
+                if (v === undefined || v === null || v === '' || isNaN(v)) v = 0;
+                v = Math.round(Number(v));
+                if (v === 0) return '0 (none)';
+                if (v === 1) return '1 (low)';
+                if (v === 2) return '2 (medium)';
+                return '3 (high)';
+            }},
+            extremist: { key: 'Extremist flag', label: 'Extremist', groupFn: function(v) { return v ? 'Extremist' : 'Not extremist'; }},
+            byself: { key: 'By self', label: 'By Self', groupFn: function(v) { return v ? 'Solo' : 'Team/help'; }},
+            female: { key: 'Female on team', label: 'Female on Team', groupFn: function(v) { return v ? 'Yes' : 'No'; }},
+            quickly: { key: 'Quickly', label: 'Quick Entry', groupFn: function(v) { return v ? 'Quick' : 'Deliberate'; }},
+            casino: { key: 'Casino bet', label: 'Casino Betting', groupFn: function(v) { return v ? 'Yes' : 'No'; }},
+            friend: { key: 'Bet with friend', label: 'Bets with Friends', groupFn: function(v) { return v ? 'Yes' : 'No'; }},
+            predmarket: { key: 'Prediction market', label: 'Prediction Market User', groupFn: function(v) { return v ? 'Yes' : 'No'; }},
+            gambler: { key: "Gamblers' score", label: 'Gamblers Score', groupFn: function(v) {
+                if (!v || v === 0) return '0';
+                if (v === 1) return '1';
+                if (v === 2) return '2';
+                return '3';
+            }},
+            confidence: { key: 'Expect better than average', label: 'Expects to Beat Average', groupFn: function(v) { return v ? 'Yes' : 'No'; }}
+        };
+
+        var cfg = attrConfig[attr];
+        forecasters.forEach(function(f) {
+            var key = cfg.groupFn(f[cfg.key]);
+            if (!groups[key]) groups[key] = [];
+            groups[key].push(f['Brier of resolved props']);
+        });
+
+        var labels = Object.keys(groups).sort();
+        var avgBriers = labels.map(function(k) { return groups[k].reduce(function(a,b){return a+b;},0) / groups[k].length; });
+        var counts = labels.map(function(k) { return groups[k].length; });
+
+        var ctx = canvas.getContext('2d');
+        if (window.attrChart) window.attrChart.destroy();
+
+        window.attrChart = new Chart(ctx, {
+            type: 'bar',
+            data: { labels: labels.map(function(l,i) { return l + ' (n=' + counts[i] + ')'; }),
+                datasets: [{ label: 'Avg Brier', data: avgBriers, backgroundColor: 'rgba(37,99,235,0.7)', borderColor: 'rgba(37,99,235,1)', borderWidth: 1 }] },
+            options: { responsive: true, maintainAspectRatio: false,
+                plugins: { title: { display: true, text: cfg.label + ' vs Performance (lower is better)' } },
+                scales: { y: { beginAtZero: true } } }
+        });
+    }
+
+    function renderUnresolved(props) {
+        var html = '<div id="newsContainer">';
+        props.forEach(function(p, i) {
+            var expected = p['Expected resolution date'] ? new Date(p['Expected resolution date']).toLocaleDateString() : '';
+            var avgScore = p['Average score'] ? Number(p['Average score']).toFixed(1) + '%' : '';
+            var marketPrice = (p['Market price'] !== undefined && p['Market price'] !== '') ? Number(p['Market price']).toFixed(0) + '%' : '';
+            var url = p['Manifold prop URL'] || '';
+
+            // Get selected forecaster's prediction if one is selected
+            var yourForecast = '';
+            if (selectedForecaster) {
+                var propKey = p['Proposition'];
+                var yourVal = selectedForecaster[propKey];
+                if (yourVal !== undefined && yourVal !== null && yourVal !== '' && !isNaN(yourVal)) {
+                    yourForecast = Number(yourVal).toFixed(0) + '%';
+                }
+            }
+
+            html += '<div class="news-item" data-prop-index="' + i + '">' +
+                '<div class="prop-title">' + p['Proposition'] + '</div>' +
+                '<div class="prop-meta" style="margin: 8px 0;">' +
+                    '<span>📅 ' + expected + '</span>' +
+                    (yourForecast ? '<span style="background:#e0f2fe;padding:2px 6px;border-radius:4px;font-weight:600;">👤 You: ' + yourForecast + '</span>' : '') +
+                    (avgScore ? '<span>📊 Crowd: ' + avgScore + '</span>' : '') +
+                    (marketPrice ? '<span>💹 Market: ' + marketPrice + '</span>' : '') +
+                    (url ? '<span><a href="' + url + '" target="_blank" style="color: var(--accent);">Manifold →</a></span>' : '') +
+                '</div>' +
+                '<div class="news-summary" id="news-' + i + '">Click "Fetch AI News" to get probability assessment</div>' +
+            '</div>';
+        });
+        return html + '</div>';
+    }
+
+    async function refreshNews() {
+        var btn = document.getElementById('refreshNewsBtn');
+        btn.disabled = true;
+        btn.textContent = '⏳ Fetching...';
+
+        var props = getValidProps().filter(function(p) { return !p['Actual resolution date']; });
+
+        try {
+            // Call Apps Script with news action
+            var newsUrl = APPS_SCRIPT_URL + '?action=news';
+            var response = await fetch(newsUrl);
+            var newsData = await response.json();
+
+            if (newsData.news && Array.isArray(newsData.news)) {
+                props.forEach(function(p, i) {
+                    var el = document.getElementById('news-' + i);
+                    if (el && newsData.news[i]) {
+                        el.innerHTML = '<strong>AI:</strong> ' + newsData.news[i];
+                    } else if (el) {
+                        el.innerHTML = '<span style="color: var(--muted);">No AI assessment available</span>';
+                    }
+                });
+            } else {
+                throw new Error('News not available');
+            }
+        } catch (e) {
+            props.forEach(function(p, i) {
+                var el = document.getElementById('news-' + i);
+                if (el) el.innerHTML = '<span style="color: var(--muted);">Update Apps Script to enable AI news (see instructions)</span>';
+            });
+        }
+
+        btn.disabled = false;
+        btn.textContent = '🔄 Fetch AI News';
+    }
+
+    function handleSearch(value) {
+        var list = document.getElementById('autocompleteList');
+        if (!value || value.length < 2) { list.style.display = 'none'; return; }
+        var matches = getRealForecasters().filter(function(f) {
+            return f['Name of forecaster (or team name)'].toLowerCase().indexOf(value.toLowerCase()) > -1;
+        }).slice(0, 10);
+        if (matches.length === 0) { list.style.display = 'none'; return; }
+        list.innerHTML = matches.map(function(f) {
+            var name = f['Name of forecaster (or team name)'];
+            return '<div class="autocomplete-item" onclick="selectForecaster(\'' + name.replace(/'/g, "\\'") + '\')">' + name + '</div>';
+        }).join('');
+        list.style.display = 'block';
+    }
+
+    function selectForecaster(name) {
+        document.getElementById('forecasterSearch').value = name;
+        document.getElementById('autocompleteList').style.display = 'none';
+        selectedForecaster = getRealForecasters().find(function(f) { return f['Name of forecaster (or team name)'] === name; });
+        if (selectedForecaster) {
+            renderForecasterProfile();
+            // Re-render unresolved props to show this forecaster's predictions
+            var unresolved = getValidProps().filter(function(p) { return !p['Actual resolution date']; });
+            document.getElementById('unresolvedNews').innerHTML = renderUnresolved(unresolved);
+        }
+    }
+
+    function renderForecasterProfile() {
+        var f = selectedForecaster;
+        var all = getTimelyForecasters();
+        var avgBrier = avg(all, 'Brier of resolved props');
+        var fName = f['Name of forecaster (or team name)'];
+
+        // Helper to check if value is a valid Brier score
+        function isValidBrier(val) {
+            return val !== undefined && val !== null && val !== '' && !isNaN(Number(val));
+        }
+
+        // Rank for resolved
+        var sortedResolved = all.filter(function(x) { return isValidBrier(x['Brier of resolved props']); })
+            .sort(function(a,b) { return Number(a['Brier of resolved props']) - Number(b['Brier of resolved props']); });
+        var rankResolved = sortedResolved.findIndex(function(x) { return x['Name of forecaster (or team name)'] === fName; }) + 1;
+
+        // Rank for market scenario - use same logic as leaderboard
+        var sortedMarket = all.filter(function(x) { return isValidBrier(x['Brier blended scenario']); })
+            .sort(function(a,b) { return Number(a['Brier blended scenario']) - Number(b['Brier blended scenario']); });
+        var rankMarket = sortedMarket.findIndex(function(x) { return x['Name of forecaster (or team name)'] === fName; }) + 1;
+
+        var pct = function(key) { return (all.filter(function(x) { return x[key]; }).length / all.length * 100).toFixed(0) + '%'; };
+        var aiLabels = ['None', 'Low', 'Medium', 'High'];
+        var aiVal = f['AI use'];
+        var aiDisplay = (aiVal !== undefined && !isNaN(aiVal)) ? aiLabels[Math.round(Number(aiVal))] || 'Unknown' : 'Unknown';
+
+        var html = '<div class="forecaster-profile">' +
+            '<div class="profile-section"><h3>📊 Performance</h3>' +
+                row('Brier (Resolved)', fmt(f['Brier of resolved props'], 4), 'rank #' + (rankResolved || 'N/A') + ' of ' + sortedResolved.length, f['Brier of resolved props'] < avgBrier) +
+                row('Brier (Market)', fmt(f['Brier blended scenario'], 4), 'rank #' + (rankMarket || 'N/A') + ' of ' + sortedMarket.length) +
+            '</div>' +
+            '<div class="profile-section"><h3>👤 Profile vs Group</h3>' +
+                row('Bones', formatBones(f['Bones rating entering 2026']), avg(all, 'Bones rating entering 2026').toFixed(1) + ' avg') +
+                row('Extremist Count', f['Extremist count'] || 0, avg(all, 'Extremist count').toFixed(1) + ' avg') +
+                row('AI Usage', aiDisplay, '') +
+                row('Quick Entry', f['Quickly'] ? 'Yes' : 'No', pct('Quickly') + ' did') +
+                row('By Self', f['By self'] ? 'Yes' : 'No', pct('By self') + ' did') +
+                row('Casino Bettor', f['Casino bet'] ? 'Yes' : 'No', pct('Casino bet') + ' are') +
+                row('Prediction Markets', f['Prediction market'] ? 'Yes' : 'No', pct('Prediction market') + ' use') +
+                row('Expects to Beat Avg', f['Expect better than average'] ? 'Yes' : 'No', pct('Expect better than average') + ' do') +
+            '</div></div>';
+        document.getElementById('forecasterProfile').innerHTML = html;
+    }
+
+    function avg(arr, key) {
+        var valid = arr.filter(function(x) {
+            var v = x[key];
+            return v !== undefined && v !== null && v !== '' && !isNaN(v) && (key !== 'Bones rating entering 2026' || (v >= 0 && v <= 3));
+        });
+        return valid.length ? valid.reduce(function(a,b) { return a + Number(b[key]); }, 0) / valid.length : 0;
+    }
+
+    function fmt(v, dec) { return (v !== undefined && !isNaN(v)) ? Number(v).toFixed(dec) : '—'; }
+    function formatBones(v) {
+        if (v === undefined || v === null || v === '' || isNaN(v) || v < 0 || v > 3) return 'None';
+        var s = ''; for (var i = 0; i < Math.round(Number(v)); i++) s += '🦴';
+        return s || '0';
+    }
+
+    function row(label, val, comp, isBetter) {
+        var cls = isBetter === true ? 'better' : isBetter === false ? 'worse' : '';
+        var compStr = comp ? ' <span style="color:var(--muted);font-weight:normal;">(' + comp + ')</span>' : '';
+        return '<div class="comparison-row"><span class="comparison-label">' + label + '</span><span class="comparison-value ' + cls + '">' + val + compStr + '</span></div>';
+    }
+
+    function switchLeaderboard(tab) {
+        document.querySelectorAll('#lbTabs .tab').forEach(function(t, i) { t.className = (i === 0 && tab === 'resolved') || (i === 1 && tab === 'market') ? 'tab active' : 'tab'; });
+        document.getElementById('leaderboardContent').innerHTML = renderLeaderboard(tab);
+    }
+
+    init();
+    </script>
+</body>
+</html>
