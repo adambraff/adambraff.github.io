@@ -70,19 +70,25 @@
         button.refresh-btn:hover { background: #1d4ed8; }
         button.refresh-btn:disabled { background: #ccc; cursor: not-allowed; }
         @media (max-width: 600px) {
-            body { padding: 12px; }
+            body { padding: 12px; overflow-x: hidden; }
             .grid { grid-template-columns: 1fr; gap: 15px; }
             header h1 { font-size: 1.4rem; }
             .stats-row { gap: 15px; padding: 15px; }
             .stat-value { font-size: 1.5rem; }
-            .card { padding: 15px; }
-            .card h2 { font-size: 1rem; }
+            .card { padding: 15px; overflow-x: auto; max-width: 100%; }
+            .card h2 { font-size: 1rem; flex-wrap: wrap; }
             .prop-meta { flex-direction: column; gap: 8px; }
-            table { font-size: 0.8rem; }
+            .prop-title { word-break: break-word; }
+            table { font-size: 0.8rem; display: block; overflow-x: auto; white-space: nowrap; }
             th, td { padding: 8px 6px; }
             .chart-container { height: 250px; }
             .tabs { gap: 3px; }
             .tab { padding: 6px 10px; font-size: 0.8rem; }
+            select { max-width: 100%; }
+            .news-item { overflow-x: hidden; }
+            .news-summary { word-break: break-word; }
+            .comparison-row { flex-wrap: wrap; gap: 4px; }
+            .forecaster-profile { overflow-x: hidden; }
         }
     </style>
 </head>
