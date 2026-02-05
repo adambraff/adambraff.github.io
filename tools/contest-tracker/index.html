@@ -211,17 +211,17 @@
                 '</div>' +
                 '<div class="card full-width"><h2>Performance by Attribute</h2>' +
                     '<div style="margin-bottom: 15px;"><select id="attrSelect" onchange="renderAttributeChart()">' +
-                        '<option value="bones">Bones Rating (0-3)</option>' +
-                        '<option value="ai">AI Usage (0=none, 1=low, 2=med, 3=high)</option>' +
+                        '<option value="bones">Bones Rating</option>' +
+                        '<option value="ai">AI Usage</option>' +
                         '<option value="extremist">Extremist Flag</option>' +
                         '<option value="byself">By Self</option>' +
                         '<option value="female">Female on Team</option>' +
-                        '<option value="quickly">Quickly</option>' +
-                        '<option value="casino">Casino Bet</option>' +
-                        '<option value="friend">Bet with Friend</option>' +
-                        '<option value="predmarket">Prediction Market User</option>' +
+                        '<option value="quickly">Quick Entry</option>' +
+                        '<option value="casino">Casino Bettor</option>' +
+                        '<option value="friend">Bets with Friends</option>' +
+                        '<option value="predmarket">Prediction Markets</option>' +
                         '<option value="gambler">Gamblers Score</option>' +
-                        '<option value="confidence">Expects Better Than Average</option>' +
+                        '<option value="confidence">Expects to Beat Avg</option>' +
                     '</select></div>' +
                     '<div class="chart-container"><canvas id="attributeChart"></canvas></div>' +
                 '</div>' +
@@ -233,7 +233,7 @@
                     '<h2>Unresolved Props & News <span class="badge">' + unresolved.length + '</span> ' +
                         '<button class="refresh-btn" id="refreshNewsBtn" onclick="refreshNews()">🔄 Fetch AI News</button>' +
                     '</h2>' +
-                    '<p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 15px;">Uses AI to assess probability impact from recent news</p>' +
+                    '<p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 15px;">Uses AI to find recent news affecting each proposition (may take 60 seconds)</p>' +
                     '<div id="unresolvedNews">' + renderUnresolved(unresolved) + '</div>' +
                 '</div>' +
             '</div>';
@@ -291,11 +291,10 @@
         var html = '<table><thead><tr><th>Rank</th><th>Forecaster</th><th>Brier</th><th>Bones</th></tr></thead><tbody>';
         sorted.forEach(function(f, i) {
             var bones = f['Bones rating entering 2026'];
-            var bonesDisplay = '—';
+            var bonesDisplay = '';
             if (bones !== undefined && bones !== null && !isNaN(bones) && bones >= 0 && bones <= 3) {
-                bonesDisplay = '';
-                for (var b = 0; b < Math.round(Number(bones)); b++) bonesDisplay += '🦴';
-                if (!bonesDisplay) bonesDisplay = '0';
+                var numBones = Math.round(Number(bones));
+                for (var b = 0; b < numBones; b++) bonesDisplay += '🦴';
             }
             html += '<tr><td class="rank">#' + (i + 1) + '</td><td>' + f['Name of forecaster (or team name)'] + '</td><td class="brier">' + Number(f[scoreKey]).toFixed(4) + '</td><td>' + bonesDisplay + '</td></tr>';
         });
