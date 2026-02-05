@@ -230,10 +230,7 @@
                     '<div class="chart-container"><canvas id="distributionChart"></canvas></div>' +
                 '</div>' +
                 '<div class="card full-width">' +
-                    '<h2>Unresolved Props & News <span class="badge">' + unresolved.length + '</span> ' +
-                        '<button class="refresh-btn" id="refreshNewsBtn" onclick="refreshNews()">🔄 Fetch AI News</button>' +
-                    '</h2>' +
-                    '<p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 15px;">Uses AI to find recent news affecting each proposition (may take 60 seconds)</p>' +
+                    '<h2>Unresolved Props <span class="badge">' + unresolved.length + '</span></h2>' +
                     '<div id="unresolvedNews">' + renderUnresolved(unresolved) + '</div>' +
                 '</div>' +
             '</div>';
@@ -423,46 +420,9 @@
                     (marketPrice ? '<span>💹 Market: ' + marketPrice + '</span>' : '') +
                     (url ? '<span><a href="' + url + '" target="_blank" style="color: var(--accent);">Manifold →</a></span>' : '') +
                 '</div>' +
-                '<div class="news-summary" id="news-' + i + '">Click "Fetch AI News" to get probability assessment</div>' +
             '</div>';
         });
         return html + '</div>';
-    }
-
-    async function refreshNews() {
-        var btn = document.getElementById('refreshNewsBtn');
-        btn.disabled = true;
-        btn.textContent = '⏳ Fetching...';
-
-        var props = getValidProps().filter(function(p) { return !p['Actual resolution date']; });
-
-        try {
-            // Call Apps Script with news action
-            var newsUrl = APPS_SCRIPT_URL + '?action=news';
-            var response = await fetch(newsUrl);
-            var newsData = await response.json();
-
-            if (newsData.news && Array.isArray(newsData.news)) {
-                props.forEach(function(p, i) {
-                    var el = document.getElementById('news-' + i);
-                    if (el && newsData.news[i]) {
-                        el.innerHTML = '<strong>AI:</strong> ' + newsData.news[i];
-                    } else if (el) {
-                        el.innerHTML = '<span style="color: var(--muted);">No AI assessment available</span>';
-                    }
-                });
-            } else {
-                throw new Error('News not available');
-            }
-        } catch (e) {
-            props.forEach(function(p, i) {
-                var el = document.getElementById('news-' + i);
-                if (el) el.innerHTML = '<span style="color: var(--muted);">Update Apps Script to enable AI news (see instructions)</span>';
-            });
-        }
-
-        btn.disabled = false;
-        btn.textContent = '🔄 Fetch AI News';
     }
 
     function handleSearch(value) {
