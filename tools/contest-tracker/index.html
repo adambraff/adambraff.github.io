@@ -59,6 +59,13 @@
         .comparison-value { font-weight: 500; }
         .comparison-value.better { color: var(--success); }
         .comparison-value.worse { color: #dc2626; }
+        .tooltip-trigger { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; background: #e5e7eb; color: #666; border-radius: 50%; font-size: 11px; cursor: help; margin-left: 4px; position: relative; font-weight: 600; }
+        .tooltip-trigger:hover { background: var(--accent); color: white; }
+        .tooltip-trigger .tooltip-text { visibility: hidden; width: 220px; background: #1f2937; color: #fff; text-align: left; border-radius: 6px; padding: 10px 12px; position: absolute; z-index: 1000; bottom: 125%; left: 50%; transform: translateX(-50%); font-size: 0.8rem; font-weight: normal; line-height: 1.4; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .tooltip-trigger .tooltip-text::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #1f2937 transparent transparent transparent; }
+        .tooltip-trigger:hover .tooltip-text { visibility: visible; }
+        .tab-with-tooltip { display: inline-flex; align-items: center; gap: 4px; }
+        .highlight-row { background: #fef3c7 !important; font-weight: 600; }
         .news-item { margin-bottom: 12px; padding: 12px; background: #f9fafb; border-radius: 6px; }
         .news-summary { font-size: 0.85rem; color: var(--text); margin-top: 8px; padding: 8px; background: white; border-radius: 4px; border-left: 3px solid var(--accent); }
         .news-direction { font-weight: 600; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; }
@@ -221,8 +228,8 @@
                 '<div class="card"><h2>Coming Up (Next Month) <span class="badge">' + upcoming.length + '</span></h2>' + renderUpcoming(upcoming) + '</div>' +
                 '<div class="card full-width"><h2>Leaderboards</h2>' +
                     '<div class="tabs" id="lbTabs">' +
-                        '<button class="tab active" onclick="switchLeaderboard(\'resolved\')">Resolved Props</button>' +
-                        '<button class="tab" onclick="switchLeaderboard(\'market\')">Market Scenario</button>' +
+                        '<button class="tab active" onclick="switchLeaderboard(\'resolved\')"><span class="tab-with-tooltip">Resolved Props<span class="tooltip-trigger">?<span class="tooltip-text">Rankings based on Brier scores from propositions that have already resolved. Lower Brier = better accuracy.</span></span></span></button>' +
+                        '<button class="tab" onclick="switchLeaderboard(\'market\')"><span class="tab-with-tooltip">Market Scenario<span class="tooltip-trigger">?<span class="tooltip-text">Rankings if all unresolved props resolved at current Manifold market prices. A "what if" leaderboard.</span></span></span></button>' +
                     '</div>' +
                     '<div id="leaderboardContent">' + renderLeaderboard('resolved') + '</div>' +
                 '</div>' +
@@ -295,23 +302,53 @@
     function renderLeaderboard(type) {
         var forecasters = getTimelyForecasters();
         var scoreKey = type === 'resolved' ? 'Brier of resolved props' : 'Brier blended scenario';
-        var sorted = forecasters.filter(function(f) {
+        var allSorted = forecasters.filter(function(f) {
             var score = f[scoreKey];
             return score !== undefined && score !== null && score !== '' && !isNaN(score);
-        }).sort(function(a, b) { return a[scoreKey] - b[scoreKey]; }).slice(0, 25);
+        }).sort(function(a, b) { return a[scoreKey] - b[scoreKey]; });
 
-        if (sorted.length === 0) return '<p style="color: var(--muted);">Leaderboard populates as props resolve</p>';
+        var top15 = allSorted.slice(0, 15);
+
+        if (top15.length === 0) return '<p style="color: var(--muted);">Leaderboard populates as props resolve</p>';
+
+        var selectedName = selectedForecaster ? selectedForecaster['Name of forecaster (or team name)'] : null;
+        var selectedInTop15 = selectedName && top15.some(function(f) { return f['Name of forecaster (or team name)'] === selectedName; });
+        var selectedRank = -1;
+        var selectedData = null;
+
+        if (selectedName && !selectedInTop15) {
+            selectedRank = allSorted.findIndex(function(f) { return f['Name of forecaster (or team name)'] === selectedName; });
+            if (selectedRank >= 0) {
+                selectedData = allSorted[selectedRank];
+                selectedRank = selectedRank + 1; // Convert to 1-based
+            }
+        }
 
         var html = '<table><thead><tr><th>Rank</th><th>Forecaster</th><th>Brier</th><th>Bones</th></tr></thead><tbody>';
-        sorted.forEach(function(f, i) {
+        top15.forEach(function(f, i) {
             var bones = f['Bones rating entering 2026'];
             var bonesDisplay = '';
             if (bones !== undefined && bones !== null && !isNaN(bones) && bones >= 0 && bones <= 3) {
                 var numBones = Math.round(Number(bones));
                 for (var b = 0; b < numBones; b++) bonesDisplay += '🦴';
             }
-            html += '<tr><td class="rank">#' + (i + 1) + '</td><td>' + f['Name of forecaster (or team name)'] + '</td><td class="brier">' + Number(f[scoreKey]).toFixed(4) + '</td><td>' + bonesDisplay + '</td></tr>';
+            var isSelected = selectedName && f['Name of forecaster (or team name)'] === selectedName;
+            var rowClass = isSelected ? ' class="highlight-row"' : '';
+            html += '<tr' + rowClass + '><td class="rank">#' + (i + 1) + '</td><td>' + f['Name of forecaster (or team name)'] + '</td><td class="brier">' + Number(f[scoreKey]).toFixed(4) + '</td><td>' + bonesDisplay + '</td></tr>';
         });
+
+        // Add selected forecaster at bottom if outside top 15
+        if (selectedData && selectedRank > 15) {
+            var bones = selectedData['Bones rating entering 2026'];
+            var bonesDisplay = '';
+            if (bones !== undefined && bones !== null && !isNaN(bones) && bones >= 0 && bones <= 3) {
+                var numBones = Math.round(Number(bones));
+                for (var b = 0; b < numBones; b++) bonesDisplay += '🦴';
+            }
+            html += '<tr style="border-top:2px solid #ddd;"><td colspan="4" style="padding:4px;color:#888;font-size:0.8rem;">...</td></tr>';
+            html += '<tr class="highlight-row"><td class="rank">#' + selectedRank + '</td><td>' + selectedData['Name of forecaster (or team name)'] + '</td><td class="brier">' + Number(selectedData[scoreKey]).toFixed(4) + '</td><td>' + bonesDisplay + '</td></tr>';
+        }
+
         return html + '</tbody></table>';
     }
 
@@ -397,15 +434,35 @@
         var avgBriers = labels.map(function(k) { return groups[k].reduce(function(a,b){return a+b;},0) / groups[k].length; });
         var counts = labels.map(function(k) { return groups[k].length; });
 
+        // Calculate colors based on Brier score (red for high/bad, green for low/good)
+        var minBrier = Math.min.apply(null, avgBriers);
+        var maxBrier = Math.max.apply(null, avgBriers);
+        var range = maxBrier - minBrier || 1;
+        var colors = avgBriers.map(function(b) {
+            var normalized = (b - minBrier) / range; // 0 = best (green), 1 = worst (red)
+            // Interpolate from green (16, 163, 74) to red (220, 38, 38)
+            var r = Math.round(16 + (220 - 16) * normalized);
+            var g = Math.round(163 + (38 - 163) * normalized);
+            var blue = Math.round(74 + (38 - 74) * normalized);
+            return 'rgba(' + r + ',' + g + ',' + blue + ',0.8)';
+        });
+        var borderColors = avgBriers.map(function(b) {
+            var normalized = (b - minBrier) / range;
+            var r = Math.round(16 + (220 - 16) * normalized);
+            var g = Math.round(163 + (38 - 163) * normalized);
+            var blue = Math.round(74 + (38 - 74) * normalized);
+            return 'rgba(' + r + ',' + g + ',' + blue + ',1)';
+        });
+
         var ctx = canvas.getContext('2d');
         if (window.attrChart) window.attrChart.destroy();
 
         window.attrChart = new Chart(ctx, {
             type: 'bar',
             data: { labels: labels.map(function(l,i) { return l + ' (n=' + counts[i] + ')'; }),
-                datasets: [{ label: 'Avg Brier', data: avgBriers, backgroundColor: 'rgba(37,99,235,0.7)', borderColor: 'rgba(37,99,235,1)', borderWidth: 1 }] },
+                datasets: [{ label: 'Avg Brier', data: avgBriers, backgroundColor: colors, borderColor: borderColors, borderWidth: 1 }] },
             options: { responsive: true, maintainAspectRatio: false,
-                plugins: { title: { display: true, text: cfg.label + ' vs Performance (lower is better)' } },
+                plugins: { title: { display: true, text: cfg.label + ' vs Performance (green=better, red=worse)' } },
                 scales: { y: { beginAtZero: true } } }
         });
     }
@@ -518,6 +575,10 @@
             // Re-render unresolved props to show this forecaster's predictions
             var unresolved = getValidProps().filter(function(p) { return !p['Actual resolution date']; });
             document.getElementById('unresolvedNews').innerHTML = renderUnresolved(unresolved);
+            // Re-render leaderboard to highlight selected forecaster
+            var activeTab = document.querySelector('#lbTabs .tab.active');
+            var tabType = activeTab && activeTab.textContent.indexOf('Market') > -1 ? 'market' : 'resolved';
+            document.getElementById('leaderboardContent').innerHTML = renderLeaderboard(tabType);
         }
     }
 
@@ -547,20 +608,22 @@
         var aiVal = f['AI use'];
         var aiDisplay = (aiVal !== undefined && !isNaN(aiVal)) ? aiLabels[Math.round(Number(aiVal))] || 'Unknown' : 'Unknown';
 
+        var tt = function(text) { return '<span class="tooltip-trigger">?<span class="tooltip-text">' + text + '</span></span>'; };
+
         var html = '<div class="forecaster-profile">' +
             '<div class="profile-section"><h3>📊 Performance</h3>' +
-                row('Brier (Resolved)', fmt(f['Brier of resolved props'], 4), 'rank #' + (rankResolved || 'N/A') + ' of ' + sortedResolved.length, f['Brier of resolved props'] < avgBrier) +
-                row('Brier (Market)', fmt(f['Brier blended scenario'], 4), 'rank #' + (rankMarket || 'N/A') + ' of ' + sortedMarket.length) +
+                rowTT('Brier (Resolved)', tt('Your Brier score based on propositions that have already resolved. Lower is better—0 is perfect.'), fmt(f['Brier of resolved props'], 4), 'rank #' + (rankResolved || 'N/A') + ' of ' + sortedResolved.length, f['Brier of resolved props'] < avgBrier) +
+                rowTT('Brier (Market)', tt('Your hypothetical Brier score if all unresolved props resolved at current Manifold market prices.'), fmt(f['Brier blended scenario'], 4), 'rank #' + (rankMarket || 'N/A') + ' of ' + sortedMarket.length) +
             '</div>' +
             '<div class="profile-section"><h3>👤 Profile vs Group</h3>' +
-                row('Bones', formatBones(f['Bones rating entering 2026']), avg(all, 'Bones rating entering 2026').toFixed(1) + ' avg') +
-                row('Extremist Count', f['Extremist count'] || 0, avg(all, 'Extremist count').toFixed(1) + ' avg') +
-                row('AI Usage', aiDisplay, '') +
-                row('Quick Entry', f['Quickly'] ? 'Yes' : 'No', pct('Quickly') + ' did') +
-                row('By Self', f['By self'] ? 'Yes' : 'No', pct('By self') + ' did') +
-                row('Casino Bettor', f['Casino bet'] ? 'Yes' : 'No', pct('Casino bet') + ' are') +
-                row('Prediction Markets', f['Prediction market'] ? 'Yes' : 'No', pct('Prediction market') + ' use') +
-                row('Expects to Beat Avg', f['Expect better than average'] ? 'Yes' : 'No', pct('Expect better than average') + ' do') +
+                rowTT('Bones', tt('Skill rating (0-3 bones) based on your historical contest performance. More bones = stronger track record.'), formatBones(f['Bones rating entering 2026']), avg(all, 'Bones rating entering 2026').toFixed(1) + ' avg') +
+                rowTT('Extremist Count', tt('Number of your forecasts at exactly 0% or 100%. Extreme forecasts are risky—great if right, costly if wrong.'), f['Extremist count'] || 0, avg(all, 'Extremist count').toFixed(1) + ' avg') +
+                rowTT('AI Usage', tt('How much AI assistance you reported using. Scale: 0=none, 1=low, 2=medium, 3=high.'), aiDisplay, '') +
+                rowTT('Quick Entry', tt('You indicated you made quick guesses without doing much research.'), f['Quickly'] ? 'Yes' : 'No', pct('Quickly') + ' did') +
+                rowTT('By Self', tt('You forecasted alone without team input or outside help.'), f['By self'] ? 'Yes' : 'No', pct('By self') + ' did') +
+                rowTT('Casino Bettor', tt('You reported betting at casinos.'), f['Casino bet'] ? 'Yes' : 'No', pct('Casino bet') + ' are') +
+                rowTT('Prediction Markets', tt('You reported using prediction market platforms (PredictIt, Polymarket, Manifold, etc.).'), f['Prediction market'] ? 'Yes' : 'No', pct('Prediction market') + ' use') +
+                rowTT('Expects to Beat Avg', tt('You predicted you would perform better than average in this contest.'), f['Expect better than average'] ? 'Yes' : 'No', pct('Expect better than average') + ' do') +
             '</div></div>';
         document.getElementById('forecasterProfile').innerHTML = html;
     }
@@ -584,6 +647,12 @@
         var cls = isBetter === true ? 'better' : isBetter === false ? 'worse' : '';
         var compStr = comp ? ' <span style="color:var(--muted);font-weight:normal;">(' + comp + ')</span>' : '';
         return '<div class="comparison-row"><span class="comparison-label">' + label + '</span><span class="comparison-value ' + cls + '">' + val + compStr + '</span></div>';
+    }
+
+    function rowTT(label, tooltip, val, comp, isBetter) {
+        var cls = isBetter === true ? 'better' : isBetter === false ? 'worse' : '';
+        var compStr = comp ? ' <span style="color:var(--muted);font-weight:normal;">(' + comp + ')</span>' : '';
+        return '<div class="comparison-row"><span class="comparison-label">' + label + tooltip + '</span><span class="comparison-value ' + cls + '">' + val + compStr + '</span></div>';
     }
 
     function switchLeaderboard(tab) {
