@@ -66,6 +66,37 @@
         .tooltip-trigger:hover .tooltip-text { visibility: visible; }
         .tab-with-tooltip { display: inline-flex; align-items: center; gap: 4px; }
         .highlight-row { background: #fef3c7 !important; font-weight: 600; }
+        .sim-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
+        .sim-controls select { min-width: 200px; }
+        .sim-results { margin-top: 20px; }
+        .sim-stat { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+        .sim-stat-label { color: var(--muted); }
+        .sim-stat-value { font-weight: 600; }
+        .sim-scenario { background: #f9fafb; padding: 12px; border-radius: 6px; margin-top: 10px; font-size: 0.85rem; }
+        .sim-scenario-title { font-weight: 600; margin-bottom: 8px; }
+        .sim-prop { display: inline-block; padding: 2px 8px; margin: 2px; border-radius: 4px; font-size: 0.8rem; }
+        .sim-prop-yes { background: #dcfce7; color: #166534; }
+        .sim-prop-no { background: #fee2e2; color: #991b1b; }
+        .sim-progress { height: 4px; background: #e5e7eb; border-radius: 2px; margin: 10px 0; overflow: hidden; }
+        .sim-progress-bar { height: 100%; background: var(--accent); transition: width 0.2s; }
+        .sim-rank-dist { margin-top: 15px; }
+        .sim-rank-bar { display: flex; align-items: center; margin: 4px 0; font-size: 0.8rem; }
+        .sim-rank-label { width: 80px; flex-shrink: 0; color: var(--muted); }
+        .sim-rank-track { flex: 1; height: 20px; background: #e5e7eb; border-radius: 3px; margin-right: 8px; }
+        .sim-rank-fill { height: 100%; background: var(--accent); border-radius: 3px; min-width: 2px; }
+        .sim-rank-pct { width: 50px; flex-shrink: 0; font-weight: 500; text-align: right; }
+        .prop-impact { display: flex; align-items: center; padding: 6px 0; border-bottom: 1px solid #eee; font-size: 0.85rem; }
+        .prop-impact-num { width: 40px; flex-shrink: 0; font-weight: 600; }
+        .prop-impact-outcome { width: 45px; flex-shrink: 0; }
+        .prop-impact-track { flex: 1; height: 8px; background: #e5e7eb; border-radius: 4px; margin: 0 12px; }
+        .prop-impact-bar { height: 100%; background: var(--success); border-radius: 4px; }
+        .prop-impact-compare { width: 120px; flex-shrink: 0; text-align: right; font-size: 0.8rem; color: var(--muted); }
+        .sim-prop { position: relative; cursor: help; }
+        .sim-prop .prop-tooltip { visibility: hidden; width: 280px; background: #1f2937; color: #fff; text-align: left; border-radius: 6px; padding: 8px 10px; position: absolute; z-index: 1000; bottom: 125%; left: 50%; transform: translateX(-50%); font-size: 0.75rem; font-weight: normal; line-height: 1.3; box-shadow: 0 4px 12px rgba(0,0,0,0.3); white-space: normal; }
+        .sim-prop .prop-tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #1f2937 transparent transparent transparent; }
+        .sim-prop:hover .prop-tooltip { visibility: visible; }
+        .sim-prop .prop-tooltip-right { left: 0; transform: none; }
+        .sim-prop .prop-tooltip-right::after { left: 20px; }
         .news-item { margin-bottom: 12px; padding: 12px; background: #f9fafb; border-radius: 6px; }
         .news-summary { font-size: 0.85rem; color: var(--text); margin-top: 8px; padding: 8px; background: white; border-radius: 4px; border-left: 3px solid var(--accent); }
         .news-direction { font-weight: 600; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; }
@@ -117,6 +148,8 @@
 
     let contestData = null;
     let selectedForecaster = null;
+    let selectedOpponent = null;
+    let simResults = null;
 
     async function init() {
         try {
@@ -256,6 +289,17 @@
                 '<div class="card full-width">' +
                     '<h2>Unresolved Props <span class="badge">' + unresolved.length + '</span></h2>' +
                     '<div id="unresolvedNews">' + renderUnresolved(unresolved) + '</div>' +
+                '</div>' +
+                '<div class="card full-width" id="simulatorCard">' +
+                    '<h2>🎲 Scenario Simulator <span class="tooltip-trigger">?<span class="tooltip-text">Monte Carlo simulation using Manifold market probabilities. Simulates 100K scenarios to estimate your chances of winning, beating opponents, and achieving various ranks.</span></span></h2>' +
+                    '<div class="sim-controls">' +
+                        '<label>Compare against: <select id="opponentSelect" onchange="selectOpponent(this.value)">' +
+                            '<option value="">(No specific opponent)</option>' +
+                            getOpponentOptions() +
+                        '</select></label>' +
+                        '<button class="refresh-btn" id="runSimBtn" onclick="runSimulation()">Run Simulation (100K scenarios)</button>' +
+                    '</div>' +
+                    '<div id="simResults"><p style="color:var(--muted);">Select yourself above, then run the simulation to see your chances.</p></div>' +
                 '</div>' +
             '</div>';
 
@@ -658,6 +702,284 @@
     function switchLeaderboard(tab) {
         document.querySelectorAll('#lbTabs .tab').forEach(function(t, i) { t.className = (i === 0 && tab === 'resolved') || (i === 1 && tab === 'market') ? 'tab active' : 'tab'; });
         document.getElementById('leaderboardContent').innerHTML = renderLeaderboard(tab);
+    }
+
+    function getOpponentOptions() {
+        if (!contestData) return '';
+        return getTimelyForecasters()
+            .sort(function(a, b) { return a['Name of forecaster (or team name)'].localeCompare(b['Name of forecaster (or team name)']); })
+            .map(function(f) {
+                var name = f['Name of forecaster (or team name)'];
+                return '<option value="' + name.replace(/"/g, '&quot;') + '">' + name + '</option>';
+            }).join('');
+    }
+
+    function selectOpponent(name) {
+        selectedOpponent = name || null;
+    }
+
+    function runSimulation() {
+        if (!selectedForecaster) {
+            alert('Please select yourself first using the lookup above.');
+            return;
+        }
+
+        var btn = document.getElementById('runSimBtn');
+        btn.disabled = true;
+        btn.textContent = 'Running...';
+        document.getElementById('simResults').innerHTML = '<div class="sim-progress"><div class="sim-progress-bar" id="simProgressBar" style="width:0%"></div></div><p style="color:var(--muted);">Simulating 100,000 scenarios...</p>';
+
+        // Use setTimeout to allow UI to update
+        setTimeout(function() { executeSimulation(); }, 50);
+    }
+
+    function executeSimulation() {
+        var NUM_SIMS = 100000;
+        var unresolved = getValidProps().filter(function(p) { return !p['Actual resolution date']; });
+        var resolved = getValidProps().filter(function(p) { return p['Actual resolution date']; });
+        var forecasters = getTimelyForecasters();
+        var userName = selectedForecaster['Name of forecaster (or team name)'];
+        var totalProps = resolved.length + unresolved.length;
+
+        // Pre-fetch Manifold market probabilities for each unresolved prop
+        // If no market price, fall back to crowd average, then 50%
+        var marketProbs = unresolved.map(function(p) {
+            var market = p['Market price'];
+            if (market !== undefined && market !== '' && !isNaN(market)) {
+                return Number(market) / 100; // Convert 0-100 to 0-1
+            }
+            var crowd = p['Average score'];
+            if (crowd !== undefined && crowd !== '' && !isNaN(crowd)) {
+                return Number(crowd) / 100;
+            }
+            return 0.5; // Last resort fallback
+        });
+
+        // Pre-calculate resolved Brier sums for each forecaster
+        var forecasterData = forecasters.map(function(f) {
+            var resolvedSum = 0;
+            resolved.forEach(function(p) {
+                var forecast = f[p['Proposition']];
+                var outcome = p['Resolved outcome (blank, 0, 100)'] === 100 ? 1 : 0;
+                if (forecast !== undefined && !isNaN(forecast)) {
+                    var prob = forecast / 100;
+                    resolvedSum += Math.pow(prob - outcome, 2);
+                }
+            });
+            // Pre-fetch unresolved forecasts
+            var unresolvedForecasts = unresolved.map(function(p) {
+                var v = f[p['Proposition']];
+                return (v !== undefined && !isNaN(v)) ? Number(v) / 100 : 0.5;
+            });
+            return {
+                name: f['Name of forecaster (or team name)'],
+                resolvedSum: resolvedSum,
+                unresolvedForecasts: unresolvedForecasts
+            };
+        });
+
+        var userIndex = forecasterData.findIndex(function(fd) { return fd.name === userName; });
+        var oppIndex = selectedOpponent ? forecasterData.findIndex(function(fd) { return fd.name === selectedOpponent; }) : -1;
+
+        // Results tracking
+        var results = {
+            wins: 0,
+            winScenarios: [],
+            bestRank: Infinity,
+            bestScenarios: [],
+            vsOpponentWins: 0,
+            biggestBeatMargin: 0,
+            biggestBeatScenario: null,
+            rankCounts: {}
+        };
+
+        // Run simulations
+        for (var sim = 0; sim < NUM_SIMS; sim++) {
+            // Generate random outcomes using Manifold market probabilities
+            var outcomes = [];
+            for (var j = 0; j < unresolved.length; j++) {
+                outcomes.push(Math.random() < marketProbs[j] ? 1 : 0);
+            }
+
+            // Calculate Brier scores
+            var scores = [];
+            for (var fi = 0; fi < forecasterData.length; fi++) {
+                var fd = forecasterData[fi];
+                var sum = fd.resolvedSum;
+                for (var pi = 0; pi < outcomes.length; pi++) {
+                    var diff = fd.unresolvedForecasts[pi] - outcomes[pi];
+                    sum += diff * diff;
+                }
+                scores.push({ idx: fi, brier: sum / totalProps });
+            }
+
+            // Sort by Brier (lower is better)
+            scores.sort(function(a, b) { return a.brier - b.brier; });
+
+            // Find user's rank
+            var userRank = 0;
+            var userBrier = 0;
+            for (var ri = 0; ri < scores.length; ri++) {
+                if (scores[ri].idx === userIndex) {
+                    userRank = ri + 1;
+                    userBrier = scores[ri].brier;
+                    break;
+                }
+            }
+
+            // Track wins
+            if (userRank === 1) {
+                results.wins++;
+                if (results.winScenarios.length < 3) {
+                    results.winScenarios.push(outcomes.slice());
+                }
+            }
+
+            // Track best rank
+            if (userRank < results.bestRank) {
+                results.bestRank = userRank;
+                results.bestScenarios = [outcomes.slice()];
+            } else if (userRank === results.bestRank && results.bestScenarios.length < 3) {
+                results.bestScenarios.push(outcomes.slice());
+            }
+
+            // Track vs opponent
+            if (oppIndex >= 0) {
+                var oppBrier = 0;
+                for (var oi = 0; oi < scores.length; oi++) {
+                    if (scores[oi].idx === oppIndex) {
+                        oppBrier = scores[oi].brier;
+                        break;
+                    }
+                }
+                if (userBrier < oppBrier) {
+                    results.vsOpponentWins++;
+                    var margin = oppBrier - userBrier;
+                    if (margin > results.biggestBeatMargin) {
+                        results.biggestBeatMargin = margin;
+                        results.biggestBeatScenario = outcomes.slice();
+                    }
+                }
+            }
+
+            // Track rank distribution (mutually exclusive buckets)
+            var bucket = userRank <= 10 ? '1-10' : userRank <= 25 ? '11-25' : userRank <= 50 ? '26-50' : '51+';
+            results.rankCounts[bucket] = (results.rankCounts[bucket] || 0) + 1;
+            results.rankCounts['#' + userRank] = (results.rankCounts['#' + userRank] || 0) + 1;
+        }
+
+        // Analyze biggest beat scenario for prop impact
+        if (results.biggestBeatScenario && oppIndex >= 0) {
+            results.propImpacts = [];
+            var userFd = forecasterData[userIndex];
+            var oppFd = forecasterData[oppIndex];
+            for (var pi = 0; pi < unresolved.length; pi++) {
+                var outcome = results.biggestBeatScenario[pi];
+                var userContrib = Math.pow(userFd.unresolvedForecasts[pi] - outcome, 2);
+                var oppContrib = Math.pow(oppFd.unresolvedForecasts[pi] - outcome, 2);
+                var impact = oppContrib - userContrib; // Positive = good for user
+                results.propImpacts.push({
+                    prop: unresolved[pi]['Proposition'],
+                    outcome: outcome === 1 ? 'YES' : 'NO',
+                    impact: impact,
+                    userForecast: (userFd.unresolvedForecasts[pi] * 100).toFixed(0) + '%',
+                    oppForecast: (oppFd.unresolvedForecasts[pi] * 100).toFixed(0) + '%'
+                });
+            }
+            results.propImpacts.sort(function(a, b) { return b.impact - a.impact; });
+        }
+
+        simResults = results;
+        renderSimResults(results, unresolved, NUM_SIMS);
+
+        var btn = document.getElementById('runSimBtn');
+        btn.disabled = false;
+        btn.textContent = 'Run Simulation (100K scenarios)';
+    }
+
+    function renderSimResults(results, unresolved, numSims) {
+        var html = '<div class="sim-results">';
+
+        // Key stats
+        html += '<div class="profile-section"><h3>📈 Your Chances</h3>';
+        html += '<div class="sim-stat"><span class="sim-stat-label">Win the contest</span><span class="sim-stat-value">' + (results.wins / numSims * 100).toFixed(2) + '%</span></div>';
+        html += '<div class="sim-stat"><span class="sim-stat-label">Best possible finish</span><span class="sim-stat-value">#' + results.bestRank + '</span></div>';
+        html += '<div class="sim-stat"><span class="sim-stat-label">Top 10 finish</span><span class="sim-stat-value">' + ((results.rankCounts['1-10'] || 0) / numSims * 100).toFixed(1) + '%</span></div>';
+        html += '<div class="sim-stat"><span class="sim-stat-label">Top 25 finish</span><span class="sim-stat-value">' + (((results.rankCounts['1-10'] || 0) + (results.rankCounts['11-25'] || 0)) / numSims * 100).toFixed(1) + '%</span></div>';
+
+        if (selectedOpponent) {
+            html += '<div class="sim-stat" style="border-top:2px solid var(--accent);padding-top:12px;margin-top:8px;"><span class="sim-stat-label">Beat ' + selectedOpponent + '</span><span class="sim-stat-value" style="color:' + (results.vsOpponentWins > numSims/2 ? 'var(--success)' : '#dc2626') + ';">' + (results.vsOpponentWins / numSims * 100).toFixed(1) + '%</span></div>';
+        }
+        html += '</div>';
+
+        // Rank distribution visualization
+        html += '<div class="profile-section"><h3>📊 Rank Distribution</h3><div class="sim-rank-dist">';
+        var buckets = ['1-10', '11-25', '26-50', '51+'];
+        var maxPct = 0;
+        buckets.forEach(function(b) { maxPct = Math.max(maxPct, (results.rankCounts[b] || 0) / numSims); });
+        buckets.forEach(function(b) {
+            var pct = (results.rankCounts[b] || 0) / numSims * 100;
+            var width = maxPct > 0 ? (pct / (maxPct * 100) * 100) : 0;
+            html += '<div class="sim-rank-bar"><span class="sim-rank-label">' + b + '</span><div class="sim-rank-track"><div class="sim-rank-fill" style="width:' + width + '%;"></div></div><span class="sim-rank-pct">' + pct.toFixed(1) + '%</span></div>';
+        });
+        html += '</div></div>';
+
+        // Best finish scenario
+        if (results.bestScenarios.length > 0) {
+            html += '<div class="profile-section"><h3>🏆 Scenario for Best Finish (#' + results.bestRank + ')</h3>';
+            html += '<div class="sim-scenario">';
+            html += renderScenarioOutcomes(results.bestScenarios[0], unresolved);
+            html += '</div></div>';
+        }
+
+        // Win scenario if different from best
+        if (results.wins > 0 && results.bestRank === 1 && results.winScenarios.length > 0) {
+            // Already showed winning scenario above
+        } else if (results.winScenarios.length > 0) {
+            html += '<div class="profile-section"><h3>🥇 Example Win Scenario</h3>';
+            html += '<div class="sim-scenario">';
+            html += renderScenarioOutcomes(results.winScenarios[0], unresolved);
+            html += '</div></div>';
+        }
+
+        // Biggest beat analysis
+        if (selectedOpponent && results.biggestBeatScenario && results.propImpacts) {
+            html += '<div class="profile-section"><h3>💪 Biggest Win vs ' + selectedOpponent + '</h3>';
+            html += '<p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">Props that helped you most in this scenario:</p>';
+            var topImpacts = results.propImpacts.filter(function(p) { return p.impact > 0; }).slice(0, 5);
+            if (topImpacts.length > 0) {
+                var maxImpact = topImpacts[0].impact;
+                topImpacts.forEach(function(pi) {
+                    var propNum = pi.prop.match(/^(\d+)\./);
+                    var propShort = propNum ? '#' + propNum[1] : pi.prop.substring(0, 30);
+                    var propText = pi.prop.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                    html += '<div class="prop-impact">';
+                    html += '<span class="prop-impact-num sim-prop" style="background:none;padding:0;margin:0;">' + propShort + '<span class="prop-tooltip prop-tooltip-right">' + propText + '</span></span>';
+                    html += '<span class="prop-impact-outcome"><span class="sim-prop sim-prop-' + pi.outcome.toLowerCase() + '" style="cursor:default;">' + pi.outcome + '</span></span>';
+                    html += '<div class="prop-impact-track"><div class="prop-impact-bar" style="width:' + (pi.impact / maxImpact * 100) + '%;"></div></div>';
+                    html += '<span class="prop-impact-compare">You: ' + pi.userForecast + ' vs ' + pi.oppForecast + '</span>';
+                    html += '</div>';
+                });
+            }
+            html += '</div>';
+        }
+
+        html += '</div>';
+        document.getElementById('simResults').innerHTML = html;
+    }
+
+    function renderScenarioOutcomes(outcomes, unresolved) {
+        var html = '<div style="display:flex;flex-wrap:wrap;gap:4px;">';
+        outcomes.forEach(function(o, i) {
+            var propNum = unresolved[i]['Proposition'].match(/^(\d+)\./);
+            var propLabel = propNum ? '#' + propNum[1] : '#' + (i + 1);
+            var outcomeText = o === 1 ? 'YES' : 'NO';
+            var cls = o === 1 ? 'sim-prop-yes' : 'sim-prop-no';
+            var propText = unresolved[i]['Proposition'].replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            html += '<span class="sim-prop ' + cls + '">' + propLabel + ': ' + outcomeText + '<span class="prop-tooltip">' + propText + '</span></span>';
+        });
+        html += '</div>';
+        return html;
     }
 
     init();
