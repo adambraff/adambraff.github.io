@@ -117,8 +117,12 @@
             .card h2 { font-size: 1rem; flex-wrap: wrap; }
             .prop-meta { flex-direction: column; gap: 8px; }
             .prop-title { word-break: break-word; }
-            table { font-size: 0.8rem; display: block; overflow-x: auto; white-space: nowrap; }
-            th, td { padding: 8px 6px; }
+            table { font-size: 0.75rem; display: block; overflow-x: auto; white-space: normal; width: 100%; }
+            th, td { padding: 6px 4px; }
+            td:nth-child(2) { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            th:nth-child(1), td:nth-child(1) { width: 35px; }
+            th:nth-child(3), td:nth-child(3) { width: 55px; }
+            th:nth-child(4), td:nth-child(4) { width: 50px; }
             .chart-container { height: 250px; }
             .tabs { gap: 3px; }
             .tab { padding: 6px 10px; font-size: 0.8rem; }
