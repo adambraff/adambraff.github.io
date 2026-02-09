@@ -137,6 +137,7 @@ input[type=range] { width: 120px; }
       <option value="recentSBs">SBs Won (last 10yr)</option>
       <option value="lag1WinPct">Win % (2 yrs before pub)</option>
       <option value="lag2Rolling3">3-Yr Rolling Win % (2 yrs before pub)</option>
+      <option value="forbesYear">Forbes Year (time trend)</option>
     </select>
   </div>
   <div class="control-group">
@@ -388,7 +389,8 @@ const VARS = {
   cumPlayoff5: { label: 'Playoff Success (5yr cumul.)', fmt: v => v.toFixed(1), unitLabel: 'cumulative PO point', slopeScale: 1, timeDim: '5-yr sum of round codes (0-5) thru season Y-1' },
   recentSBs: { label: 'SBs Won (last 10yr)', fmt: v => v.toFixed(0), unitLabel: 'recent SB win', slopeScale: 1, timeDim: '10-yr window thru season Y-1' },
   lag1WinPct: { label: 'Win % (2 yrs before pub)', fmt: v => (v*100).toFixed(1)+'%', unitLabel: '10pp win rate', slopeScale: 0.1, timeDim: 'Season Y-2' },
-  lag2Rolling3: { label: '3-Yr Rolling Win % (2 yrs before pub)', fmt: v => (v*100).toFixed(1)+'%', unitLabel: '10pp rolling win rate', slopeScale: 0.1, timeDim: '3-yr window thru season Y-2' }
+  lag2Rolling3: { label: '3-Yr Rolling Win % (2 yrs before pub)', fmt: v => (v*100).toFixed(1)+'%', unitLabel: '10pp rolling win rate', slopeScale: 0.1, timeDim: '3-yr window thru season Y-2' },
+  forbesYear: { label: 'Forbes Year (time trend)', fmt: v => v.toFixed(0), unitLabel: 'year', slopeScale: 1, timeDim: 'Publication year (captures league-wide inflation)' }
 };
 
 // ==================== HELPER FUNCTIONS ====================
@@ -422,6 +424,7 @@ function getVal(teamKey, forbesYear, varName) {
     case 'lag1WinPct': return getLaggedWinPct(teamKey, seasonYear, 1);
     case 'lag2Rolling3': return getRollingWinPct(teamKey, seasonYear - 1, 3);
     case 'predicted': return getPredictedVal(teamKey, forbesYear);
+    case 'forbesYear': return forbesYear;
     default: return null;
   }
 }
@@ -499,7 +502,9 @@ function getPredictedVal(teamKey, forbesYear) {
     _predCache = {};
     const isPooled = yearVal === 'all';
     const fys = isPooled ? [2019,2020,2021,2022,2023,2024] : [parseInt(yearVal)];
-    const preds = ['metroPop','tvHH','wins','sbWins','stadCap','stadAge','playoffRate5'];
+    const preds = isPooled
+      ? ['forbesYear','metroPop','tvHH','wins','sbWins','stadCap','stadAge','playoffRate5']
+      : ['metroPop','tvHH','wins','sbWins','stadCap','stadAge','playoffRate5'];
     const X = [], y = [], keys = [];
     fys.forEach(fy => {
       getTeamKeys().forEach(tk => {
@@ -883,8 +888,12 @@ function buildCorrelationMatrix() {
   const yearVal = document.getElementById('yearSelect').value;
   const isPooled = yearVal === 'all';
   const forbesYears = isPooled ? [2019,2020,2021,2022,2023,2024] : [parseInt(yearVal)];
-  const vars = ['valuation','wins','winPct','metroPop','tvHH','dmaRank','sbWins','stadCap','stadAge','rollingWinPct','playoffRate5'];
-  const shortLabels = ['Val','W','W%','Pop','TV','DMA','SB','Cap','Age','3yW%','PO%'];
+  const vars = isPooled
+    ? ['valuation','forbesYear','wins','winPct','metroPop','tvHH','dmaRank','sbWins','stadCap','stadAge','rollingWinPct','playoffRate5']
+    : ['valuation','wins','winPct','metroPop','tvHH','dmaRank','sbWins','stadCap','stadAge','rollingWinPct','playoffRate5'];
+  const shortLabels = isPooled
+    ? ['Val','Yr','W','W%','Pop','TV','DMA','SB','Cap','Age','3yW%','PO%']
+    : ['Val','W','W%','Pop','TV','DMA','SB','Cap','Age','3yW%','PO%'];
 
   // Gather data
   const allData = {};
@@ -939,8 +948,12 @@ function buildMultiVariable() {
   const yearVal = document.getElementById('yearSelect').value;
   const isPooled = yearVal === 'all';
   const forbesYears = isPooled ? [2019,2020,2021,2022,2023,2024] : [parseInt(yearVal)];
-  const predictors = ['metroPop','tvHH','wins','sbWins','stadCap','stadAge','playoffRate5'];
-  const predLabels = ['Metro Pop','TV HH','Wins','SB Wins','Stad Cap','Stad Age','PO Rate'];
+  const predictors = isPooled
+    ? ['forbesYear','metroPop','tvHH','wins','sbWins','stadCap','stadAge','playoffRate5']
+    : ['metroPop','tvHH','wins','sbWins','stadCap','stadAge','playoffRate5'];
+  const predLabels = isPooled
+    ? ['Year','Metro Pop','TV HH','Wins','SB Wins','Stad Cap','Stad Age','PO Rate']
+    : ['Metro Pop','TV HH','Wins','SB Wins','Stad Cap','Stad Age','PO Rate'];
 
   const X = [];
   const y = [];
