@@ -184,9 +184,14 @@
     let selectedOpponent = null;
     let simResults = null;
 
+    function isResolved(p) {
+        var v = p['Resolved outcome (blank, 0, 100)'];
+        return v === 0 || v === 100;
+    }
+
     async function init() {
         try {
-            const response = await fetch(APPS_SCRIPT_URL);
+            const response = await fetch(APPS_SCRIPT_URL + '?t=' + Date.now());
             if (!response.ok) throw new Error('HTTP ' + response.status);
             contestData = await response.json();
             // Preload Adam Braff's data
@@ -254,19 +259,20 @@
         var oneMonthFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
         var recentlyResolved = props.filter(function(p) {
-            if (!p['Actual resolution date']) return false;
+            if (!isResolved(p)) return false;
+            if (!p['Actual resolution date']) return true; // resolved but no date — show it
             var resolved = new Date(p['Actual resolution date']);
             return resolved >= twoWeeksAgo && resolved <= now;
         });
 
         var upcoming = props.filter(function(p) {
-            if (p['Actual resolution date']) return false;
+            if (isResolved(p)) return false;
             var expected = new Date(p['Expected resolution date']);
             return expected >= now && expected <= oneMonthFromNow;
         });
 
-        var unresolved = props.filter(function(p) { return !p['Actual resolution date']; });
-        var resolvedCount = props.filter(function(p) { return p['Actual resolution date']; }).length;
+        var unresolved = props.filter(function(p) { return !isResolved(p); });
+        var resolvedCount = props.filter(function(p) { return isResolved(p); }).length;
 
         var allForecasters = getRealForecasters();
         var timelyForecasters = getTimelyForecasters();
@@ -347,7 +353,7 @@
             var outcome = p['Resolved outcome (blank, 0, 100)'];
             var outcomeClass = outcome === 100 ? 'outcome-yes' : 'outcome-no';
             var outcomeText = outcome === 100 ? 'YES' : 'NO';
-            var date = new Date(p['Actual resolution date']).toLocaleDateString();
+            var date = p['Actual resolution date'] ? new Date(p['Actual resolution date']).toLocaleDateString() : '';
             var avgScore = p['Average score'] ? Number(p['Average score']).toFixed(1) + '%' : '';
             html += '<li class="prop-item"><div class="prop-title">' + p['Proposition'] + '</div><div class="prop-meta">' +
                 '<span class="' + outcomeClass + ' outcome-tag">' + outcomeText + '</span>' +
@@ -650,7 +656,7 @@
         if (selectedForecaster) {
             renderForecasterProfile();
             // Re-render unresolved props to show this forecaster's predictions
-            var unresolved = getValidProps().filter(function(p) { return !p['Actual resolution date']; });
+            var unresolved = getValidProps().filter(function(p) { return !isResolved(p); });
             document.getElementById('unresolvedNews').innerHTML = renderUnresolved(unresolved);
             // Re-render leaderboard to highlight selected forecaster
             var activeTab = document.querySelector('#lbTabs .tab.active');
@@ -768,8 +774,8 @@
 
     function executeSimulation() {
         var NUM_SIMS = 100000;
-        var unresolved = getValidProps().filter(function(p) { return !p['Actual resolution date']; });
-        var resolved = getValidProps().filter(function(p) { return p['Actual resolution date']; });
+        var unresolved = getValidProps().filter(function(p) { return !isResolved(p); });
+        var resolved = getValidProps().filter(function(p) { return isResolved(p); });
         var forecasters = getTimelyForecasters();
         var userName = selectedForecaster['Name of forecaster (or team name)'];
         var totalProps = resolved.length + unresolved.length;
