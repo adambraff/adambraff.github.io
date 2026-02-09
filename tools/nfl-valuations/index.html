@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFL Valuation Explorer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #0f1117;
+  --panel: #1a1d28;
+  --border: #2a2d3a;
+  --text: #e0e0e0;
+  --muted: #888;
+  --accent: #4f8cff;
+  --afc: #0077be;
+  --nfc: #d50a0a;
+  --highlight: #f0c040;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+h1 { font-size: 1.5rem; font-weight: 700; }
+h2 { font-size: 1.1rem; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
+h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
+
+.header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+.header-sub { font-size: 0.8rem; color: var(--muted); }
+
+.controls { display: flex; flex-wrap: wrap; gap: 12px; padding: 12px 24px; border-bottom: 1px solid var(--border); background: var(--panel); align-items: flex-end; }
+.control-group { display: flex; flex-direction: column; gap: 3px; }
+.control-group label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 600; }
+select, input[type=range] { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 5px 8px; border-radius: 4px; font-size: 0.85rem; }
+select { min-width: 140px; cursor: pointer; }
+select:focus, input:focus { outline: none; border-color: var(--accent); }
+input[type=range] { width: 120px; }
+
+.main { display: grid; grid-template-columns: 1fr 320px; gap: 0; min-height: 480px; }
+.chart-area { padding: 16px 24px; position: relative; }
+.chart-area canvas { max-height: 460px; }
+.stats-panel { padding: 16px; border-left: 1px solid var(--border); background: var(--panel); overflow-y: auto; max-height: 520px; }
+
+.stat-box { background: var(--bg); border-radius: 6px; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border); }
+.stat-big { font-size: 2rem; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-value { font-size: 1.1rem; font-weight: 600; }
+.stat-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; }
+
+.value-of-win { background: linear-gradient(135deg, #1a3a1a, #0f1117); border: 1px solid #2a5a2a; }
+.value-of-win .stat-big { color: #4ae04a; }
+
+.bottom-section { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-top: 1px solid var(--border); }
+.bottom-left, .bottom-right { padding: 16px 24px; }
+.bottom-left { border-right: 1px solid var(--border); }
+.bottom-left canvas { max-height: 320px; }
+
+.corr-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
+.corr-table th, .corr-table td { padding: 4px; text-align: center; border: 1px solid var(--border); }
+.corr-table th { background: var(--panel); font-weight: 600; font-size: 0.65rem; }
+
+.residuals-table { width: 100%; font-size: 0.8rem; }
+.residuals-table td { padding: 2px 4px; }
+.overvalued { color: #ff6b6b; }
+.undervalued { color: #4ae04a; }
+
+.legend-bar { display: flex; gap: 16px; align-items: center; font-size: 0.8rem; padding: 4px 0; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+.team-chips { display: flex; flex-wrap: wrap; gap: 4px; max-height: 100px; overflow-y: auto; }
+.team-chip { font-size: 0.7rem; padding: 2px 6px; border-radius: 3px; cursor: pointer; border: 1px solid var(--border); background: var(--bg); transition: all 0.15s; }
+.team-chip:hover { border-color: var(--accent); }
+.team-chip.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
+.team-chip.afc { border-left: 3px solid var(--afc); }
+.team-chip.nfc { border-left: 3px solid var(--nfc); }
+
+.tab-bar { display: flex; gap: 0; border-bottom: 1px solid var(--border); }
+.tab { padding: 6px 16px; cursor: pointer; font-size: 0.8rem; border-bottom: 2px solid transparent; color: var(--muted); }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.multi-reg-results { font-size: 0.8rem; }
+.multi-reg-results table { width: 100%; border-collapse: collapse; }
+.multi-reg-results th, .multi-reg-results td { padding: 4px 8px; text-align: left; border-bottom: 1px solid var(--border); }
+.multi-reg-results th { color: var(--muted); font-size: 0.7rem; text-transform: uppercase; }
+
+.tooltip-custom { position: absolute; background: rgba(0,0,0,0.85); border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; font-size: 0.8rem; pointer-events: none; z-index: 100; white-space: nowrap; display: none; }
+
+@media (max-width: 900px) {
+  .main { grid-template-columns: 1fr; }
+  .bottom-section { grid-template-columns: 1fr; }
+  .stats-panel { border-left: none; border-top: 1px solid var(--border); max-height: none; }
+  .bottom-left { border-right: none; border-bottom: 1px solid var(--border); }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>NFL Valuation Explorer</h1>
+    <div class="header-sub">What drives NFL franchise values? Explore the data and find out.</div>
+  </div>
+  <div class="header-sub">Data: Forbes NFL Valuations (2019–2024) &bull; NFL Season Records (2018–2023)</div>
+</div>
+
+<div class="controls">
+  <div class="control-group">
+    <label>Forbes Year</label>
+    <select id="yearSelect">
+      <option value="2024" selected>2024</option>
+      <option value="2023">2023</option>
+      <option value="2022">2022</option>
+      <option value="2021">2021</option>
+      <option value="2020">2020</option>
+      <option value="2019">2019</option>
+    </select>
+  </div>
+  <div class="control-group">
+    <label>X-Axis</label>
+    <select id="xSelect">
+      <option value="metroPop">Metro Population</option>
+      <option value="tvHH">TV Households (DMA)</option>
+      <option value="dmaRank">DMA Rank</option>
+      <option value="wins" selected>Season Wins</option>
+      <option value="winPct">Win %</option>
+      <option value="playoffRound">Playoff Round</option>
+      <option value="sbWins">All-Time Super Bowl Wins</option>
+      <option value="stadCap">Stadium Capacity</option>
+      <option value="stadAge">Stadium Age</option>
+      <option value="rollingWinPct">3-Yr Rolling Win %</option>
+      <option value="playoffRate5">Playoff Rate (Last 5 Yrs)</option>
+      <option value="recentSBs">Super Bowls (Last 10 Yrs)</option>
+    </select>
+  </div>
+  <div class="control-group">
+    <label>Y-Axis</label>
+    <select id="ySelect">
+      <option value="valuation" selected>Valuation ($M)</option>
+      <option value="metroPop">Metro Population</option>
+      <option value="tvHH">TV Households (DMA)</option>
+      <option value="wins">Season Wins</option>
+      <option value="winPct">Win %</option>
+      <option value="playoffRound">Playoff Round</option>
+      <option value="stadCap">Stadium Capacity</option>
+      <option value="stadAge">Stadium Age</option>
+      <option value="rollingWinPct">3-Yr Rolling Win %</option>
+      <option value="playoffRate5">Playoff Rate (Last 5 Yrs)</option>
+    </select>
+  </div>
+  <div class="control-group">
+    <label>Conference</label>
+    <select id="confSelect">
+      <option value="all">All</option>
+      <option value="AFC">AFC</option>
+      <option value="NFC">NFC</option>
+    </select>
+  </div>
+  <div class="control-group">
+    <label>Division</label>
+    <select id="divSelect">
+      <option value="all">All</option>
+      <option value="East">East</option>
+      <option value="West">West</option>
+      <option value="North">North</option>
+      <option value="South">South</option>
+    </select>
+  </div>
+  <div class="control-group">
+    <label>Color By</label>
+    <select id="colorSelect">
+      <option value="conference" selected>Conference</option>
+      <option value="division">Division</option>
+      <option value="valuation">Valuation Rank</option>
+    </select>
+  </div>
+</div>
+
+<div class="main">
+  <div class="chart-area">
+    <canvas id="scatterChart"></canvas>
+  </div>
+  <div class="stats-panel">
+    <div class="stat-box">
+      <div class="stat-label">R-Squared</div>
+      <div class="stat-big" id="rSquared">—</div>
+      <div class="stat-label" style="margin-top:4px">Regression Equation</div>
+      <div class="stat-value" id="regEquation" style="font-size:0.85rem">—</div>
+    </div>
+    <div class="stat-box value-of-win" id="vowBox">
+      <div class="stat-label">Value of One Win</div>
+      <div class="stat-big" id="vowValue">—</div>
+      <div style="font-size:0.75rem;color:var(--muted);margin-top:2px" id="vowNote">Select Wins vs Valuation to see</div>
+    </div>
+    <div class="stat-box">
+      <h3>Interpretation</h3>
+      <div id="interpretation" style="font-size:0.8rem;color:var(--muted)">Select variables to analyze.</div>
+    </div>
+    <div class="stat-box">
+      <h3>Most Overvalued (vs regression)</h3>
+      <table class="residuals-table" id="overvaluedTable"></table>
+    </div>
+    <div class="stat-box">
+      <h3>Most Undervalued (vs regression)</h3>
+      <table class="residuals-table" id="undervaluedTable"></table>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-section">
+  <div class="bottom-left">
+    <h2>Valuation Over Time</h2>
+    <div class="team-chips" id="teamChips"></div>
+    <canvas id="timeChart" style="margin-top:8px"></canvas>
+  </div>
+  <div class="bottom-right">
+    <div class="tab-bar">
+      <div class="tab active" data-tab="corr">Correlation Matrix</div>
+      <div class="tab" data-tab="multi">Multi-Variable</div>
+      <div class="tab" data-tab="insights">Key Insights</div>
+    </div>
+    <div id="tabCorr" style="margin-top:8px; overflow-x:auto;"></div>
+    <div id="tabMulti" style="margin-top:8px; display:none;"></div>
+    <div id="tabInsights" style="margin-top:8px; display:none;"></div>
+  </div>
+</div>
+
+<script>
+// ==================== DATA ====================
+
+const TEAMS = {
+  ARI: { name:'Arizona Cardinals', conf:'NFC', div:'West', city:'Phoenix', st:'AZ', dma:11, tvHH:2178, metroPop:3252, stadCap:63400, stadYear:2006, sbWins:0 },
+  ATL: { name:'Atlanta Falcons', conf:'NFC', div:'South', city:'Atlanta', st:'GA', dma:7, tvHH:2758, metroPop:6167, stadCap:71000, stadYear:2017, sbWins:0 },
+  BAL: { name:'Baltimore Ravens', conf:'AFC', div:'North', city:'Baltimore', st:'MD', dma:26, tvHH:1242, metroPop:2622, stadCap:71008, stadYear:1998, sbWins:2 },
+  BUF: { name:'Buffalo Bills', conf:'AFC', div:'East', city:'Buffalo', st:'NY', dma:51, tvHH:843, metroPop:1148, stadCap:70080, stadYear:1973, sbWins:0 },
+  CAR: { name:'Carolina Panthers', conf:'NFC', div:'South', city:'Charlotte', st:'NC', dma:28, tvHH:1126, metroPop:3397, stadCap:75523, stadYear:1996, sbWins:0 },
+  CHI: { name:'Chicago Bears', conf:'NFC', div:'North', city:'Chicago', st:'IL', dma:3, tvHH:3655, metroPop:9550, stadCap:61500, stadYear:1924, sbWins:1 },
+  CIN: { name:'Cincinnati Bengals', conf:'AFC', div:'North', city:'Cincinnati', st:'OH', dma:35, tvHH:953, metroPop:2356, stadCap:65439, stadYear:2000, sbWins:0 },
+  CLE: { name:'Cleveland Browns', conf:'AFC', div:'North', city:'Cleveland', st:'OH', dma:33, tvHH:1034, metroPop:2048, stadCap:67431, stadYear:1999, sbWins:0 },
+  DAL: { name:'Dallas Cowboys', conf:'NFC', div:'East', city:'Arlington', st:'TX', dma:4, tvHH:3264, metroPop:8098, stadCap:80000, stadYear:2009, sbWins:5 },
+  DEN: { name:'Denver Broncos', conf:'AFC', div:'West', city:'Denver', st:'CO', dma:17, tvHH:1735, metroPop:2109, stadCap:76125, stadYear:2001, sbWins:3 },
+  DET: { name:'Detroit Lions', conf:'NFC', div:'North', city:'Detroit', st:'MI', dma:14, tvHH:1879, metroPop:4312, stadCap:65000, stadYear:2002, sbWins:0 },
+  GB:  { name:'Green Bay Packers', conf:'NFC', div:'North', city:'Green Bay', st:'WI', dma:71, tvHH:417, metroPop:471, stadCap:81441, stadYear:1957, sbWins:4 },
+  HOU: { name:'Houston Texans', conf:'AFC', div:'South', city:'Houston', st:'TX', dma:6, tvHH:2797, metroPop:7556, stadCap:72220, stadYear:2002, sbWins:0 },
+  IND: { name:'Indianapolis Colts', conf:'AFC', div:'South', city:'Indianapolis', st:'IN', dma:25, tvHH:1259, metroPop:2083, stadCap:67000, stadYear:2008, sbWins:2 },
+  JAX: { name:'Jacksonville Jaguars', conf:'AFC', div:'South', city:'Jacksonville', st:'FL', dma:41, tvHH:727, metroPop:1612, stadCap:69132, stadYear:1995, sbWins:0 },
+  KC:  { name:'Kansas City Chiefs', conf:'AFC', div:'West', city:'Kansas City', st:'MO', dma:31, tvHH:1083, metroPop:2432, stadCap:76416, stadYear:1972, sbWins:4 },
+  LAC: { name:'Los Angeles Chargers', conf:'AFC', div:'West', city:'Los Angeles', st:'CA', dma:2, tvHH:5836, metroPop:13201, stadCap:70240, stadYear:2020, sbWins:0 },
+  LAR: { name:'Los Angeles Rams', conf:'NFC', div:'West', city:'Los Angeles', st:'CA', dma:2, tvHH:5836, metroPop:13201, stadCap:70240, stadYear:2020, sbWins:2 },
+  LV:  { name:'Las Vegas Raiders', conf:'AFC', div:'West', city:'Las Vegas', st:'NV', dma:40, tvHH:896, metroPop:2417, stadCap:61000, stadYear:2020, sbWins:3 },
+  MIA: { name:'Miami Dolphins', conf:'AFC', div:'East', city:'Miami', st:'FL', dma:18, tvHH:1667, metroPop:2253, stadCap:65326, stadYear:1987, sbWins:2 },
+  MIN: { name:'Minnesota Vikings', conf:'NFC', div:'North', city:'Minneapolis', st:'MN', dma:15, tvHH:1844, metroPop:3693, stadCap:70000, stadYear:2016, sbWins:0 },
+  NE:  { name:'New England Patriots', conf:'AFC', div:'East', city:'Foxborough', st:'MA', dma:9, tvHH:2584, metroPop:5080, stadCap:65878, stadYear:2002, sbWins:6 },
+  NO:  { name:'New Orleans Saints', conf:'NFC', div:'South', city:'New Orleans', st:'LA', dma:50, tvHH:853, metroPop:1366, stadCap:73208, stadYear:1975, sbWins:1 },
+  NYG: { name:'New York Giants', conf:'NFC', div:'East', city:'East Rutherford', st:'NJ', dma:1, tvHH:7495, metroPop:20140, stadCap:82500, stadYear:2010, sbWins:4 },
+  NYJ: { name:'New York Jets', conf:'AFC', div:'East', city:'East Rutherford', st:'NJ', dma:1, tvHH:7495, metroPop:20140, stadCap:82500, stadYear:2010, sbWins:1 },
+  PHI: { name:'Philadelphia Eagles', conf:'NFC', div:'East', city:'Philadelphia', st:'PA', dma:5, tvHH:3146, metroPop:6245, stadCap:69952, stadYear:2003, sbWins:2 },
+  PIT: { name:'Pittsburgh Steelers', conf:'AFC', div:'North', city:'Pittsburgh', st:'PA', dma:27, tvHH:1189, metroPop:2318, stadCap:68400, stadYear:2001, sbWins:6 },
+  SF:  { name:'San Francisco 49ers', conf:'NFC', div:'West', city:'Santa Clara', st:'CA', dma:12, tvHH:2542, metroPop:7623, stadCap:68500, stadYear:2014, sbWins:5 },
+  SEA: { name:'Seattle Seahawks', conf:'NFC', div:'West', city:'Seattle', st:'WA', dma:13, tvHH:2175, metroPop:2415, stadCap:69000, stadYear:2002, sbWins:1 },
+  TB:  { name:'Tampa Bay Buccaneers', conf:'NFC', div:'South', city:'Tampa', st:'FL', dma:19, tvHH:1541, metroPop:2396, stadCap:65618, stadYear:1998, sbWins:2 },
+  TEN: { name:'Tennessee Titans', conf:'AFC', div:'South', city:'Nashville', st:'TN', dma:30, tvHH:1126, metroPop:1980, stadCap:69143, stadYear:1999, sbWins:0 },
+  WAS: { name:'Washington Commanders', conf:'NFC', div:'East', city:'Landover', st:'MD', dma:8, tvHH:2631, metroPop:6385, stadCap:82000, stadYear:1997, sbWins:3 }
+};
+
+// playoffRound: 0=missed, 1=lost wild card, 2=lost divisional, 3=lost conf champ, 4=lost super bowl, 5=won super bowl
+// [wins, losses, ties, playoffRound, Forbes valuation published that year+1 ($M)]
+const SEASONS = {
+  2018: {
+    ARI:[3,13,0,0], ATL:[7,9,0,0], BAL:[10,6,0,1], BUF:[6,10,0,0], CAR:[7,9,0,0], CHI:[12,4,0,1],
+    CIN:[6,10,0,0], CLE:[7,8,1,0], DAL:[10,6,0,2], DEN:[6,10,0,0], DET:[6,10,0,0], GB:[6,9,1,0],
+    HOU:[11,5,0,1], IND:[10,6,0,2], JAX:[5,11,0,0], KC:[12,4,0,3], LAC:[12,4,0,2], LAR:[13,3,0,4],
+    LV:[4,12,0,0], MIA:[7,9,0,0], MIN:[8,7,1,0], NE:[11,5,0,5], NO:[13,3,0,3], NYG:[5,11,0,0],
+    NYJ:[4,12,0,0], PHI:[9,7,0,2], PIT:[9,6,1,0], SF:[4,12,0,0], SEA:[10,6,0,1], TB:[5,11,0,0],
+    TEN:[9,7,0,0], WAS:[7,9,0,0]
+  },
+  2019: {
+    ARI:[5,10,1,0], ATL:[7,9,0,0], BAL:[14,2,0,2], BUF:[10,6,0,1], CAR:[5,11,0,0], CHI:[8,8,0,0],
+    CIN:[2,14,0,0], CLE:[6,10,0,0], DAL:[8,8,0,0], DEN:[7,9,0,0], DET:[3,12,1,0], GB:[13,3,0,3],
+    HOU:[10,6,0,2], IND:[7,9,0,0], JAX:[6,10,0,0], KC:[12,4,0,5], LAC:[5,11,0,0], LAR:[9,7,0,0],
+    LV:[7,9,0,0], MIA:[5,11,0,0], MIN:[10,6,0,2], NE:[12,4,0,1], NO:[13,3,0,1], NYG:[4,12,0,0],
+    NYJ:[7,9,0,0], PHI:[9,7,0,1], PIT:[8,8,0,0], SF:[13,3,0,4], SEA:[11,5,0,2], TB:[7,9,0,0],
+    TEN:[9,7,0,3], WAS:[3,13,0,0]
+  },
+  2020: {
+    ARI:[8,8,0,0], ATL:[4,12,0,0], BAL:[11,5,0,2], BUF:[13,3,0,3], CAR:[5,11,0,0], CHI:[8,8,0,1],
+    CIN:[4,11,1,0], CLE:[11,5,0,2], DAL:[6,10,0,0], DEN:[5,11,0,0], DET:[5,11,0,0], GB:[13,3,0,3],
+    HOU:[4,12,0,0], IND:[11,5,0,1], JAX:[1,15,0,0], KC:[14,2,0,4], LAC:[7,9,0,0], LAR:[10,6,0,2],
+    LV:[8,8,0,0], MIA:[10,6,0,0], MIN:[7,9,0,0], NE:[7,9,0,0], NO:[12,4,0,2], NYG:[6,10,0,0],
+    NYJ:[2,14,0,0], PHI:[4,11,1,0], PIT:[12,4,0,1], SF:[6,10,0,0], SEA:[12,4,0,1], TB:[11,5,0,5],
+    TEN:[11,5,0,1], WAS:[7,9,0,1]
+  },
+  2021: {
+    ARI:[11,6,0,1], ATL:[7,10,0,0], BAL:[8,9,0,0], BUF:[11,6,0,2], CAR:[5,12,0,0], CHI:[6,11,0,0],
+    CIN:[10,7,0,4], CLE:[8,9,0,0], DAL:[12,5,0,1], DEN:[7,10,0,0], DET:[3,13,1,0], GB:[13,4,0,2],
+    HOU:[4,13,0,0], IND:[9,8,0,0], JAX:[3,14,0,0], KC:[12,5,0,3], LAC:[9,8,0,0], LAR:[12,5,0,5],
+    LV:[10,7,0,1], MIA:[9,8,0,0], MIN:[8,9,0,0], NE:[10,7,0,1], NO:[9,8,0,0], NYG:[4,13,0,0],
+    NYJ:[4,13,0,0], PHI:[9,8,0,1], PIT:[9,7,1,1], SF:[10,7,0,3], SEA:[7,10,0,0], TB:[13,4,0,2],
+    TEN:[12,5,0,2], WAS:[7,10,0,0]
+  },
+  2022: {
+    ARI:[4,13,0,0], ATL:[7,10,0,0], BAL:[10,7,0,1], BUF:[13,3,0,2], CAR:[7,10,0,0], CHI:[3,14,0,0],
+    CIN:[12,4,0,3], CLE:[7,10,0,0], DAL:[12,5,0,2], DEN:[5,12,0,0], DET:[9,8,0,0], GB:[8,9,0,0],
+    HOU:[3,13,1,0], IND:[4,12,1,0], JAX:[9,8,0,2], KC:[14,3,0,5], LAC:[10,7,0,1], LAR:[5,12,0,0],
+    LV:[6,11,0,0], MIA:[9,8,0,1], MIN:[13,4,0,1], NE:[8,9,0,0], NO:[7,10,0,0], NYG:[9,7,1,2],
+    NYJ:[7,10,0,0], PHI:[14,3,0,4], PIT:[7,10,0,0], SF:[13,4,0,3], SEA:[9,8,0,1], TB:[8,9,0,1],
+    TEN:[7,10,0,0], WAS:[8,8,1,0]
+  },
+  2023: {
+    ARI:[4,13,0,0], ATL:[7,10,0,0], BAL:[13,4,0,3], BUF:[11,6,0,2], CAR:[2,15,0,0], CHI:[7,10,0,0],
+    CIN:[9,8,0,0], CLE:[11,6,0,1], DAL:[12,5,0,1], DEN:[8,9,0,0], DET:[12,5,0,3], GB:[9,8,0,2],
+    HOU:[10,7,0,2], IND:[9,8,0,0], JAX:[9,8,0,0], KC:[11,6,0,5], LAC:[5,12,0,0], LAR:[10,7,0,1],
+    LV:[8,9,0,0], MIA:[11,6,0,1], MIN:[7,10,0,0], NE:[4,13,0,0], NO:[9,8,0,0], NYG:[6,11,0,0],
+    NYJ:[7,10,0,0], PHI:[11,6,0,1], PIT:[10,7,0,1], SF:[12,5,0,4], SEA:[9,8,0,0], TB:[9,8,0,2],
+    TEN:[6,11,0,0], WAS:[4,13,0,0]
+  }
+};
+
+// Forbes valuations ($M) by publication year
+// Forbes publishes in Aug/Sep of year Y, reflecting season Y-1
+const VALUATIONS = {
+  2019: { // reflects 2018 season
+    ARI:2150, ATL:2800, BAL:2800, BUF:1900, CAR:2550, CHI:3450, CIN:1800, CLE:2175, DAL:5500, DEN:3000,
+    DET:1950, GB:2850, HOU:3100, IND:2700, JAX:2050, KC:2300, LAC:2475, LAR:3800, LV:2600, MIA:2775,
+    MIN:2750, NE:4100, NO:2350, NYG:3900, NYJ:3100, PHI:3050, PIT:2800, SF:3500, SEA:2975, TB:2425,
+    TEN:2425, WAS:3400
+  },
+  2020: { // reflects 2019 season
+    ARI:2300, ATL:2850, BAL:2850, BUF:2150, CAR:2625, CHI:3525, CIN:2000, CLE:2350, DAL:5700, DEN:3200,
+    DET:2100, GB:2950, HOU:3300, IND:2875, JAX:2200, KC:2500, LAC:2600, LAR:4200, LV:2900, MIA:2900,
+    MIN:2850, NE:4400, NO:2400, NYG:4300, NYJ:3200, PHI:3200, PIT:3050, SF:3800, SEA:3100, TB:2540,
+    TEN:2600, WAS:3500
+  },
+  2021: { // reflects 2020 season
+    ARI:2580, ATL:3265, BAL:3400, BUF:2270, CAR:2870, CHI:4075, CIN:2275, CLE:2850, DAL:6500, DEN:3750,
+    DET:2100, GB:3480, HOU:3700, IND:3100, JAX:2450, KC:2500, LAC:2950, LAR:4800, LV:3415, MIA:3580,
+    MIN:3300, NE:5000, NO:2780, NYG:4850, NYJ:3550, PHI:4100, PIT:3460, SF:4690, SEA:3500, TB:3100,
+    TEN:2770, WAS:4200
+  },
+  2022: { // reflects 2021 season
+    ARI:3400, ATL:3730, BAL:3800, BUF:3050, CAR:3430, CHI:5800, CIN:3000, CLE:3530, DAL:8000, DEN:4650,
+    DET:2950, GB:4085, HOU:4700, IND:3290, JAX:2940, KC:3500, LAC:3875, LAR:6200, LV:5100, MIA:4730,
+    MIN:4225, NE:6400, NO:3400, NYG:6000, NYJ:5400, PHI:5450, PIT:4400, SF:5600, SEA:4400, TB:3350,
+    TEN:3580, WAS:5600
+  },
+  2023: { // reflects 2022 season
+    ARI:3800, ATL:4310, BAL:4340, BUF:3650, CAR:4250, CHI:6300, CIN:3500, CLE:4125, DAL:9000, DEN:5450,
+    DET:3625, GB:4500, HOU:5050, IND:4050, JAX:4000, KC:4200, LAC:4600, LAR:6900, LV:5600, MIA:5350,
+    MIN:4600, NE:7000, NO:4100, NYG:6800, NYJ:6000, PHI:5450, PIT:4730, SF:6000, SEA:5000, TB:4580,
+    TEN:4300, WAS:5600
+  },
+  2024: { // reflects 2023 season
+    ARI:4250, ATL:5000, BAL:5025, BUF:4200, CAR:4975, CHI:6350, CIN:4100, CLE:4800, DAL:10100, DEN:5850,
+    DET:4150, GB:5050, HOU:5600, IND:4500, JAX:4350, KC:4850, LAC:5075, LAR:7600, LV:6700, MIA:6170,
+    MIN:5350, NE:7400, NO:4600, NYG:7300, NYJ:6900, PHI:6600, PIT:5230, SF:6800, SEA:5570, TB:5100,
+    TEN:4950, WAS:6050
+  }
+};
+
+// ==================== VARIABLE DEFINITIONS ====================
+
+const VARS = {
+  valuation: { label: 'Valuation ($M)', fmt: v => '$'+v.toLocaleString()+'M' },
+  wins: { label: 'Season Wins', fmt: v => v.toFixed(0) },
+  winPct: { label: 'Win %', fmt: v => (v*100).toFixed(1)+'%' },
+  metroPop: { label: 'Metro Pop (000s)', fmt: v => v.toLocaleString()+'K' },
+  tvHH: { label: 'TV Households (000s)', fmt: v => v.toLocaleString()+'K' },
+  dmaRank: { label: 'DMA Rank', fmt: v => '#'+v },
+  playoffRound: { label: 'Playoff Round', fmt: v => ['Missed','WC Loss','Div Loss','Conf Loss','SB Loss','SB Win'][v] },
+  sbWins: { label: 'All-Time SB Wins', fmt: v => v.toFixed(0) },
+  stadCap: { label: 'Stadium Capacity', fmt: v => v.toLocaleString() },
+  stadAge: { label: 'Stadium Age (yrs)', fmt: v => v.toFixed(0) },
+  rollingWinPct: { label: '3-Yr Rolling Win %', fmt: v => (v*100).toFixed(1)+'%' },
+  playoffRate5: { label: 'Playoff Rate (5yr)', fmt: v => (v*100).toFixed(0)+'%' },
+  recentSBs: { label: 'SBs Won (last 10yr)', fmt: v => v.toFixed(0) }
+};
+
+// ==================== HELPER FUNCTIONS ====================
+
+function getTeamKeys() { return Object.keys(TEAMS); }
+
+function getVal(teamKey, forbesYear, varName) {
+  const t = TEAMS[teamKey];
+  const seasonYear = forbesYear - 1;
+  const s = SEASONS[seasonYear] ? SEASONS[seasonYear][teamKey] : null;
+  const v = VALUATIONS[forbesYear] ? VALUATIONS[forbesYear][teamKey] : null;
+
+  switch(varName) {
+    case 'valuation': return v;
+    case 'wins': return s ? s[0] : null;
+    case 'winPct': return s ? (s[0] + 0.5*s[2]) / (s[0]+s[1]+s[2]) : null;
+    case 'metroPop': return t.metroPop;
+    case 'tvHH': return t.tvHH;
+    case 'dmaRank': return t.dma;
+    case 'playoffRound': return s ? s[3] : null;
+    case 'sbWins': return t.sbWins;
+    case 'stadCap': return t.stadCap;
+    case 'stadAge': return forbesYear - t.stadYear;
+    case 'rollingWinPct': return getRollingWinPct(teamKey, seasonYear, 3);
+    case 'playoffRate5': return getPlayoffRate(teamKey, seasonYear, 5);
+    case 'recentSBs': return getRecentSBs(teamKey, seasonYear, 10);
+    default: return null;
+  }
+}
+
+function getRollingWinPct(teamKey, endYear, n) {
+  let totalW = 0, totalG = 0;
+  for (let y = endYear; y > endYear - n; y--) {
+    const s = SEASONS[y] ? SEASONS[y][teamKey] : null;
+    if (s) { totalW += s[0] + 0.5*s[2]; totalG += s[0]+s[1]+s[2]; }
+  }
+  return totalG > 0 ? totalW / totalG : null;
+}
+
+function getPlayoffRate(teamKey, endYear, n) {
+  let made = 0, count = 0;
+  for (let y = endYear; y > endYear - n; y--) {
+    const s = SEASONS[y] ? SEASONS[y][teamKey] : null;
+    if (s) { if (s[3] > 0) made++; count++; }
+  }
+  return count > 0 ? made / count : null;
+}
+
+function getRecentSBs(teamKey, endYear, n) {
+  let wins = 0;
+  for (let y = endYear; y > endYear - n; y--) {
+    const s = SEASONS[y] ? SEASONS[y][teamKey] : null;
+    if (s && s[3] === 5) wins++;
+  }
+  return wins;
+}
+
+// ==================== STATISTICS ====================
+
+function linearRegression(xs, ys) {
+  const n = xs.length;
+  if (n < 2) return { slope: 0, intercept: 0, r2: 0, r: 0 };
+  let sx = 0, sy = 0, sxx = 0, sxy = 0, syy = 0;
+  for (let i = 0; i < n; i++) {
+    sx += xs[i]; sy += ys[i];
+    sxx += xs[i]*xs[i]; sxy += xs[i]*ys[i]; syy += ys[i]*ys[i];
+  }
+  const denom = n*sxx - sx*sx;
+  if (Math.abs(denom) < 1e-10) return { slope: 0, intercept: sy/n, r2: 0, r: 0 };
+  const slope = (n*sxy - sx*sy) / denom;
+  const intercept = (sy - slope*sx) / n;
+  const rNum = n*sxy - sx*sy;
+  const rDen = Math.sqrt((n*sxx - sx*sx)*(n*syy - sy*sy));
+  const r = rDen > 0 ? rNum / rDen : 0;
+  return { slope, intercept, r2: r*r, r };
+}
+
+function pearsonR(xs, ys) {
+  return linearRegression(xs, ys).r;
+}
+
+// Multiple regression using normal equations (X'X)^-1 X'y
+function multipleRegression(X, y) {
+  // X is array of arrays (each row is an observation), y is array
+  const n = X.length;
+  const p = X[0].length;
+  // Add intercept column
+  const Xa = X.map(row => [1, ...row]);
+  const k = p + 1;
+  // X'X
+  const XtX = Array.from({length: k}, () => Array(k).fill(0));
+  const Xty = Array(k).fill(0);
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < k; j++) {
+      Xty[j] += Xa[i][j] * y[i];
+      for (let l = 0; l < k; l++) {
+        XtX[j][l] += Xa[i][j] * Xa[i][l];
+      }
+    }
+  }
+  // Solve via Gaussian elimination
+  const aug = XtX.map((row, i) => [...row, Xty[i]]);
+  for (let col = 0; col < k; col++) {
+    let maxRow = col;
+    for (let row = col+1; row < k; row++) {
+      if (Math.abs(aug[row][col]) > Math.abs(aug[maxRow][col])) maxRow = row;
+    }
+    [aug[col], aug[maxRow]] = [aug[maxRow], aug[col]];
+    if (Math.abs(aug[col][col]) < 1e-10) continue;
+    for (let row = 0; row < k; row++) {
+      if (row === col) continue;
+      const f = aug[row][col] / aug[col][col];
+      for (let j = col; j <= k; j++) aug[row][j] -= f * aug[col][j];
+    }
+  }
+  const beta = aug.map((row, i) => row[k] / row[i]);
+  // R²
+  const yMean = y.reduce((a,b) => a+b, 0) / n;
+  let ssTot = 0, ssRes = 0;
+  for (let i = 0; i < n; i++) {
+    let yHat = beta[0];
+    for (let j = 0; j < p; j++) yHat += beta[j+1] * X[i][j];
+    ssRes += (y[i] - yHat) ** 2;
+    ssTot += (y[i] - yMean) ** 2;
+  }
+  return { beta, r2: 1 - ssRes/ssTot, intercept: beta[0], coefficients: beta.slice(1) };
+}
+
+// ==================== CHART COLORS ====================
+
+const CONF_COLORS = { AFC: 'rgba(0,119,190,0.7)', NFC: 'rgba(213,10,10,0.7)' };
+const DIV_COLORS = { East: '#4f8cff', West: '#ff6b6b', North: '#4ae04a', South: '#f0c040' };
+
+function getPointColor(teamKey, colorBy) {
+  const t = TEAMS[teamKey];
+  if (colorBy === 'conference') return t.conf === 'AFC' ? CONF_COLORS.AFC : CONF_COLORS.NFC;
+  if (colorBy === 'division') return DIV_COLORS[t.div];
+  return 'rgba(79,140,255,0.7)';
+}
+
+// ==================== CHARTS ====================
+
+let scatterChart = null;
+let timeChart = null;
+let selectedTimeTeams = new Set(['DAL','NE','GB','KC','CIN','DET']);
+
+function buildScatter() {
+  const forbesYear = parseInt(document.getElementById('yearSelect').value);
+  const xVar = document.getElementById('xSelect').value;
+  const yVar = document.getElementById('ySelect').value;
+  const confFilter = document.getElementById('confSelect').value;
+  const divFilter = document.getElementById('divSelect').value;
+  const colorBy = document.getElementById('colorSelect').value;
+
+  const data = [];
+  const labels = [];
+  const colors = [];
+  const teamKeys = [];
+
+  getTeamKeys().forEach(tk => {
+    const t = TEAMS[tk];
+    if (confFilter !== 'all' && t.conf !== confFilter) return;
+    if (divFilter !== 'all' && t.div !== divFilter) return;
+    const x = getVal(tk, forbesYear, xVar);
+    const y = getVal(tk, forbesYear, yVar);
+    if (x == null || y == null) return;
+    data.push({ x, y });
+    labels.push(tk);
+    colors.push(getPointColor(tk, colorBy));
+    teamKeys.push(tk);
+  });
+
+  const xs = data.map(d => d.x);
+  const ys = data.map(d => d.y);
+  const reg = linearRegression(xs, ys);
+
+  // Regression line points
+  const xMin = Math.min(...xs);
+  const xMax = Math.max(...xs);
+  const regLine = [
+    { x: xMin, y: reg.slope * xMin + reg.intercept },
+    { x: xMax, y: reg.slope * xMax + reg.intercept }
+  ];
+
+  const ctx = document.getElementById('scatterChart').getContext('2d');
+  if (scatterChart) scatterChart.destroy();
+
+  scatterChart = new Chart(ctx, {
+    type: 'scatter',
+    data: {
+      datasets: [
+        {
+          label: 'Teams',
+          data: data,
+          backgroundColor: colors,
+          borderColor: colors.map(c => c.replace('0.7','1')),
+          borderWidth: 1,
+          pointRadius: 7,
+          pointHoverRadius: 10
+        },
+        {
+          label: 'Regression',
+          data: regLine,
+          type: 'line',
+          borderColor: 'rgba(255,255,255,0.4)',
+          borderWidth: 2,
+          borderDash: [6, 4],
+          pointRadius: 0,
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              if (ctx.datasetIndex === 1) return '';
+              const tk = labels[ctx.dataIndex];
+              const t = TEAMS[tk];
+              const xFmt = VARS[xVar].fmt(ctx.parsed.x);
+              const yFmt = VARS[yVar].fmt(ctx.parsed.y);
+              return `${t.name}: ${VARS[xVar].label}=${xFmt}, ${VARS[yVar].label}=${yFmt}`;
+            }
+          },
+          backgroundColor: 'rgba(0,0,0,0.9)',
+          titleFont: { size: 0 },
+          bodyFont: { size: 12 }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: VARS[xVar].label, color: '#aaa' },
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          ticks: { color: '#888' }
+        },
+        y: {
+          title: { display: true, text: VARS[yVar].label, color: '#aaa' },
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          ticks: { color: '#888' }
+        }
+      }
+    },
+    plugins: [{
+      afterDraw: function(chart) {
+        const ctx = chart.ctx;
+        const dataset = chart.data.datasets[0];
+        const meta = chart.getDatasetMeta(0);
+        ctx.font = '10px sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.textAlign = 'center';
+        meta.data.forEach((point, i) => {
+          ctx.fillText(labels[i], point.x, point.y - 12);
+        });
+      }
+    }]
+  });
+
+  // Update stats
+  updateStats(xs, ys, reg, xVar, yVar, labels, teamKeys, forbesYear);
+}
+
+function updateStats(xs, ys, reg, xVar, yVar, labels, teamKeys, forbesYear) {
+  document.getElementById('rSquared').textContent = reg.r2.toFixed(3);
+
+  const slopeStr = reg.slope >= 0 ? reg.slope.toFixed(2) : reg.slope.toFixed(2);
+  document.getElementById('regEquation').textContent =
+    `${VARS[yVar].label} = ${slopeStr} × ${VARS[xVar].label} + ${reg.intercept.toFixed(0)}`;
+
+  // Value of a win
+  const vowBox = document.getElementById('vowBox');
+  const vowValue = document.getElementById('vowValue');
+  const vowNote = document.getElementById('vowNote');
+
+  if (xVar === 'wins' && yVar === 'valuation') {
+    vowValue.textContent = '$' + Math.round(reg.slope).toLocaleString() + 'M';
+    vowNote.textContent = `Each additional win is associated with ~$${Math.round(reg.slope)}M in franchise value (${forbesYear} data, R²=${reg.r2.toFixed(3)})`;
+    vowBox.style.display = 'block';
+  } else if (xVar === 'winPct' && yVar === 'valuation') {
+    const perWin = reg.slope / (1/17); // approx value per win via win%
+    vowValue.textContent = '~$' + Math.round(reg.slope * (1/17)).toLocaleString() + 'M/win';
+    vowNote.textContent = `Via win%: each 1pp win% ≈ $${Math.round(reg.slope/100)}M. One win (≈5.9pp) ≈ $${Math.round(reg.slope * 0.059)}M`;
+    vowBox.style.display = 'block';
+  } else {
+    vowBox.style.display = 'none';
+  }
+
+  // Interpretation
+  const interp = document.getElementById('interpretation');
+  const strength = reg.r2 > 0.5 ? 'strong' : reg.r2 > 0.2 ? 'moderate' : reg.r2 > 0.05 ? 'weak' : 'negligible';
+  const direction = reg.slope > 0 ? 'positive' : 'negative';
+  interp.innerHTML = `There is a <strong>${strength} ${direction}</strong> relationship between ${VARS[xVar].label} and ${VARS[yVar].label} (R²=${reg.r2.toFixed(3)}). ` +
+    `${VARS[xVar].label} explains about <strong>${(reg.r2*100).toFixed(1)}%</strong> of the variance in ${VARS[yVar].label}. ` +
+    (reg.r2 > 0.1 ?
+      `Each unit increase in ${VARS[xVar].label} is associated with a ${Math.abs(reg.slope).toFixed(1)} unit ${direction === 'positive' ? 'increase' : 'decrease'} in ${VARS[yVar].label}.` :
+      `The relationship is too weak to draw meaningful conclusions from this variable alone.`);
+
+  // Residuals (over/undervalued)
+  if (yVar === 'valuation') {
+    const residuals = labels.map((tk, i) => {
+      const predicted = reg.slope * xs[i] + reg.intercept;
+      return { team: tk, actual: ys[i], predicted, residual: ys[i] - predicted };
+    }).sort((a, b) => b.residual - a.residual);
+
+    const overTable = document.getElementById('overvaluedTable');
+    const underTable = document.getElementById('undervaluedTable');
+    overTable.innerHTML = residuals.slice(0, 5).map(r =>
+      `<tr><td>${TEAMS[r.team].name}</td><td class="overvalued">+$${Math.round(r.residual).toLocaleString()}M</td></tr>`
+    ).join('');
+    underTable.innerHTML = residuals.slice(-5).reverse().map(r =>
+      `<tr><td>${TEAMS[r.team].name}</td><td class="undervalued">-$${Math.round(Math.abs(r.residual)).toLocaleString()}M</td></tr>`
+    ).join('');
+  } else {
+    document.getElementById('overvaluedTable').innerHTML = '<tr><td colspan="2" style="color:var(--muted)">Set Y-axis to Valuation</td></tr>';
+    document.getElementById('undervaluedTable').innerHTML = '';
+  }
+}
+
+function buildTimeChart() {
+  const ctx = document.getElementById('timeChart').getContext('2d');
+  if (timeChart) timeChart.destroy();
+
+  const years = [2019, 2020, 2021, 2022, 2023, 2024];
+  const datasets = [];
+  const teamColors = {};
+  const palette = ['#4f8cff','#ff6b6b','#4ae04a','#f0c040','#c084fc','#fb923c','#22d3ee','#f472b6','#a3e635','#e879f9','#fbbf24','#34d399'];
+  let ci = 0;
+
+  selectedTimeTeams.forEach(tk => {
+    const color = palette[ci++ % palette.length];
+    teamColors[tk] = color;
+    datasets.push({
+      label: tk,
+      data: years.map(y => VALUATIONS[y] ? VALUATIONS[y][tk] : null),
+      borderColor: color,
+      backgroundColor: color,
+      borderWidth: 2,
+      pointRadius: 3,
+      fill: false,
+      tension: 0.2
+    });
+  });
+
+  timeChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels: years, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: '#ccc', boxWidth: 12, font: { size: 10 } }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${TEAMS[ctx.dataset.label]?.name || ctx.dataset.label}: $${ctx.parsed.y?.toLocaleString()}M`
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' } },
+        y: {
+          title: { display: true, text: 'Valuation ($M)', color: '#aaa' },
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          ticks: { color: '#888', callback: v => '$'+v.toLocaleString()+'M' }
+        }
+      }
+    }
+  });
+}
+
+// ==================== CORRELATION MATRIX ====================
+
+function buildCorrelationMatrix() {
+  const forbesYear = parseInt(document.getElementById('yearSelect').value);
+  const vars = ['valuation','wins','winPct','metroPop','tvHH','dmaRank','sbWins','stadCap','stadAge','rollingWinPct','playoffRate5'];
+  const shortLabels = ['Val','W','W%','Pop','TV','DMA','SB','Cap','Age','3yW%','PO%'];
+
+  // Gather data
+  const allData = {};
+  vars.forEach(v => { allData[v] = []; });
+  getTeamKeys().forEach(tk => {
+    const allValid = vars.every(v => getVal(tk, forbesYear, v) != null);
+    if (allValid) {
+      vars.forEach(v => { allData[v].push(getVal(tk, forbesYear, v)); });
+    }
+  });
+
+  // Compute correlation matrix
+  const n = vars.length;
+  const matrix = Array.from({length:n}, () => Array(n).fill(0));
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      matrix[i][j] = pearsonR(allData[vars[i]], allData[vars[j]]);
+    }
+  }
+
+  // Render as HTML table
+  let html = '<table class="corr-table"><tr><th></th>';
+  shortLabels.forEach(l => { html += `<th>${l}</th>`; });
+  html += '</tr>';
+  for (let i = 0; i < n; i++) {
+    html += `<tr><th>${shortLabels[i]}</th>`;
+    for (let j = 0; j < n; j++) {
+      const v = matrix[i][j];
+      const r = Math.round(Math.abs(v) * 255);
+      const bg = v > 0 ? `rgba(79,140,255,${Math.abs(v)*0.6})` : `rgba(255,107,107,${Math.abs(v)*0.6})`;
+      html += `<td style="background:${bg};color:${Math.abs(v)>0.5?'#fff':'#ccc'};cursor:pointer" ` +
+        `onclick="setAxes('${vars[i]}','${vars[j]}')" title="${VARS[vars[i]].label} vs ${VARS[vars[j]].label}: r=${v.toFixed(3)}">${v.toFixed(2)}</td>`;
+    }
+    html += '</tr>';
+  }
+  html += '</table>';
+  html += '<div style="font-size:0.7rem;color:var(--muted);margin-top:4px">Click any cell to set scatter plot axes. Blue=positive, red=negative correlation.</div>';
+  document.getElementById('tabCorr').innerHTML = html;
+}
+
+function setAxes(xVar, yVar) {
+  document.getElementById('xSelect').value = xVar;
+  document.getElementById('ySelect').value = yVar;
+  buildScatter();
+}
+
+// ==================== MULTI-VARIABLE REGRESSION ====================
+
+function buildMultiVariable() {
+  const forbesYear = parseInt(document.getElementById('yearSelect').value);
+  const predictors = ['metroPop','tvHH','wins','sbWins','stadCap','stadAge','playoffRate5'];
+  const predLabels = ['Metro Pop','TV HH','Wins','SB Wins','Stad Cap','Stad Age','PO Rate'];
+
+  const X = [];
+  const y = [];
+  const teamList = [];
+
+  getTeamKeys().forEach(tk => {
+    const val = getVal(tk, forbesYear, 'valuation');
+    const row = predictors.map(p => getVal(tk, forbesYear, p));
+    if (val != null && row.every(v => v != null)) {
+      X.push(row);
+      y.push(val);
+      teamList.push(tk);
+    }
+  });
+
+  if (X.length < predictors.length + 2) {
+    document.getElementById('tabMulti').innerHTML = '<p style="color:var(--muted)">Not enough data for multi-variable regression.</p>';
+    return;
+  }
+
+  // Standardize for comparison
+  const means = predictors.map((_, j) => X.reduce((s, row) => s + row[j], 0) / X.length);
+  const stds = predictors.map((_, j) => {
+    const m = means[j];
+    return Math.sqrt(X.reduce((s, row) => s + (row[j]-m)**2, 0) / X.length);
+  });
+  const Xs = X.map(row => row.map((v, j) => stds[j] > 0 ? (v - means[j]) / stds[j] : 0));
+  const yMean = y.reduce((a,b)=>a+b,0) / y.length;
+  const yStd = Math.sqrt(y.reduce((s,v) => s + (v-yMean)**2, 0) / y.length);
+  const ys = y.map(v => (v - yMean) / yStd);
+
+  const result = multipleRegression(Xs, ys);
+  const rawResult = multipleRegression(X, y);
+
+  // Also do individual R² for each predictor
+  const indivR2 = predictors.map(p => {
+    const xs = [];
+    const ys2 = [];
+    getTeamKeys().forEach(tk => {
+      const val = getVal(tk, forbesYear, 'valuation');
+      const pv = getVal(tk, forbesYear, p);
+      if (val != null && pv != null) { xs.push(pv); ys2.push(val); }
+    });
+    return linearRegression(xs, ys2).r2;
+  });
+
+  let html = '<div class="multi-reg-results">';
+  html += `<div class="stat-box"><div class="stat-label">Combined R²</div><div class="stat-big">${rawResult.r2.toFixed(3)}</div>`;
+  html += `<div style="font-size:0.75rem;color:var(--muted)">These ${predictors.length} variables together explain ${(rawResult.r2*100).toFixed(1)}% of valuation variance</div></div>`;
+
+  html += '<table><tr><th>Variable</th><th>Std β</th><th>Solo R²</th><th>Impact</th></tr>';
+  const sorted = predictors.map((p, i) => ({
+    label: predLabels[i],
+    beta: result.coefficients[i],
+    r2: indivR2[i],
+    rawCoeff: rawResult.coefficients[i]
+  })).sort((a, b) => Math.abs(b.beta) - Math.abs(a.beta));
+
+  sorted.forEach(s => {
+    const bar = '█'.repeat(Math.round(Math.abs(s.beta) * 10));
+    const color = s.beta > 0 ? '#4f8cff' : '#ff6b6b';
+    html += `<tr><td>${s.label}</td><td style="color:${color}">${s.beta > 0 ? '+' : ''}${s.beta.toFixed(3)}</td>` +
+      `<td>${s.r2.toFixed(3)}</td><td style="color:${color};font-family:monospace;font-size:0.7rem">${bar}</td></tr>`;
+  });
+  html += '</table>';
+  html += '<div style="font-size:0.7rem;color:var(--muted);margin-top:6px">Std β: standardized coefficient (comparable across variables). Solo R²: variance explained by that variable alone.</div>';
+  html += '</div>';
+  document.getElementById('tabMulti').innerHTML = html;
+}
+
+// ==================== KEY INSIGHTS ====================
+
+function buildInsights() {
+  const years = [2019,2020,2021,2022,2023,2024];
+
+  // Value of a win over time
+  let vowHtml = '<h3>Value of One Win Over Time</h3><table style="width:100%;font-size:0.8rem">';
+  vowHtml += '<tr style="color:var(--muted)"><th>Forbes Year</th><th>$/Win</th><th>R²</th><th>Avg Val</th></tr>';
+  years.forEach(fy => {
+    const xs = [], ys = [];
+    getTeamKeys().forEach(tk => {
+      const w = getVal(tk, fy, 'wins');
+      const v = getVal(tk, fy, 'valuation');
+      if (w != null && v != null) { xs.push(w); ys.push(v); }
+    });
+    const reg = linearRegression(xs, ys);
+    const avg = ys.reduce((a,b)=>a+b,0)/ys.length;
+    vowHtml += `<tr><td>${fy}</td><td>$${Math.round(reg.slope).toLocaleString()}M</td><td>${reg.r2.toFixed(3)}</td><td>$${Math.round(avg).toLocaleString()}M</td></tr>`;
+  });
+  vowHtml += '</table>';
+
+  // Metro pop correlation over time
+  let popHtml = '<h3 style="margin-top:12px">Market Size (Metro Pop) Correlation Over Time</h3><table style="width:100%;font-size:0.8rem">';
+  popHtml += '<tr style="color:var(--muted)"><th>Forbes Year</th><th>r</th><th>R²</th></tr>';
+  years.forEach(fy => {
+    const xs = [], ys = [];
+    getTeamKeys().forEach(tk => {
+      const p = getVal(tk, fy, 'metroPop');
+      const v = getVal(tk, fy, 'valuation');
+      if (p != null && v != null) { xs.push(p); ys.push(v); }
+    });
+    const reg = linearRegression(xs, ys);
+    popHtml += `<tr><td>${fy}</td><td>${reg.r.toFixed(3)}</td><td>${reg.r2.toFixed(3)}</td></tr>`;
+  });
+  popHtml += '</table>';
+
+  // Biggest movers
+  let moversHtml = '<h3 style="margin-top:12px">Biggest Valuation Movers (2019→2024)</h3><table style="width:100%;font-size:0.8rem">';
+  const movers = getTeamKeys().map(tk => {
+    const v19 = VALUATIONS[2019][tk];
+    const v24 = VALUATIONS[2024][tk];
+    return { team: tk, v19, v24, growth: ((v24/v19)-1)*100, abs: v24 - v19 };
+  }).sort((a,b) => b.growth - a.growth);
+
+  moversHtml += '<tr style="color:var(--muted)"><th>Team</th><th>2019</th><th>2024</th><th>Growth</th></tr>';
+  moversHtml += movers.slice(0,5).map(m =>
+    `<tr><td>${TEAMS[m.team].name}</td><td>$${m.v19.toLocaleString()}M</td><td>$${m.v24.toLocaleString()}M</td><td class="undervalued">+${m.growth.toFixed(0)}%</td></tr>`
+  ).join('');
+  moversHtml += '<tr><td colspan="4" style="color:var(--muted);font-size:0.7rem">...</td></tr>';
+  moversHtml += movers.slice(-3).map(m =>
+    `<tr><td>${TEAMS[m.team].name}</td><td>$${m.v19.toLocaleString()}M</td><td>$${m.v24.toLocaleString()}M</td><td class="overvalued">+${m.growth.toFixed(0)}%</td></tr>`
+  ).join('');
+  moversHtml += '</table>';
+
+  document.getElementById('tabInsights').innerHTML = vowHtml + popHtml + moversHtml;
+}
+
+// ==================== TEAM CHIPS ====================
+
+function buildTeamChips() {
+  const container = document.getElementById('teamChips');
+  container.innerHTML = '';
+  getTeamKeys().sort((a,b) => TEAMS[a].name.localeCompare(TEAMS[b].name)).forEach(tk => {
+    const chip = document.createElement('span');
+    chip.className = `team-chip ${TEAMS[tk].conf.toLowerCase()} ${selectedTimeTeams.has(tk) ? 'selected' : ''}`;
+    chip.textContent = tk;
+    chip.title = TEAMS[tk].name;
+    chip.onclick = () => {
+      if (selectedTimeTeams.has(tk)) selectedTimeTeams.delete(tk);
+      else if (selectedTimeTeams.size < 12) selectedTimeTeams.add(tk);
+      chip.classList.toggle('selected');
+      buildTimeChart();
+    };
+    container.appendChild(chip);
+  });
+}
+
+// ==================== TAB SWITCHING ====================
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tabCorr').style.display = tab.dataset.tab === 'corr' ? 'block' : 'none';
+    document.getElementById('tabMulti').style.display = tab.dataset.tab === 'multi' ? 'block' : 'none';
+    document.getElementById('tabInsights').style.display = tab.dataset.tab === 'insights' ? 'block' : 'none';
+    if (tab.dataset.tab === 'multi') buildMultiVariable();
+    if (tab.dataset.tab === 'insights') buildInsights();
+  });
+});
+
+// ==================== EVENT LISTENERS ====================
+
+['yearSelect','xSelect','ySelect','confSelect','divSelect','colorSelect'].forEach(id => {
+  document.getElementById(id).addEventListener('change', () => {
+    buildScatter();
+    buildCorrelationMatrix();
+  });
+});
+
+// ==================== INIT ====================
+
+function init() {
+  buildScatter();
+  buildTeamChips();
+  buildTimeChart();
+  buildCorrelationMatrix();
+}
+
+init();
+</script>
+</body>
+</html>
