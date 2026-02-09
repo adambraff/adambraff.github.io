@@ -128,8 +128,14 @@ input[type=range] { width: 120px; }
       <option value="stadCap">Stadium Capacity</option>
       <option value="stadAge">Stadium Age</option>
       <option value="rollingWinPct">3-Yr Rolling Win %</option>
+      <option value="rolling5WinPct">5-Yr Rolling Win %</option>
+      <option value="playoffRate3">Playoff Rate (Last 3 Yrs)</option>
       <option value="playoffRate5">Playoff Rate (Last 5 Yrs)</option>
+      <option value="cumPlayoff3">Playoff Success (3-Yr Cumul.)</option>
+      <option value="cumPlayoff5">Playoff Success (5-Yr Cumul.)</option>
       <option value="recentSBs">Super Bowls (Last 10 Yrs)</option>
+      <option value="lag1WinPct">Prior Season Win % (1yr lag)</option>
+      <option value="lag2Rolling3">3-Yr Rolling Win % (1yr lag)</option>
     </select>
   </div>
   <div class="control-group">
@@ -187,9 +193,9 @@ input[type=range] { width: 120px; }
       <div class="stat-value" id="regEquation" style="font-size:0.85rem">—</div>
     </div>
     <div class="stat-box value-of-win" id="vowBox">
-      <div class="stat-label">Value of One Win</div>
+      <div class="stat-label" id="vowLabel">Value of One Unit</div>
       <div class="stat-big" id="vowValue">—</div>
-      <div style="font-size:0.75rem;color:var(--muted);margin-top:2px" id="vowNote">Select Wins vs Valuation to see</div>
+      <div style="font-size:0.75rem;color:var(--muted);margin-top:2px" id="vowNote"></div>
     </div>
     <div class="stat-box">
       <h3>Interpretation</h3>
@@ -216,10 +222,12 @@ input[type=range] { width: 120px; }
     <div class="tab-bar">
       <div class="tab active" data-tab="corr">Correlation Matrix</div>
       <div class="tab" data-tab="multi">Multi-Variable</div>
+      <div class="tab" data-tab="lag">Lag Analysis</div>
       <div class="tab" data-tab="insights">Key Insights</div>
     </div>
     <div id="tabCorr" style="margin-top:8px; overflow-x:auto;"></div>
     <div id="tabMulti" style="margin-top:8px; display:none;"></div>
+    <div id="tabLag" style="margin-top:8px; display:none;"></div>
     <div id="tabInsights" style="margin-top:8px; display:none;"></div>
   </div>
 </div>
@@ -359,19 +367,25 @@ const VALUATIONS = {
 // ==================== VARIABLE DEFINITIONS ====================
 
 const VARS = {
-  valuation: { label: 'Valuation ($M)', fmt: v => '$'+v.toLocaleString()+'M' },
-  wins: { label: 'Season Wins', fmt: v => v.toFixed(0) },
-  winPct: { label: 'Win %', fmt: v => (v*100).toFixed(1)+'%' },
-  metroPop: { label: 'Metro Pop (000s)', fmt: v => v.toLocaleString()+'K' },
-  tvHH: { label: 'TV Households (000s)', fmt: v => v.toLocaleString()+'K' },
-  dmaRank: { label: 'DMA Rank', fmt: v => '#'+v },
-  playoffRound: { label: 'Playoff Round', fmt: v => ['Missed','WC Loss','Div Loss','Conf Loss','SB Loss','SB Win'][v] },
-  sbWins: { label: 'All-Time SB Wins', fmt: v => v.toFixed(0) },
-  stadCap: { label: 'Stadium Capacity', fmt: v => v.toLocaleString() },
-  stadAge: { label: 'Stadium Age (yrs)', fmt: v => v.toFixed(0) },
-  rollingWinPct: { label: '3-Yr Rolling Win %', fmt: v => (v*100).toFixed(1)+'%' },
-  playoffRate5: { label: 'Playoff Rate (5yr)', fmt: v => (v*100).toFixed(0)+'%' },
-  recentSBs: { label: 'SBs Won (last 10yr)', fmt: v => v.toFixed(0) }
+  valuation: { label: 'Valuation ($M)', fmt: v => '$'+v.toLocaleString()+'M', unitLabel: '$1M valuation', slopeScale: 1, timeDim: 'Forbes pub year' },
+  wins: { label: 'Season Wins', fmt: v => v.toFixed(0), unitLabel: 'win', slopeScale: 1, timeDim: 'Single season (yr before Forbes pub)' },
+  winPct: { label: 'Win %', fmt: v => (v*100).toFixed(1)+'%', unitLabel: '10pp win rate', slopeScale: 0.1, timeDim: 'Single season' },
+  metroPop: { label: 'Metro Pop (000s)', fmt: v => v.toLocaleString()+'K', unitLabel: '1M metro residents', slopeScale: 1000, timeDim: 'Static (current)' },
+  tvHH: { label: 'TV Households (000s)', fmt: v => v.toLocaleString()+'K', unitLabel: '1M TV households', slopeScale: 1000, timeDim: 'Static (current Nielsen DMA)' },
+  dmaRank: { label: 'DMA Rank', fmt: v => '#'+v, unitLabel: 'DMA rank (lower=bigger)', slopeScale: 1, timeDim: 'Static (current)' },
+  playoffRound: { label: 'Playoff Round', fmt: v => ['Missed','WC Loss','Div Loss','Conf Loss','SB Loss','SB Win'][v], unitLabel: 'playoff round', slopeScale: 1, timeDim: 'Single season' },
+  sbWins: { label: 'All-Time SB Wins', fmt: v => v.toFixed(0), unitLabel: 'Super Bowl', slopeScale: 1, timeDim: 'All-time cumulative' },
+  stadCap: { label: 'Stadium Capacity', fmt: v => v.toLocaleString(), unitLabel: '10K seats', slopeScale: 10000, timeDim: 'Static (current)' },
+  stadAge: { label: 'Stadium Age (yrs)', fmt: v => v.toFixed(0), unitLabel: 'year of age', slopeScale: 1, timeDim: 'Static (current)' },
+  rollingWinPct: { label: '3-Yr Rolling Win %', fmt: v => (v*100).toFixed(1)+'%', unitLabel: '10pp rolling win rate', slopeScale: 0.1, timeDim: '3-yr window ending at reflected season, lag=0' },
+  rolling5WinPct: { label: '5-Yr Rolling Win %', fmt: v => (v*100).toFixed(1)+'%', unitLabel: '10pp rolling win rate', slopeScale: 0.1, timeDim: '5-yr window ending at reflected season, lag=0' },
+  playoffRate3: { label: 'Playoff Rate (3yr)', fmt: v => (v*100).toFixed(0)+'%', unitLabel: '33pp playoff rate', slopeScale: 0.33, timeDim: '3-yr window, lag=0' },
+  playoffRate5: { label: 'Playoff Rate (5yr)', fmt: v => (v*100).toFixed(0)+'%', unitLabel: '20pp playoff rate', slopeScale: 0.20, timeDim: '5-yr window, lag=0' },
+  cumPlayoff3: { label: 'Playoff Success (3yr)', fmt: v => v.toFixed(1), unitLabel: 'cumulative PO point', slopeScale: 1, timeDim: '3-yr sum of round codes (0-5), lag=0' },
+  cumPlayoff5: { label: 'Playoff Success (5yr)', fmt: v => v.toFixed(1), unitLabel: 'cumulative PO point', slopeScale: 1, timeDim: '5-yr sum of round codes (0-5), lag=0' },
+  recentSBs: { label: 'SBs Won (last 10yr)', fmt: v => v.toFixed(0), unitLabel: 'recent SB win', slopeScale: 1, timeDim: '10-yr window, lag=0' },
+  lag1WinPct: { label: 'Prior Season Win %', fmt: v => (v*100).toFixed(1)+'%', unitLabel: '10pp win rate', slopeScale: 0.1, timeDim: 'Single season, lag=1yr' },
+  lag2Rolling3: { label: '3-Yr Rolling Win % (lagged)', fmt: v => (v*100).toFixed(1)+'%', unitLabel: '10pp rolling win rate', slopeScale: 0.1, timeDim: '3-yr window, lag=1yr' }
 };
 
 // ==================== HELPER FUNCTIONS ====================
@@ -396,8 +410,14 @@ function getVal(teamKey, forbesYear, varName) {
     case 'stadCap': return t.stadCap;
     case 'stadAge': return forbesYear - t.stadYear;
     case 'rollingWinPct': return getRollingWinPct(teamKey, seasonYear, 3);
+    case 'rolling5WinPct': return getRollingWinPct(teamKey, seasonYear, 5);
+    case 'playoffRate3': return getPlayoffRate(teamKey, seasonYear, 3);
     case 'playoffRate5': return getPlayoffRate(teamKey, seasonYear, 5);
+    case 'cumPlayoff3': return getCumPlayoffSuccess(teamKey, seasonYear, 3);
+    case 'cumPlayoff5': return getCumPlayoffSuccess(teamKey, seasonYear, 5);
     case 'recentSBs': return getRecentSBs(teamKey, seasonYear, 10);
+    case 'lag1WinPct': return getLaggedWinPct(teamKey, seasonYear, 1);
+    case 'lag2Rolling3': return getRollingWinPct(teamKey, seasonYear - 1, 3);
     default: return null;
   }
 }
@@ -418,6 +438,41 @@ function getPlayoffRate(teamKey, endYear, n) {
     if (s) { if (s[3] > 0) made++; count++; }
   }
   return count > 0 ? made / count : null;
+}
+
+function getCumPlayoffSuccess(teamKey, endYear, n) {
+  let total = 0, count = 0;
+  for (let y = endYear; y > endYear - n; y--) {
+    const s = SEASONS[y] ? SEASONS[y][teamKey] : null;
+    if (s) { total += s[3]; count++; }
+  }
+  return count > 0 ? total : null;
+}
+
+function getLaggedWinPct(teamKey, seasonYear, lag) {
+  const targetYear = seasonYear - lag;
+  const s = SEASONS[targetYear] ? SEASONS[targetYear][teamKey] : null;
+  return s ? (s[0] + 0.5*s[2]) / (s[0]+s[1]+s[2]) : null;
+}
+
+// Compute R² for a performance metric at a given lookback and lag vs valuation
+function lagR2(forbesYears, metric, lookback, lag) {
+  const xs = [], ys = [];
+  forbesYears.forEach(fy => {
+    getTeamKeys().forEach(tk => {
+      const val = VALUATIONS[fy] ? VALUATIONS[fy][tk] : null;
+      if (val == null) return;
+      const seasonYear = fy - 1 - lag;
+      let x = null;
+      if (metric === 'winPct') x = getRollingWinPct(tk, seasonYear, lookback);
+      else if (metric === 'playoffRate') x = getPlayoffRate(tk, seasonYear, lookback);
+      else if (metric === 'cumPlayoff') x = getCumPlayoffSuccess(tk, seasonYear, lookback);
+      if (x != null) { xs.push(x); ys.push(val); }
+    });
+  });
+  if (xs.length < 5) return { r2: null, n: xs.length, slope: null };
+  const reg = linearRegression(xs, ys);
+  return { r2: reg.r2, n: xs.length, slope: reg.slope, r: reg.r };
 }
 
 function getRecentSBs(teamKey, endYear, n) {
@@ -652,34 +707,24 @@ function updateStats(xs, ys, reg, xVar, yVar, labels, teamKeys, forbesYear, isPo
   document.getElementById('regEquation').textContent =
     `${VARS[yVar].label} = ${slopeStr} × ${VARS[xVar].label} + ${reg.intercept.toFixed(0)}`;
 
-  // Value of a win — always compute and show
+  // Dynamic hero metric: "Value of One [X unit]" relative to Y
   const vowBox = document.getElementById('vowBox');
+  const vowLabel = document.getElementById('vowLabel');
   const vowValue = document.getElementById('vowValue');
   const vowNote = document.getElementById('vowNote');
 
-  // Always compute wins vs valuation for the reference stat
-  const winsXs = [], winsYs = [];
-  const yearsToUse = forbesYears || [typeof forbesYear === 'number' ? forbesYear : 2024];
-  yearsToUse.forEach(fy => {
-    getTeamKeys().forEach(tk => {
-      const w = getVal(tk, fy, 'wins');
-      const v = getVal(tk, fy, 'valuation');
-      if (w != null && v != null) { winsXs.push(w); winsYs.push(v); }
-    });
-  });
-  const winsReg = linearRegression(winsXs, winsYs);
-
-  if (xVar === 'wins' && yVar === 'valuation') {
-    vowValue.textContent = '$' + Math.round(reg.slope).toLocaleString() + 'M';
-    vowNote.textContent = `Each additional win ≈ $${Math.round(reg.slope)}M in franchise value (${forbesYear}, R²=${reg.r2.toFixed(3)}, n=${xs.length})`;
-  } else if (xVar === 'winPct' && yVar === 'valuation') {
-    vowValue.textContent = '~$' + Math.round(reg.slope * 0.059).toLocaleString() + 'M';
-    vowNote.textContent = `Via win%: 1pp ≈ $${Math.round(reg.slope/100)}M → one win ≈ $${Math.round(reg.slope * 0.059)}M`;
+  if (yVar === 'valuation' && VARS[xVar]) {
+    const vi = VARS[xVar];
+    const scaledSlope = reg.slope * (vi.slopeScale || 1);
+    const sign = scaledSlope >= 0 ? '+' : '';
+    vowLabel.textContent = 'Value of One ' + (vi.unitLabel || xVar);
+    vowValue.textContent = sign + '$' + Math.round(scaledSlope).toLocaleString() + 'M';
+    const timeTxt = vi.timeDim ? ` [${vi.timeDim}]` : '';
+    vowNote.textContent = `Each ${vi.unitLabel} → ${sign}$${Math.round(scaledSlope).toLocaleString()}M in franchise value (R²=${reg.r2.toFixed(3)}, n=${xs.length})${timeTxt}`;
+    vowBox.style.display = 'block';
   } else {
-    vowValue.textContent = '$' + Math.round(winsReg.slope).toLocaleString() + 'M';
-    vowNote.textContent = `Reference: wins vs valuation (${forbesYear}): $${Math.round(winsReg.slope)}M/win, R²=${winsReg.r2.toFixed(3)}. Current axes show different variables.`;
+    vowBox.style.display = 'none';
   }
-  vowBox.style.display = 'block';
 
   // Interpretation
   const interp = document.getElementById('interpretation');
@@ -886,9 +931,10 @@ function buildMultiVariable() {
   html += `<div class="stat-box"><div class="stat-label">Combined R²</div><div class="stat-big">${rawResult.r2.toFixed(3)}</div>`;
   html += `<div style="font-size:0.75rem;color:var(--muted)">These ${predictors.length} variables together explain ${(rawResult.r2*100).toFixed(1)}% of valuation variance</div></div>`;
 
-  html += '<table><tr><th>Variable</th><th>Std β</th><th>Solo R²</th><th>Impact</th></tr>';
+  html += '<table><tr><th>Variable</th><th>Std β</th><th>Solo R²</th><th>Time Window</th><th>Impact</th></tr>';
   const sorted = predictors.map((p, i) => ({
     label: predLabels[i],
+    varKey: p,
     beta: result.coefficients[i],
     r2: indivR2[i],
     rawCoeff: rawResult.coefficients[i]
@@ -897,13 +943,129 @@ function buildMultiVariable() {
   sorted.forEach(s => {
     const bar = '█'.repeat(Math.round(Math.abs(s.beta) * 10));
     const color = s.beta > 0 ? '#4f8cff' : '#ff6b6b';
+    const timeDim = VARS[s.varKey] ? VARS[s.varKey].timeDim : '';
     html += `<tr><td>${s.label}</td><td style="color:${color}">${s.beta > 0 ? '+' : ''}${s.beta.toFixed(3)}</td>` +
-      `<td>${s.r2.toFixed(3)}</td><td style="color:${color};font-family:monospace;font-size:0.7rem">${bar}</td></tr>`;
+      `<td>${s.r2.toFixed(3)}</td><td style="font-size:0.65rem;color:var(--muted)">${timeDim}</td>` +
+      `<td style="color:${color};font-family:monospace;font-size:0.7rem">${bar}</td></tr>`;
   });
   html += '</table>';
-  html += '<div style="font-size:0.7rem;color:var(--muted);margin-top:6px">Std β: standardized coefficient (comparable across variables). Solo R²: variance explained by that variable alone.</div>';
+  html += '<div style="font-size:0.7rem;color:var(--muted);margin-top:6px">Std β: standardized coefficient. Time Window: how each variable is measured. SB Wins = all-time cumulative; TV HH = static current market size; Wins = single season reflected by Forbes.</div>';
   html += '</div>';
   document.getElementById('tabMulti').innerHTML = html;
+}
+
+// ==================== LAG ANALYSIS ====================
+
+function buildLagAnalysis() {
+  const forbesYears = [2019,2020,2021,2022,2023,2024];
+  const metrics = [
+    { key: 'winPct', label: 'Rolling Win %' },
+    { key: 'playoffRate', label: 'Playoff Make Rate' },
+    { key: 'cumPlayoff', label: 'Cumul. Playoff Success' }
+  ];
+  const lookbacks = [1, 2, 3, 5];
+  const lags = [0, 1, 2];
+
+  let bestR2 = -1, bestCombo = '';
+
+  // Build heatmap data
+  const results = [];
+  metrics.forEach(m => {
+    lookbacks.forEach(lb => {
+      const row = { metric: m.label, lookback: lb, cells: [] };
+      lags.forEach(lag => {
+        const res = lagR2(forbesYears, m.key, lb, lag);
+        row.cells.push(res);
+        if (res.r2 != null && res.r2 > bestR2) {
+          bestR2 = res.r2;
+          bestCombo = `${m.label}, ${lb}-yr lookback, ${lag}-yr lag`;
+        }
+      });
+      results.push(row);
+    });
+  });
+
+  let html = '<div style="font-size:0.8rem">';
+  html += '<div class="stat-box" style="margin-bottom:10px"><div class="stat-label">Best Performance Signal</div>';
+  html += `<div class="stat-big" style="font-size:1.4rem">${bestCombo}</div>`;
+  html += `<div style="color:var(--muted);font-size:0.75rem">R² = ${bestR2.toFixed(4)} — pooled across all 6 Forbes years (${32*6} team-years)</div>`;
+  html += '</div>';
+
+  html += '<p style="color:var(--muted);margin-bottom:8px">How well do on-field performance metrics predict franchise valuation? Each cell shows R² (higher = stronger signal). ' +
+    '<strong>Lookback</strong> = how many seasons are averaged. <strong>Lag</strong> = how many extra years back we shift (lag=0 means the window ends at the season reflected by Forbes; lag=1 means it ends one year earlier, avoiding any contemporaneous information).</p>';
+
+  // Build one table per metric
+  metrics.forEach((m, mi) => {
+    html += `<h3 style="margin-top:${mi > 0 ? '12px' : '4px'}">${m.label}</h3>`;
+    html += '<table style="width:100%;border-collapse:collapse;font-size:0.78rem">';
+    html += '<tr><th style="text-align:left;padding:3px 6px;color:var(--muted)">Lookback</th>';
+    lags.forEach(lag => {
+      html += `<th style="padding:3px 6px;color:var(--muted)">Lag ${lag}</th>`;
+    });
+    html += '</tr>';
+
+    lookbacks.forEach(lb => {
+      const rowResults = results.find(r => r.metric === m.label && r.lookback === lb);
+      html += '<tr>';
+      html += `<td style="padding:3px 6px;font-weight:600">${lb}-yr</td>`;
+      rowResults.cells.forEach(cell => {
+        if (cell.r2 == null) {
+          html += '<td style="padding:3px 6px;text-align:center;color:var(--muted)">—</td>';
+        } else {
+          const intensity = Math.min(cell.r2 / 0.05, 1); // scale so 0.05 is max intensity
+          const isBest = Math.abs(cell.r2 - bestR2) < 0.0001;
+          const bg = isBest ? 'rgba(74,224,74,0.3)' : `rgba(79,140,255,${intensity * 0.5})`;
+          const border = isBest ? '2px solid #4ae04a' : '1px solid var(--border)';
+          html += `<td style="padding:3px 6px;text-align:center;background:${bg};border:${border}">${cell.r2.toFixed(4)}<br><span style="font-size:0.65rem;color:var(--muted)">n=${cell.n}</span></td>`;
+        }
+      });
+      html += '</tr>';
+    });
+    html += '</table>';
+  });
+
+  // Summary interpretation
+  html += '<div style="margin-top:12px;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px">';
+  html += '<h3>What This Means</h3>';
+  html += '<p style="color:var(--muted);margin-top:4px">Even the best-performing combination yields an R² of only ~' + bestR2.toFixed(3) +
+    ', confirming that on-field performance is a <strong>weak predictor</strong> of franchise valuation. ' +
+    'Market factors (metro population, TV households) and brand equity (all-time Super Bowl wins) dominate. ' +
+    'The "value of one win" is real but small relative to structural market advantages.</p>';
+
+  // Add comparison context
+  html += '<table style="width:100%;font-size:0.78rem;margin-top:8px">';
+  html += '<tr style="color:var(--muted)"><th style="text-align:left">Variable</th><th>R² vs Valuation</th><th>Type</th></tr>';
+  const comparisons = [
+    ['All-Time SB Wins', 'sbWins', 'Brand/History'],
+    ['TV Households', 'tvHH', 'Market Size'],
+    ['Metro Population', 'metroPop', 'Market Size'],
+    ['Stadium Capacity', 'stadCap', 'Infrastructure'],
+    ['Best Perf. Signal', null, 'On-Field']
+  ];
+  comparisons.forEach(([label, varKey, type]) => {
+    let r2;
+    if (varKey) {
+      const xs = [], ys = [];
+      forbesYears.forEach(fy => {
+        getTeamKeys().forEach(tk => {
+          const x = getVal(tk, fy, varKey);
+          const y = getVal(tk, fy, 'valuation');
+          if (x != null && y != null) { xs.push(x); ys.push(y); }
+        });
+      });
+      r2 = linearRegression(xs, ys).r2;
+    } else {
+      r2 = bestR2;
+    }
+    const bar = '█'.repeat(Math.round(r2 * 50));
+    const color = varKey ? '#4f8cff' : '#4ae04a';
+    html += `<tr><td>${label}</td><td style="font-family:monospace;color:${color}">${r2.toFixed(3)} <span style="font-size:0.65rem">${bar}</span></td><td style="color:var(--muted)">${type}</td></tr>`;
+  });
+  html += '</table>';
+  html += '</div>';
+
+  html += '</div>';
+  document.getElementById('tabLag').innerHTML = html;
 }
 
 // ==================== KEY INSIGHTS ====================
@@ -991,8 +1153,10 @@ document.querySelectorAll('.tab').forEach(tab => {
     tab.classList.add('active');
     document.getElementById('tabCorr').style.display = tab.dataset.tab === 'corr' ? 'block' : 'none';
     document.getElementById('tabMulti').style.display = tab.dataset.tab === 'multi' ? 'block' : 'none';
+    document.getElementById('tabLag').style.display = tab.dataset.tab === 'lag' ? 'block' : 'none';
     document.getElementById('tabInsights').style.display = tab.dataset.tab === 'insights' ? 'block' : 'none';
     if (tab.dataset.tab === 'multi') buildMultiVariable();
+    if (tab.dataset.tab === 'lag') buildLagAnalysis();
     if (tab.dataset.tab === 'insights') buildInsights();
   });
 });
