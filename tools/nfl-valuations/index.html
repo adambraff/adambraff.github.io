@@ -112,6 +112,7 @@ input[type=range] { width: 120px; }
       <option value="2021">2021</option>
       <option value="2020">2020</option>
       <option value="2019">2019</option>
+      <option value="all">All Years Pooled</option>
     </select>
   </div>
   <div class="control-group">
@@ -518,7 +519,9 @@ let timeChart = null;
 let selectedTimeTeams = new Set(['DAL','NE','GB','KC','CIN','DET']);
 
 function buildScatter() {
-  const forbesYear = parseInt(document.getElementById('yearSelect').value);
+  const yearVal = document.getElementById('yearSelect').value;
+  const isPooled = yearVal === 'all';
+  const forbesYears = isPooled ? [2019,2020,2021,2022,2023,2024] : [parseInt(yearVal)];
   const xVar = document.getElementById('xSelect').value;
   const yVar = document.getElementById('ySelect').value;
   const confFilter = document.getElementById('confSelect').value;
@@ -530,17 +533,19 @@ function buildScatter() {
   const colors = [];
   const teamKeys = [];
 
-  getTeamKeys().forEach(tk => {
-    const t = TEAMS[tk];
-    if (confFilter !== 'all' && t.conf !== confFilter) return;
-    if (divFilter !== 'all' && t.div !== divFilter) return;
-    const x = getVal(tk, forbesYear, xVar);
-    const y = getVal(tk, forbesYear, yVar);
-    if (x == null || y == null) return;
-    data.push({ x, y });
-    labels.push(tk);
-    colors.push(getPointColor(tk, colorBy));
-    teamKeys.push(tk);
+  forbesYears.forEach(forbesYear => {
+    getTeamKeys().forEach(tk => {
+      const t = TEAMS[tk];
+      if (confFilter !== 'all' && t.conf !== confFilter) return;
+      if (divFilter !== 'all' && t.div !== divFilter) return;
+      const x = getVal(tk, forbesYear, xVar);
+      const y = getVal(tk, forbesYear, yVar);
+      if (x == null || y == null) return;
+      data.push({ x, y });
+      labels.push(isPooled ? tk + "'" + String(forbesYear).slice(2) : tk);
+      colors.push(getPointColor(tk, colorBy));
+      teamKeys.push(tk);
+    });
   });
 
   const xs = data.map(d => d.x);
@@ -568,8 +573,8 @@ function buildScatter() {
           backgroundColor: colors,
           borderColor: colors.map(c => c.replace('0.7','1')),
           borderWidth: 1,
-          pointRadius: 7,
-          pointHoverRadius: 10
+          pointRadius: isPooled ? 4 : 7,
+          pointHoverRadius: isPooled ? 7 : 10
         },
         {
           label: 'Regression',
@@ -592,11 +597,13 @@ function buildScatter() {
           callbacks: {
             label: function(ctx) {
               if (ctx.datasetIndex === 1) return '';
-              const tk = labels[ctx.dataIndex];
+              const lbl = labels[ctx.dataIndex];
+              const tk = lbl.includes("'") ? lbl.split("'")[0] : lbl;
               const t = TEAMS[tk];
               const xFmt = VARS[xVar].fmt(ctx.parsed.x);
               const yFmt = VARS[yVar].fmt(ctx.parsed.y);
-              return `${t.name}: ${VARS[xVar].label}=${xFmt}, ${VARS[yVar].label}=${yFmt}`;
+              const yearSuffix = lbl.includes("'") ? ' (' + lbl.split("'")[1] + ')' : '';
+              return `${t.name}${yearSuffix}: ${VARS[xVar].label}=${xFmt}, ${VARS[yVar].label}=${yFmt}`;
             }
           },
           backgroundColor: 'rgba(0,0,0,0.9)',
@@ -619,6 +626,7 @@ function buildScatter() {
     },
     plugins: [{
       afterDraw: function(chart) {
+        if (isPooled) return; // Skip labels in pooled mode
         const ctx = chart.ctx;
         const dataset = chart.data.datasets[0];
         const meta = chart.getDatasetMeta(0);
@@ -633,33 +641,45 @@ function buildScatter() {
   });
 
   // Update stats
-  updateStats(xs, ys, reg, xVar, yVar, labels, teamKeys, forbesYear);
+  const displayYear = isPooled ? 'All Years' : forbesYears[0];
+  updateStats(xs, ys, reg, xVar, yVar, labels, teamKeys, displayYear, isPooled, forbesYears);
 }
 
-function updateStats(xs, ys, reg, xVar, yVar, labels, teamKeys, forbesYear) {
+function updateStats(xs, ys, reg, xVar, yVar, labels, teamKeys, forbesYear, isPooled, forbesYears) {
   document.getElementById('rSquared').textContent = reg.r2.toFixed(3);
 
   const slopeStr = reg.slope >= 0 ? reg.slope.toFixed(2) : reg.slope.toFixed(2);
   document.getElementById('regEquation').textContent =
     `${VARS[yVar].label} = ${slopeStr} × ${VARS[xVar].label} + ${reg.intercept.toFixed(0)}`;
 
-  // Value of a win
+  // Value of a win — always compute and show
   const vowBox = document.getElementById('vowBox');
   const vowValue = document.getElementById('vowValue');
   const vowNote = document.getElementById('vowNote');
 
+  // Always compute wins vs valuation for the reference stat
+  const winsXs = [], winsYs = [];
+  const yearsToUse = forbesYears || [typeof forbesYear === 'number' ? forbesYear : 2024];
+  yearsToUse.forEach(fy => {
+    getTeamKeys().forEach(tk => {
+      const w = getVal(tk, fy, 'wins');
+      const v = getVal(tk, fy, 'valuation');
+      if (w != null && v != null) { winsXs.push(w); winsYs.push(v); }
+    });
+  });
+  const winsReg = linearRegression(winsXs, winsYs);
+
   if (xVar === 'wins' && yVar === 'valuation') {
     vowValue.textContent = '$' + Math.round(reg.slope).toLocaleString() + 'M';
-    vowNote.textContent = `Each additional win is associated with ~$${Math.round(reg.slope)}M in franchise value (${forbesYear} data, R²=${reg.r2.toFixed(3)})`;
-    vowBox.style.display = 'block';
+    vowNote.textContent = `Each additional win ≈ $${Math.round(reg.slope)}M in franchise value (${forbesYear}, R²=${reg.r2.toFixed(3)}, n=${xs.length})`;
   } else if (xVar === 'winPct' && yVar === 'valuation') {
-    const perWin = reg.slope / (1/17); // approx value per win via win%
-    vowValue.textContent = '~$' + Math.round(reg.slope * (1/17)).toLocaleString() + 'M/win';
-    vowNote.textContent = `Via win%: each 1pp win% ≈ $${Math.round(reg.slope/100)}M. One win (≈5.9pp) ≈ $${Math.round(reg.slope * 0.059)}M`;
-    vowBox.style.display = 'block';
+    vowValue.textContent = '~$' + Math.round(reg.slope * 0.059).toLocaleString() + 'M';
+    vowNote.textContent = `Via win%: 1pp ≈ $${Math.round(reg.slope/100)}M → one win ≈ $${Math.round(reg.slope * 0.059)}M`;
   } else {
-    vowBox.style.display = 'none';
+    vowValue.textContent = '$' + Math.round(winsReg.slope).toLocaleString() + 'M';
+    vowNote.textContent = `Reference: wins vs valuation (${forbesYear}): $${Math.round(winsReg.slope)}M/win, R²=${winsReg.r2.toFixed(3)}. Current axes show different variables.`;
   }
+  vowBox.style.display = 'block';
 
   // Interpretation
   const interp = document.getElementById('interpretation');
@@ -673,18 +693,20 @@ function updateStats(xs, ys, reg, xVar, yVar, labels, teamKeys, forbesYear) {
 
   // Residuals (over/undervalued)
   if (yVar === 'valuation') {
-    const residuals = labels.map((tk, i) => {
+    const residuals = labels.map((lbl, i) => {
+      const tk = lbl.includes("'") ? lbl.split("'")[0] : lbl;
       const predicted = reg.slope * xs[i] + reg.intercept;
-      return { team: tk, actual: ys[i], predicted, residual: ys[i] - predicted };
+      return { team: tk, label: lbl, actual: ys[i], predicted, residual: ys[i] - predicted };
     }).sort((a, b) => b.residual - a.residual);
 
     const overTable = document.getElementById('overvaluedTable');
     const underTable = document.getElementById('undervaluedTable');
+    const getName = r => isPooled ? r.label : TEAMS[r.team].name;
     overTable.innerHTML = residuals.slice(0, 5).map(r =>
-      `<tr><td>${TEAMS[r.team].name}</td><td class="overvalued">+$${Math.round(r.residual).toLocaleString()}M</td></tr>`
+      `<tr><td>${getName(r)}</td><td class="overvalued">+$${Math.round(r.residual).toLocaleString()}M</td></tr>`
     ).join('');
     underTable.innerHTML = residuals.slice(-5).reverse().map(r =>
-      `<tr><td>${TEAMS[r.team].name}</td><td class="undervalued">-$${Math.round(Math.abs(r.residual)).toLocaleString()}M</td></tr>`
+      `<tr><td>${getName(r)}</td><td class="undervalued">-$${Math.round(Math.abs(r.residual)).toLocaleString()}M</td></tr>`
     ).join('');
   } else {
     document.getElementById('overvaluedTable').innerHTML = '<tr><td colspan="2" style="color:var(--muted)">Set Y-axis to Valuation</td></tr>';
@@ -749,18 +771,22 @@ function buildTimeChart() {
 // ==================== CORRELATION MATRIX ====================
 
 function buildCorrelationMatrix() {
-  const forbesYear = parseInt(document.getElementById('yearSelect').value);
+  const yearVal = document.getElementById('yearSelect').value;
+  const isPooled = yearVal === 'all';
+  const forbesYears = isPooled ? [2019,2020,2021,2022,2023,2024] : [parseInt(yearVal)];
   const vars = ['valuation','wins','winPct','metroPop','tvHH','dmaRank','sbWins','stadCap','stadAge','rollingWinPct','playoffRate5'];
   const shortLabels = ['Val','W','W%','Pop','TV','DMA','SB','Cap','Age','3yW%','PO%'];
 
   // Gather data
   const allData = {};
   vars.forEach(v => { allData[v] = []; });
-  getTeamKeys().forEach(tk => {
-    const allValid = vars.every(v => getVal(tk, forbesYear, v) != null);
-    if (allValid) {
-      vars.forEach(v => { allData[v].push(getVal(tk, forbesYear, v)); });
-    }
+  forbesYears.forEach(forbesYear => {
+    getTeamKeys().forEach(tk => {
+      const allValid = vars.every(v => getVal(tk, forbesYear, v) != null);
+      if (allValid) {
+        vars.forEach(v => { allData[v].push(getVal(tk, forbesYear, v)); });
+      }
+    });
   });
 
   // Compute correlation matrix
@@ -801,7 +827,9 @@ function setAxes(xVar, yVar) {
 // ==================== MULTI-VARIABLE REGRESSION ====================
 
 function buildMultiVariable() {
-  const forbesYear = parseInt(document.getElementById('yearSelect').value);
+  const yearVal = document.getElementById('yearSelect').value;
+  const isPooled = yearVal === 'all';
+  const forbesYears = isPooled ? [2019,2020,2021,2022,2023,2024] : [parseInt(yearVal)];
   const predictors = ['metroPop','tvHH','wins','sbWins','stadCap','stadAge','playoffRate5'];
   const predLabels = ['Metro Pop','TV HH','Wins','SB Wins','Stad Cap','Stad Age','PO Rate'];
 
@@ -809,14 +837,16 @@ function buildMultiVariable() {
   const y = [];
   const teamList = [];
 
-  getTeamKeys().forEach(tk => {
-    const val = getVal(tk, forbesYear, 'valuation');
-    const row = predictors.map(p => getVal(tk, forbesYear, p));
-    if (val != null && row.every(v => v != null)) {
-      X.push(row);
-      y.push(val);
-      teamList.push(tk);
-    }
+  forbesYears.forEach(forbesYear => {
+    getTeamKeys().forEach(tk => {
+      const val = getVal(tk, forbesYear, 'valuation');
+      const row = predictors.map(p => getVal(tk, forbesYear, p));
+      if (val != null && row.every(v => v != null)) {
+        X.push(row);
+        y.push(val);
+        teamList.push(tk);
+      }
+    });
   });
 
   if (X.length < predictors.length + 2) {
@@ -842,10 +872,12 @@ function buildMultiVariable() {
   const indivR2 = predictors.map(p => {
     const xs = [];
     const ys2 = [];
-    getTeamKeys().forEach(tk => {
-      const val = getVal(tk, forbesYear, 'valuation');
-      const pv = getVal(tk, forbesYear, p);
-      if (val != null && pv != null) { xs.push(pv); ys2.push(val); }
+    forbesYears.forEach(fy => {
+      getTeamKeys().forEach(tk => {
+        const val = getVal(tk, fy, 'valuation');
+        const pv = getVal(tk, fy, p);
+        if (val != null && pv != null) { xs.push(pv); ys2.push(val); }
+      });
     });
     return linearRegression(xs, ys2).r2;
   });
