@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Facts</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  header {
+    text-align: center;
+    padding: 3rem 1rem 1.5rem;
+  }
+
+  header h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #f59e0b, #ef4444, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.4rem;
+  }
+
+  header p {
+    color: #94a3b8;
+    font-size: 1.05rem;
+  }
+
+  .input-area {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: center;
+    margin: 1.5rem 0 2rem;
+    flex-wrap: wrap;
+    padding: 0 1rem;
+  }
+
+  .input-area label {
+    font-size: 1rem;
+    color: #cbd5e1;
+  }
+
+  .input-area input[type="date"] {
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: 2px solid #334155;
+    background: #1e293b;
+    color: #e2e8f0;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .input-area input[type="date"]:focus {
+    border-color: #f59e0b;
+  }
+
+  .input-area button {
+    padding: 0.6rem 1.6rem;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .input-area button:hover { opacity: 0.9; }
+  .input-area button:active { transform: scale(0.97); }
+
+  #error {
+    color: #f87171;
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+  }
+
+  #loading {
+    display: none;
+    text-align: center;
+    padding: 2rem;
+    color: #94a3b8;
+  }
+
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid #334155;
+    border-top-color: #f59e0b;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 1rem;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  #results {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    max-width: 860px;
+    width: 100%;
+    padding: 0 1rem 3rem;
+  }
+
+  @media (max-width: 640px) {
+    #results { grid-template-columns: 1fr; }
+  }
+
+  .fact-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 1.25rem;
+    opacity: 0;
+    transform: translateY(16px);
+    animation: fadeUp 0.4s ease forwards;
+  }
+
+  .fact-card:nth-child(1)  { animation-delay: 0.05s; }
+  .fact-card:nth-child(2)  { animation-delay: 0.10s; }
+  .fact-card:nth-child(3)  { animation-delay: 0.15s; }
+  .fact-card:nth-child(4)  { animation-delay: 0.20s; }
+  .fact-card:nth-child(5)  { animation-delay: 0.25s; }
+  .fact-card:nth-child(6)  { animation-delay: 0.30s; }
+  .fact-card:nth-child(7)  { animation-delay: 0.35s; }
+  .fact-card:nth-child(8)  { animation-delay: 0.40s; }
+  .fact-card:nth-child(9)  { animation-delay: 0.45s; }
+  .fact-card:nth-child(10) { animation-delay: 0.50s; }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fact-card .icon {
+    font-size: 1.6rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .fact-card .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+    margin-bottom: 0.3rem;
+  }
+
+  .fact-card .title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #f8fafc;
+    margin-bottom: 0.3rem;
+  }
+
+  .fact-card .detail {
+    font-size: 0.92rem;
+    color: #94a3b8;
+    line-height: 1.45;
+  }
+
+  footer {
+    text-align: center;
+    padding: 1rem;
+    color: #475569;
+    font-size: 0.8rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Birthday Facts</h1>
+  <p>Enter your date of birth and discover 10 things about it.</p>
+</header>
+
+<div class="input-area">
+  <label for="dob">Date of Birth:</label>
+  <input type="date" id="dob" max="">
+  <button onclick="go()">Tell Me</button>
+</div>
+
+<div id="error"></div>
+<div id="loading"><div class="spinner"></div>Digging up your birthday facts&hellip;</div>
+<div id="results"></div>
+
+<footer>adambraff.github.io</footer>
+
+<script>
+// Set max date to today
+document.getElementById('dob').max = new Date().toISOString().split('T')[0];
+
+// --- DATA ---
+
+const ZODIAC = [
+  { sign: 'Capricorn',   start: [1,1],   end: [1,19],  icon: '♑', trait: 'Disciplined and ambitious — the CEO of the zodiac.' },
+  { sign: 'Aquarius',    start: [1,20],  end: [2,18],  icon: '♒', trait: 'Independent and original — marches to a drum only they can hear.' },
+  { sign: 'Pisces',      start: [2,19],  end: [3,20],  icon: '♓', trait: 'Intuitive and empathetic — feels the room before reading it.' },
+  { sign: 'Aries',       start: [3,21],  end: [4,19],  icon: '♈', trait: 'Bold and energetic — first through the door, every time.' },
+  { sign: 'Taurus',      start: [4,20],  end: [5,20],  icon: '♉', trait: 'Steadfast and sensual — immovable object meets fine dining.' },
+  { sign: 'Gemini',      start: [5,21],  end: [6,20],  icon: '♊', trait: 'Curious and adaptable — never boring, sometimes exhausting.' },
+  { sign: 'Cancer',      start: [6,21],  end: [7,22],  icon: '♋', trait: 'Nurturing and protective — tough shell, soft heart.' },
+  { sign: 'Leo',         start: [7,23],  end: [8,22],  icon: '♌', trait: 'Charismatic and generous — the room brightens when they enter.' },
+  { sign: 'Virgo',       start: [8,23],  end: [9,22],  icon: '♍', trait: 'Analytical and detail-oriented — finds the typo everyone missed.' },
+  { sign: 'Libra',       start: [9,23],  end: [10,22], icon: '♎', trait: 'Diplomatic and fair-minded — the human scales of justice.' },
+  { sign: 'Scorpio',     start: [10,23], end: [11,21], icon: '♏', trait: 'Intense and perceptive — sees through everything, forgives selectively.' },
+  { sign: 'Sagittarius', start: [11,22], end: [12,21], icon: '♐', trait: 'Adventurous and philosophical — always chasing the next horizon.' },
+  { sign: 'Capricorn',   start: [12,22], end: [12,31], icon: '♑', trait: 'Disciplined and ambitious — the CEO of the zodiac.' },
+];
+
+const CHINESE_ZODIAC = [
+  { animal: 'Rat',     icon: '🐀', trait: 'Quick-witted, resourceful, and versatile.' },
+  { animal: 'Ox',      icon: '🐂', trait: 'Diligent, dependable, and determined.' },
+  { animal: 'Tiger',   icon: '🐅', trait: 'Brave, competitive, and confident.' },
+  { animal: 'Rabbit',  icon: '🐇', trait: 'Quiet, elegant, and kind.' },
+  { animal: 'Dragon',  icon: '🐉', trait: 'Confident, ambitious, and energetic.' },
+  { animal: 'Snake',   icon: '🐍', trait: 'Enigmatic, intelligent, and wise.' },
+  { animal: 'Horse',   icon: '🐎', trait: 'Animated, active, and energetic.' },
+  { animal: 'Goat',    icon: '🐐', trait: 'Calm, gentle, and sympathetic.' },
+  { animal: 'Monkey',  icon: '🐒', trait: 'Sharp, smart, and curious.' },
+  { animal: 'Rooster', icon: '🐓', trait: 'Observant, hardworking, and courageous.' },
+  { animal: 'Dog',     icon: '🐕', trait: 'Loyal, honest, and prudent.' },
+  { animal: 'Pig',     icon: '🐖', trait: 'Compassionate, generous, and diligent.' },
+];
+
+const BIRTHSTONES = {
+  1:  { stone: 'Garnet',    color: '#8B0000' },
+  2:  { stone: 'Amethyst',  color: '#9966CC' },
+  3:  { stone: 'Aquamarine',color: '#7FFFD4' },
+  4:  { stone: 'Diamond',   color: '#B9F2FF' },
+  5:  { stone: 'Emerald',   color: '#50C878' },
+  6:  { stone: 'Alexandrite',color: '#008B8B' },
+  7:  { stone: 'Ruby',      color: '#E0115F' },
+  8:  { stone: 'Peridot',   color: '#AAFF00' },
+  9:  { stone: 'Sapphire',  color: '#0F52BA' },
+  10: { stone: 'Opal',      color: '#A8C3BC' },
+  11: { stone: 'Topaz',     color: '#FFC87C' },
+  12: { stone: 'Tanzanite', color: '#4169E1' },
+};
+
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+const DAY_FACTS = {
+  Sunday:    'The ancient Romans called it "dies Solis" — day of the Sun. More U.S. presidents have been born on Sunday than any other day.',
+  Monday:    '"Monday\'s child is fair of face," says the old nursery rhyme. The word comes from Old English "Mōnandæg" — day of the Moon.',
+  Tuesday:   'Named after Tiw, the Norse god of single combat. Mars rules this day in Romance languages (French: mardi).',
+  Wednesday: 'Named after Odin (Woden), the Norse allfather. Statistically, it\'s the least common day for U.S. births.',
+  Thursday:  'Thor\'s day — the god of thunder. In the Thai solar calendar, the color associated with Thursday is orange.',
+  Friday:    'Named after Frigg, Norse goddess of love. Studies show Friday is the most common day of the week for births in the U.S.',
+  Saturday:  'Named after Saturn, the Roman god of agriculture. Only about 1 in 7 U.S. presidents were born on a Saturday.',
+};
+
+const GENERATIONS = [
+  { name: 'Greatest Generation',  start: 1901, end: 1927, desc: 'The generation that weathered the Depression and won WWII.' },
+  { name: 'Silent Generation',    start: 1928, end: 1945, desc: 'Came of age in postwar conformity — but produced rock & roll.' },
+  { name: 'Baby Boomers',         start: 1946, end: 1964, desc: 'The demographic tidal wave that reshaped American culture.' },
+  { name: 'Generation X',         start: 1965, end: 1980, desc: 'The latchkey generation — independent, skeptical, and adaptable.' },
+  { name: 'Millennials',          start: 1981, end: 1996, desc: 'Digital natives who came of age around the turn of the millennium.' },
+  { name: 'Generation Z',         start: 1997, end: 2012, desc: 'True smartphone natives — pragmatic and socially conscious.' },
+  { name: 'Generation Alpha',     start: 2013, end: 2030, desc: 'Growing up with AI assistants and tablets before training wheels.' },
+];
+
+// --- COMPUTED FACTS ---
+
+function getZodiac(month, day) {
+  for (const z of ZODIAC) {
+    const afterStart = month > z.start[0] || (month === z.start[0] && day >= z.start[1]);
+    const beforeEnd  = month < z.end[0]   || (month === z.end[0]   && day <= z.end[1]);
+    if (afterStart && beforeEnd) return z;
+  }
+  return ZODIAC[0]; // Capricorn fallback
+}
+
+function getChineseZodiac(year) {
+  // Chinese New Year varies, but this is the standard simplification
+  const idx = (year - 4) % 12;
+  return CHINESE_ZODIAC[idx >= 0 ? idx : idx + 12];
+}
+
+function getGeneration(year) {
+  for (const g of GENERATIONS) {
+    if (year >= g.start && year <= g.end) return g;
+  }
+  return null;
+}
+
+function dayOfYear(date) {
+  const start = new Date(date.getFullYear(), 0, 0);
+  const diff = date - start;
+  return Math.floor(diff / 86400000);
+}
+
+function formatNumber(n) {
+  return n.toLocaleString();
+}
+
+// --- WIKIPEDIA API ---
+
+async function fetchWikipediaOnThisDay(month, day) {
+  const mm = String(month).padStart(2, '0');
+  const dd = String(day).padStart(2, '0');
+  const url = `https://en.wikipedia.org/api/rest_v1/feed/onthisday/all/${mm}/${dd}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('API error');
+    return await res.json();
+  } catch (e) {
+    console.warn('Wikipedia API failed:', e);
+    return null;
+  }
+}
+
+function pickRandom(arr, n) {
+  const shuffled = [...arr].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, n);
+}
+
+// --- RENDER ---
+
+function renderCard(icon, label, title, detail) {
+  return `<div class="fact-card">
+    <div class="icon">${icon}</div>
+    <div class="label">${label}</div>
+    <div class="title">${title}</div>
+    <div class="detail">${detail}</div>
+  </div>`;
+}
+
+async function go() {
+  const input = document.getElementById('dob');
+  const errEl = document.getElementById('error');
+  const loadEl = document.getElementById('loading');
+  const resEl = document.getElementById('results');
+
+  errEl.textContent = '';
+  resEl.innerHTML = '';
+
+  const val = input.value;
+  if (!val) { errEl.textContent = 'Please enter a date.'; return; }
+
+  const parts = val.split('-');
+  const year  = parseInt(parts[0]);
+  const month = parseInt(parts[1]);
+  const day   = parseInt(parts[2]);
+  const dob   = new Date(year, month - 1, day);
+
+  if (dob > new Date()) { errEl.textContent = 'Date cannot be in the future.'; return; }
+  if (year < 1900) { errEl.textContent = 'Please enter a date after 1900.'; return; }
+
+  loadEl.style.display = 'block';
+
+  // Computed facts
+  const dayName  = DAYS[dob.getDay()];
+  const zodiac   = getZodiac(month, day);
+  const cz       = getChineseZodiac(year);
+  const stone    = BIRTHSTONES[month];
+  const gen      = getGeneration(year);
+  const now      = new Date();
+  const ageDays  = Math.floor((now - dob) / 86400000);
+  const ageWeeks = Math.floor(ageDays / 7);
+  const doyNum   = dayOfYear(dob);
+
+  // Fetch Wikipedia data
+  const wiki = await fetchWikipediaOnThisDay(month, day);
+
+  loadEl.style.display = 'none';
+
+  const facts = [];
+
+  // 1. Day of the week
+  facts.push(renderCard('📅', 'Day of the Week',
+    `You were born on a ${dayName}`,
+    DAY_FACTS[dayName]
+  ));
+
+  // 2. Zodiac
+  facts.push(renderCard(zodiac.icon, 'Western Zodiac',
+    zodiac.sign,
+    zodiac.trait
+  ));
+
+  // 3. Chinese Zodiac
+  facts.push(renderCard(cz.icon, 'Chinese Zodiac',
+    `Year of the ${cz.animal}`,
+    cz.trait
+  ));
+
+  // 4. Birthstone
+  facts.push(renderCard('💎', 'Birthstone',
+    stone.stone,
+    `The birthstone for ${new Date(2000, month-1).toLocaleString('en',{month:'long'})} is ${stone.stone}.`
+  ));
+
+  // 5. Age in days
+  facts.push(renderCard('⏱️', 'Time Alive',
+    `${formatNumber(ageDays)} days old`,
+    `That's ${formatNumber(ageWeeks)} weeks, or about ${formatNumber(ageDays * 24)} hours you've been on this planet.`
+  ));
+
+  // 6. Day of the year
+  facts.push(renderCard('🔢', 'Day of the Year',
+    `Day #${doyNum} of ${year}`,
+    `Your birthday falls ${doyNum <= 182 ? 'in the first half' : 'in the second half'} of the year. ${doyNum === 1 ? 'New Year baby!' : doyNum === 365 || doyNum === 366 ? 'New Year\'s Eve baby!' : ''}`
+  ));
+
+  // 7. Generation
+  if (gen) {
+    facts.push(renderCard('👥', 'Generation',
+      gen.name,
+      gen.desc
+    ));
+  } else {
+    facts.push(renderCard('👥', 'Generation',
+      'Off the charts',
+      `Born in ${year} — you defy generational labels.`
+    ));
+  }
+
+  // 8-9. Historical events
+  if (wiki && wiki.events && wiki.events.length > 0) {
+    const events = pickRandom(wiki.events.filter(e => e.year && e.text), 2);
+    events.forEach((evt, i) => {
+      facts.push(renderCard('📜', `On This Day (${evt.year})`,
+        evt.text.length > 100 ? evt.text.slice(0, 97) + '…' : evt.text,
+        `This happened on ${new Date(2000, month-1).toLocaleString('en',{month:'long'})} ${day}, ${evt.year}.`
+      ));
+    });
+  } else {
+    facts.push(renderCard('📜', 'On This Day',
+      'History is shy today',
+      'Could not load historical events. Try again in a moment.'
+    ));
+    facts.push(renderCard('📜', 'On This Day',
+      'Still shy',
+      'The Wikipedia API may be temporarily unavailable.'
+    ));
+  }
+
+  // 10. Famous birthday
+  if (wiki && wiki.births && wiki.births.length > 0) {
+    const births = pickRandom(wiki.births.filter(b => b.year && b.text), 1);
+    if (births.length > 0) {
+      const b = births[0];
+      facts.push(renderCard('🎂', `Birthday Twin (${b.year})`,
+        b.text.length > 100 ? b.text.slice(0, 97) + '…' : b.text,
+        `Also born on ${new Date(2000, month-1).toLocaleString('en',{month:'long'})} ${day}.`
+      ));
+    }
+  } else {
+    facts.push(renderCard('🎂', 'Birthday Twin',
+      'No twins found',
+      'Could not load famous birthdays.'
+    ));
+  }
+
+  // Trim to exactly 10
+  resEl.innerHTML = facts.slice(0, 10).join('');
+}
+
+// Allow Enter key
+document.getElementById('dob').addEventListener('keydown', e => {
+  if (e.key === 'Enter') go();
+});
+</script>
+</body>
+</html>
