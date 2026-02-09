@@ -99,7 +99,7 @@ input[type=range] { width: 120px; }
     <h1>NFL Valuation Explorer</h1>
     <div class="header-sub">What drives NFL franchise values? Explore the data and find out.</div>
   </div>
-  <div class="header-sub">Data: Forbes NFL Valuations (2019–2024) &bull; NFL Season Records (2018–2023)</div>
+  <div class="header-sub">Data: Forbes NFL Valuations (2019–2024) &bull; NFL Season Records (2018–2023) &bull; Forbes year Y reflects season Y−1</div>
 </div>
 
 <div class="controls">
@@ -118,24 +118,25 @@ input[type=range] { width: 120px; }
   <div class="control-group">
     <label>X-Axis</label>
     <select id="xSelect">
-      <option value="metroPop">Metro Population</option>
-      <option value="tvHH">TV Households (DMA)</option>
-      <option value="dmaRank">DMA Rank</option>
-      <option value="wins" selected>Season Wins</option>
-      <option value="winPct">Win %</option>
-      <option value="playoffRound">Playoff Round</option>
-      <option value="sbWins">All-Time Super Bowl Wins</option>
-      <option value="stadCap">Stadium Capacity</option>
-      <option value="stadAge">Stadium Age</option>
+      <option value="predicted">Model Prediction (multi-reg)</option>
+      <option value="metroPop">Metro Population (static)</option>
+      <option value="tvHH">TV Households (static)</option>
+      <option value="dmaRank">DMA Rank (static)</option>
+      <option value="wins" selected>Wins (prior season)</option>
+      <option value="winPct">Win % (prior season)</option>
+      <option value="playoffRound">Playoff Round (prior season)</option>
+      <option value="sbWins">SB Wins (all-time cumul.)</option>
+      <option value="stadCap">Stadium Capacity (static)</option>
+      <option value="stadAge">Stadium Age (static)</option>
       <option value="rollingWinPct">3-Yr Rolling Win %</option>
       <option value="rolling5WinPct">5-Yr Rolling Win %</option>
-      <option value="playoffRate3">Playoff Rate (Last 3 Yrs)</option>
-      <option value="playoffRate5">Playoff Rate (Last 5 Yrs)</option>
-      <option value="cumPlayoff3">Playoff Success (3-Yr Cumul.)</option>
-      <option value="cumPlayoff5">Playoff Success (5-Yr Cumul.)</option>
-      <option value="recentSBs">Super Bowls (Last 10 Yrs)</option>
-      <option value="lag1WinPct">Prior Season Win % (1yr lag)</option>
-      <option value="lag2Rolling3">3-Yr Rolling Win % (1yr lag)</option>
+      <option value="playoffRate3">Playoff Rate (3yr)</option>
+      <option value="playoffRate5">Playoff Rate (5yr)</option>
+      <option value="cumPlayoff3">Playoff Success (3yr cumul.)</option>
+      <option value="cumPlayoff5">Playoff Success (5yr cumul.)</option>
+      <option value="recentSBs">SBs Won (last 10yr)</option>
+      <option value="lag1WinPct">Win % (2 yrs before pub)</option>
+      <option value="lag2Rolling3">3-Yr Rolling Win % (2 yrs before pub)</option>
     </select>
   </div>
   <div class="control-group">
@@ -148,9 +149,10 @@ input[type=range] { width: 120px; }
       <option value="winPct">Win %</option>
       <option value="playoffRound">Playoff Round</option>
       <option value="stadCap">Stadium Capacity</option>
-      <option value="stadAge">Stadium Age</option>
+      <option value="stadAge">Stadium Age (static)</option>
       <option value="rollingWinPct">3-Yr Rolling Win %</option>
-      <option value="playoffRate5">Playoff Rate (Last 5 Yrs)</option>
+      <option value="playoffRate5">Playoff Rate (5yr)</option>
+      <option value="predicted">Model Prediction ($M)</option>
     </select>
   </div>
   <div class="control-group">
@@ -368,24 +370,25 @@ const VALUATIONS = {
 
 const VARS = {
   valuation: { label: 'Valuation ($M)', fmt: v => '$'+v.toLocaleString()+'M', unitLabel: '$1M valuation', slopeScale: 1, timeDim: 'Forbes pub year' },
-  wins: { label: 'Season Wins', fmt: v => v.toFixed(0), unitLabel: 'win', slopeScale: 1, timeDim: 'Single season (yr before Forbes pub)' },
-  winPct: { label: 'Win %', fmt: v => (v*100).toFixed(1)+'%', unitLabel: '10pp win rate', slopeScale: 0.1, timeDim: 'Single season' },
-  metroPop: { label: 'Metro Pop (000s)', fmt: v => v.toLocaleString()+'K', unitLabel: '1M metro residents', slopeScale: 1000, timeDim: 'Static (current)' },
-  tvHH: { label: 'TV Households (000s)', fmt: v => v.toLocaleString()+'K', unitLabel: '1M TV households', slopeScale: 1000, timeDim: 'Static (current Nielsen DMA)' },
-  dmaRank: { label: 'DMA Rank', fmt: v => '#'+v, unitLabel: 'DMA rank (lower=bigger)', slopeScale: 1, timeDim: 'Static (current)' },
-  playoffRound: { label: 'Playoff Round', fmt: v => ['Missed','WC Loss','Div Loss','Conf Loss','SB Loss','SB Win'][v], unitLabel: 'playoff round', slopeScale: 1, timeDim: 'Single season' },
-  sbWins: { label: 'All-Time SB Wins', fmt: v => v.toFixed(0), unitLabel: 'Super Bowl', slopeScale: 1, timeDim: 'All-time cumulative' },
-  stadCap: { label: 'Stadium Capacity', fmt: v => v.toLocaleString(), unitLabel: '10K seats', slopeScale: 10000, timeDim: 'Static (current)' },
-  stadAge: { label: 'Stadium Age (yrs)', fmt: v => v.toFixed(0), unitLabel: 'year of age', slopeScale: 1, timeDim: 'Static (current)' },
-  rollingWinPct: { label: '3-Yr Rolling Win %', fmt: v => (v*100).toFixed(1)+'%', unitLabel: '10pp rolling win rate', slopeScale: 0.1, timeDim: '3-yr window ending at reflected season, lag=0' },
-  rolling5WinPct: { label: '5-Yr Rolling Win %', fmt: v => (v*100).toFixed(1)+'%', unitLabel: '10pp rolling win rate', slopeScale: 0.1, timeDim: '5-yr window ending at reflected season, lag=0' },
-  playoffRate3: { label: 'Playoff Rate (3yr)', fmt: v => (v*100).toFixed(0)+'%', unitLabel: '33pp playoff rate', slopeScale: 0.33, timeDim: '3-yr window, lag=0' },
-  playoffRate5: { label: 'Playoff Rate (5yr)', fmt: v => (v*100).toFixed(0)+'%', unitLabel: '20pp playoff rate', slopeScale: 0.20, timeDim: '5-yr window, lag=0' },
-  cumPlayoff3: { label: 'Playoff Success (3yr)', fmt: v => v.toFixed(1), unitLabel: 'cumulative PO point', slopeScale: 1, timeDim: '3-yr sum of round codes (0-5), lag=0' },
-  cumPlayoff5: { label: 'Playoff Success (5yr)', fmt: v => v.toFixed(1), unitLabel: 'cumulative PO point', slopeScale: 1, timeDim: '5-yr sum of round codes (0-5), lag=0' },
-  recentSBs: { label: 'SBs Won (last 10yr)', fmt: v => v.toFixed(0), unitLabel: 'recent SB win', slopeScale: 1, timeDim: '10-yr window, lag=0' },
-  lag1WinPct: { label: 'Prior Season Win %', fmt: v => (v*100).toFixed(1)+'%', unitLabel: '10pp win rate', slopeScale: 0.1, timeDim: 'Single season, lag=1yr' },
-  lag2Rolling3: { label: '3-Yr Rolling Win % (lagged)', fmt: v => (v*100).toFixed(1)+'%', unitLabel: '10pp rolling win rate', slopeScale: 0.1, timeDim: '3-yr window, lag=1yr' }
+  predicted: { label: 'Model Prediction ($M)', fmt: v => '$'+v.toLocaleString()+'M', unitLabel: 'predicted $M', slopeScale: 1, timeDim: 'Multi-variable regression output' },
+  wins: { label: 'Wins (prior season)', fmt: v => v.toFixed(0), unitLabel: 'win', slopeScale: 1, timeDim: 'Season Y-1 (yr before Forbes pub)' },
+  winPct: { label: 'Win % (prior season)', fmt: v => (v*100).toFixed(1)+'%', unitLabel: '10pp win rate', slopeScale: 0.1, timeDim: 'Season Y-1' },
+  metroPop: { label: 'Metro Pop — static (000s)', fmt: v => v.toLocaleString()+'K', unitLabel: '1M metro residents', slopeScale: 1000, timeDim: 'Static (current)' },
+  tvHH: { label: 'TV Households — static (000s)', fmt: v => v.toLocaleString()+'K', unitLabel: '1M TV households', slopeScale: 1000, timeDim: 'Static (current Nielsen DMA)' },
+  dmaRank: { label: 'DMA Rank — static', fmt: v => '#'+v, unitLabel: 'DMA rank (lower=bigger)', slopeScale: 1, timeDim: 'Static (current)' },
+  playoffRound: { label: 'Playoff Round (prior season)', fmt: v => ['Missed','WC Loss','Div Loss','Conf Loss','SB Loss','SB Win'][v], unitLabel: 'playoff round', slopeScale: 1, timeDim: 'Season Y-1' },
+  sbWins: { label: 'SB Wins — all-time cumul.', fmt: v => v.toFixed(0), unitLabel: 'Super Bowl', slopeScale: 1, timeDim: 'All-time cumulative' },
+  stadCap: { label: 'Stadium Capacity — static', fmt: v => v.toLocaleString(), unitLabel: '10K seats', slopeScale: 10000, timeDim: 'Static (current)' },
+  stadAge: { label: 'Stadium Age — static', fmt: v => v.toFixed(0), unitLabel: 'year of age', slopeScale: 1, timeDim: 'Static (current)' },
+  rollingWinPct: { label: '3-Yr Rolling Win %', fmt: v => (v*100).toFixed(1)+'%', unitLabel: '10pp rolling win rate', slopeScale: 0.1, timeDim: '3-yr window thru season Y-1' },
+  rolling5WinPct: { label: '5-Yr Rolling Win %', fmt: v => (v*100).toFixed(1)+'%', unitLabel: '10pp rolling win rate', slopeScale: 0.1, timeDim: '5-yr window thru season Y-1' },
+  playoffRate3: { label: 'Playoff Rate (3yr)', fmt: v => (v*100).toFixed(0)+'%', unitLabel: '33pp playoff rate', slopeScale: 0.33, timeDim: '3-yr window thru season Y-1' },
+  playoffRate5: { label: 'Playoff Rate (5yr)', fmt: v => (v*100).toFixed(0)+'%', unitLabel: '20pp playoff rate', slopeScale: 0.20, timeDim: '5-yr window thru season Y-1' },
+  cumPlayoff3: { label: 'Playoff Success (3yr cumul.)', fmt: v => v.toFixed(1), unitLabel: 'cumulative PO point', slopeScale: 1, timeDim: '3-yr sum of round codes (0-5) thru season Y-1' },
+  cumPlayoff5: { label: 'Playoff Success (5yr cumul.)', fmt: v => v.toFixed(1), unitLabel: 'cumulative PO point', slopeScale: 1, timeDim: '5-yr sum of round codes (0-5) thru season Y-1' },
+  recentSBs: { label: 'SBs Won (last 10yr)', fmt: v => v.toFixed(0), unitLabel: 'recent SB win', slopeScale: 1, timeDim: '10-yr window thru season Y-1' },
+  lag1WinPct: { label: 'Win % (2 yrs before pub)', fmt: v => (v*100).toFixed(1)+'%', unitLabel: '10pp win rate', slopeScale: 0.1, timeDim: 'Season Y-2' },
+  lag2Rolling3: { label: '3-Yr Rolling Win % (2 yrs before pub)', fmt: v => (v*100).toFixed(1)+'%', unitLabel: '10pp rolling win rate', slopeScale: 0.1, timeDim: '3-yr window thru season Y-2' }
 };
 
 // ==================== HELPER FUNCTIONS ====================
@@ -418,6 +421,7 @@ function getVal(teamKey, forbesYear, varName) {
     case 'recentSBs': return getRecentSBs(teamKey, seasonYear, 10);
     case 'lag1WinPct': return getLaggedWinPct(teamKey, seasonYear, 1);
     case 'lag2Rolling3': return getRollingWinPct(teamKey, seasonYear - 1, 3);
+    case 'predicted': return getPredictedVal(teamKey, forbesYear);
     default: return null;
   }
 }
@@ -482,6 +486,43 @@ function getRecentSBs(teamKey, endYear, n) {
     if (s && s[3] === 5) wins++;
   }
   return wins;
+}
+
+// ==================== PREDICTED VALUES (MULTI-REG) ====================
+
+let _predCache = {};
+let _predCacheKey = '';
+
+function getPredictedVal(teamKey, forbesYear) {
+  const yearVal = document.getElementById('yearSelect').value;
+  if (_predCacheKey !== yearVal) {
+    _predCache = {};
+    const isPooled = yearVal === 'all';
+    const fys = isPooled ? [2019,2020,2021,2022,2023,2024] : [parseInt(yearVal)];
+    const preds = ['metroPop','tvHH','wins','sbWins','stadCap','stadAge','playoffRate5'];
+    const X = [], y = [], keys = [];
+    fys.forEach(fy => {
+      getTeamKeys().forEach(tk => {
+        const val = VALUATIONS[fy] ? VALUATIONS[fy][tk] : null;
+        const row = preds.map(p => getVal(tk, fy, p));
+        if (val != null && row.every(v => v != null)) {
+          X.push(row);
+          y.push(val);
+          keys.push(tk + '_' + fy);
+        }
+      });
+    });
+    if (X.length > preds.length + 2) {
+      const result = multipleRegression(X, y);
+      keys.forEach((key, i) => {
+        let pred = result.intercept;
+        for (let j = 0; j < preds.length; j++) pred += result.coefficients[j] * X[i][j];
+        _predCache[key] = Math.round(pred);
+      });
+    }
+    _predCacheKey = yearVal;
+  }
+  return _predCache[teamKey + '_' + forbesYear] ?? null;
 }
 
 // ==================== STATISTICS ====================
@@ -587,6 +628,7 @@ function buildScatter() {
   const labels = [];
   const colors = [];
   const teamKeys = [];
+  const valsForRank = [];
 
   forbesYears.forEach(forbesYear => {
     getTeamKeys().forEach(tk => {
@@ -600,8 +642,22 @@ function buildScatter() {
       labels.push(isPooled ? tk + "'" + String(forbesYear).slice(2) : tk);
       colors.push(getPointColor(tk, colorBy));
       teamKeys.push(tk);
+      valsForRank.push(VALUATIONS[forbesYear] ? VALUATIONS[forbesYear][tk] : null);
     });
   });
+
+  // Red-to-green gradient when coloring by valuation rank
+  if (colorBy === 'valuation') {
+    const sorted = [...valsForRank].filter(v => v != null).sort((a, b) => a - b);
+    for (let i = 0; i < valsForRank.length; i++) {
+      const v = valsForRank[i];
+      if (v == null) { colors[i] = 'rgba(100,100,100,0.5)'; continue; }
+      const pct = sorted.length > 1 ? sorted.indexOf(v) / (sorted.length - 1) : 0.5;
+      const r = Math.round(230 * (1 - pct));
+      const g = Math.round(210 * pct);
+      colors[i] = `rgba(${r},${g},50,0.8)`;
+    }
+  }
 
   const xs = data.map(d => d.x);
   const ys = data.map(d => d.y);
@@ -713,14 +769,22 @@ function updateStats(xs, ys, reg, xVar, yVar, labels, teamKeys, forbesYear, isPo
   const vowValue = document.getElementById('vowValue');
   const vowNote = document.getElementById('vowNote');
 
-  if (yVar === 'valuation' && VARS[xVar]) {
+  if (yVar === 'valuation' && xVar === 'predicted') {
+    // Special case: predicted vs actual shows model accuracy
+    vowLabel.textContent = 'Model Accuracy';
+    vowValue.textContent = 'R² = ' + reg.r2.toFixed(3);
+    vowNote.innerHTML = `Multi-variable regression (TV HH, SB Wins, Wins, Metro Pop, etc.) explains <strong>${(reg.r2*100).toFixed(1)}%</strong> of valuation variance. Points near the diagonal = well-predicted teams. (n=${xs.length})`;
+    vowBox.style.display = 'block';
+  } else if (yVar === 'valuation' && VARS[xVar]) {
     const vi = VARS[xVar];
     const scaledSlope = reg.slope * (vi.slopeScale || 1);
     const sign = scaledSlope >= 0 ? '+' : '';
     vowLabel.textContent = 'Value of One ' + (vi.unitLabel || xVar);
     vowValue.textContent = sign + '$' + Math.round(scaledSlope).toLocaleString() + 'M';
     const timeTxt = vi.timeDim ? ` [${vi.timeDim}]` : '';
-    vowNote.textContent = `Each ${vi.unitLabel} → ${sign}$${Math.round(scaledSlope).toLocaleString()}M in franchise value (R²=${reg.r2.toFixed(3)}, n=${xs.length})${timeTxt}`;
+    const isPerf = ['wins','winPct','playoffRound','rollingWinPct','rolling5WinPct','playoffRate3','playoffRate5','cumPlayoff3','cumPlayoff5','lag1WinPct','lag2Rolling3','recentSBs'].includes(xVar);
+    const caveat = isPerf ? ' ⚠ Simple bivariate correlation — the Multi-Variable tab (controlling for TV market + SB history) tells a richer story.' : '';
+    vowNote.innerHTML = `Each ${vi.unitLabel} → ${sign}$${Math.round(scaledSlope).toLocaleString()}M in franchise value (R²=${reg.r2.toFixed(3)}, n=${xs.length})${timeTxt}${caveat}`;
     vowBox.style.display = 'block';
   } else {
     vowBox.style.display = 'none';
