@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onelife Merge Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0f172a;
+            color: #e2e8f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 30px;
+            border-bottom: 2px solid #334155;
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #f1f5f9;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        .status-box {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .status-line {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+            display: inline-block;
+        }
+
+        .status-indicator.pending {
+            background: #94a3b8;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .status-indicator.success {
+            background: #10b981;
+        }
+
+        .status-indicator.error {
+            background: #ef4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .log-section {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .log-entry {
+            padding: 4px 0;
+            line-height: 1.4;
+            color: #cbd5e1;
+        }
+
+        .log-entry.info {
+            color: #64b5f6;
+        }
+
+        .log-entry.success {
+            color: #10b981;
+        }
+
+        .log-entry.warning {
+            color: #f59e0b;
+        }
+
+        .log-entry.error {
+            color: #ef4444;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #475569;
+            transform: translateY(-1px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .error-box {
+            background: #7f1d1d;
+            border: 1px solid #dc2626;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            color: #fecaca;
+        }
+
+        .success-box {
+            background: #064e3b;
+            border: 1px solid #10b981;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            color: #a7f3d0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Merge Tool</h1>
+            <p class="subtitle">Merge batch results with location data</p>
+        </header>
+
+        <div class="status-box" id="statusBox">
+            <div class="status-line">
+                <span class="status-indicator pending" id="statusIndicator"></span>
+                <span id="statusText">Initializing merge process...</span>
+            </div>
+        </div>
+
+        <div id="errorBox"></div>
+        <div id="successBox"></div>
+
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-label">Batch Locations</div>
+                <div class="stat-value" id="batchCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Locations</div>
+                <div class="stat-value" id="totalCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Successfully Merged</div>
+                <div class="stat-value" id="mergedCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Coords Updated</div>
+                <div class="stat-value" id="coordsUpdated">0</div>
+            </div>
+        </div>
+
+        <div class="log-section" id="logSection"></div>
+
+        <div class="button-group">
+            <button class="btn-primary" id="downloadBtn" disabled>
+                Download Merged JSON
+            </button>
+            <button class="btn-secondary" id="retryBtn" style="display: none;">
+                Retry
+            </button>
+        </div>
+    </div>
+
+    <script>
+        class MergeTool {
+            constructor() {
+                this.batchResults = null;
+                this.dataModified = null;
+                this.mergedData = null;
+                this.stats = {
+                    batchCount: 0,
+                    totalCount: 0,
+                    mergedCount: 0,
+                    coordsUpdated: 0
+                };
+            }
+
+            log(message, type = 'info') {
+                const logSection = document.getElementById('logSection');
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                const timestamp = new Date().toLocaleTimeString();
+                entry.textContent = `[${timestamp}] ${message}`;
+                logSection.appendChild(entry);
+                logSection.scrollTop = logSection.scrollHeight;
+            }
+
+            updateStatus(message, success = false) {
+                const statusText = document.getElementById('statusText');
+                const indicator = document.getElementById('statusIndicator');
+                statusText.textContent = message;
+                if (success === true) {
+                    indicator.className = 'status-indicator success';
+                } else if (success === false) {
+                    indicator.className = 'status-indicator error';
+                }
+            }
+
+            updateStats() {
+                document.getElementById('batchCount').textContent = this.stats.batchCount;
+                document.getElementById('totalCount').textContent = this.stats.totalCount;
+                document.getElementById('mergedCount').textContent = this.stats.mergedCount;
+                document.getElementById('coordsUpdated').textContent = this.stats.coordsUpdated;
+            }
+
+            async init() {
+                try {
+                    this.log('Starting merge initialization...', 'info');
+
+                    // Load batch results from sessionStorage
+                    const batchResultsStr = sessionStorage.getItem('batchResults');
+                    if (!batchResultsStr) {
+                        throw new Error('No batch results found in sessionStorage. Run the batch tool first.');
+                    }
+                    this.batchResults = JSON.parse(batchResultsStr);
+                    this.stats.batchCount = this.batchResults.length;
+                    this.log(`Loaded ${this.batchResults.length} batch results from sessionStorage`, 'success');
+
+                    // Fetch data_modified.json
+                    this.log('Fetching data_modified.json...', 'info');
+                    const response = await fetch('./data_modified.json');
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch data_modified.json: ${response.status}`);
+                    }
+                    this.dataModified = await response.json();
+                    this.stats.totalCount = this.dataModified.length;
+                    this.log(`Loaded ${this.dataModified.length} locations from data_modified.json`, 'success');
+
+                    // Perform merge
+                    this.log('Starting merge process...', 'info');
+                    this.performMerge();
+
+                    this.updateStats();
+                    this.updateStatus('Merge completed successfully', true);
+                    document.getElementById('downloadBtn').disabled = false;
+
+                    const successBox = document.getElementById('successBox');
+                    successBox.innerHTML = `<div class="success-box">
+                        Merge completed: ${this.stats.mergedCount}/${this.stats.batchCount} locations merged,
+                        ${this.stats.coordsUpdated} coordinates updated
+                    </div>`;
+
+                } catch (error) {
+                    this.log(`Error: ${error.message}`, 'error');
+                    this.updateStatus('Merge failed', false);
+
+                    const errorBox = document.getElementById('errorBox');
+                    errorBox.innerHTML = `<div class="error-box">
+                        <strong>Error during merge:</strong><br>${error.message}
+                    </div>`;
+
+                    document.getElementById('retryBtn').style.display = 'inline-block';
+                }
+            }
+
+            performMerge() {
+                for (const batchItem of this.batchResults) {
+                    const batchName = batchItem.name;
+
+                    // Find matching location in dataModified by name
+                    const matchingLocation = this.dataModified.find(loc => loc.name === batchName);
+
+                    if (!matchingLocation) {
+                        this.log(`Warning: No matching location found for "${batchName}"`, 'warning');
+                        continue;
+                    }
+
+                    // Update lat/lng if they are 0
+                    if (matchingLocation.lat === 0 || matchingLocation.lng === 0) {
+                        const oldLat = matchingLocation.lat;
+                        const oldLng = matchingLocation.lng;
+                        matchingLocation.lat = batchItem.lat;
+                        matchingLocation.lng = batchItem.lng;
+                        this.log(`Updated coordinates for "${batchName}": (${oldLat}, ${oldLng}) -> (${batchItem.lat}, ${batchItem.lng})`, 'success');
+                        this.stats.coordsUpdated++;
+                    }
+
+                    // Replace competitors array with batch results
+                    const competitorCount = batchItem.competitors ? batchItem.competitors.length : 0;
+                    matchingLocation.competitors = batchItem.competitors || [];
+                    this.log(`Merged "${batchName}" with ${competitorCount} competitors`, 'success');
+                    this.stats.mergedCount++;
+                }
+            }
+
+            downloadMergedData() {
+                if (!this.dataModified) {
+                    alert('No merged data available');
+                    return;
+                }
+
+                const dataStr = JSON.stringify(this.dataModified, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'merged_data.json';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                this.log('Downloaded merged_data.json', 'success');
+            }
+        }
+
+        // Initialize on page load
+        const mergeTool = new MergeTool();
+
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            mergeTool.downloadMergedData();
+        });
+
+        document.getElementById('retryBtn').addEventListener('click', () => {
+            location.reload();
+        });
+
+        mergeTool.init();
+    </script>
+</body>
+</html>
