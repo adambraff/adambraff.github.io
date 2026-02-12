@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onelife Census Data Preparation Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: #4fa3ff;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h2 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #4fa3ff;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 6px;
+            color: #b0b0b0;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 8px 12px;
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-size: 13px;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #4fa3ff;
+            background: #3a3a3a;
+        }
+
+        .helper-text {
+            font-size: 11px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        button {
+            background: #4fa3ff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        button:hover:not(:disabled) {
+            background: #66b3ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 163, 255, 0.4);
+        }
+
+        button:disabled {
+            background: #555;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .progress-section {
+            margin-bottom: 20px;
+        }
+
+        .phase-item {
+            margin-bottom: 12px;
+        }
+
+        .phase-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: #b0b0b0;
+        }
+
+        .phase-bar {
+            width: 100%;
+            height: 6px;
+            background: #444;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .phase-progress {
+            height: 100%;
+            background: #4fa3ff;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .phase-progress.completed {
+            background: #66cc33;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-box {
+            background: #333;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 3px solid #4fa3ff;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #4fa3ff;
+        }
+
+        .console {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 12px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #0f0;
+            margin-bottom: 15px;
+        }
+
+        .console-line {
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .console-line.info {
+            color: #4fa3ff;
+        }
+
+        .console-line.success {
+            color: #66cc33;
+        }
+
+        .console-line.error {
+            color: #ff6b6b;
+        }
+
+        .console-line.warn {
+            color: #ffaa33;
+        }
+
+        .download-section {
+            text-align: center;
+            padding: 15px;
+            background: #333;
+            border-radius: 4px;
+            border: 1px solid #555;
+        }
+
+        .file-size {
+            font-size: 12px;
+            color: #888;
+            margin-top: 8px;
+        }
+
+        .completion-badge {
+            display: inline-block;
+            background: #66cc33;
+            color: #000;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        a.download-link {
+            color: #4fa3ff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        a.download-link:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: #553333;
+            border-left: 3px solid #ff6b6b;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 12px;
+            color: #ffb3b3;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #2a2a2a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #777;
+        }
+
+        @media (max-width: 900px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Onelife Census Data Preparation</h1>
+            <p class="subtitle">Fetch ACS data, boundaries, and generate GeoJSON for competitive mapping</p>
+        </header>
+
+        <div class="main-grid">
+            <!-- Left Panel: Controls -->
+            <div>
+                <div class="card">
+                    <h2>Configuration</h2>
+
+                    <div class="form-group">
+                        <label for="apiKey">Census API Key (Optional)</label>
+                        <input type="text" id="apiKey" placeholder="Leave blank for 500 req/day limit">
+                        <div class="helper-text">Get free key at: api.census.gov/data/key_signup.html</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="acsYear">ACS Year</label>
+                        <select id="acsYear">
+                            <option value="2022" selected>2022 (5-Year)</option>
+                            <option value="2021">2021 (5-Year)</option>
+                            <option value="2020">2020 (5-Year)</option>
+                        </select>
+                    </div>
+
+                    <button id="startBtn" onclick="startProcess()">Start Processing</button>
+
+                    <div style="margin-top: 20px;">
+                        <div class="progress-section">
+                            <h2 style="font-size: 14px; margin-bottom: 15px;">Progress</h2>
+
+                            <div class="phase-item">
+                                <div class="phase-label">
+                                    <span>Phase 1: Fetch ACS Data</span>
+                                    <span id="phase1Pct">0%</span>
+                                </div>
+                                <div class="phase-bar">
+                                    <div class="phase-progress" id="phase1Bar"></div>
+                                </div>
+                            </div>
+
+                            <div class="phase-item">
+                                <div class="phase-label">
+                                    <span>Phase 2: Fetch Boundaries</span>
+                                    <span id="phase2Pct">0%</span>
+                                </div>
+                                <div class="phase-bar">
+                                    <div class="phase-progress" id="phase2Bar"></div>
+                                </div>
+                            </div>
+
+                            <div class="phase-item">
+                                <div class="phase-label">
+                                    <span>Phase 3: Join & Filter</span>
+                                    <span id="phase3Pct">0%</span>
+                                </div>
+                                <div class="phase-bar">
+                                    <div class="phase-progress" id="phase3Bar"></div>
+                                </div>
+                            </div>
+
+                            <div class="phase-item">
+                                <div class="phase-label">
+                                    <span>Phase 4: Export</span>
+                                    <span id="phase4Pct">0%</span>
+                                </div>
+                                <div class="phase-bar">
+                                    <div class="phase-progress" id="phase4Bar"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stats-grid">
+                            <div class="stat-box">
+                                <div class="stat-label">States</div>
+                                <div class="stat-value" id="statsStates">0</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Tracts Fetched</div>
+                                <div class="stat-value" id="statsTractsFetched">0</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">With Data</div>
+                                <div class="stat-value" id="statsTractsWithData">0</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label">Final Count</div>
+                                <div class="stat-value" id="statsFinalCount">0</div>
+                            </div>
+                        </div>
+
+                        <div id="downloadSection" class="download-section" style="display: none;">
+                            <div style="margin-bottom: 10px;">
+                                <button onclick="downloadGeoJSON()" style="background: #66cc33; color: #000;">
+                                    ↓ Download GeoJSON
+                                </button>
+                            </div>
+                            <div class="file-size">
+                                File size: <strong id="fileSizeEstimate">0 KB</strong>
+                                <span class="completion-badge">COMPLETE</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Console & Output -->
+            <div>
+                <div class="card">
+                    <h2>Execution Log</h2>
+                    <div class="console" id="console"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================================
+        // ONELIFE LOCATIONS (69 locations)
+        // ============================================================================
+        const OL_COORDS = [
+            [38.7983, -77.0628], // Alexandria
+            [38.9901, -76.5431], // Annapolis
+            [35.7450, -78.8827], // Apex
+            [33.8560, -84.5821], // Austell
+            [38.8790, -77.1107], // Ballston
+            [38.9839, -77.0893], // Bethesda
+            [39.4656, -76.3079], // Box Hill
+            [38.9842, -77.5369], // Brambleton
+            [38.7757, -77.2645], // Burke
+            [38.8810, -77.0010], // Capitol Hill
+            [33.5496, -85.0735], // Carrollton
+            [38.7764, -76.8825], // Clinton
+            [33.4009, -84.5941], // Commerce
+            [34.0836, -84.3563], // Crabapple
+            [38.8538, -77.0487], // Crystal Park
+            [34.3505, -84.0510], // Dawsonville
+            [33.7280, -84.7383], // Douglasville
+            [35.9514, -78.9882], // Durham-Chapel Hill
+            [38.8468, -77.3728], // Fairfax
+            [34.0206, -80.9821], // Forest Acres
+            [38.8046, -77.6043], // Gainesville Heritage Village
+            [39.1977, -77.2581], // Germantown
+            [36.7778, -76.2364], // Greenbrier
+            [34.0324, -83.9096], // Hamilton Mill
+            [37.0471, -76.3906], // Hampton
+            [34.1768, -84.4207], // Holly Springs
+            [39.4980, -76.6555], // Hunt Valley
+            [34.0925, -81.1688], // Irmo
+            [34.1380, -80.9517], // Killian
+            [33.9671, -84.0225], // Lawrenceville
+            [33.4083, -86.6672], // Lee Branch
+            [32.8983, -83.6894], // Macon
+            [38.7737, -77.5057], // Manassas
+            [38.9176, -77.2150], // McLean
+            [38.8700, -77.2310], // Mosaic District
+            [33.3849, -84.7628], // Newnan
+            [37.1266, -76.5104], // Newport News
+            [36.8589, -76.2097], // Norfolk
+            [39.4482, -77.3944], // North Frederick
+            [33.9906, -81.2337], // North Lake
+            [39.1494, -77.0650], // Olney
+            [33.9205, -84.3428], // Perimeter
+            [39.0494, -77.1173], // Pike & Rose
+            [38.9521, -77.3377], // Reston
+            [39.0912, -77.1764], // Rockville
+            [34.1288, -80.8757], // Sandhills
+            [38.8445, -77.1187], // Skyline
+            [39.3913, -77.4095], // South Frederick
+            [38.4736, -77.4203], // Stafford
+            [39.0356, -77.3990], // Sterling
+            [38.9416, -77.0766], // Tenleytown
+            [38.9233, -77.2301], // Tysons
+            [39.6250, -77.7711], // Valley Mall
+            [34.1800, -84.2177], // Vickery
+            [36.7852, -76.1089], // VA Beach Princess Anne
+            [36.7839, -76.0008], // VA Beach Red Mill
+            [36.8421, -75.9923], // VA Beach Blvd
+            [39.1559, -78.1725], // Winchester
+            [34.1325, -84.1237], // Windermere
+            [38.6284, -77.2862], // Woodbridge
+            [34.0865, -84.4681], // Woodstock
+            [36.8100, -76.3800], // Chesapeake Square
+            [38.8820, -77.1710], // Falls Church
+            [38.9500, -77.0000], // Fort Totten
+            [33.3970, -84.5800], // Lexington (Peachtree City)
+            [39.4560, -77.9640], // Martinsburg
+            [33.3700, -86.9500], // McCalla
+            [38.8050, -77.0470], // Old Town
+            [37.0700, -76.4900], // Tech Center
+        ];
+
+        // State FIPS codes where OL operates
+        const OL_STATES = {
+            '51': 'VA',
+            '24': 'MD',
+            '11': 'DC',
+            '13': 'GA',
+            '37': 'NC',
+            '45': 'SC',
+            '01': 'AL',
+            '54': 'WV'
+        };
+
+        // Global state
+        let currentGeojson = null;
+        let acsData = {}; // state -> { geoid -> properties }
+        let boundsData = {}; // state -> geojson features
+
+        // ============================================================================
+        // UTILITY FUNCTIONS
+        // ============================================================================
+        function log(message, type = 'info') {
+            const console_el = document.getElementById('console');
+            const line = document.createElement('div');
+            line.className = `console-line ${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            line.textContent = `[${timestamp}] ${message}`;
+            console_el.appendChild(line);
+            console_el.scrollTop = console_el.scrollHeight;
+        }
+
+        function updatePhase(phase, progress, completed = false) {
+            const bar = document.getElementById(`phase${phase}Bar`);
+            const pct = document.getElementById(`phase${phase}Pct`);
+            bar.style.width = progress + '%';
+            pct.textContent = progress + '%';
+            if (completed) {
+                bar.classList.add('completed');
+            }
+        }
+
+        function updateStats(stats) {
+            if (stats.states !== undefined) document.getElementById('statsStates').textContent = stats.states;
+            if (stats.tractsFetched !== undefined) document.getElementById('statsTractsFetched').textContent = stats.tractsFetched;
+            if (stats.tractsWithData !== undefined) document.getElementById('statsTractsWithData').textContent = stats.tractsWithData;
+            if (stats.finalCount !== undefined) document.getElementById('statsFinalCount').textContent = stats.finalCount;
+        }
+
+        function haversineDistance(lat1, lon1, lat2, lon2) {
+            const R = 3959; // Earth radius in miles
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        function getCentroid(geometry) {
+            if (geometry.type === 'Polygon') {
+                const coords = geometry.coordinates[0];
+                let lat = 0, lon = 0;
+                for (let i = 0; i < coords.length; i++) {
+                    lon += coords[i][0];
+                    lat += coords[i][1];
+                }
+                return [lat / coords.length, lon / coords.length];
+            }
+            return null;
+        }
+
+        function buildGeoid(stateFips, countyFips, tract) {
+            const padState = stateFips.toString().padStart(2, '0');
+            const padCounty = countyFips.toString().padStart(3, '0');
+            const padTract = tract.toString().padStart(6, '0');
+            return padState + padCounty + padTract;
+        }
+
+        // ============================================================================
+        // PHASE 1: FETCH ACS DATA
+        // ============================================================================
+        async function fetchAcsData() {
+            log('Phase 1: Fetching ACS data from Census API...', 'info');
+            const year = document.getElementById('acsYear').value;
+            const apiKey = document.getElementById('apiKey').value || '';
+
+            const variables = [
+                'B19013_001E', // Median household income
+                'B25010_001E', // Average household size
+                'B15003_001E', // Total population 25+
+                'B15003_022E', // Bachelor's degree
+                'B15003_023E', // Master's degree
+                'B15003_024E', // Professional school degree
+                'B15003_025E', // Doctorate degree
+                'B19001_001E', // Total households
+                'B19001_014E', // $100K-$124,999
+                'B19001_015E', // $125K-$149,999
+                'B19001_016E', // $150K-$199,999
+                'B19001_017E'  // $200,000+
+            ];
+
+            const states = Object.keys(OL_STATES);
+            let totalFetched = 0;
+
+            for (let i = 0; i < states.length; i++) {
+                const stateFips = states[i];
+                const stateName = OL_STATES[stateFips];
+
+                try {
+                    log(`Fetching ${stateName} (FIPS: ${stateFips})...`);
+                    const variableStr = variables.join(',');
+                    let url = `https://api.census.gov/data/${year}/acs/acs5?get=NAME,${variableStr}&for=tract:*&in=state:${stateFips}`;
+                    if (apiKey) url += `&key=${apiKey}`;
+
+                    const response = await fetch(url);
+                    const data = await response.json();
+
+                    if (!Array.isArray(data) || data.length < 2) {
+                        log(`No data for ${stateName}`, 'warn');
+                        updatePhase(1, Math.round((i + 1) / states.length * 100));
+                        continue;
+                    }
+
+                    const headers = data[0];
+                    const stateData = {};
+
+                    for (let rowIdx = 1; rowIdx < data.length; rowIdx++) {
+                        const row = data[rowIdx];
+                        const name = row[headers.indexOf('NAME')];
+                        const medianIncome = parseInt(row[headers.indexOf('B19013_001E')]) || 0;
+                        const avgHhSize = parseFloat(row[headers.indexOf('B25010_001E')]) || 0;
+                        const totalPop25 = parseInt(row[headers.indexOf('B15003_001E')]) || 0;
+                        const bachelorDeg = parseInt(row[headers.indexOf('B15003_022E')]) || 0;
+                        const mastersDeg = parseInt(row[headers.indexOf('B15003_023E')]) || 0;
+                        const profDeg = parseInt(row[headers.indexOf('B15003_024E')]) || 0;
+                        const doctDeg = parseInt(row[headers.indexOf('B15003_025E')]) || 0;
+                        const totalHh = parseInt(row[headers.indexOf('B19001_001E')]) || 0;
+                        const hh100_125 = parseInt(row[headers.indexOf('B19001_014E')]) || 0;
+                        const hh125_150 = parseInt(row[headers.indexOf('B19001_015E')]) || 0;
+                        const hh150_200 = parseInt(row[headers.indexOf('B19001_016E')]) || 0;
+                        const hh200plus = parseInt(row[headers.indexOf('B19001_017E')]) || 0;
+
+                        // Validate data
+                        if (medianIncome < 0 || medianIncome > 500000) continue;
+
+                        // Build GEOID
+                        const county = row[headers.indexOf('county')];
+                        const tract = row[headers.indexOf('tract')];
+                        const geoid = buildGeoid(stateFips, county, tract);
+
+                        // Calculate derived metrics
+                        const pctBachelorPlus = totalPop25 > 0 ? ((bachelorDeg + mastersDeg + profDeg + doctDeg) / totalPop25 * 100) : 0;
+                        const pctAbove100k = totalHh > 0 ? ((hh100_125 + hh125_150 + hh150_200 + hh200plus) / totalHh * 100) : 0;
+
+                        stateData[geoid] = {
+                            name,
+                            median_income: medianIncome,
+                            avg_hh_size: parseFloat(avgHhSize.toFixed(2)),
+                            pct_bachelor_plus: parseFloat(pctBachelorPlus.toFixed(1)),
+                            pct_above_100k: parseFloat(pctAbove100k.toFixed(1)),
+                            total_hh: totalHh,
+                            hh_100_125k: hh100_125,
+                            hh_125_150k: hh125_150,
+                            hh_150_200k: hh150_200,
+                            hh_200k_plus: hh200plus
+                        };
+
+                        totalFetched++;
+                    }
+
+                    acsData[stateFips] = stateData;
+                    log(`  → ${Object.keys(stateData).length} tracts with valid data`);
+
+                } catch (err) {
+                    log(`Error fetching ${stateName}: ${err.message}`, 'error');
+                }
+
+                updatePhase(1, Math.round((i + 1) / states.length * 100));
+            }
+
+            updatePhase(1, 100, true);
+            log(`Phase 1 complete: ${totalFetched} total tracts fetched`, 'success');
+            updateStats({ tractsFetched: totalFetched });
+            return Object.keys(acsData).length;
+        }
+
+        // ============================================================================
+        // PHASE 2: FETCH TRACT BOUNDARIES FROM TIGERWEB
+        // ============================================================================
+        async function computeMetroClusters() {
+            const clusters = [];
+            const processed = new Set();
+
+            // Group locations into geographic clusters (roughly 15-mile radius)
+            for (let loc of OL_COORDS) {
+                const locKey = loc.join(',');
+                if (processed.has(locKey)) continue;
+
+                const cluster = [loc];
+                processed.add(locKey);
+
+                // Find nearby locations within ~15 miles (0.25 degrees ~ 15 miles)
+                for (let other of OL_COORDS) {
+                    const otherKey = other.join(',');
+                    if (processed.has(otherKey)) continue;
+
+                    const dist = haversineDistance(loc[0], loc[1], other[0], other[1]);
+                    if (dist < 20) {
+                        cluster.push(other);
+                        processed.add(otherKey);
+                    }
+                }
+
+                // Compute bounding box
+                let minLat = cluster[0][0], maxLat = cluster[0][0];
+                let minLon = cluster[0][1], maxLon = cluster[0][1];
+
+                for (let pt of cluster) {
+                    minLat = Math.min(minLat, pt[0]);
+                    maxLat = Math.max(maxLat, pt[0]);
+                    minLon = Math.min(minLon, pt[1]);
+                    maxLon = Math.max(maxLon, pt[1]);
+                }
+
+                // Add buffer (0.25 degrees ~ 15 miles)
+                const buffer = 0.25;
+                clusters.push({
+                    minLat: minLat - buffer,
+                    maxLat: maxLat + buffer,
+                    minLon: minLon - buffer,
+                    maxLon: maxLon + buffer,
+                    locations: cluster
+                });
+            }
+
+            return clusters;
+        }
+
+        async function fetchBoundaries() {
+            log('Phase 2: Fetching tract boundaries from TIGERweb...', 'info');
+
+            const clusters = await computeMetroClusters();
+            log(`  → Processing ${clusters.length} metro clusters`);
+
+            let totalBoundaries = 0;
+
+            for (let clusterIdx = 0; clusterIdx < clusters.length; clusterIdx++) {
+                const cluster = clusters[clusterIdx];
+                log(`Cluster ${clusterIdx + 1}/${clusters.length}: ${cluster.locations.length} locations`);
+
+                let resultOffset = 0;
+                let hasMore = true;
+
+                while (hasMore) {
+                    try {
+                        const geometry = `${cluster.minLon},${cluster.minLat},${cluster.maxLon},${cluster.maxLat}`;
+                        const url = 'https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2022/MapServer/8/query' +
+                            `?geometry=${geometry}` +
+                            `&geometryType=esriGeometryEnvelope` +
+                            `&spatialRel=esriSpatialRelIntersects` +
+                            `&outFields=GEOID,BASENAME,STATE,COUNTY,TRACT` +
+                            `&f=geojson` +
+                            `&outSR=4326` +
+                            `&resultRecordCount=5000` +
+                            `&resultOffset=${resultOffset}`;
+
+                        const response = await fetch(url);
+                        const geojson = await response.json();
+
+                        if (!geojson.features || geojson.features.length === 0) {
+                            hasMore = false;
+                            break;
+                        }
+
+                        for (let feature of geojson.features) {
+                            const geoid = feature.properties.GEOID;
+                            const state = feature.properties.STATE.toString().padStart(2, '0');
+
+                            if (!boundsData[state]) boundsData[state] = {};
+                            boundsData[state][geoid] = feature;
+                            totalBoundaries++;
+                        }
+
+                        if (geojson.exceededTransferLimit === false) {
+                            hasMore = false;
+                        } else {
+                            resultOffset += 5000;
+                        }
+
+                    } catch (err) {
+                        log(`Error fetching cluster ${clusterIdx}: ${err.message}`, 'error');
+                        hasMore = false;
+                    }
+                }
+
+                updatePhase(2, Math.round((clusterIdx + 1) / clusters.length * 100));
+                await new Promise(resolve => setTimeout(resolve, 100)); // Rate limiting
+            }
+
+            updatePhase(2, 100, true);
+            log(`Phase 2 complete: ${totalBoundaries} tract boundaries fetched`, 'success');
+            return totalBoundaries;
+        }
+
+        // ============================================================================
+        // PHASE 3: JOIN AND FILTER
+        // ============================================================================
+        async function joinAndFilter() {
+            log('Phase 3: Joining ACS data with boundaries and filtering...', 'info');
+
+            const features = [];
+            let totalJoined = 0;
+            let withinProximity = 0;
+
+            // Iterate through all boundary data
+            for (let state in boundsData) {
+                for (let geoid in boundsData[state]) {
+                    const boundary = boundsData[state][geoid];
+                    const props = acsData[state]?.[geoid];
+
+                    if (!props) {
+                        continue; // No ACS data for this tract
+                    }
+
+                    // Check proximity to OL locations
+                    const centroid = getCentroid(boundary.geometry);
+                    if (!centroid) continue;
+
+                    let withinRange = false;
+                    for (let loc of OL_COORDS) {
+                        const dist = haversineDistance(centroid[0], centroid[1], loc[0], loc[1]);
+                        if (dist <= 20) { // 20-mile radius
+                            withinRange = true;
+                            break;
+                        }
+                    }
+
+                    if (!withinRange) {
+                        continue;
+                    }
+
+                    withinProximity++;
+
+                    // Build final feature
+                    const feature = {
+                        type: 'Feature',
+                        geometry: boundary.geometry,
+                        properties: {
+                            GEOID: geoid,
+                            NAME: props.name,
+                            median_income: props.median_income,
+                            avg_hh_size: props.avg_hh_size,
+                            pct_bachelor_plus: props.pct_bachelor_plus,
+                            pct_above_100k: props.pct_above_100k,
+                            total_hh: props.total_hh,
+                            hh_100_125k: props.hh_100_125k,
+                            hh_125_150k: props.hh_125_150k,
+                            hh_150_200k: props.hh_150_200k,
+                            hh_200k_plus: props.hh_200k_plus
+                        }
+                    };
+
+                    features.push(feature);
+                    totalJoined++;
+
+                    if (totalJoined % 100 === 0) {
+                        updatePhase(3, Math.min(99, Math.round(totalJoined / 2000 * 100)));
+                    }
+                }
+            }
+
+            updatePhase(3, 100, true);
+            log(`Phase 3 complete: ${totalJoined} tracts in final dataset`, 'success');
+            log(`  → Within 20-mile proximity: ${withinProximity}`, 'info');
+
+            return features;
+        }
+
+        // ============================================================================
+        // PHASE 4: BUILD AND EXPORT GEOJSON
+        // ============================================================================
+        async function buildAndExportGeojson(features) {
+            log('Phase 4: Building and exporting GeoJSON...', 'info');
+
+            currentGeojson = {
+                type: 'FeatureCollection',
+                features: features
+            };
+
+            const jsonStr = JSON.stringify(currentGeojson);
+            const fileSizeKb = Math.round(jsonStr.length / 1024);
+
+            updatePhase(4, 100, true);
+            log(`Phase 4 complete: GeoJSON built (${fileSizeKb} KB)`, 'success');
+            log(`Total features in GeoJSON: ${features.length}`, 'success');
+
+            document.getElementById('fileSizeEstimate').textContent = fileSizeKb + ' KB';
+            document.getElementById('downloadSection').style.display = 'block';
+
+            updateStats({ finalCount: features.length });
+
+            return currentGeojson;
+        }
+
+        // ============================================================================
+        // MAIN PROCESS ORCHESTRATION
+        // ============================================================================
+        async function startProcess() {
+            const btn = document.getElementById('startBtn');
+            btn.disabled = true;
+
+            try {
+                // Reset stats
+                updateStats({ states: 0, tractsFetched: 0, tractsWithData: 0, finalCount: 0 });
+                document.getElementById('downloadSection').style.display = 'none';
+
+                // Phase 1: Fetch ACS
+                const stateCount = await fetchAcsData();
+                updateStats({ states: stateCount });
+
+                // Phase 2: Fetch Boundaries
+                await fetchBoundaries();
+
+                // Phase 3: Join & Filter
+                const features = await joinAndFilter();
+
+                // Phase 4: Export
+                await buildAndExportGeojson(features);
+
+                log('All phases complete!', 'success');
+
+            } catch (err) {
+                log(`Fatal error: ${err.message}`, 'error');
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function downloadGeoJSON() {
+            if (!currentGeojson) {
+                log('No GeoJSON data available', 'error');
+                return;
+            }
+
+            const jsonStr = JSON.stringify(currentGeojson, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/geo+json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'ol_census_tracts.geojson';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            log('GeoJSON downloaded: ol_census_tracts.geojson', 'success');
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            log('Census Data Preparation Tool initialized', 'info');
+            log('Ready to fetch data. Ensure Census API key is set (optional).', 'info');
+        });
+    </script>
+</body>
+</html>
