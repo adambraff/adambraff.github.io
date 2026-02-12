@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OL Batch Location Update</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #1a1a1a; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
+        .header { background: #0d0d0d; border-bottom: 2px solid #2a7f62; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .header h1 { font-size: 24px; font-weight: 600; color: #2a7f62; margin-bottom: 10px; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .control-section { background: #252525; border: 1px solid #3a3a3a; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+        .control-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px; align-items: flex-end; }
+        .form-group { display: flex; flex-direction: column; }
+        label { font-size: 12px; font-weight: 600; color: #2a7f62; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+        input[type="password"], input[type="text"] { background: #1a1a1a; border: 1px solid #3a3a3a; color: #e0e0e0; padding: 10px 12px; border-radius: 4px; font-size: 13px; font-family: 'Courier New', monospace; }
+        input:focus { outline: none; border-color: #2a7f62; box-shadow: 0 0 8px rgba(42,127,98,0.3); }
+        button { padding: 10px 20px; font-size: 13px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.2s; }
+        .btn-primary { background: #2a7f62; color: white; }
+        .btn-primary:hover:not(:disabled) { background: #359b7f; box-shadow: 0 4px 12px rgba(42,127,98,0.4); }
+        .btn-danger { background: #d64545; color: white; }
+        .btn-danger:hover:not(:disabled) { background: #e85959; }
+        .btn-secondary { background: #3a3a3a; color: #e0e0e0; }
+        .btn-secondary:hover:not(:disabled) { background: #4a4a4a; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: #252525; border: 1px solid #3a3a3a; border-radius: 8px; padding: 15px; text-align: center; }
+        .stat-value { font-size: 28px; font-weight: 700; color: #2a7f62; margin: 8px 0; }
+        .stat-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+        .progress-bar { width: 100%; height: 6px; background: #1a1a1a; border-radius: 3px; overflow: hidden; margin-top: 10px; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #2a7f62, #359b7f); width: 0%; transition: width 0.3s ease; }
+        .phase-indicator { background: #252525; border: 1px solid #3a3a3a; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+        .phase-title { font-size: 12px; color: #2a7f62; text-transform: uppercase; font-weight: 600; margin-bottom: 10px; }
+        .phase-stages { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .phase-stage { background: #1a1a1a; border: 1px solid #3a3a3a; padding: 10px; border-radius: 4px; text-align: center; font-size: 12px; transition: all 0.2s; }
+        .phase-stage.active { background: #2a7f62; border-color: #2a7f62; color: white; font-weight: 600; }
+        .phase-stage.completed { background: #1a3a2a; border-color: #2a7f62; color: #2a7f62; }
+        .log-container { background: #0d0d0d; border: 1px solid #3a3a3a; border-radius: 8px; padding: 0; overflow: hidden; display: flex; flex-direction: column; height: 400px; margin-bottom: 20px; }
+        .log-header { background: #1a1a1a; border-bottom: 1px solid #3a3a3a; padding: 10px 15px; font-size: 12px; color: #2a7f62; font-weight: 600; text-transform: uppercase; }
+        .log-content { flex: 1; overflow-y: auto; padding: 15px; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.5; }
+        .log-entry { margin-bottom: 4px; }
+        .log-entry.info { color: #888; }
+        .log-entry.success { color: #2a7f62; }
+        .log-entry.warning { color: #d4a574; }
+        .log-entry.error { color: #d64545; }
+        .log-entry.phase { color: #64b5f6; font-weight: 600; }
+        .export-section { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .export-btn { padding: 12px 20px; font-size: 13px; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #1a1a1a; }
+        ::-webkit-scrollbar-thumb { background: #3a3a3a; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4a4a4a; }
+        .error-message { background: #3a1a1a; border: 1px solid #d64545; border-radius: 4px; padding: 12px 15px; margin-bottom: 15px; color: #ff8a8a; font-size: 12px; }
+        .success-message { background: #1a3a2a; border: 1px solid #2a7f62; border-radius: 4px; padding: 12px 15px; margin-bottom: 15px; color: #7cff9a; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>OL Batch Location Update</h1>
+        <p>Process 17 Onelife Fitness locations through geocoding, nearby search, chain text search, and drive time calculation</p>
+    </div>
+    <div class="container">
+        <div class="control-section">
+            <div class="control-row">
+                <div class="form-group">
+                    <label for="apiKey">Google Maps API Key</label>
+                    <input type="password" id="apiKey" placeholder="Enter your Google Maps API key">
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button class="btn-primary" id="startBtn" onclick="startBatch()">Start Processing</button>
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button class="btn-danger" id="stopBtn" onclick="stopBatch()" disabled>Stop Processing</button>
+                </div>
+            </div>
+        </div>
+        <div id="errorMsg" class="error-message" style="display: none;"></div>
+        <div id="successMsg" class="success-message" style="display: none;"></div>
+        <div class="phase-indicator">
+            <div class="phase-title">Processing Phases</div>
+            <div class="phase-stages">
+                <div class="phase-stage" id="phase1">Phase 1: Geocoding</div>
+                <div class="phase-stage" id="phase2">Phase 2: Nearby Search</div>
+                <div class="phase-stage" id="phase3">Phase 3: Chain Search</div>
+                <div class="phase-stage" id="phase4">Phase 4: Drive Times</div>
+            </div>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-label">Locations Processed</div><div class="stat-value" id="locProcessed">0</div><div class="progress-bar"><div class="progress-fill" id="locProgress"></div></div></div>
+            <div class="stat-card"><div class="stat-label">Gyms Found</div><div class="stat-value" id="gymsFound">0</div></div>
+            <div class="stat-card"><div class="stat-label">API Calls</div><div class="stat-value" id="apiCalls">0</div></div>
+            <div class="stat-card"><div class="stat-label">Drive Times Calculated</div><div class="stat-value" id="driveTimes">0</div></div>
+        </div>
+        <div class="log-container">
+            <div class="log-header">Processing Log</div>
+            <div class="log-content" id="logContent">
+                <div class="log-entry info">Ready to start. Enter API key and click Start Processing.</div>
+            </div>
+        </div>
+        <div class="control-section export-section">
+            <button class="btn-secondary export-btn" id="exportJsonBtn" onclick="exportJSON()" disabled>Export JSON</button>
+            <button class="btn-secondary export-btn" id="exportCsvBtn" onclick="exportCSV()" disabled>Export CSV</button>
+        </div>
+    </div>
+    <script>
+        var LOCATIONS = [
+            {"name":"Box Hill","addr":"3409 Merchant Blvd, Abingdon, MD 21009","lat":0,"lng":0},
+            {"name":"Brambleton","addr":"42365 Soave Dr, Brambleton, VA 20148","lat":0,"lng":0},
+            {"name":"Carrollton","addr":"812 S Park St, Carrollton, GA 30117","lat":0,"lng":0},
+            {"name":"Chesapeake Square","addr":"4628 Portsmouth Blvd, Chesapeake, VA 23321","lat":0,"lng":0},
+            {"name":"Dawsonville","addr":"534 Marketplace Pkwy, Dawsonville, GA 30534","lat":34.350452,"lng":-84.050989},
+            {"name":"Falls Church","addr":"1000 E Broad St, Falls Church, VA 22042","lat":0,"lng":0},
+            {"name":"Fort Totten","addr":"5198 South Dakota Ave NE, Washington, DC 20017","lat":0,"lng":0},
+            {"name":"Holly Springs","addr":"4512 Holly Springs Pkwy, Holly Springs, GA 30115","lat":0,"lng":0},
+            {"name":"Lexington","addr":"680 Lexington Cir, Peachtree City, GA 30269","lat":0,"lng":0},
+            {"name":"Martinsburg","addr":"830 Foxcroft Ave, Martinsburg, WV 25401","lat":0,"lng":0},
+            {"name":"McCalla","addr":"4835 Promenade Pkwy, Bessemer, AL 35022","lat":0,"lng":0},
+            {"name":"Newport News","addr":"815 City Center Blvd, Newport News, VA 23602","lat":0,"lng":0},
+            {"name":"Norfolk","addr":"1900 Monticello Ave, Norfolk, VA 23517","lat":0,"lng":0},
+            {"name":"Old Town","addr":"209 Madison St, Alexandria, VA 22314","lat":0,"lng":0},
+            {"name":"Tech Center","addr":"651 Tech Center Pkwy, Newport News, VA 23606","lat":0,"lng":0},
+            {"name":"Virginia Beach Blvd","addr":"2844 Virginia Beach Blvd, Virginia Beach, VA 23451","lat":0,"lng":0},
+            {"name":"Winchester","addr":"251 Commonwealth Court, Winchester, VA 22602","lat":0,"lng":0}
+        ];
+        var SEARCH_CHAINS = ["Planet Fitness","LA Fitness","Anytime Fitness","YMCA","F45 Training","Orangetheory Fitness","Gold's Gym","CrossFit","Life Time","Crunch Fitness","Snap Fitness","Workout Anytime","Equinox","VIDA Fitness","JCC","Fitness Together","Yoga District","Club Pilates","CorePower Yoga","Burn Boot Camp","Club Studio","Pure Barre","NYSC","DMV Iron Gym","Jazzercise"];
+        var SCORES_LOOKUP = {"Planet Fitness":8,"LA Fitness":10,"Anytime Fitness":9,"Orangetheory Fitness":5,"Life Time":10,"Gold's Gym":10,"Fitness Together":6,"Club Pilates":4,"Snap Fitness":8,"Burn Boot Camp":5,"Hot Yoga Tysons":4,"Crunch Fitness - Chevy Chase":10,"Aussienick Squash":5,"FITology":5,"Bethesda Travel Agent":1,"YMCA Bethesda-Chevy Chase":7,"YMCA Fairfax County Reston":7,"CrossFit DC":6,"Club Studio":5,"Battle Fitness":6,"CorePower Yoga - Georgetown":4,"Equinox Sports Club Washington, D.C.":10,"Down Dog Yoga Georgetown":4,"The Jefferson, Washington, DC":1,"VIDA - City Vista":7,"Epic Yoga DC":4,"Holiday Inn Washington-Central/White House by IHG":1,"Crew Club":4,"Flow Yoga Center":4,"VIDA - Logan Circle":7,"Yoga District - Dupont":4,"Edlavitch DC Jewish Community Center":3,"MINT Gym & Studio":6,"Gwendolyn Coffield Community Center":3,"Gold's Gym - Fairfax Station":10,"Bender JCC of Greater Washington":3,"Pure Barre":4,"Sportrock Climbing Centers":4,"YMCA Arlington":7,"Yoga District - I St.":4,"New York Sports Club":8,"Equinox Bethesda":10,"Dynamite Gymnastics Center":3,"Claude Moore Recreation & Community Center":3,"Movement Rockville":5,"Trident Athletics":5,"Patriot Crossfit":6,"VIDA - U Street":7,"Estilo Jiu Jitsu":3,"Dance Trance DC":3,"The nZone":5,"DMV Iron Gym":6,"Snap Fitness Alexandria (Old Town)":8,"Inside Edge Strength and Conditioning":6,"Super Kicks Karate":3,"Manassas Park Community Center":5,"Equinox Tysons Corner":10,"The Aspen Hill Club":5,"Glorious Health Club and Art Gallery":7,"Chevy Chase Athletic Club":7,"Cub Run Rec Center":5,"Hot House Yoga":4,"Gold's Gym - Lorton":10,"Jazzercise Ashburn":5,"MindShift Gym":6,"CrossFit Fairfax":5,"Snap Fitness Alexandria":8,"Capitol City Circus School":5,"Lloyd Irvin's Mixed Martial Arts Academy":3,"ARIA Medispa":2,"Snap Fitness Herndon (Franklin Farm)":8,"Curves":5,"YMCA Alexandria":7,"CorePower Yoga - Bethesda":4,"CrossFit Reston":5,"Underground Athlete":5,"Bangkok Boxing Fitness":4,"Northwest Family YMCA":7,"Om Thai Yoga Wellness Center":4,"Crowne Plaza Atlanta Perimeter at Ravinia by IHG":1,"Marcus Jewish Community Center of Atlanta":6,"F45 Training Arlington":7,"Equinox Wisconsin Avenue":10,"Freedom Aquatic & Fitness Center":7,"Ed Isakson/Alpharetta Family YMCA":7,"Robert D. Fowler Family YMCA":7,"SWEET SCIENCE FITNESS BOXING CLUB":4,"Northpark Towncenter":5,"Roswell Fitness Factory":6,"F45 Training Clarendon":7,"Equinox Anthem Row":10,"La Fitness":10,"CrossFit Tysons Corner":5,"F45 Training Fairfax Circle":7,"F45 Training Mosaic District":7,"Tiger Academy of Martial Arts":3,"Life Time Alpharetta":10,"Alloy Personal Training Haynes Bridge Village":3,"The Manor Golf & Country Club":5,"Rich Parlo Personal Trainer":5,"Johns Creek Pilates":4,"Shaolin Institute Kung Fu and Martial Arts":3,"Windermere Golf Club":5,"Capital MMA & Elite Fitness | Loudoun-Dulles, VA":3,"First Defense Krav Maga":5,"Gold's Gym - Reston":10};
+        var DUES_LOOKUP = {"Planet Fitness":["Planet Fitness",15.0,30.0,22.0],"LA Fitness":["LA Fitness",32.0,53.0,42.0],"Anytime Fitness":["Anytime Fitness",40.0,55.0,48.0],"Orangetheory Fitness":["Orangetheory Fitness",57.0,221.0,139.0],"Life Time":["Life Time",90.0,332.0,211.0],"Gold's Gym":["Gold's Gym",27.0,52.0,40.0],"Fitness Together":["Fitness Together",214.0,427.0,320.0],"Club Pilates":["Club Pilates",98.0,216.0,157.0],"Snap Fitness":["Snap Fitness",30.0,45.0,38.0],"Burn Boot Camp":["Burn Boot Camp",147.0,193.0,170.0],"Hot Yoga Tysons":["Hot Yoga (various)",89.0,201.0,145.0],"Crunch Fitness - Chevy Chase":["Crunch Fitness",11.0,56.0,34.0],"YMCA Bethesda-Chevy Chase":["YMCA",34.0,98.0,66.0],"YMCA Fairfax County Reston":["YMCA",34.0,98.0,66.0],"CrossFit DC":["CrossFit (various)",134.0,279.0,206.0],"Club Studio":["Club Studio",30.0,50.0,40.0],"CorePower Yoga - Georgetown":["CorePower Yoga",111.0,211.0,161.0],"Equinox Sports Club Washington, D.C.":["Equinox",221.0,441.0,331.0],"VIDA - City Vista":["VIDA Fitness",166.0,222.0,194.0],"VIDA - Logan Circle":["VIDA Fitness",166.0,222.0,194.0],"Yoga District - Dupont":["Yoga District",89.0,201.0,145.0],"Edlavitch DC Jewish Community Center":["JCC",45.0,112.0,78.0],"Gold's Gym - Fairfax Station":["Gold's Gym",28.0,55.0,42.0],"Bender JCC of Greater Washington":["JCC",45.0,112.0,78.0],"Pure Barre":["Pure Barre",96.0,193.0,144.0],"YMCA Arlington":["YMCA",34.0,98.0,66.0],"New York Sports Club":["New York Sports Club",75.0,125.0,100.0],"Equinox Bethesda":["Equinox",221.0,441.0,331.0],"Equinox Tysons Corner":["Equinox",221.0,441.0,331.0],"Gold's Gym - Lorton":["Gold's Gym",27.0,52.0,40.0],"Snap Fitness Alexandria (Old Town)":["Snap Fitness",30.0,45.0,38.0],"Snap Fitness Alexandria":["Snap Fitness",30.0,45.0,38.0],"YMCA Alexandria":["YMCA",34.0,98.0,66.0],"CorePower Yoga - Bethesda":["CorePower Yoga",111.0,211.0,161.0],"Northwest Family YMCA":["YMCA",34.0,98.0,66.0],"F45 Training Arlington":["F45 Training",89.0,199.0,144.0],"Equinox Wisconsin Avenue":["Equinox",221.0,441.0,331.0],"Freedom Aquatic & Fitness Center":["YMCA",34.0,98.0,66.0],"Ed Isakson/Alpharetta Family YMCA":["YMCA",34.0,98.0,66.0],"Robert D. Fowler Family YMCA":["YMCA",34.0,98.0,66.0],"Roswell Fitness Factory":["",34.0,67.0,50.0],"F45 Training Clarendon":["F45 Training",89.0,199.0,144.0],"Equinox Anthem Row":["Equinox",221.0,441.0,331.0],"La Fitness":["LA Fitness",32.0,53.0,42.0],"F45 Training Fairfax Circle":["F45 Training",89.0,199.0,144.0],"F45 Training Mosaic District":["F45 Training",89.0,199.0,144.0],"Life Time Alpharetta":["Life Time",90.0,332.0,211.0],"Gold's Gym - Reston":["Gold's Gym",27.0,52.0,40.0]};
+        var running = false;
+        var results = [];
+        var apiCallCount = 0;
+        var gymsFoundCount = 0;
+        var driveTimesCount = 0;
+        var geocoder = null;
+        var placesService = null;
+        var currentPhase = 0;
+
+        function log(message, type = 'info') {
+            var logContent = document.getElementById('logContent');
+            var entry = document.createElement('div');
+            entry.className = 'log-entry ' + type;
+            entry.textContent = '[' + new Date().toLocaleTimeString() + '] ' + message;
+            logContent.appendChild(entry);
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+        function updateStats() {
+            document.getElementById('locProcessed').textContent = results.length;
+            document.getElementById('locProgress').style.width = (results.length / LOCATIONS.length * 100) + '%';
+            document.getElementById('gymsFound').textContent = gymsFoundCount;
+            document.getElementById('apiCalls').textContent = apiCallCount;
+            document.getElementById('driveTimes').textContent = driveTimesCount;
+        }
+        function setPhase(phaseNum) {
+            currentPhase = phaseNum;
+            for (let i = 1; i <= 4; i++) {
+                var phase = document.getElementById('phase' + i);
+                if (i < phaseNum) phase.className = 'phase-stage completed';
+                else if (i === phaseNum) phase.className = 'phase-stage active';
+                else phase.className = 'phase-stage';
+            }
+        }
+        function showError(msg) { var d = document.getElementById('errorMsg'); d.textContent = msg; d.style.display = 'block'; log('ERROR: ' + msg, 'error'); }
+        function showSuccess(msg) { var d = document.getElementById('successMsg'); d.textContent = msg; d.style.display = 'block'; setTimeout(() => { d.style.display = 'none'; }, 5000); }
+
+        function startBatch() {
+            var apiKey = document.getElementById('apiKey').value.trim();
+            if (!apiKey) { showError('Please enter a Google Maps API key'); return; }
+            running = true; results = []; apiCallCount = 0; gymsFoundCount = 0; driveTimesCount = 0;
+            document.getElementById('logContent').innerHTML = '';
+            document.getElementById('errorMsg').style.display = 'none';
+            document.getElementById('successMsg').style.display = 'none';
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+            document.getElementById('apiKey').disabled = true;
+            document.getElementById('exportJsonBtn').disabled = true;
+            document.getElementById('exportCsvBtn').disabled = true;
+            log('Initializing Google Maps API...', 'phase');
+            var script = document.createElement('script');
+            script.src = 'https://maps.googleapis.com/maps/api/js?key=' + apiKey + '&libraries=places';
+            script.onload = function() {
+                log('Google Maps API loaded', 'success');
+                geocoder = new google.maps.Geocoder();
+                var mapDiv = document.createElement('div'); mapDiv.style.display = 'none'; document.body.appendChild(mapDiv);
+                var map = new google.maps.Map(mapDiv);
+                placesService = new google.maps.places.PlacesService(map);
+                processBatch(apiKey);
+            };
+            script.onerror = function() { showError('Failed to load Google Maps API. Check your API key.'); running = false; document.getElementById('startBtn').disabled = false; document.getElementById('stopBtn').disabled = true; document.getElementById('apiKey').disabled = false; };
+            document.head.appendChild(script);
+        }
+        function stopBatch() { running = false; log('Batch processing stopped by user', 'warning'); document.getElementById('startBtn').disabled = false; document.getElementById('stopBtn').disabled = true; document.getElementById('apiKey').disabled = false; }
+
+        async function processBatch(apiKey) {
+            try {
+                setPhase(1); log('Phase 1: Geocoding locations with lat=0/lng=0', 'phase'); await phase1Geocode(); if (!running) return;
+                setPhase(2); log('Phase 2: Running nearby search (gym, 10 miles)', 'phase'); await phase2NearbySearch(); if (!running) return;
+                setPhase(3); log('Phase 3: Running chain text search', 'phase'); await phase3ChainSearch(); if (!running) return;
+                setPhase(4); log('Phase 4: Calculating drive times via OSRM', 'phase'); await phase4DriveTimes(); if (!running) return;
+                log('Enriching results with scores and dues...', 'info'); enrichResults();
+                log('All phases completed successfully!', 'success');
+                showSuccess('Processing complete. Results ready for export.');
+                document.getElementById('exportJsonBtn').disabled = false;
+                document.getElementById('exportCsvBtn').disabled = false;
+            } catch (err) { showError(err.message); } finally {
+                running = false; document.getElementById('startBtn').disabled = false; document.getElementById('stopBtn').disabled = true; document.getElementById('apiKey').disabled = false;
+            }
+        }
+
+        async function phase1Geocode() {
+            for (let i = 0; i < LOCATIONS.length && running; i++) {
+                let loc = LOCATIONS[i];
+                if (loc.lat === 0 && loc.lng === 0) {
+                    log('Geocoding: ' + loc.name, 'info');
+                    try {
+                        await new Promise((resolve, reject) => {
+                            geocoder.geocode({ address: loc.addr }, (results, status) => {
+                                apiCallCount++;
+                                if (status === 'OK' && results[0]) { loc.lat = results[0].geometry.location.lat(); loc.lng = results[0].geometry.location.lng(); log('  ' + loc.name + ': ' + loc.lat.toFixed(4) + ', ' + loc.lng.toFixed(4), 'success'); }
+                                else { log('  ' + loc.name + ': ' + status, 'error'); }
+                                resolve();
+                            });
+                        });
+                    } catch (err) { log('  ' + loc.name + ': ' + err.message, 'error'); }
+                    await sleep(200);
+                } else { log('  ' + loc.name + ': Already geocoded', 'success'); }
+                updateStats();
+            }
+        }
+
+        async function phase2NearbySearch() {
+            for (let i = 0; i < LOCATIONS.length && running; i++) {
+                let loc = LOCATIONS[i];
+                var competitors = [];
+                log('Nearby search for ' + loc.name + '...', 'info');
+                await performNearbySearch(loc, competitors);
+                if (!results.find(r => r.name === loc.name)) { results.push({ name: loc.name, addr: loc.addr, lat: loc.lat, lng: loc.lng, competitors: competitors }); }
+                updateStats();
+            }
+        }
+
+        function performNearbySearch(loc, competitors) {
+            return new Promise((resolve) => {
+                var pageNum = 0;
+                var request = { location: new google.maps.LatLng(loc.lat, loc.lng), radius: 16093, type: 'gym' };
+                function handlePage(results, status, pagination) {
+                    apiCallCount++; pageNum++;
+                    if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+                        for (let place of results) {
+                            if (!place.name.toLowerCase().includes('onelife') && !place.name.toLowerCase().includes('one life')) { competitors.push(formatCompetitor(place, loc)); gymsFoundCount++; }
+                        }
+                        log('  Page ' + pageNum + ': Found ' + results.length + ' gyms', 'success');
+                    } else if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) { log('  No results', 'warning'); }
+                    else { log('  Status: ' + status, 'warning'); }
+                    if (pagination && pagination.hasNextPage && pageNum < 3 && running) { setTimeout(function() { apiCallCount++; pagination.nextPage(); }, 2000); }
+                    else { resolve(); }
+                }
+                placesService.nearbySearch(request, handlePage);
+            });
+        }
+
+        async function phase3ChainSearch() {
+            for (let i = 0; i < LOCATIONS.length && running; i++) {
+                let loc = results.find(r => r.name === LOCATIONS[i].name);
+                if (!loc) continue;
+                log('Chain search for ' + loc.name + '...', 'info');
+                var existingIds = new Set(loc.competitors.map(c => c.pid));
+                for (let chain of SEARCH_CHAINS) {
+                    if (!running) break;
+                    var query = chain + ' gym near ' + loc.addr;
+                    await new Promise((resolve) => {
+                        placesService.textSearch({ query: query, location: new google.maps.LatLng(loc.lat, loc.lng), radius: 16093 }, (results, status) => {
+                            apiCallCount++;
+                            if (status === 'OK' && results) {
+                                var newCount = 0;
+                                for (let place of results) {
+                                    if (!existingIds.has(place.place_id)) {
+                                        var dist = haversine(loc.lat, loc.lng, place.geometry.location.lat(), place.geometry.location.lng());
+                                        if (dist <= 15) { loc.competitors.push(formatCompetitor(place, loc)); existingIds.add(place.place_id); gymsFoundCount++; newCount++; }
+                                    }
+                                }
+                                if (newCount > 0) log('  ' + chain + ': +' + newCount + ' new', 'success');
+                            }
+                            resolve();
+                        });
+                    });
+                    await sleep(200);
+                }
+                updateStats();
+            }
+        }
+
+        function formatCompetitor(place, olLoc) {
+            var straight = haversine(olLoc.lat, olLoc.lng, place.geometry.location.lat(), place.geometry.location.lng());
+            return { n: place.name, a: place.formatted_address || place.vicinity || '', lat: place.geometry.location.lat(), lng: place.geometry.location.lng(), d: Math.round(straight * 10) / 10, r: place.rating || 0, rv: place.user_ratings_total || 0, s: 0, pid: place.place_id || '', dt: 0, dd: 0, ch: '', dm: 0, dl: 0, dh: 0 };
+        }
+
+        async function phase4DriveTimes() {
+            for (let i = 0; i < results.length && running; i++) {
+                let locResult = results[i];
+                log('Drive times for ' + locResult.name + '...', 'info');
+                for (let j = 0; j < locResult.competitors.length && running; j++) {
+                    let comp = locResult.competitors[j];
+                    if (comp.lat && comp.lng) {
+                        try {
+                            var response = await fetch('https://router.project-osrm.org/route/v1/driving/' + comp.lng + ',' + comp.lat + ';' + locResult.lng + ',' + locResult.lat + '?overview=false');
+                            if (response.ok) { var data = await response.json(); if (data.routes && data.routes[0]) { comp.dt = Math.round(data.routes[0].duration / 60 * 10) / 10; comp.dd = Math.round(data.routes[0].distance * 0.000621371 * 10) / 10; driveTimesCount++; } }
+                        } catch (err) { log('  OSRM error for ' + comp.n + ': ' + err.message, 'warning'); }
+                        await sleep(50);
+                    }
+                }
+                updateStats();
+            }
+        }
+
+        function enrichResults() {
+            for (let loc of results) {
+                for (let comp of loc.competitors) {
+                    if (SCORES_LOOKUP[comp.n]) comp.s = SCORES_LOOKUP[comp.n];
+                    var chainMatch = matchChain(comp.n);
+                    if (chainMatch) {
+                        comp.ch = chainMatch;
+                        if (DUES_LOOKUP[comp.n]) { var dues = DUES_LOOKUP[comp.n]; comp.dl = dues[1]; comp.dh = dues[2]; comp.dm = dues[3]; }
+                        else if (DUES_LOOKUP[chainMatch]) { var dues = DUES_LOOKUP[chainMatch]; comp.dl = dues[1]; comp.dh = dues[2]; comp.dm = dues[3]; }
+                    }
+                }
+            }
+        }
+
+        function matchChain(gymName) {
+            var name = gymName.toLowerCase(); var matches = [];
+            for (let chain of SEARCH_CHAINS) { if (name.includes(chain.toLowerCase())) matches.push(chain); }
+            return matches.sort((a, b) => b.length - a.length)[0] || '';
+        }
+
+        function haversine(lat1, lon1, lat2, lon2) {
+            var R = 3958.8; var dLat = (lat2-lat1)*Math.PI/180; var dLon = (lon2-lon1)*Math.PI/180;
+            var a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+
+        function exportJSON() {
+            var dataStr = JSON.stringify(results, null, 2);
+            var dataBlob = new Blob([dataStr], { type: 'application/json' });
+            var url = URL.createObjectURL(dataBlob); var link = document.createElement('a');
+            link.href = url; link.download = 'batch_results_' + new Date().getTime() + '.json';
+            document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
+            log('JSON exported', 'success');
+        }
+        function exportCSV() {
+            var csv = 'Location,Gym Name,Address,Straight Distance (mi),Drive Time (min),Drive Distance (mi),Rating,Reviews,Score,Chain,Dues Low,Dues Mid,Dues High\n';
+            for (let loc of results) { for (let comp of loc.competitors) {
+                csv += '"'+loc.name+'","'+comp.n+'","'+comp.a.replace(/"/g,'""')+'",'+comp.d+','+comp.dt+','+comp.dd+','+comp.r+','+comp.rv+','+comp.s+',"'+comp.ch+'",'+comp.dl+','+comp.dm+','+comp.dh+'\n';
+            }}
+            var dataBlob = new Blob([csv], { type: 'text/csv' });
+            var url = URL.createObjectURL(dataBlob); var link = document.createElement('a');
+            link.href = url; link.download = 'batch_results_' + new Date().getTime() + '.csv';
+            document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
+            log('CSV exported', 'success');
+        }
+        function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+    </script>
+</body>
+</html>
