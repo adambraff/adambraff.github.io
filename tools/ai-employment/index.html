@@ -63,11 +63,12 @@
   .stat-delta.up { color: var(--accent3); }
   .stat-delta.down { color: var(--accent2); }
   .industry-section { margin-top: 20px; }
-  .industry-bar { display: flex; align-items: center; margin-bottom: 8px; font-size: 0.82rem; }
-  .industry-bar .ind-name { width: 180px; flex-shrink: 0; text-align: right; padding-right: 12px; color: var(--text-dim); }
-  .industry-bar .ind-track { flex: 1; height: 20px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
-  .industry-bar .ind-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+  .industry-bar { display: flex; align-items: center; margin-bottom: 4px; font-size: 0.82rem; }
+  .industry-bar .ind-name { width: 160px; flex-shrink: 0; text-align: right; padding-right: 12px; color: var(--text-dim); line-height: 1.2; }
+  .industry-bar .ind-track { flex: 1; background: transparent; position: relative; display: flex; align-items: center; }
+  .industry-bar .ind-fill { border-radius: 3px; transition: width 0.5s ease; min-width: 2px; }
   .industry-bar .ind-val { width: 50px; text-align: right; padding-left: 8px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .industry-bar .ind-zero { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,0.1); }
   .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
   .footnote { font-size: 0.75rem; color: var(--text-dim); line-height: 1.6; margin-top: 8px; }
   .footnote a { color: var(--accent); text-decoration: none; }
@@ -361,22 +362,22 @@
 
       <!-- INDUSTRY BREAKDOWN -->
       <div class="panel industry-section">
-        <h2>Industry AI Exposure & Forecasted Employment Change</h2>
-        <div style="display:flex;gap:10px;font-size:0.72rem;color:var(--text-dim);margin-bottom:10px;align-items:center">
-          <span>Bar = % of tasks automatable under your scenario</span>
+        <h2>Forecasted Employment Change by Industry (by 2030)</h2>
+        <div style="display:flex;gap:12px;font-size:0.72rem;color:var(--text-dim);margin-bottom:12px;align-items:center;flex-wrap:wrap">
+          <span>Bar length = forecasted % change in jobs</span>
           <span style="display:inline-block;width:1px;height:12px;background:var(--border)"></span>
-          <span>Bar thickness = industry employment size</span>
+          <span>Bar thickness = current industry size (area ≈ jobs gained/lost)</span>
           <span style="display:inline-block;width:1px;height:12px;background:var(--border)"></span>
-          <span>Right number = forecasted employment change by 2030</span>
-          <span style="display:inline-block;width:1px;height:12px;background:var(--border)"></span>
-          <span style="display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgb(60,200,60)"></span>Growing <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgb(255,200,20);margin-left:4px"></span>Flat <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgb(255,50,0);margin-left:4px"></span>Shrinking</span>
+          <span style="display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgb(60,200,60)"></span>Growing <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgb(255,50,0);margin-left:6px"></span>Shrinking</span>
         </div>
         <div id="industry-bars"></div>
         <p class="footnote" style="margin-top:12px">
-          Task automation exposure (bar length) adjusts dynamically based on your adoption speed and depth settings. Employment change forecasts (right column) are from calibrated forecasters at the
+          Employment change forecasts from calibrated forecasters at the
           <a href="https://www.convergenceanalysis.org/threshold-2030/comprehensive-summary" target="_blank">Threshold 2030 conference</a>.
-          Note the divergence: healthcare has 25% task exposure but <em>growing</em> employment (+6%) because demand growth outpaces automation. Programming has only 55% exposure but is the hardest-hit white-collar sector (−9%) because AI directly substitutes for the core task.
-          Industry employment figures from BLS (2024 annual averages).
+          Task automation % (right column) from McKinsey/WEF/MIT, adjusted by your scenario settings.
+          Note: healthcare has 25% task automation but <em>growing</em> employment (+6%) — demand growth outpaces displacement.
+          Programming has moderate automation exposure but is the hardest-hit white-collar sector (−9%) because AI directly substitutes for the core task.
+          Industry employment from BLS (2024 annual averages).
         </p>
       </div>
 
@@ -901,26 +902,52 @@ function updateStats(proj, params) {
 function updateIndustryBars(params) {
   const adoption = sCurve(10, params.adoption);
   const el = document.getElementById('industry-bars');
-  const maxEmp = Math.max(...INDUSTRIES.map(d => d.empMillions)); // for bar height scaling
+  const maxEmp = Math.max(...INDUSTRIES.map(d => d.empMillions));
+  // Max absolute employment change for scaling bar length
+  const maxAbsChange = Math.max(...INDUSTRIES.map(d => Math.abs(d.empChange2030)));
 
+  // Build a diverging bar chart: center = 0%, left = shrinking, right = growing
+  // Bar thickness ∝ industry employment (area ≈ absolute jobs impacted)
   el.innerHTML = INDUSTRIES.map(ind => {
-    // Net projected employment change: scenario-adjusted from base exposure × adoption × depth
     const scenarioMultiplier = adoption * params.depth / 0.35;
     const projectedExposure = Math.min(99, ind.exposure * scenarioMultiplier);
 
-    // Bar height proportional to industry employment size (min 14px, max 32px)
-    const barH = Math.round(14 + (ind.empMillions / maxEmp) * 18);
+    // Bar height: 12px min (agriculture 2.6M) to 36px max (healthcare 20.4M)
+    const barH = Math.round(12 + (ind.empMillions / maxEmp) * 24);
 
-    // Color from green→red based on forecasted employment change
     const barColor = impactColor(ind.empChange2030);
-
     const empSign = ind.empChange2030 >= 0 ? '+' : '';
 
-    return `<div class="industry-bar" style="margin-bottom:6px">
-      <div class="ind-name" title="${ind.empMillions}M employed">${ind.name}<span style="display:block;font-size:0.68rem;color:var(--text-dim);font-weight:400">${ind.empMillions}M workers</span></div>
-      <div class="ind-track" style="height:${barH}px"><div class="ind-fill" style="width:${projectedExposure}%;background:${barColor};height:100%"></div></div>
-      <div class="ind-val">${projectedExposure.toFixed(0)}%</div>
-      <div style="width:55px;text-align:right;padding-left:4px;font-size:0.78rem;font-weight:700;color:${barColor}">${empSign}${ind.empChange2030}%</div>
+    // Bar width as % of half the track (each side is 50% of track width)
+    const barWidthPct = (Math.abs(ind.empChange2030) / maxAbsChange) * 48;
+
+    // Position: negative bars grow leftward from center, positive grow rightward
+    let barStyle, barPos;
+    if (ind.empChange2030 < 0) {
+      // Shrinking: bar goes left from center
+      barPos = `position:absolute;right:50%;height:${barH}px;width:${barWidthPct}%;`;
+      barStyle = `${barPos}background:${barColor};border-radius:3px 0 0 3px;`;
+    } else if (ind.empChange2030 > 0) {
+      // Growing: bar goes right from center
+      barPos = `position:absolute;left:50%;height:${barH}px;width:${barWidthPct}%;`;
+      barStyle = `${barPos}background:${barColor};border-radius:0 3px 3px 0;`;
+    } else {
+      // Exactly zero: tiny marker at center
+      barPos = `position:absolute;left:calc(50% - 1px);height:${barH}px;width:2px;`;
+      barStyle = `${barPos}background:${barColor};border-radius:1px;`;
+    }
+
+    // Absolute jobs impacted
+    const jobsImpacted = Math.abs(ind.empChange2030 / 100 * ind.empMillions).toFixed(1);
+
+    return `<div class="industry-bar" style="margin-bottom:2px;min-height:${barH + 4}px">
+      <div class="ind-name">${ind.name}<span style="display:block;font-size:0.68rem;color:var(--text-dim);font-weight:400">${ind.empMillions}M workers</span></div>
+      <div class="ind-track" style="height:${barH + 4}px;position:relative">
+        <div class="ind-zero"></div>
+        <div style="${barStyle}top:50%;transform:translateY(-50%)"></div>
+      </div>
+      <div style="width:50px;text-align:right;padding-left:6px;font-weight:700;font-size:0.85rem;color:${barColor};font-variant-numeric:tabular-nums">${empSign}${ind.empChange2030}%</div>
+      <div style="width:55px;text-align:right;padding-left:4px;font-size:0.72rem;color:var(--text-dim);font-variant-numeric:tabular-nums" title="Tasks automatable under your scenario">${projectedExposure.toFixed(0)}% auto</div>
     </div>`;
   }).join('');
 }
