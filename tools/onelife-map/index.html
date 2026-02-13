@@ -1188,14 +1188,25 @@ var CHAIN_INDEX = {};
       CHAIN_INDEX[ch].push({ locIdx: i, comp: c });
     }
   }
-  // Populate chain dropdown, sorted by count desc
+  // Populate chain dropdown, sorted by unique location count desc
   var chainNames = Object.keys(CHAIN_INDEX);
-  chainNames.sort(function(a, b) { return CHAIN_INDEX[b].length - CHAIN_INDEX[a].length; });
+  // Count unique locations per chain (deduplicate by Place ID or lat+lng)
+  var chainUniqueCounts = {};
+  for (var k = 0; k < chainNames.length; k++) {
+    var seen = {};
+    var entries = CHAIN_INDEX[chainNames[k]];
+    for (var m = 0; m < entries.length; m++) {
+      var key = entries[m].comp.pid || (entries[m].comp.lat + ',' + entries[m].comp.lng);
+      seen[key] = true;
+    }
+    chainUniqueCounts[chainNames[k]] = Object.keys(seen).length;
+  }
+  chainNames.sort(function(a, b) { return chainUniqueCounts[b] - chainUniqueCounts[a]; });
   var chainSel = document.getElementById('chain-select');
   for (var k = 0; k < chainNames.length; k++) {
     var opt = document.createElement('option');
     opt.value = chainNames[k];
-    opt.textContent = chainNames[k] + ' (' + CHAIN_INDEX[chainNames[k]].length + ')';
+    opt.textContent = chainNames[k] + ' (' + chainUniqueCounts[chainNames[k]] + ')';
     chainSel.appendChild(opt);
   }
 })();
