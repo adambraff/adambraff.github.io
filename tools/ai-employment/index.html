@@ -38,6 +38,7 @@
   header p { color: var(--text-dim); font-size: 0.95rem; margin-top: 6px; }
   .layout { display: grid; grid-template-columns: 320px 1fr; gap: 20px; margin-top: 20px; }
   @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+  .layout > div:nth-child(2) { display: flex; flex-direction: column; }
   .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
   .panel h2 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); margin-bottom: 16px; font-weight: 600; }
   .control-group { margin-bottom: 18px; }
@@ -62,7 +63,9 @@
   .stat-card .stat-delta { font-size: 0.78rem; margin-top: 2px; font-weight: 600; }
   .stat-delta.up { color: var(--accent3); }
   .stat-delta.down { color: var(--accent2); }
-  .industry-section { margin-top: 20px; }
+  .industry-section { margin-top: 20px; order: 2; }
+  .market-panel { order: 3 !important; }
+  .sources-panel { order: 4; }
   .industry-bar { display: flex; align-items: center; margin-bottom: 4px; font-size: 0.82rem; }
   .industry-bar .ind-name { width: 160px; flex-shrink: 0; text-align: right; padding-right: 12px; color: var(--text-dim); line-height: 1.2; }
   .industry-bar .ind-track { flex: 1; background: transparent; position: relative; display: flex; align-items: center; }
@@ -133,11 +136,11 @@
           <input type="checkbox" id="chk-market" checked onchange="onSlider()">
           <span class="slider"></span>
         </label>
-        <span>Anchor to prediction markets <span class="tooltip-info" data-tip="Blends Kalshi/Polymarket/Metaculus forecasts into years 1-4. Market-implied median unemployment ~4.8% (2026), Metaculus community ~6.2% (2027). Fades to scenario model by year 5.">?</span></span>
+        <span>Anchor to prediction markets <span class="tooltip-info" data-tip="Blends Kalshi/Polymarket (2026) and Metaculus (2027) forecasts into years 1-2 only — these are the only market-grounded data points. Fades to scenario model by year 3.">?</span></span>
       </div>
 
       <div class="control-group">
-        <label>Market weight (near-term) <span class="tooltip-info" data-tip="How much to trust market prices vs your scenario settings for years 1-2. At 100%, years 1-2 are fully market-driven. At 0%, markets are ignored entirely.">?</span>
+        <label>Market weight (near-term) <span class="tooltip-info" data-tip="How much to trust market prices vs your scenario settings for years 1-2 (the only years with grounded market data). At 100%, year 1 is fully market-driven and year 2 is half-weighted. At 0%, markets are ignored entirely.">?</span>
           <span class="val" id="v-mktweight">70%</span>
         </label>
         <input type="range" id="s-mktweight" min="0" max="100" step="10" value="70" oninput="onSlider()">
@@ -362,22 +365,26 @@
 
       <!-- INDUSTRY BREAKDOWN -->
       <div class="panel industry-section">
-        <h2>Forecasted Employment Change by Industry (by 2030)</h2>
+        <h2>Scenario-Adjusted Employment Change by Industry (by 2030)</h2>
         <div style="display:flex;gap:12px;font-size:0.72rem;color:var(--text-dim);margin-bottom:12px;align-items:center;flex-wrap:wrap">
-          <span>Bar length = forecasted % change in jobs</span>
+          <span>Bar length = % change in jobs by 2030</span>
           <span style="display:inline-block;width:1px;height:12px;background:var(--border)"></span>
-          <span>Bar thickness = current industry size (area ≈ jobs gained/lost)</span>
+          <span>Bar thickness = current workforce (area ≈ total jobs affected)</span>
           <span style="display:inline-block;width:1px;height:12px;background:var(--border)"></span>
           <span style="display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgb(60,200,60)"></span>Growing <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgb(255,50,0);margin-left:6px"></span>Shrinking</span>
+          <span style="display:inline-block;width:1px;height:12px;background:var(--border)"></span>
+          <span>Responds to scenario sliders above</span>
         </div>
         <div id="industry-bars"></div>
         <p class="footnote" style="margin-top:12px">
-          Employment change forecasts from calibrated forecasters at the
-          <a href="https://www.convergenceanalysis.org/threshold-2030/comprehensive-summary" target="_blank">Threshold 2030 conference</a>.
-          Task automation % (right column) from McKinsey/WEF/MIT, adjusted by your scenario settings.
-          Note: healthcare has 25% task automation but <em>growing</em> employment (+6%) — demand growth outpaces displacement.
-          Programming has moderate automation exposure but is the hardest-hit white-collar sector (−9%) because AI directly substitutes for the core task.
-          Industry employment from BLS (2024 annual averages).
+          Baseline employment changes calibrated from forecasters at the
+          <a href="https://www.convergenceanalysis.org/threshold-2030/comprehensive-summary" target="_blank">Threshold 2030 conference</a>,
+          then scaled to match the aggregate model's total employment projection vs CBO baseline counterfactual.
+          Right column shows absolute jobs gained/lost (hover for automation exposure).
+          Healthcare has 25% task automation but <em>growing</em> employment — demand growth outpaces displacement.
+          Programming has moderate automation exposure but is the hardest-hit white-collar sector because AI directly substitutes for the core task.
+          Industry employment from BLS (2024 annual averages). These 11 industries cover ~70% of US employment;
+          80% of AI impact is attributed to tracked industries (they are disproportionately exposed).
         </p>
       </div>
 
@@ -390,9 +397,9 @@
           <a href="https://polymarket.com/event/how-high-will-us-unemployment-go-in-2026" target="_blank">Polymarket</a> unemployment distribution ($64K vol),
           <a href="https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html" target="_blank">CME FedWatch</a> (Fed Funds futures),
           <a href="https://www.bls.gov/jlt/" target="_blank">BLS JOLTS</a>, Conference Board, U of Michigan, VIX.<br>
-          <strong>Medium-term forecasts (2027-2029):</strong> <a href="https://www.metaculus.com/questions/11341/us-unemployment-rate-for-2027/" target="_blank">Metaculus Q11341</a> US unemployment 2027 (community median 6.19%),
-          <a href="https://kalshi.com/markets/kxu3max/unemployment-spike" target="_blank">Kalshi KXU3MAX-30</a> 2029 unemployment contracts,
-          <a href="https://manifold.markets/ScottAlexander/by-2028-will-there-be-a-visible-bre" target="_blank">Manifold</a> 44% P(visible AI economic break by 2028).<br>
+          <strong>Medium-term forecasts (2027+):</strong> <a href="https://www.metaculus.com/questions/11341/us-unemployment-rate-for-2027/" target="_blank">Metaculus Q11341</a> US unemployment 2027 (community median 6.19%),
+          <a href="https://manifold.markets/ScottAlexander/by-2028-will-there-be-a-visible-bre" target="_blank">Manifold</a> 44% P(visible AI economic break by 2028).
+          <a href="https://kalshi.com/markets/kxu3max/unemployment-spike" target="_blank">Kalshi KXU3MAX-30</a> 2029 contracts exist but are not used as model anchors (insufficient grounding).<br>
           <strong>Long-range structural anchors (2030-2035):</strong> <a href="https://www.metaculus.com/questions/21427/employment-in-ai-automatable-jobs/" target="_blank">Metaculus Q21427</a> AI-automatable jobs index (3.53→1.32),
           <a href="https://www.metaculus.com/questions/19356/transformative-ai-date/" target="_blank">Metaculus</a> Transformative AI date (median ~2030),
           <a href="https://www.convergenceanalysis.org/threshold-2030/comprehensive-summary" target="_blank">Threshold 2030</a> forecaster conference (programmers −9%, physicians +6%),
@@ -400,10 +407,12 @@
           <strong>AI forecasts:</strong> <a href="https://www.weforum.org/publications/the-future-of-jobs-report-2025/" target="_blank">WEF Future of Jobs 2025</a>,
           <a href="https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai" target="_blank">McKinsey</a>,
           <a href="https://www.goldmansachs.com/insights/articles/how-will-ai-affect-the-global-workforce" target="_blank">Goldman Sachs</a>, IMF.<br>
-          <strong>Model:</strong> Three-layer architecture: (1) Near-term (years 1-4) blends market-implied unemployment with scenario model — Kalshi/Polymarket CDF for 2026,
-          Metaculus community median for 2027, extrapolated for 2028-2029, fading linearly. (2) Long-range (years 5-10) uses Metaculus AI-automatable jobs index
-          as a structural displacement trajectory, scaled by user's depth/adoption settings. (3) Uncertainty bands widen in years 2-5 per Manifold's 44% regime-change probability,
+          <strong>Model:</strong> Three-layer architecture: (1) Near-term (years 1-2) blends market-implied unemployment with scenario model — only
+          Kalshi/Polymarket CDF for 2026 and Metaculus community median for 2027, as these are the only market-grounded data points. Fades linearly over 2 years.
+          (2) Long-range (years 3-10) transitions to Metaculus AI-automatable jobs index as a structural displacement trajectory, scaled by scenario settings.
+          (3) Uncertainty bands widen in years 2-5 per Manifold's 44% regime-change probability,
           reflecting bimodal uncertainty about whether AI disruption arrives gradually or as a structural break.
+          Industry-level employment changes are derived from Threshold 2030 forecaster calibrations, then scaled to match the aggregate model's total employment projection vs CBO baseline.
           Leading indicator composite (JOLTS, consumer confidence, VIX, Fed cut probability) nudges near-term projections.<br>
           <strong>Limitations:</strong> This is a scenario tool, not a forecast. Near-term market liquidity is thin ($64-189K). Metaculus is calibrated-forecaster consensus, not real-money.
           Manifold uses play money. The farther out you go, the more you're relying on scenario assumptions rather than market-priced expectations — which is exactly the point of this tool.
@@ -430,9 +439,7 @@ HIST.empop = HIST.years.map((_, i) => +(HIST.lfpr[i] * (1 - HIST.urate[i] / 100)
 //       Implied median ≈ 4.8%, mean ≈ 5.0%
 // 2027: Metaculus Q11341 community median = 6.19% (resolves Jan 2028)
 //       This is notably bearish vs 2026 markets — forecasters see deterioration
-// 2028: Kalshi KXU3MAX-30 series (2029 unemployment spike contracts exist)
-//       Extrapolated from Metaculus trajectory + CBO baseline
-// 2029: Fade toward structural anchor from AI-automatable jobs index
+// 2028+: No grounded market data — model transitions to structural anchors
 // ============================================================
 const MARKET_ANCHORS = {
   // Year: { urate: {median, p10, p90}, lfpr: {median, p10, p90}, source }
@@ -446,16 +453,8 @@ const MARKET_ANCHORS = {
     lfpr:  { median: 61.8, p10: 61.0, p90: 62.4 },
     source: 'Metaculus'
   },
-  2028: {
-    urate: { median: 5.8, p10: 3.8, p90: 8.0 },    // Interpolated: Metaculus peak → partial recovery
-    lfpr:  { median: 61.5, p10: 60.5, p90: 62.3 },
-    source: 'Kalshi KXU3MAX-30 / extrapolated'
-  },
-  2029: {
-    urate: { median: 5.5, p10: 3.5, p90: 8.5 },    // Fading toward CBO long-run + AI displacement
-    lfpr:  { median: 61.3, p10: 60.0, p90: 62.2 },
-    source: 'Extrapolated (Metaculus + CBO)'
-  }
+  // 2028-2029: REMOVED — no market-grounded data for these years.
+  // Model transitions to structural anchors (Metaculus AI jobs index) after year 2.
 };
 
 // ============================================================
@@ -557,8 +556,8 @@ const INDUSTRIES = [
 ];
 // Color scale: green (positive/safe) → yellow (neutral) → red (severe displacement)
 function impactColor(empChange) {
-  // Maps empChange2030 from +6 (green) to -15 (red)
-  const t = Math.max(0, Math.min(1, (empChange - 6) / (-15 - 6))); // 0=best, 1=worst
+  // Maps employment change from +10 (green) to -20 (red), clamped
+  const t = Math.max(0, Math.min(1, (empChange - 10) / (-20 - 10))); // 0=best, 1=worst
   if (t <= 0.5) {
     // green to yellow
     const s = t * 2;
@@ -649,7 +648,11 @@ function projectForward(params) {
     const tasksDisplaced = adoption * params.depth;
     const displacementPressure = tasksDisplaced * Math.exp(-0.5 * Math.max(0, i - params.lag) / params.lag);
     const creationOffset = tasksDisplaced * (params.creation - 1) * Math.min(1, Math.max(0, (i - params.lag * 0.5)) / params.lag);
-    const netUrateChange = (displacementPressure - creationOffset * 0.6) * 100 / policyDampen;
+    // Conversion from task-displacement fraction to unemployment pp.
+    // Calibrated so baseline (depth=35%, adoption=5) ≈ +1.2pp by year 5 (2030).
+    // Previously * 100, which was masked by 4-year market anchors; now recalibrated
+    // for 2-year market blend where scenario model runs unchecked from year 3.
+    const netUrateChange = (displacementPressure - creationOffset * 0.6) * 15 / policyDampen;
     const discouraged = displacementPressure * 2.5 * (1 - policyDampen * 0.3);
 
     // Structural anchor nudge for years 5-10:
@@ -663,19 +666,19 @@ function projectForward(params) {
     let scen_urate = Math.max(2.5, Math.min(25,
       lastUrate + netUrateChange +
       leadingNudge * Math.max(0, 1 - i / 4) +
-      // Structural anchor influence grows as market anchors fade (years 5-10)
-      structPressure * Math.max(0, (i - 4) / 6) * (params.useMarket ? 0.3 : 0)
+      // Structural anchor influence grows as market anchors fade (years 3-10)
+      structPressure * Math.max(0, (i - 2) / 8) * (params.useMarket ? 0.3 : 0)
     ));
     let scen_empop = scen_lfpr * (1 - scen_urate / 100);
 
-    // --- MARKET ANCHOR BLEND (now years 1-4) ---
+    // --- MARKET ANCHOR BLEND (years 1-2 only: grounded in Kalshi/Polymarket 2026, Metaculus 2027) ---
     let final_urate = scen_urate, final_lfpr = scen_lfpr, final_empop = scen_empop;
     let mkt_spread50_urate = null, mkt_spread80_urate = null;
 
     if (params.useMarket && MARKET_ANCHORS[yr]) {
       const ma = MARKET_ANCHORS[yr];
-      // Blend weight: full market weight at year 1, fades linearly over 4 years (was 3)
-      const blendWeight = params.mktWeight * Math.max(0, 1 - (i - 1) / 4);
+      // Blend weight: full market weight at year 1, fades linearly over 2 years
+      const blendWeight = params.mktWeight * Math.max(0, 1 - (i - 1) / 2);
 
       final_urate = lerp(scen_urate, ma.urate.median, blendWeight);
       final_lfpr  = lerp(scen_lfpr, ma.lfpr.median, blendWeight);
@@ -713,7 +716,7 @@ function projectForward(params) {
 
       // Blend market-implied spreads for near-term
       if (mkt_spread50_urate !== null && m === 'urate') {
-        const scenWeight = 1 - params.mktWeight * Math.max(0, 1 - (i - 1) / 4);
+        const scenWeight = 1 - params.mktWeight * Math.max(0, 1 - (i - 1) / 2);
         sp50 = scen_spread50 * scenWeight + mkt_spread50_urate * (1 - scenWeight);
         sp80 = scen_spread80 * scenWeight + mkt_spread80_urate * (1 - scenWeight);
       }
@@ -843,7 +846,7 @@ function buildChart() {
   if (chart) chart.destroy();
   chart = new Chart(document.getElementById('mainChart'), config);
   updateStats(proj, params);
-  updateIndustryBars(params);
+  updateIndustryBars(params, proj);
 }
 
 function updateStats(proj, params) {
@@ -899,57 +902,99 @@ function updateStats(proj, params) {
   `;
 }
 
-function updateIndustryBars(params) {
-  const adoption = sCurve(10, params.adoption);
+function updateIndustryBars(params, proj) {
   const el = document.getElementById('industry-bars');
   const maxEmp = Math.max(...INDUSTRIES.map(d => d.empMillions));
-  // Max absolute employment change for scaling bar length
-  const maxAbsChange = Math.max(...INDUSTRIES.map(d => Math.abs(d.empChange2030)));
+  const adoption = sCurve(10, params.adoption);
 
-  // Build a diverging bar chart: center = 0%, left = shrinking, right = growing
-  // Bar thickness ∝ industry employment (area ≈ absolute jobs impacted)
-  el.innerHTML = INDUSTRIES.map(ind => {
-    const scenarioMultiplier = adoption * params.depth / 0.35;
-    const projectedExposure = Math.min(99, ind.exposure * scenarioMultiplier);
+  // --- AGGREGATE CONSISTENCY ---
+  // Compute total employment implied by the aggregate model for 2030 (index 4)
+  const projUrate2030 = proj.central.urate[4];
+  const projLfpr2030 = proj.central.lfpr[4];
 
-    // Bar height: 12px min (agriculture 2.6M) to 36px max (healthcare 20.4M)
-    const barH = Math.round(12 + (ind.empMillions / maxEmp) * 24);
+  // Demographics: civilian noninstitutional population ~267M (2025), ~0.4%/yr growth
+  const POP_2025 = 267;
+  const pop2030 = POP_2025 * Math.pow(1.004, 5); // ~272.4M
+  const scenarioEmployed = pop2030 * (projLfpr2030 / 100) * (1 - projUrate2030 / 100);
 
-    const barColor = impactColor(ind.empChange2030);
-    const empSign = ind.empChange2030 >= 0 ? '+' : '';
+  // CBO counterfactual (no AI shock): 4.4% urate, 61.5% LFPR
+  const cboEmployed2030 = pop2030 * 0.615 * (1 - 0.044); // ~160.1M
 
-    // Bar width as % of half the track (each side is 50% of track width)
-    const barWidthPct = (Math.abs(ind.empChange2030) / maxAbsChange) * 48;
+  // AI-attributable net employment change (negative = AI destroying jobs)
+  const aiNetDelta = scenarioEmployed - cboEmployed2030;
 
-    // Position: negative bars grow leftward from center, positive grow rightward
-    let barStyle, barPos;
-    if (ind.empChange2030 < 0) {
-      // Shrinking: bar goes left from center
-      barPos = `position:absolute;right:50%;height:${barH}px;width:${barWidthPct}%;`;
-      barStyle = `${barPos}background:${barColor};border-radius:3px 0 0 3px;`;
-    } else if (ind.empChange2030 > 0) {
-      // Growing: bar goes right from center
-      barPos = `position:absolute;left:50%;height:${barH}px;width:${barWidthPct}%;`;
-      barStyle = `${barPos}background:${barColor};border-radius:0 3px 3px 0;`;
+  // Threshold 2030 baseline template: net jobs change across tracked industries
+  const baselineNetJobs = INDUSTRIES.reduce((s, d) => s + d.empChange2030 / 100 * d.empMillions, 0); // ~-4.8M
+
+  // Tracked industries (112.7M) = ~70% of workforce but ~80% of AI exposure
+  const TRACKED_SHARE = 0.80;
+  const trackedAiDelta = aiNetDelta * TRACKED_SHARE;
+
+  // Scale factor: how much to multiply Threshold 2030 template to match aggregate
+  // scaleFactor ≈ 1.0 at baseline, >1 in pessimistic, <1 in optimistic
+  const scaleFactor = baselineNetJobs !== 0 ? trackedAiDelta / baselineNetJobs : 1;
+
+  // Compute scenario-adjusted changes for each industry
+  const scaled = INDUSTRIES.map(ind => {
+    let adjChange;
+    if (ind.empChange2030 <= 0) {
+      // Shrinking: scale proportionally
+      adjChange = ind.empChange2030 * scaleFactor;
     } else {
-      // Exactly zero: tiny marker at center
-      barPos = `position:absolute;left:calc(50% - 1px);height:${barH}px;width:2px;`;
-      barStyle = `${barPos}background:${barColor};border-radius:1px;`;
+      // Growing: demand-driven growth persists but dampens in worse scenarios
+      // At scaleFactor=1 (baseline): keep original. At 2x: growth → 0. At 3x: growth flips negative.
+      adjChange = ind.empChange2030 * Math.max(-ind.empChange2030, 2 - scaleFactor);
     }
+    // Clamp to reasonable range
+    adjChange = Math.max(-80, Math.min(30, adjChange));
+    return { ...ind, adjChange: +adjChange.toFixed(1) };
+  });
 
-    // Absolute jobs impacted
-    const jobsImpacted = Math.abs(ind.empChange2030 / 100 * ind.empMillions).toFixed(1);
+  // Automation exposure (scenario-adjusted)
+  const scenarioMultiplier = adoption * params.depth / 0.35;
+
+  // Compute totals for summary line
+  const totalJobsDelta = scaled.reduce((s, d) => s + d.adjChange / 100 * d.empMillions, 0);
+  const totalJobsLost = scaled.filter(d => d.adjChange < 0).reduce((s, d) => s + d.adjChange / 100 * d.empMillions, 0);
+  const totalJobsGained = scaled.filter(d => d.adjChange > 0).reduce((s, d) => s + d.adjChange / 100 * d.empMillions, 0);
+
+  const maxAbsChange = Math.max(1, ...scaled.map(d => Math.abs(d.adjChange)));
+
+  // Build diverging bar chart
+  el.innerHTML = scaled.map(ind => {
+    const projectedExposure = Math.min(99, ind.exposure * scenarioMultiplier);
+    const barH = Math.round(12 + (ind.empMillions / maxEmp) * 24);
+    const barColor = impactColor(ind.adjChange);
+    const empSign = ind.adjChange >= 0 ? '+' : '';
+    const barWidthPct = (Math.abs(ind.adjChange) / maxAbsChange) * 48;
+    const jobsM = (ind.adjChange / 100 * ind.empMillions).toFixed(1);
+    const jobsSign = ind.adjChange >= 0 ? '+' : '';
+
+    let barStyle;
+    if (ind.adjChange < 0) {
+      barStyle = `position:absolute;right:50%;height:${barH}px;width:${barWidthPct}%;background:${barColor};border-radius:3px 0 0 3px;top:50%;transform:translateY(-50%)`;
+    } else if (ind.adjChange > 0) {
+      barStyle = `position:absolute;left:50%;height:${barH}px;width:${barWidthPct}%;background:${barColor};border-radius:0 3px 3px 0;top:50%;transform:translateY(-50%)`;
+    } else {
+      barStyle = `position:absolute;left:calc(50% - 1px);height:${barH}px;width:2px;background:${barColor};border-radius:1px;top:50%;transform:translateY(-50%)`;
+    }
 
     return `<div class="industry-bar" style="margin-bottom:2px;min-height:${barH + 4}px">
       <div class="ind-name">${ind.name}<span style="display:block;font-size:0.68rem;color:var(--text-dim);font-weight:400">${ind.empMillions}M workers</span></div>
       <div class="ind-track" style="height:${barH + 4}px;position:relative">
         <div class="ind-zero"></div>
-        <div style="${barStyle}top:50%;transform:translateY(-50%)"></div>
+        <div style="${barStyle}"></div>
       </div>
-      <div style="width:50px;text-align:right;padding-left:6px;font-weight:700;font-size:0.85rem;color:${barColor};font-variant-numeric:tabular-nums">${empSign}${ind.empChange2030}%</div>
-      <div style="width:55px;text-align:right;padding-left:4px;font-size:0.72rem;color:var(--text-dim);font-variant-numeric:tabular-nums" title="Tasks automatable under your scenario">${projectedExposure.toFixed(0)}% auto</div>
+      <div style="width:55px;text-align:right;padding-left:6px;font-weight:700;font-size:0.85rem;color:${barColor};font-variant-numeric:tabular-nums" title="Forecasted employment change by 2030">${empSign}${ind.adjChange}%</div>
+      <div style="width:65px;text-align:right;padding-left:4px;font-size:0.72rem;color:var(--text-dim);font-variant-numeric:tabular-nums" title="${ind.exposure}% of tasks automatable (McKinsey/WEF/MIT)">${jobsSign}${jobsM}M jobs</div>
     </div>`;
-  }).join('');
+  }).join('') +
+  `<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:0.78rem;display:flex;gap:16px;color:var(--text-dim)">
+    <span style="color:${impactColor(totalJobsDelta < 0 ? -5 : 3)};font-weight:600">Net: ${totalJobsDelta >= 0 ? '+' : ''}${totalJobsDelta.toFixed(1)}M jobs in tracked industries</span>
+    <span>Lost: ${totalJobsLost.toFixed(1)}M</span>
+    <span>Gained: ${totalJobsGained >= 0 ? '+' : ''}${totalJobsGained.toFixed(1)}M</span>
+    <span style="font-size:0.7rem">(${(TRACKED_SHARE*100).toFixed(0)}% of AI impact; ${(112.7/160*100).toFixed(0)}% of workforce)</span>
+  </div>`;
 }
 
 // ============================================================
