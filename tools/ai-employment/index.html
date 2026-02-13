@@ -236,7 +236,7 @@
 
       <!-- MARKET SIGNALS PANEL -->
       <div class="panel market-panel">
-        <h2>Market Signals — Skin-in-the-Game Data</h2>
+        <h2>Market Signals</h2>
         <div class="section-label" style="margin-top:0">Near-term (2026)</div>
         <div class="market-grid">
           <div class="market-card">
@@ -362,11 +362,21 @@
       <!-- INDUSTRY BREAKDOWN -->
       <div class="panel industry-section">
         <h2>Industry AI Exposure & Forecasted Employment Change</h2>
+        <div style="display:flex;gap:10px;font-size:0.72rem;color:var(--text-dim);margin-bottom:10px;align-items:center">
+          <span>Bar = % of tasks automatable under your scenario</span>
+          <span style="display:inline-block;width:1px;height:12px;background:var(--border)"></span>
+          <span>Bar thickness = industry employment size</span>
+          <span style="display:inline-block;width:1px;height:12px;background:var(--border)"></span>
+          <span>Right number = forecasted employment change by 2030</span>
+          <span style="display:inline-block;width:1px;height:12px;background:var(--border)"></span>
+          <span style="display:flex;align-items:center;gap:3px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgb(60,200,60)"></span>Growing <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgb(255,200,20);margin-left:4px"></span>Flat <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgb(255,50,0);margin-left:4px"></span>Shrinking</span>
+        </div>
         <div id="industry-bars"></div>
         <p class="footnote" style="margin-top:12px">
-          Left bar = % of industry tasks automatable (McKinsey/WEF/MIT). Right column = forecaster-calibrated employment change by 2030 from
+          Task automation exposure (bar length) adjusts dynamically based on your adoption speed and depth settings. Employment change forecasts (right column) are from calibrated forecasters at the
           <a href="https://www.convergenceanalysis.org/threshold-2030/comprehensive-summary" target="_blank">Threshold 2030 conference</a>.
-          Note the divergence: high-exposure sectors like healthcare see <em>positive</em> employment due to demand growth outpacing automation.
+          Note the divergence: healthcare has 25% task exposure but <em>growing</em> employment (+6%) because demand growth outpaces automation. Programming has only 55% exposure but is the hardest-hit white-collar sector (−9%) because AI directly substitutes for the core task.
+          Industry employment figures from BLS (2024 annual averages).
         </p>
       </div>
 
@@ -528,22 +538,41 @@ const OVERLAYS = {
   }
 };
 
-// Industry exposure: blended from McKinsey/WEF estimates + Metaculus Threshold 2030
-// conference forecaster-calibrated employment change by 2030
+// Industry data: task automation exposure (McKinsey/WEF/MIT), forecaster-calibrated
+// employment change by 2030 (Threshold 2030), and US employment in millions (BLS 2024)
 // Threshold 2030 notable: Programmers -9%, Physicians +6%, global labor share stable
 const INDUSTRIES = [
-  { name: 'Office & Admin', exposure: 85, empChange2030: -15, color: '#ff4d6a' },
-  { name: 'Finance & Insurance', exposure: 72, empChange2030: -8, color: '#ff6b4d' },
-  { name: 'Legal Services', exposure: 65, empChange2030: -7, color: '#ff8c4d' },
-  { name: 'Programming & IT', exposure: 55, empChange2030: -9, color: '#ffab4d' },  // Threshold 2030: -9%
-  { name: 'Retail & E-Commerce', exposure: 58, empChange2030: -6, color: '#ffc94d' },
-  { name: 'Manufacturing', exposure: 52, empChange2030: -5, color: '#e0ff4d' },
-  { name: 'Transportation', exposure: 44, empChange2030: -4, color: '#8cff4d' },
-  { name: 'Education', exposure: 35, empChange2030: -2, color: '#4dff8c' },
-  { name: 'Healthcare', exposure: 25, empChange2030: +6, color: '#4dc9ff' },         // Threshold 2030: +6% (physicians)
-  { name: 'Construction', exposure: 15, empChange2030: +1, color: '#4d8cff' },
-  { name: 'Agriculture', exposure: 12, empChange2030: 0, color: '#6c4dff' }
+  { name: 'Office & Admin', exposure: 85, empChange2030: -15, empMillions: 19.3 },
+  { name: 'Finance & Insurance', exposure: 72, empChange2030: -8, empMillions: 6.8 },
+  { name: 'Legal Services', exposure: 65, empChange2030: -7, empMillions: 1.4 },
+  { name: 'Programming & IT', exposure: 55, empChange2030: -9, empMillions: 5.4 },
+  { name: 'Retail & E-Commerce', exposure: 58, empChange2030: -6, empMillions: 15.5 },
+  { name: 'Manufacturing', exposure: 52, empChange2030: -5, empMillions: 12.9 },
+  { name: 'Transportation', exposure: 44, empChange2030: -4, empMillions: 6.5 },
+  { name: 'Education', exposure: 35, empChange2030: -2, empMillions: 13.6 },
+  { name: 'Healthcare', exposure: 25, empChange2030: +6, empMillions: 20.4 },
+  { name: 'Construction', exposure: 15, empChange2030: +1, empMillions: 8.3 },
+  { name: 'Agriculture', exposure: 12, empChange2030: 0, empMillions: 2.6 }
 ];
+// Color scale: green (positive/safe) → yellow (neutral) → red (severe displacement)
+function impactColor(empChange) {
+  // Maps empChange2030 from +6 (green) to -15 (red)
+  const t = Math.max(0, Math.min(1, (empChange - 6) / (-15 - 6))); // 0=best, 1=worst
+  if (t <= 0.5) {
+    // green to yellow
+    const s = t * 2;
+    const r = Math.round(60 + s * 195);
+    const g = Math.round(200 - s * 0);
+    const b = Math.round(60 - s * 40);
+    return `rgb(${r},${g},${b})`;
+  }
+  // yellow to red
+  const s = (t - 0.5) * 2;
+  const r = Math.round(255);
+  const g = Math.round(200 - s * 150);
+  const b = Math.round(20 - s * 20);
+  return `rgb(${r},${g},${b})`;
+}
 
 // ============================================================
 // STATE
@@ -872,15 +901,26 @@ function updateStats(proj, params) {
 function updateIndustryBars(params) {
   const adoption = sCurve(10, params.adoption);
   const el = document.getElementById('industry-bars');
+  const maxEmp = Math.max(...INDUSTRIES.map(d => d.empMillions)); // for bar height scaling
+
   el.innerHTML = INDUSTRIES.map(ind => {
-    const projected = Math.min(99, ind.exposure * adoption * params.depth / 0.35);
+    // Net projected employment change: scenario-adjusted from base exposure × adoption × depth
+    const scenarioMultiplier = adoption * params.depth / 0.35;
+    const projectedExposure = Math.min(99, ind.exposure * scenarioMultiplier);
+
+    // Bar height proportional to industry employment size (min 14px, max 32px)
+    const barH = Math.round(14 + (ind.empMillions / maxEmp) * 18);
+
+    // Color from green→red based on forecasted employment change
+    const barColor = impactColor(ind.empChange2030);
+
     const empSign = ind.empChange2030 >= 0 ? '+' : '';
-    const empColor = ind.empChange2030 >= 0 ? 'var(--accent3)' : 'var(--accent2)';
-    return `<div class="industry-bar">
-      <div class="ind-name">${ind.name}</div>
-      <div class="ind-track"><div class="ind-fill" style="width:${projected}%;background:${ind.color}"></div></div>
-      <div class="ind-val">${projected.toFixed(0)}%</div>
-      <div style="width:65px;text-align:right;padding-left:6px;font-size:0.75rem;font-weight:600;color:${empColor}" title="Threshold 2030 forecaster estimate">${empSign}${ind.empChange2030}% by '30</div>
+
+    return `<div class="industry-bar" style="margin-bottom:6px">
+      <div class="ind-name" title="${ind.empMillions}M employed">${ind.name}<span style="display:block;font-size:0.68rem;color:var(--text-dim);font-weight:400">${ind.empMillions}M workers</span></div>
+      <div class="ind-track" style="height:${barH}px"><div class="ind-fill" style="width:${projectedExposure}%;background:${barColor};height:100%"></div></div>
+      <div class="ind-val">${projectedExposure.toFixed(0)}%</div>
+      <div style="width:55px;text-align:right;padding-left:4px;font-size:0.78rem;font-weight:700;color:${barColor}">${empSign}${ind.empChange2030}%</div>
     </div>`;
   }).join('');
 }
