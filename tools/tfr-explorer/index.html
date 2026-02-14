@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TFR Explorer — What's Driving the Fertility Decline?</title>
+<title>Fertility Explorer — What's Driving the Decline in Children?</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -394,8 +394,8 @@ input[type="range"]::-webkit-slider-thumb {
 </div>
 
 <header class="app-header">
-  <h1>TFR Explorer</h1>
-  <p class="subtitle">What's driving the fertility decline? 52 years of General Social Survey data, 75,699 respondents.</p>
+  <h1>Fertility Explorer</h1>
+  <p class="subtitle">What's driving the decline in children? 52 years of General Social Survey data, 75,699 respondents.</p>
 </header>
 
 <nav class="tab-bar" id="tabBar">
@@ -428,7 +428,7 @@ input[type="range"]::-webkit-slider-thumb {
     </div>
   </div>
 
-  <div class="source-note">Source: General Social Survey (GSS), NORC at the University of Chicago, 1972–2024. N=75,699 respondents. CHILDS = number of children; CHLDIDEL = ideal number of children. Missing/inapplicable responses excluded.</div>
+  <div class="source-note">Source: General Social Survey (GSS), NORC at the University of Chicago, 1972–2024. N=75,699 respondents. CHILDS = number of children ever had; CHLDIDEL = ideal number for a family. Responses of "as many as you want" (CHLDIDEL=8) are excluded from ideal-children averages — this response spiked post-2021 due to a <a href="https://familyinequality.wordpress.com/2025/02/15/it-might-be-time-to-retire-the-gss-measure-of-ideal-number-of-children/" target="_blank" style="color:var(--blue)">survey mode change</a> (in-person → online). Missing/inapplicable responses excluded.</div>
 </div>
 
 <!-- ==================== SECTION 2: DEMOGRAPHICS ==================== -->
@@ -618,15 +618,24 @@ const C = {
 };
 
 const GROUP_COLORS = {
+  // Education
   '< High School': C.red, 'High School': C.orange, 'Some College': C.purple, 'College+': C.blue,
+  // Religion
   'Protestant': C.blue, 'Catholic': C.orange, 'Jewish': C.purple, 'None': C.red, 'Other Religion': C.teal,
+  // Race
   'White': C.blue, 'Black': C.orange, 'Other': C.teal,
+  // Marital
   'Married': C.blue, 'Widowed': C.purple, 'Divorced/Sep': C.orange, 'Never Married': C.red,
+  // Party
   'Strong Dem': '#2266cc', 'Dem': '#6699dd', 'Independent': C.purple, 'Rep': '#dd6666', 'Strong Rep': '#cc2222', 'Other Party': C.teal,
+  // Region
   'Northeast': C.blue, 'Midwest': C.orange, 'South': C.red, 'West': C.green,
+  // Sex
   'Male': C.blue, 'Female': C.orange,
+  // Employment
   'Full-time': C.blue, 'Part-time': C.teal, 'Unemployed': C.red, 'Retired': C.purple,
   'In School': C.green, 'Keeping House': C.orange, 'Other Work': C.yellow,
+  // Age
   '18-29': C.green, '30-39': C.blue, '40-49': C.purple, '50-64': C.orange, '65+': C.red,
 };
 
@@ -634,6 +643,7 @@ const GROUP_COLORS = {
 // DATA LOADING & PREPROCESSING
 // ============================================================
 async function loadData() {
+  // Try embedded data first (for file:// usage), then fetch
   let text;
   const embedded = document.getElementById('csvData');
   if (embedded && embedded.textContent.trim().length > 100) {
@@ -654,12 +664,14 @@ async function loadData() {
     RAW.push(row);
   }
 
+  // Derive groups
   for (const r of RAW) {
     r.valid_childs = r.CHILDS >= 0;
-    r.valid_ideal = r.CHLDIDEL >= 0;
+    r.valid_ideal = r.CHLDIDEL >= 0 && r.CHLDIDEL !== 8; // Exclude 8 = "as many as you want"
     r.valid_both = r.valid_childs && r.valid_ideal;
     if (r.valid_both) r.gap = r.CHLDIDEL - r.CHILDS;
 
+    // Education groups
     if (r.EDUC >= 0) {
       if (r.EDUC < 12) r.educ_group = '< High School';
       else if (r.EDUC === 12) r.educ_group = 'High School';
@@ -667,19 +679,23 @@ async function loadData() {
       else r.educ_group = 'College+';
     }
 
+    // Religion
     const religMap = {1:'Protestant',2:'Catholic',3:'Jewish',4:'None'};
     r.relig_group = (r.RELIG >= 1 && r.RELIG <= 4) ? religMap[r.RELIG] :
                     (r.RELIG >= 5 ? 'Other Religion' : undefined);
 
+    // Race
     const raceMap = {1:'White',2:'Black',3:'Other'};
     r.race_group = raceMap[r.RACE] || undefined;
 
+    // Marital
     if (r.MARITAL >= 1 && r.MARITAL <= 5) {
       r.marital_group = r.MARITAL === 1 ? 'Married' :
                         r.MARITAL === 2 ? 'Widowed' :
                         (r.MARITAL === 3 || r.MARITAL === 4) ? 'Divorced/Sep' : 'Never Married';
     }
 
+    // Party
     if (r.PARTYID >= 0 && r.PARTYID <= 7) {
       r.party_group = r.PARTYID === 0 ? 'Strong Dem' :
                       r.PARTYID === 1 ? 'Dem' :
@@ -688,14 +704,17 @@ async function loadData() {
                       r.PARTYID === 6 ? 'Strong Rep' : 'Other Party';
     }
 
+    // Region
     if (r.REGION >= 1 && r.REGION <= 9) {
       r.region_group = r.REGION === 1 ? 'Northeast' :
                        r.REGION === 2 ? 'Midwest' :
                        (r.REGION >= 3 && r.REGION <= 7) ? 'South' : 'West';
     }
 
+    // Sex
     r.sex_group = r.SEX === 1 ? 'Male' : r.SEX === 2 ? 'Female' : undefined;
 
+    // Employment
     if (r.WRKSTAT >= 1 && r.WRKSTAT <= 8) {
       r.wrkstat_group = r.WRKSTAT === 1 ? 'Full-time' :
                         r.WRKSTAT === 2 ? 'Part-time' :
@@ -705,6 +724,7 @@ async function loadData() {
                         r.WRKSTAT === 7 ? 'Keeping House' : 'Other Work';
     }
 
+    // Age group
     if (r.AGE > 0) {
       r.age_group = r.AGE < 30 ? '18-29' :
                     r.AGE < 40 ? '30-39' :
@@ -712,6 +732,7 @@ async function loadData() {
                     r.AGE < 65 ? '50-64' : '65+';
     }
 
+    // Birth cohort (decade)
     if (r.YEAR > 0 && r.AGE > 0) {
       const birthYear = r.YEAR - r.AGE;
       r.cohort_decade = Math.floor(birthYear / 10) * 10;
@@ -729,11 +750,17 @@ function getYears() {
   return [...s].sort((a,b) => a-b);
 }
 
+function isValidCol(r, col) {
+  if (r[col] < 0) return false;
+  if (col === 'CHLDIDEL' && r[col] === 8) return false; // Exclude "as many as you want"
+  return true;
+}
+
 function meanByYear(col, filter) {
   const years = getYears();
   const result = { years: [], means: [], counts: [] };
   for (const y of years) {
-    const rows = DATA.filter(r => r.YEAR === y && r[col] >= 0 && (!filter || filter(r)));
+    const rows = DATA.filter(r => r.YEAR === y && isValidCol(r, col) && (!filter || filter(r)));
     if (rows.length >= 20) {
       result.years.push(y);
       result.means.push(rows.reduce((s, r) => s + r[col], 0) / rows.length);
@@ -750,7 +777,7 @@ function meanByYearAndGroup(col, groupCol, filter) {
   for (const g of groups) {
     result[g] = { years: [], means: [], counts: [] };
     for (const y of years) {
-      const rows = DATA.filter(r => r.YEAR === y && r[col] >= 0 && r[groupCol] === g && (!filter || filter(r)));
+      const rows = DATA.filter(r => r.YEAR === y && isValidCol(r, col) && r[groupCol] === g && (!filter || filter(r)));
       if (rows.length >= 10) {
         result[g].years.push(y);
         result[g].means.push(rows.reduce((s, r) => s + r[col], 0) / rows.length);
@@ -783,10 +810,12 @@ function linReg(xs, ys) {
   return { slope, intercept, r2, se, n };
 }
 
+// Multi-variable OLS using normal equations (X'X)^-1 X'y
 function multiRegress(y, X, featureNames) {
   const n = y.length;
   const k = X[0].length;
 
+  // Standardize
   const yMean = y.reduce((a,b)=>a+b,0)/n;
   const yStd = Math.sqrt(y.reduce((a,b)=>a+(b-yMean)**2,0)/n) || 1;
 
@@ -799,9 +828,11 @@ function multiRegress(y, X, featureNames) {
     xStds.push(s);
   }
 
+  // Build standardized design matrix with intercept
   const Xs = X.map(row => [1, ...row.map((v,j) => (v-xMeans[j])/xStds[j])]);
   const ys = y.map(v => (v-yMean)/yStd);
 
+  // X'X
   const kk = k+1;
   const XtX = Array.from({length:kk}, () => new Float64Array(kk));
   const Xty = new Float64Array(kk);
@@ -814,10 +845,12 @@ function multiRegress(y, X, featureNames) {
       }
     }
   }
+  // Symmetrize
   for (let a = 0; a < kk; a++)
     for (let b = 0; b < a; b++)
       XtX[a][b] = XtX[b][a];
 
+  // Solve via Gaussian elimination
   const aug = XtX.map((row,i) => [...row, Xty[i]]);
   for (let p = 0; p < kk; p++) {
     let maxRow = p;
@@ -836,19 +869,21 @@ function multiRegress(y, X, featureNames) {
 
   const betaStd = aug.map(row => row[kk]);
 
+  // R² on standardized
   let ssRes = 0, ssTot = 0;
   for (let i = 0; i < n; i++) {
     let pred = 0;
     for (let j = 0; j < kk; j++) pred += Xs[i][j] * betaStd[j];
     ssRes += (ys[i]-pred)**2;
-    ssTot += ys[i]**2;
+    ssTot += ys[i]**2; // already centered
   }
   const r2 = ssTot ? 1 - ssRes/ssTot : 0;
 
+  // Return standardized coefficients (skip intercept)
   const coefs = featureNames.map((name, j) => ({
     name,
-    beta: betaStd[j+1],
-    raw: betaStd[j+1] * yStd / xStds[j],
+    beta: betaStd[j+1], // standardized
+    raw: betaStd[j+1] * yStd / xStds[j], // unstandardized
   }));
 
   return { coefs, r2, n, intercept: betaStd[0] };
@@ -867,11 +902,13 @@ function renderOverview() {
   const actual = meanByYear('CHILDS');
   const ideal = meanByYear('CHLDIDEL');
 
+  // Metrics
   const earlyActual = actual.means[0];
   const lateActual = actual.means[actual.means.length-1];
   const earlyIdeal = ideal.means[0];
   const lateIdeal = ideal.means[ideal.means.length-1];
   const earlyGap = earlyIdeal - earlyActual;
+  // Find matching years for gap
   const gapData = [];
   for (let i = 0; i < actual.years.length; i++) {
     const y = actual.years[i];
@@ -904,6 +941,7 @@ function renderOverview() {
     </div>
   `;
 
+  // Main chart
   destroyChart('chartOverview');
   const allYears = [...new Set([...actual.years, ...ideal.years])].sort((a,b)=>a-b);
   const actualMap = Object.fromEntries(actual.years.map((y,i)=>[y,actual.means[i]]));
@@ -964,13 +1002,16 @@ function renderOverview() {
     }
   });
 
+  // Insight — data-adaptive
+  const idealDir = lateIdeal > earlyIdeal + 0.1 ? 'risen' : lateIdeal < earlyIdeal - 0.1 ? 'fallen' : 'remained relatively stable';
+  const gapGrew = lateGap > earlyGap + 0.1;
   document.getElementById('overviewInsight').innerHTML = `
-    <strong>Key finding:</strong> Actual fertility has fallen steadily from ${fmt(earlyActual)} to ${fmt(lateActual)} children.
-    But ideal fertility has recently <em>increased</em> — from ${fmt(earlyIdeal)} in the 1970s to ${fmt(lateIdeal)} in the 2020s.
-    The gap between what people want and what they have has widened from +${fmt(earlyGap)} to +${fmt(lateGap)} children —
-    suggesting the decline isn't about wanting fewer kids, but about barriers to having them.
+    <strong>Key finding:</strong> The mean number of children has fallen from ${fmt(earlyActual)} to ${fmt(lateActual)}.
+    Meanwhile, the ideal number of children (excluding "as many as you want" responses) has ${idealDir} — from ${fmt(earlyIdeal)} in the 1970s to ${fmt(lateIdeal)} in the 2020s.
+    ${gapGrew ? `The gap between what people want and what they have has widened from +${fmt(earlyGap)} to +${fmt(lateGap)} children — suggesting the decline isn't about wanting fewer kids, but about barriers to having them.` : `The gap between ideal and actual has shifted from +${fmt(earlyGap)} to +${fmt(lateGap)} children.`}
   `;
 
+  // Distribution charts
   renderDistributions();
 }
 
@@ -979,7 +1020,7 @@ function renderDistributions() {
   const lateRows = DATA.filter(r => r.YEAR >= 2018 && r.YEAR <= 2024);
 
   function dist(rows, col) {
-    const valid = rows.filter(r => r[col] >= 0);
+    const valid = rows.filter(r => isValidCol(r, col));
     const counts = {};
     for (const r of valid) {
       const v = Math.min(r[col], 7);
@@ -991,6 +1032,7 @@ function renderDistributions() {
     return { labels, pcts };
   }
 
+  // Actual children distribution
   const earlyActDist = dist(earlyRows, 'CHILDS');
   const lateActDist = dist(lateRows, 'CHILDS');
 
@@ -1020,6 +1062,7 @@ function renderDistributions() {
     }
   });
 
+  // Ideal children distribution
   const earlyIdDist = dist(earlyRows, 'CHLDIDEL');
   const lateIdDist = dist(lateRows, 'CHLDIDEL');
 
@@ -1065,6 +1108,7 @@ function renderDemographics() {
   const grouped = meanByYearAndGroup(metric, slice);
   const allYears = getYears();
 
+  // Sort groups for consistent ordering
   const groupOrder = {
     educ_group: ['< High School','High School','Some College','College+'],
     relig_group: ['Protestant','Catholic','Jewish','None','Other Religion'],
@@ -1112,10 +1156,12 @@ function renderDemographics() {
     }
   });
 
+  // Change bar chart
   destroyChart('chartDemoChange');
   const changes = groups.map(g => {
     const d = grouped[g];
     if (d.years.length < 2) return { group: g, change: 0 };
+    // Compare first 5 years vs last 5 years of data
     const earlyMean = d.means.slice(0, Math.min(5, d.means.length)).reduce((a,b)=>a+b,0) / Math.min(5, d.means.length);
     const lateMean = d.means.slice(-Math.min(5, d.means.length)).reduce((a,b)=>a+b,0) / Math.min(5, d.means.length);
     return { group: g, change: lateMean - earlyMean, early: earlyMean, late: lateMean };
@@ -1155,6 +1201,7 @@ function renderDemographics() {
     }
   });
 
+  // Insight
   const biggestDrop = changes[0];
   const smallestChange = changes.reduce((best, c) => Math.abs(c.change) < Math.abs(best.change) ? c : best);
   document.getElementById('demoInsight').innerHTML = `
@@ -1167,6 +1214,7 @@ function renderDemographics() {
 // SECTION 3: DESIRE GAP
 // ============================================================
 function renderGap() {
+  // Gap over time
   const years = getYears();
   const gapByYear = { years: [], means: [], counts: [] };
   for (const y of years) {
@@ -1178,6 +1226,7 @@ function renderGap() {
     }
   }
 
+  // Metrics
   const bothRows = DATA.filter(r => r.valid_both);
   const deficit = bothRows.filter(r => r.gap > 0).length;
   const surplus = bothRows.filter(r => r.gap < 0).length;
@@ -1206,6 +1255,7 @@ function renderGap() {
     </div>
   `;
 
+  // Gap time series
   destroyChart('chartGapTime');
   CHARTS['chartGapTime'] = new Chart(document.getElementById('chartGapTime'), {
     type: 'line',
@@ -1275,6 +1325,7 @@ function renderGapHeatmap() {
     cellData.push({ group: g, cells: rowData, totalN });
   }
 
+  // Sort by latest gap
   cellData.sort((a,b) => {
     const aLast = [...a.cells].reverse().find(c => c !== null);
     const bLast = [...b.cells].reverse().find(c => c !== null);
@@ -1290,6 +1341,7 @@ function renderGapHeatmap() {
       if (cell === null) {
         html += '<td style="color:var(--text-muted)">—</td>';
       } else {
+        // Color: blue (low gap) to red (high gap)
         const t = maxVal > minVal ? (cell.val - minVal) / (maxVal - minVal) : 0.5;
         const r = Math.round(80 + t * 175);
         const g = Math.round(140 - t * 80);
@@ -1303,12 +1355,13 @@ function renderGapHeatmap() {
   html += '</tbody></table>';
   document.getElementById('gapHeatmap').innerHTML = html;
 
+  // Insight
   const widest = cellData[0];
   const narrowest = cellData[cellData.length - 1];
   document.getElementById('gapInsight').innerHTML = `
     <strong>Widest desire gap:</strong> ${widest.group} — consistently want more children than they have.
     <strong>Narrowest gap:</strong> ${narrowest.group}.
-    The gap has widened significantly since 2010, suggesting growing structural barriers to achieving desired family size.
+    Note: "as many as you want" responses (CHLDIDEL=8) are excluded from ideal-children calculations. This response spiked after the GSS shifted to online surveys in 2021.
   `;
 }
 
@@ -1328,6 +1381,7 @@ function renderModel() {
     return true;
   });
 
+  // Sample filter
   if (sampleKey === 'female') rows = rows.filter(r => r.SEX === 2);
   else if (sampleKey === 'male') rows = rows.filter(r => r.SEX === 1);
   else if (sampleKey === 'recent') rows = rows.filter(r => r.YEAR >= 2010);
@@ -1337,6 +1391,7 @@ function renderModel() {
     return;
   }
 
+  // Build feature matrix
   const featureNames = ['Age', 'Education (yrs)', 'Real Income ($10k)', 'Female', 'Black', 'Other Race',
     'Married', 'Never Married', 'Protestant', 'Catholic', 'No Religion', 'Republican lean', 'Year'];
 
@@ -1360,6 +1415,7 @@ function renderModel() {
 
   const result = multiRegress(y, X, featureNames);
 
+  // Sort by absolute standardized coefficient
   const sorted = [...result.coefs].sort((a,b) => Math.abs(b.beta) - Math.abs(a.beta));
   const maxBeta = Math.max(...sorted.map(c => Math.abs(c.beta)));
 
@@ -1367,6 +1423,8 @@ function renderModel() {
   for (const c of sorted) {
     const pct = Math.abs(c.beta) / maxBeta * 100;
     const color = c.beta > 0 ? C.green : C.red;
+    const dir = c.beta > 0 ? 'right' : 'left';
+    const leftPos = c.beta > 0 ? '50%' : `${50 - pct/2}%`;
     const width = pct / 2;
 
     html += `<div class="coef-bar-container">
@@ -1381,6 +1439,7 @@ function renderModel() {
 
   document.getElementById('modelCoefs').innerHTML = html;
 
+  // Stats
   const targetLabel = targetKey === 'gap' ? 'Desire Gap' : targetKey === 'CHILDS' ? 'Actual Children' : 'Ideal Children';
   document.getElementById('modelStats').innerHTML = `
     <div class="metric-card">
@@ -1398,6 +1457,7 @@ function renderModel() {
     </div>
   `;
 
+  // Insight
   const top3 = sorted.slice(0, 3);
   document.getElementById('modelInsight').innerHTML = `
     <strong>Top predictors of ${targetLabel.toLowerCase()}:</strong>
@@ -1407,6 +1467,7 @@ function renderModel() {
     Note: standardized coefficients show relative importance; a 1-SD increase in each predictor maps to the shown effect on the target (in SDs).
   `;
 
+  // Coefficients over time
   renderModelOverTime(targetKey, featureNames);
 }
 
@@ -1420,6 +1481,7 @@ function renderModelOverTime(targetKey, featureNames) {
     { label: '2020s', start: 2020, end: 2024 },
   ];
 
+  // Pick top 4 features to track
   const topFeatures = ['Age', 'Education (yrs)', 'Married', 'No Religion'];
   const featureColors = { 'Age': C.blue, 'Education (yrs)': C.red, 'Married': C.green, 'No Religion': C.purple };
 
@@ -1496,23 +1558,31 @@ function renderForecast() {
   const marriageShift = parseFloat(document.getElementById('sliderMarriage').value);
   const incomeGrowth = parseFloat(document.getElementById('sliderIncome').value);
 
+  // Historical data
   const actual = meanByYear('CHILDS');
   const ideal = meanByYear('CHLDIDEL');
 
+  // Fit trend from trendStart
   const trendYears = actual.years.filter(y => y >= trendStart);
   const trendMeans = trendYears.map(y => actual.means[actual.years.indexOf(y)]);
   const reg = linReg(trendYears, trendMeans);
 
+  // Also fit ideal trend
   const idealTrendYears = ideal.years.filter(y => y >= trendStart);
   const idealTrendMeans = idealTrendYears.map(y => ideal.means[ideal.years.indexOf(y)]);
   const idealReg = linReg(idealTrendYears, idealTrendMeans);
 
+  // Forecast years
   const forecastYears = [];
   for (let y = 2025; y <= 2050; y++) forecastYears.push(y);
 
+  // Scenario adjustments
+  // Education effect: from model, ~-0.08 children per year of education (raw coef)
+  // Marriage effect: married people have ~+0.8 more children
+  // Income: minimal effect (~+0.01 per $10k)
   const educEffect = -0.08 * educShift;
   const marriageEffect = 0.8 * (marriageShift / 100);
-  const incomeEffect = 0.01 * incomeGrowth * 2;
+  const incomeEffect = 0.01 * incomeGrowth * 2; // rough
 
   const scenarioAdj = educEffect + marriageEffect + incomeEffect;
 
@@ -1520,6 +1590,7 @@ function renderForecast() {
   const scenarioForecast = forecastYears.map(y => Math.max(0, reg.intercept + reg.slope * y + scenarioAdj));
   const idealForecast = forecastYears.map(y => idealReg.intercept + idealReg.slope * y);
 
+  // Prediction intervals (based on SE)
   const tFactor80 = 1.28;
   const tFactor95 = 1.96;
   const band80 = forecastYears.map((y, i) => {
@@ -1541,6 +1612,7 @@ function renderForecast() {
     data: {
       labels: allYears,
       datasets: [
+        // 95% band
         {
           label: '95% interval',
           data: allYears.map(y => {
@@ -1565,6 +1637,7 @@ function renderForecast() {
           pointRadius: 0,
           spanGaps: false,
         },
+        // 80% band
         {
           label: '80% interval',
           data: allYears.map(y => {
@@ -1589,6 +1662,7 @@ function renderForecast() {
           pointRadius: 0,
           spanGaps: false,
         },
+        // Historical actual
         {
           label: 'Actual (historical)',
           data: allYears.map(y => {
@@ -1602,11 +1676,13 @@ function renderForecast() {
           spanGaps: true,
           fill: false,
         },
+        // Baseline forecast
         {
           label: 'Baseline forecast',
           data: allYears.map(y => {
             const fi = forecastYears.indexOf(y);
             if (fi >= 0) return baselineForecast[fi];
+            // Connect to last historical point
             if (y === actual.years[actual.years.length - 1]) return actual.means[actual.means.length - 1];
             return null;
           }),
@@ -1618,6 +1694,7 @@ function renderForecast() {
           spanGaps: true,
           fill: false,
         },
+        // Scenario forecast
         {
           label: 'Scenario forecast',
           data: allYears.map(y => {
@@ -1635,6 +1712,7 @@ function renderForecast() {
           fill: false,
           hidden: scenarioAdj === 0,
         },
+        // Historical ideal
         {
           label: 'Ideal (historical)',
           data: allYears.map(y => {
@@ -1676,6 +1754,7 @@ function renderForecast() {
     }
   });
 
+  // Forecast table
   const checkpoints = [2030, 2040, 2050];
   let thtml = '<table class="heatmap-table"><thead><tr><th>Scenario</th>';
   for (const cp of checkpoints) thtml += `<th>${cp}</th>`;
@@ -1704,6 +1783,7 @@ function renderForecast() {
   thtml += '</tbody></table>';
   document.getElementById('forecastTable').innerHTML = thtml;
 
+  // Insight
   const f2050 = baselineForecast[forecastYears.indexOf(2050)];
   document.getElementById('forecastInsight').innerHTML = `
     <strong>Baseline projection:</strong> If the ${trendStart}–2024 trend continues, average children per respondent
@@ -1717,6 +1797,7 @@ function renderForecast() {
 // SECTION 6: COHORTS
 // ============================================================
 function renderCohorts() {
+  // Cohort trajectories: mean CHILDS by age, grouped by birth decade
   const cohortDecades = [1930, 1940, 1950, 1960, 1970, 1980, 1990];
   const cohortColors = {
     1930: '#2a4a7f', 1940: '#3a6a9f', 1950: '#4a8abf',
@@ -1774,6 +1855,7 @@ function renderCohorts() {
     }
   });
 
+  // Completed fertility bar chart (age 40-55)
   const completedDecades = [1930, 1940, 1950, 1960, 1970, 1980];
   const completedData = completedDecades.map(cd => {
     const rows = DATA.filter(r => r.valid_childs && r.AGE >= 40 && r.AGE <= 55 && r.cohort_decade === cd);
@@ -1818,6 +1900,7 @@ function renderCohorts() {
     }
   });
 
+  // Childlessness rate
   const childlessData = completedDecades.map(cd => {
     const rows = DATA.filter(r => r.valid_childs && r.AGE >= 40 && r.cohort_decade === cd);
     const childless = rows.filter(r => r.CHILDS === 0);
@@ -1868,6 +1951,7 @@ function renderCohorts() {
     }
   });
 
+  // Insight
   const oldest = completedData[0]?.mean;
   const newest = completedData[completedData.length - 1]?.mean;
   const oldChildless = childlessData[0]?.rate;
@@ -1894,6 +1978,7 @@ function initTabs() {
       const tab = document.getElementById('tab-' + btn.dataset.tab);
       tab.classList.add('active');
 
+      // Lazy render
       switch (btn.dataset.tab) {
         case 'overview': if (!CHARTS['chartOverview']) renderOverview(); break;
         case 'demographics': renderDemographics(); break;
@@ -1917,6 +2002,7 @@ function initControls() {
   document.getElementById('modelTarget').addEventListener('change', renderModel);
   document.getElementById('modelSample').addEventListener('change', renderModel);
 
+  // Forecast sliders
   const sliders = ['TrendStart', 'Educ', 'Marriage', 'Income'];
   for (const s of sliders) {
     const el = document.getElementById('slider' + s);
