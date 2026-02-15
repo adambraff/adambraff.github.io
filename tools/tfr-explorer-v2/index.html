@@ -754,7 +754,7 @@
 
             <div class="grid-2">
                 <div class="card">
-                    <h3>Global TFR Trend 1960–2024</h3>
+                    <h3>Global TFR Trend 2000–2023</h3>
                     <div class="chart-container">
                         <canvas id="overview-global-trend"></canvas>
                     </div>
@@ -1326,7 +1326,7 @@
                 <p><strong>Model:</strong> Two-way fixed effects (entity + year) ordinary least squares (OLS) with clustered standard errors at country level.</p>
                 <p><strong>Equation:</strong> TFR<sub>it</sub> = α + β₁X₁ᵢₜ + β₂X₂ᵢₜ + ... + γᵢ + δₜ + εᵢₜ</p>
                 <p>Where γᵢ are country fixed effects and δₜ are year fixed effects. Year fixed effects control for global shocks (e.g., financial crises, pandemics). Where variables are collinear with time trends (e.g., technology adoption), some models use entity-only fixed effects to preserve variation.</p>
-                <p><strong>Sample:</strong> 180+ countries, 1960–2024 (panel unbalanced). Detailed country analysis limited to 60+ countries with complete historical data.</p>
+                <p><strong>Sample:</strong> 180+ countries, 2000–2023 (panel unbalanced). Detailed country analysis limited to 60+ countries with sufficient data coverage.</p>
                 <p><strong>Standard Errors:</strong> Clustered at country level to account for within-country autocorrelation.</p>
             </div>
 
@@ -1428,10 +1428,18 @@
             }
         }
 
+        function formatCoefficient(coef) {
+            if (coef === 0) return '0';
+            const abs = Math.abs(coef);
+            if (abs >= 0.01) return coef.toFixed(4);
+            if (abs >= 0.001) return coef.toFixed(5);
+            return coef.toExponential(3);
+        }
+
         // ==================== DATA LOADING ====================
         async function loadData() {
             try {
-                const v = 'v=2';
+                const v = 'v=3';
                 const [panel, models, gss] = await Promise.all([
                     fetch('data/panel_data.json?' + v).then(r => r.json()),
                     fetch('data/model_results.json?' + v).then(r => r.json()),
@@ -1565,9 +1573,9 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${varName}</td>
-                    <td>${coefData.coef.toFixed(4)}</td>
-                    <td>${coefData.se.toFixed(4)}</td>
-                    <td>${coefData.pvalue.toFixed(4)}</td>
+                    <td>${formatCoefficient(coefData.coef)}</td>
+                    <td>${formatCoefficient(coefData.se)}</td>
+                    <td>${coefData.pvalue < 0.0001 ? coefData.pvalue.toExponential(2) : coefData.pvalue.toFixed(4)}</td>
                     <td><span class="${sigClass}">${sigLevel || '–'}</span></td>
                 `;
                 tableBody.appendChild(row);
@@ -1739,7 +1747,7 @@
             const h1 = modelResults.hypotheses.H1;
 
             const mainCoef = h1.models[0].coefficients.female_lfp?.coef || 0;
-            document.getElementById('h1-key-stat').textContent = mainCoef.toFixed(4);
+            document.getElementById('h1-key-stat').textContent = formatCoefficient(mainCoef);
 
             renderH1ScatterChart();
 
@@ -1779,6 +1787,14 @@
             displayEvidenceBadge('H1');
         }
 
+        function getGdpBracket(gdpPc) {
+            if (gdpPc == null) return null;
+            if (gdpPc < 1146) return 'Low Income';
+            if (gdpPc < 4516) return 'Lower-Middle';
+            if (gdpPc < 14006) return 'Upper-Middle';
+            return 'High Income';
+        }
+
         function renderH1ScatterChart() {
             const { panelData } = globalData;
             const filter = globalData.currentGdpFilter;
@@ -1790,8 +1806,9 @@
             let scatterData = [];
             detailedCountries.forEach(([code, country]) => {
                 country.data.forEach(d => {
-                    if (d.female_lfp !== undefined && d.gdp_bracket !== undefined) {
-                        if (filter === 'all' || d.gdp_bracket === filter) {
+                    if (d.female_lfp !== undefined && d.tfr !== undefined) {
+                        const bracket = getGdpBracket(d.gdp_pc);
+                        if (filter === 'all' || bracket === filter) {
                             scatterData.push({
                                 x: d.female_lfp,
                                 y: d.tfr,
@@ -1837,15 +1854,15 @@
             const { panelData, modelResults, gssData } = globalData;
             const h2 = modelResults.hypotheses.H2;
 
-            const mainCoef = h2.models[0].coefficients.housing_price?.coef || 0;
-            document.getElementById('h2-key-stat').textContent = mainCoef.toFixed(4);
+            const mainCoef = h2.models[0].coefficients.housing_cost_proxy?.coef || 0;
+            document.getElementById('h2-key-stat').textContent = formatCoefficient(mainCoef);
 
             let scatterData = [];
             Object.entries(panelData.countries).forEach(([code, country]) => {
                 country.data.forEach(d => {
-                    if (d.housing_price_index !== undefined) {
+                    if (d.housing_cost_proxy !== undefined && d.housing_cost_proxy !== null) {
                         scatterData.push({
-                            x: d.housing_price_index,
+                            x: d.housing_cost_proxy,
                             y: d.tfr,
                             region: country.region,
                             code: code
@@ -1873,7 +1890,7 @@
                         maintainAspectRatio: false,
                         plugins: { legend: { position: 'bottom' } },
                         scales: {
-                            x: { title: { display: true, text: 'Housing Price Index' } },
+                            x: { title: { display: true, text: 'Housing Cost Proxy (Price-to-Income)' } },
                             y: { title: { display: true, text: 'TFR' } }
                         }
                     }
@@ -2010,7 +2027,7 @@
             const h4 = modelResults.hypotheses.H4;
 
             const mainCoef = h4.models[0]?.coefficients?.religiosity_index?.coef || 0;
-            document.getElementById('h4-key-stat').textContent = mainCoef.toFixed(4);
+            document.getElementById('h4-key-stat').textContent = formatCoefficient(mainCoef);
 
             let scatterData = [];
             Object.entries(panelData.countries).forEach(([code, country]) => {
@@ -2089,7 +2106,7 @@
             const h5 = modelResults.hypotheses.H5;
 
             const mainCoef = h5.models[0].coefficients.urban_pct?.coef || 0;
-            document.getElementById('h5-key-stat').textContent = mainCoef.toFixed(4);
+            document.getElementById('h5-key-stat').textContent = formatCoefficient(mainCoef);
 
             let scatterData = [];
             Object.entries(panelData.countries).forEach(([code, country]) => {
@@ -2173,7 +2190,7 @@
             const h6 = modelResults.hypotheses.H6;
 
             const mainCoef = h6.models[0].coefficients.global_epu?.coef || 0;
-            document.getElementById('h6-key-stat').textContent = mainCoef.toFixed(4);
+            document.getElementById('h6-key-stat').textContent = formatCoefficient(mainCoef);
 
             // Extract actual global_epu from country data (it's the same across all countries per year)
             // since overview.global_trend doesn't contain global_epu
@@ -2306,15 +2323,15 @@
             const { panelData, modelResults } = globalData;
             const h8 = modelResults.hypotheses.H8;
 
-            const mainCoef = h8.models[0].coefficients.family_spending?.coef || 0;
-            document.getElementById('h8-key-stat').textContent = mainCoef.toFixed(4);
+            const mainCoef = h8.models[0].coefficients.family_spending_gdp_pct?.coef || 0;
+            document.getElementById('h8-key-stat').textContent = formatCoefficient(mainCoef);
 
             let scatterData = [];
             Object.entries(panelData.countries).forEach(([code, country]) => {
                 country.data.forEach(d => {
-                    if (d.family_spending !== undefined) {
+                    if (d.family_spending_gdp_pct !== undefined && d.family_spending_gdp_pct !== null) {
                         scatterData.push({
-                            x: d.family_spending,
+                            x: d.family_spending_gdp_pct,
                             y: d.tfr,
                             region: country.region
                         });
@@ -2557,20 +2574,24 @@
             const slidersContainer = document.getElementById('projection-sliders');
             slidersContainer.innerHTML = '';
 
-            const variables = ['female_lfp', 'gdp_pc', 'hdi', 'urban_pct'];
+            const variableLabels = {
+                'female_lfp': 'Female Labor Force Participation (%)',
+                'urban_pct': 'Urbanization (%)',
+                'log_gdp_pc': 'Log GDP per Capita',
+                'internet_pct': 'Internet Penetration (%)'
+            };
+            const variables = Object.keys(variableLabels);
             variables.forEach(varName => {
                 const currentVal = latest[varName] || 0;
-                const range = projParams.variable_ranges[varName] || [0, 100];
-
-                // Use global range, not derived from currentVal
-                const minVal = range[0];
-                const maxVal = range[1];
-                const step = (maxVal - minVal) / 100;
+                const rangeObj = projParams.variable_ranges?.[varName] || {};
+                const minVal = rangeObj.min ?? 0;
+                const maxVal = rangeObj.max ?? 100;
+                const step = (maxVal - minVal) / 100 || 1;
 
                 const group = document.createElement('div');
                 group.className = 'slider-group';
                 group.innerHTML = `
-                    <label>${varName}</label>
+                    <label>${variableLabels[varName]}</label>
                     <div class="slider-row">
                         <input type="range" class="projection-slider" data-var="${varName}"
                                min="${minVal}" max="${maxVal}" step="${step}" value="${currentVal}">
@@ -2585,7 +2606,7 @@
                 const resetBtn = group.querySelector('.slider-reset');
 
                 slider.addEventListener('input', (e) => {
-                    valueSpan.textContent = e.target.value;
+                    valueSpan.textContent = parseFloat(e.target.value).toFixed(2);
                     updateProjectionChart(countryCode);
                 });
 
@@ -2610,21 +2631,26 @@
 
             const historicalData = country.data.map(d => ({ year: d.year, tfr: d.tfr }));
 
-            const coef = projParams.coefficients;
-            let tfrBase = latest.tfr;
-            Object.entries(sliderValues).forEach(([varName, val]) => {
-                tfrBase += (coef[varName] || 0) * val;
+            // Apply coefficient * (slider_value - current_value) for each variable
+            const coef = projParams.coefficients || {};
+            let tfrDelta = 0;
+            Object.entries(sliderValues).forEach(([varName, sliderVal]) => {
+                const currentVal = latest[varName] || 0;
+                const c = coef[varName]?.coef ?? (typeof coef[varName] === 'number' ? coef[varName] : 0);
+                tfrDelta += c * (sliderVal - currentVal);
             });
 
-            const projectedTfr = Math.max(0.5, tfrBase);
+            const projectedTfr = Math.max(0.5, latest.tfr + tfrDelta);
+            const residStd = projParams.residual_std || 0.21;
 
+            const midTfr = (latest.tfr + projectedTfr) / 2;
             const projData = [
                 { year: 2024, tfr: latest.tfr, upper: latest.tfr, lower: latest.tfr },
-                { year: 2035, tfr: (latest.tfr + projectedTfr) / 2, upper: (latest.tfr + projectedTfr) / 2 + 0.5, lower: (latest.tfr + projectedTfr) / 2 - 0.5 },
-                { year: 2050, tfr: projectedTfr, upper: projectedTfr + 1.96 * projParams.residual_std, lower: Math.max(0.5, projectedTfr - 1.96 * projParams.residual_std) }
+                { year: 2035, tfr: midTfr, upper: midTfr + 0.98 * residStd, lower: Math.max(0.5, midTfr - 0.98 * residStd) },
+                { year: 2050, tfr: projectedTfr, upper: projectedTfr + 1.96 * residStd, lower: Math.max(0.5, projectedTfr - 1.96 * residStd) }
             ];
 
-            document.getElementById('proj-2035-tfr').textContent = ((latest.tfr + projectedTfr) / 2).toFixed(2);
+            document.getElementById('proj-2035-tfr').textContent = midTfr.toFixed(2);
             document.getElementById('proj-2050-tfr').textContent = projectedTfr.toFixed(2);
 
             destroyChart('proj-traj');
@@ -2641,23 +2667,34 @@
                                 borderColor: colors.cyan,
                                 fill: false,
                                 tension: 0.4,
-                                borderWidth: 2
+                                borderWidth: 2,
+                                spanGaps: false
                             },
                             {
                                 label: 'Projection',
-                                data: [...Array(historicalData.length).fill(null), ...projData.map(d => d.tfr)],
+                                data: [...Array(historicalData.length - 1).fill(null), latest.tfr, ...projData.slice(1).map(d => d.tfr)],
                                 borderColor: colors.primary,
                                 fill: false,
                                 tension: 0.4,
                                 borderWidth: 2,
-                                borderDash: [5, 5]
+                                borderDash: [5, 5],
+                                spanGaps: false
                             },
                             {
-                                label: '95% CI',
-                                data: [...Array(historicalData.length).fill(null), ...projData.map(d => d.upper)],
+                                label: '95% CI Upper',
+                                data: [...Array(historicalData.length - 1).fill(null), latest.tfr, ...projData.slice(1).map(d => d.upper)],
                                 borderColor: colors.red,
                                 fill: '-1',
                                 backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                                borderWidth: 1,
+                                borderDash: [2, 2],
+                                pointRadius: 0
+                            },
+                            {
+                                label: '95% CI Lower',
+                                data: [...Array(historicalData.length - 1).fill(null), latest.tfr, ...projData.slice(1).map(d => d.lower)],
+                                borderColor: colors.red,
+                                fill: false,
                                 borderWidth: 1,
                                 borderDash: [2, 2],
                                 pointRadius: 0
@@ -2667,7 +2704,16 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: { legend: { position: 'bottom' } },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    filter: function(item) {
+                                        return !item.text.includes('CI');
+                                    }
+                                }
+                            }
+                        },
                         scales: {
                             x: { title: { display: true, text: 'Year' } },
                             y: { title: { display: true, text: 'TFR' } }
