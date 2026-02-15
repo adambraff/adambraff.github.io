@@ -800,10 +800,10 @@
                             <label for="h1-gdp-filter">Filter by GDP Level:</label>
                             <select id="h1-gdp-filter">
                                 <option value="all">All Countries</option>
-                                <option value="low">Low Income</option>
-                                <option value="lower-middle">Lower-Middle</option>
-                                <option value="upper-middle">Upper-Middle</option>
-                                <option value="high">High Income</option>
+                                <option value="Low Income">Low Income</option>
+                                <option value="Lower-Middle">Lower-Middle</option>
+                                <option value="Upper-Middle">Upper-Middle</option>
+                                <option value="High Income">High Income</option>
                             </select>
                         </div>
                     </div>
@@ -1248,10 +1248,11 @@
                     <div class="control-group">
                         <label for="ml-pdp-selector">Select Variable:</label>
                         <select id="ml-pdp-selector">
-                            <option value="female_lfp">Female LFP</option>
-                            <option value="gdp_pc">GDP per Capita</option>
-                            <option value="hdi">Human Development Index</option>
-                            <option value="life_expectancy">Life Expectancy</option>
+                            <option value="female_edu_secondary">Female Education (Secondary %)</option>
+                            <option value="female_lfp">Female Labor Force Participation</option>
+                            <option value="internet_pct">Internet Penetration (%)</option>
+                            <option value="log_gdp_pc">Log GDP per Capita</option>
+                            <option value="urban_pct">Urbanization (%)</option>
                         </select>
                     </div>
                 </div>
@@ -1403,14 +1404,19 @@
         };
 
         const regionColorMap = {
-            'Nordic': colors.nordic,
-            'W.Europe': colors.w_europe,
-            'S.Europe': colors.s_europe,
-            'E.Europe': colors.e_europe,
-            'E.Asia': colors.e_asia,
-            'Americas': colors.americas,
-            'Africa': colors.africa,
-            'Other': colors.other
+            'Africa': '#f97316',
+            'S. Asia': '#fb923c',
+            'Middle East': '#fbbf24',
+            'SE Asia': '#facc15',
+            'L. America': '#a78bfa',
+            'Oceania': '#38bdf8',
+            'N. America': '#818cf8',
+            'E. Europe': '#e94560',
+            'S. Europe': '#ffc93c',
+            'W. Europe': '#4ecca3',
+            'Nordic': '#53d8fb',
+            'E. Asia': '#ff6b6b',
+            'Other': '#94a3b8'
         };
 
         // Chart.js defaults
@@ -1439,7 +1445,7 @@
         // ==================== DATA LOADING ====================
         async function loadData() {
             try {
-                const v = 'v=3';
+                const v = 'v=4';
                 const [panel, models, gss] = await Promise.all([
                     fetch('data/panel_data.json?' + v).then(r => r.json()),
                     fetch('data/model_results.json?' + v).then(r => r.json()),
@@ -1601,24 +1607,35 @@
                     type: 'line',
                     data: {
                         labels: globalTrend.map(d => d.year),
-                        datasets: [{
-                            label: 'Global TFR',
-                            data: globalTrend.map(d => d.global_tfr_weighted || d.tfr),
-                            borderColor: colors.primary,
-                            backgroundColor: 'rgba(233, 69, 96, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
-                            pointRadius: 2,
-                            pointHoverRadius: 5,
-                            pointBackgroundColor: colors.primary
-                        }]
+                        datasets: [
+                            {
+                                label: 'Global TFR (unweighted avg)',
+                                data: globalTrend.map(d => d.global_tfr_unweighted || d.tfr),
+                                borderColor: colors.primary,
+                                backgroundColor: 'rgba(233, 69, 96, 0.1)',
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 2,
+                                pointHoverRadius: 5,
+                                pointBackgroundColor: colors.primary
+                            },
+                            {
+                                label: 'Replacement level (2.1)',
+                                data: globalTrend.map(() => 2.1),
+                                borderColor: 'rgba(255, 255, 255, 0.3)',
+                                borderWidth: 1,
+                                borderDash: [5, 5],
+                                pointRadius: 0,
+                                fill: false
+                            }
+                        ]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: { display: false }
+                            legend: { position: 'bottom' }
                         },
                         scales: {
                             y: {
@@ -1644,7 +1661,7 @@
                         acc[d.region] = d.tfr;
                         return acc;
                     }, {})
-            );
+            ).sort((a, b) => b[1] - a[1]);
 
             destroyChart('overview-regional');
             globalData.charts['overview-regional'] = new Chart(
@@ -1678,7 +1695,7 @@
             const belowReplacement = countryTfrs.filter(t => t < 2.1).length;
             const totalCountries = countryTfrs.length;
             const pctBelow = ((belowReplacement / totalCountries) * 100).toFixed(1);
-            const currentGlobal = (latestTrend.global_tfr_weighted || latestTrend.tfr || 0).toFixed(2);
+            const currentGlobal = (latestTrend.global_tfr_unweighted || latestTrend.tfr || 0).toFixed(2);
 
             document.getElementById('stat-below-replacement').textContent = belowReplacement;
             document.getElementById('stat-pct-below').textContent = `${pctBelow}%`;
@@ -1700,10 +1717,15 @@
                         datasets: [{
                             label: 'Number of Countries',
                             data: binCounts.map(d => d.count),
-                            backgroundColor: (ctx) => {
-                                const range = binCounts[ctx.dataIndex].range;
-                                return range.includes('2.1') || range.includes('0–1') || range.includes('1–2') ? colors.primary : colors.cyan;
-                            }
+                            backgroundColor: binCounts.map(d => {
+                                const upperBound = parseFloat(d.range.split('–')[1]);
+                                return upperBound <= 2.1 ? '#e94560' : '#4ecca3';
+                            }),
+                            borderColor: binCounts.map(d => {
+                                const upperBound = parseFloat(d.range.split('–')[1]);
+                                return upperBound <= 2.1 ? '#c73650' : '#3db88e';
+                            }),
+                            borderWidth: 1
                         }]
                     },
                     options: {
@@ -2208,7 +2230,7 @@
             const epuData = overview_h6.global_trend.map(d => ({
                 year: d.year,
                 epu: epuByYear[d.year] || 0,
-                tfr: d.global_tfr_weighted || d.tfr || 0
+                tfr: d.global_tfr_unweighted || d.tfr || 0
             }));
 
             destroyChart('h6-epu');
@@ -2278,9 +2300,9 @@
             let scatterData = [];
             Object.entries(panelData.countries).forEach(([code, country]) => {
                 country.data.forEach(d => {
-                    if (d.hdi !== undefined) {
+                    if (d.hdi_proxy !== undefined && d.hdi_proxy !== null) {
                         scatterData.push({
-                            x: d.hdi,
+                            x: d.hdi_proxy,
                             y: d.tfr,
                             region: country.region
                         });
@@ -2374,7 +2396,8 @@
             const { panelData, modelResults } = globalData;
             const h9 = modelResults.hypotheses.H9;
 
-            document.getElementById('h9-key-stat').textContent = '-0.15';
+            const h9MainCoef = h9.models[0].coefficients.internet_pct?.coef || 0;
+            document.getElementById('h9-key-stat').textContent = formatCoefficient(h9MainCoef);
 
             // Extract average internet penetration from country data by year
             const internetByYear = {};
@@ -2394,7 +2417,7 @@
             const smartData = overview_h9.global_trend.map(d => ({
                 year: d.year,
                 internet_pct: countsByYear[d.year] ? (internetByYear[d.year] / countsByYear[d.year]) : 0,
-                tfr: d.global_tfr_weighted || d.tfr || 0
+                tfr: d.global_tfr_unweighted || d.tfr || 0
             }));
 
             destroyChart('h9-smart');
