@@ -67,211 +67,86 @@
             margin-bottom: 1.5rem;
         }
 
-        nav {
+        .tab-nav {
             display: flex;
-            gap: 1rem;
             flex-wrap: wrap;
+            gap: 0.5rem;
+            border-top: 1px solid var(--border);
+            padding-top: 1rem;
             margin-top: 1rem;
         }
 
-        button {
-            padding: 0.5rem 1rem;
+        .tab-nav button {
+            background: transparent;
             border: 1px solid var(--border);
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
-            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 0.6rem 1rem;
             border-radius: 4px;
+            cursor: pointer;
             font-size: 0.9rem;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
-        button:hover {
-            background-color: var(--accent);
+        .tab-nav button:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+        }
+
+        .tab-nav button.active {
+            background: var(--accent);
             border-color: var(--accent);
-            transform: translateY(-2px);
+            color: white;
         }
 
-        button.active {
-            background-color: var(--accent);
-            border-color: var(--accent);
-        }
-
-        /* Main Content */
+        /* Main Container */
         .container {
             max-width: 1600px;
             margin: 0 auto;
             padding: 0 1rem 2rem;
         }
 
-        .tabs {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid var(--border);
-            overflow-x: auto;
-            padding-bottom: 1rem;
-        }
-
-        .tab-button {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            background-color: transparent;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 1rem;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-
-        .tab-button:hover {
-            color: var(--text-primary);
-        }
-
-        .tab-button.active {
-            color: var(--accent);
-            border-bottom-color: var(--accent);
-            background-color: transparent;
-        }
-
+        /* Tab Content */
         .tab-content {
             display: none;
+            animation: fadeIn 0.3s ease;
         }
 
         .tab-content.active {
             display: block;
         }
 
-        /* Chart Containers */
-        .chart-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .chart-container {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        .chart-container h3 {
-            color: var(--accent);
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-        }
-
-        .chart-container canvas {
-            max-height: 400px;
-        }
-
-        /* Data Tables */
-        .table-container {
-            overflow-x: auto;
-            margin-bottom: 2rem;
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.5rem;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-
-        th {
-            background-color: var(--accent-secondary);
-            color: var(--text-primary);
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-            border-bottom: 2px solid var(--border);
-        }
-
-        td {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        tr:hover {
-            background-color: rgba(233, 69, 96, 0.1);
-        }
-
-        /* Heatmap Grid */
-        .heatmap-grid {
-            display: grid;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-        }
-
-        .heatmap-cell {
-            padding: 1rem;
-            text-align: center;
-            border-radius: 4px;
-            font-weight: 600;
-            color: white;
-            font-size: 0.9rem;
-        }
-
-        /* Controls */
-        .controls {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        select {
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        input {
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
-            border-radius: 4px;
-            font-size: 0.9rem;
-        }
-
-        input::placeholder {
-            color: var(--text-secondary);
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Loading State */
-        .loading {
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(26, 26, 46, 0.95);
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 400px;
-            color: var(--text-secondary);
-            font-size: 1.1rem;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            text-align: center;
         }
 
         .spinner {
             border: 4px solid var(--border);
             border-top: 4px solid var(--accent);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
-            margin-right: 1rem;
+            margin: 0 auto 1rem;
         }
 
         @keyframes spin {
@@ -279,770 +154,2527 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Responsive Design */
-        @media (max-width: 768px) {
+        .loading-text {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .card.theory-box {
+            background: linear-gradient(135deg, rgba(83, 216, 251, 0.05) 0%, rgba(233, 69, 96, 0.05) 100%);
+            border-color: var(--cyan);
+            border-left: 4px solid var(--cyan);
+        }
+
+        .warning-banner {
+            background: rgba(255, 107, 107, 0.1);
+            border-left: 4px solid var(--red);
+            border: 1px solid var(--red);
+            color: var(--red);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
             h1 {
                 font-size: 1.5rem;
             }
-
-            .chart-grid {
-                grid-template-columns: 1fr;
+            .tab-nav {
+                gap: 0.25rem;
             }
-
-            .controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            select, input, button {
-                width: 100%;
+            .tab-nav button {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
             }
         }
 
-        /* Color Heatmap Classes */
-        .heatmap-0 { background-color: #1a1a2e; }
-        .heatmap-1 { background-color: #2d0a1f; }
-        .heatmap-2 { background-color: #4a0f2e; }
-        .heatmap-3 { background-color: #6b1638; }
-        .heatmap-4 { background-color: #8a1f42; }
-        .heatmap-5 { background-color: #a82851; }
-        .heatmap-6 { background-color: #c63161; }
-        .heatmap-7 { background-color: #e94560; }
-        .heatmap-8 { background-color: #f05d7a; }
-        .heatmap-9 { background-color: #f77895; }
-
-        /* Info Box */
-        .info-box {
-            background-color: var(--bg-secondary);
-            border-left: 4px solid var(--accent);
-            padding: 1rem;
-            margin-bottom: 2rem;
-            border-radius: 4px;
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 1rem;
+            overflow-x: auto;
         }
 
-        .info-box h4 {
-            color: var(--accent);
-            margin-bottom: 0.5rem;
+        .chart-container.tall {
+            height: 500px;
         }
 
-        .info-box p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
+        .chart-container.small {
+            height: 300px;
         }
 
-        .stat-card {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border);
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+            .chart-container.tall {
+                height: 300px;
+            }
+        }
+
+        /* Headings */
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-primary);
+        }
+
+        h4 {
+            font-size: 1rem;
+            margin-bottom: 0.6rem;
+            color: var(--text-primary);
+        }
+
+        /* Key Stats */
+        .key-stat {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
             padding: 1.5rem;
             border-radius: 8px;
             text-align: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
         }
 
-        .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--accent);
+        .key-stat .label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 0.5rem;
+        }
+
+        /* Collapsible */
+        .collapsible {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .collapsible h4 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .collapsible h4::before {
+            content: '▶';
+            display: inline-block;
+            transition: transform 0.3s ease;
+            width: 1rem;
+        }
+
+        .collapsible.open h4::before {
+            transform: rotate(90deg);
+        }
+
+        .collapsible-content {
+            display: none;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .collapsible.open .collapsible-content {
+            display: block;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        th {
+            background: var(--accent-secondary);
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:hover {
+            background: rgba(83, 216, 251, 0.05);
+        }
+
+        /* Evidence Badges */
+        .evidence-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            cursor: help;
+        }
+
+        .evidence-badge.strong {
+            background: rgba(78, 204, 163, 0.2);
+            color: var(--green);
+            border: 1px solid var(--green);
+        }
+
+        .evidence-badge.moderate {
+            background: rgba(255, 201, 60, 0.2);
+            color: var(--gold);
+            border: 1px solid var(--gold);
+        }
+
+        .evidence-badge.weak {
+            background: rgba(249, 115, 22, 0.2);
+            color: var(--orange);
+            border: 1px solid var(--orange);
+        }
+
+        .evidence-badge.unsupported {
+            background: rgba(255, 107, 107, 0.2);
+            color: var(--red);
+            border: 1px solid var(--red);
+        }
+
+        .evidence-reasoning {
+            display: none;
+            background: var(--accent-secondary);
+            padding: 1rem;
+            border-left: 3px solid var(--cyan);
+            border-radius: 4px;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .evidence-badge:hover ~ .evidence-reasoning,
+        .evidence-reasoning:hover {
+            display: block;
+        }
+
+        /* Form Controls */
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .control-group label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        select, input[type="text"], input[type="number"], input[type="range"] {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.6rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+
+        select:hover, input:hover {
+            border-color: var(--cyan);
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(233, 69, 96, 0.2);
+        }
+
+        input[type="range"] {
+            padding: 0.4rem;
+            cursor: pointer;
+        }
+
+        .slider-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .slider-group {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 6px;
+        }
+
+        .slider-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .slider-row {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
             margin-bottom: 0.5rem;
         }
 
-        .stat-label {
+        .slider-row input[type="range"] {
+            flex: 1;
+        }
+
+        .slider-value {
+            min-width: 100px;
+            text-align: right;
+            font-weight: 500;
+            color: var(--cyan);
+        }
+
+        .slider-reset {
+            background: var(--accent-secondary);
+            border: 1px solid var(--accent);
+            color: var(--text-primary);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .slider-reset:hover {
+            background: var(--accent);
+        }
+
+        /* Text & Lists */
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        /* Utility Classes */
+        .text-center {
+            text-align: center;
+        }
+
+        .text-muted {
             color: var(--text-secondary);
             font-size: 0.9rem;
         }
 
+        .badge {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Loading & Error States */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .error {
+            background: rgba(233, 69, 96, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+
+        .success {
+            background: rgba(78, 204, 163, 0.1);
+            border: 1px solid var(--green);
+            color: var(--green);
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+
+        /* Search Box */
+        .search-box {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.8rem;
+            padding-left: 2.5rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        /* Data Source Attribution */
+        .data-source {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Significance Stars */
+        .sig-high {
+            color: var(--green);
+            font-weight: bold;
+        }
+
+        .sig-med {
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        .sig-low {
+            color: var(--text-secondary);
+        }
+
+        /* Stat Grid */
         .stat-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .stat-box .value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-box .label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem;
+            margin-top: 3rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none;
+        }
+
+        /* Methods Tab Styling */
+        .method-section {
             margin-bottom: 2rem;
+        }
+
+        .method-section h3 {
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .source-list {
+            background: var(--bg-secondary);
+            border-left: 3px solid var(--cyan);
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .source-list li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* No Data Message */
+        .no-data {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            background: rgba(233, 69, 96, 0.05);
+            border: 1px dashed var(--border);
+            border-radius: 6px;
         }
     </style>
 </head>
 <body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <div class="loading-text">Loading data...</div>
+            <div class="text-muted">This may take a moment (2MB files)</div>
+        </div>
+    </div>
+
     <header>
         <div class="header-content">
             <h1>TFR Explorer v2</h1>
-            <p class="subtitle">Global Birth Rate Analysis - Total Fertility Rate (TFR) by Country</p>
-            <nav>
-                <button onclick="setTimeFrame('all')">All Years</button>
-                <button onclick="setTimeFrame('recent')">Last 10 Years</button>
-                <button onclick="setTimeFrame('decade')">Last Decade</button>
+            <p class="subtitle">Understanding Global Fertility Decline: Data, Evidence, and Mechanisms</p>
+            <nav class="tab-nav">
+                <button class="tab-btn active" data-tab="overview">Overview</button>
+                <button class="tab-btn" data-tab="h1">H1: Opportunity Cost</button>
+                <button class="tab-btn" data-tab="h2">H2: Housing</button>
+                <button class="tab-btn" data-tab="h3">H3: Fertility Trap</button>
+                <button class="tab-btn" data-tab="h4">H4: Secularization</button>
+                <button class="tab-btn" data-tab="h5">H5: Partnership</button>
+                <button class="tab-btn" data-tab="h6">H6: Uncertainty</button>
+                <button class="tab-btn" data-tab="h7">H7: J-Curve</button>
+                <button class="tab-btn" data-tab="h8">H8: Policy</button>
+                <button class="tab-btn" data-tab="h9">H9: Smartphones</button>
+                <button class="tab-btn" data-tab="ml">ML Model</button>
+                <button class="tab-btn" data-tab="projections">Projections</button>
+                <button class="tab-btn" data-tab="methods">Methods</button>
             </nav>
         </div>
     </header>
 
     <div class="container">
-        <div class="tabs">
-            <button class="tab-button active" onclick="switchTab(event, 'overview')">Overview</button>
-            <button class="tab-button" onclick="switchTab(event, 'trends')">Trends</button>
-            <button class="tab-button" onclick="switchTab(event, 'comparison')">Comparison</button>
-            <button class="tab-button" onclick="switchTab(event, 'analysis')">Analysis</button>
-        </div>
-
-        <!-- Overview Tab -->
+        <!-- OVERVIEW TAB -->
         <div id="overview" class="tab-content active">
-            <div class="info-box">
-                <h4>About This Dashboard</h4>
-                <p>This interactive explorer visualizes global fertility rate trends across countries over time.</p>
-                <p>Total Fertility Rate (TFR) represents the average number of children a woman would have in her lifetime.</p>
-            </div>
+            <h2>Global Fertility Trends</h2>
 
-            <div class="stat-grid" id="statsContainer"></div>
-
-            <div class="chart-grid">
-                <div class="chart-container">
-                    <h3>Global Average TFR Trend</h3>
-                    <canvas id="tfrTrendChart"></canvas>
+            <div class="stat-grid">
+                <div class="stat-box">
+                    <div class="value" id="stat-current-global">2.30</div>
+                    <div class="label">Current Global TFR</div>
                 </div>
-                <div class="chart-container">
-                    <h3>Regional Distribution (Latest Year)</h3>
-                    <canvas id="regionalChart"></canvas>
+                <div class="stat-box">
+                    <div class="value" id="stat-below-replacement">125</div>
+                    <div class="label">Countries Below Replacement</div>
+                </div>
+                <div class="stat-box">
+                    <div class="value" id="stat-pct-below">60%</div>
+                    <div class="label">Percentage</div>
                 </div>
             </div>
 
-            <div class="table-container">
-                <h3 style="margin-bottom: 1rem;">Top 20 Highest TFR Countries (Latest Year)</h3>
-                <table id="topTable">
-                    <thead>
-                        <tr>
-                            <th>Rank</th>
-                            <th>Country</th>
-                            <th>TFR</th>
-                            <th>Year</th>
-                            <th>Region</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Global TFR Trend 1960–2024</h3>
+                    <div class="chart-container">
+                        <canvas id="overview-global-trend"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Regional TFR (Latest Year)</h3>
+                    <div class="chart-container">
+                        <canvas id="overview-regional"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Distribution of Countries by TFR</h3>
+                <div class="chart-container">
+                    <canvas id="overview-distribution"></canvas>
+                </div>
             </div>
         </div>
 
-        <!-- Trends Tab -->
-        <div id="trends" class="tab-content">
-            <div class="controls">
-                <input type="text" id="countryFilter" placeholder="Filter by country name...">
-                <select id="regionFilter" onchange="filterData()">
-                    <option value="">All Regions</option>
-                </select>
+        <!-- H1: OPPORTUNITY COST -->
+        <div id="h1" class="tab-content">
+            <h2>H1: Opportunity Cost of Motherhood</h2>
+            <div class="card theory-box">
+                <h3>Theory</h3>
+                <p>As female labor force participation increases, the opportunity cost of having children rises. Women face greater career opportunities and foregone income, reducing fertility incentives.</p>
             </div>
 
-            <div class="chart-grid">
-                <div class="chart-container" style="grid-column: 1 / -1;">
-                    <h3>Country TFR Trends Over Time</h3>
-                    <canvas id="trendsChart"></canvas>
+            <div id="h1-evidence-badge" class="evidence-badge"></div>
+            <div id="h1-evidence-reasoning" class="evidence-reasoning"></div>
+            <div id="h1-data-limitation" class="warning-banner hidden"></div>
+
+            <div class="key-stat">
+                <span id="h1-key-stat">-0.35</span>
+                <div class="label">Coefficient (Female LFP)</div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Female LFP vs TFR (Detailed Countries)</h3>
+                    <div class="controls">
+                        <div class="control-group">
+                            <label for="h1-gdp-filter">Filter by GDP Level:</label>
+                            <select id="h1-gdp-filter">
+                                <option value="all">All Countries</option>
+                                <option value="low">Low Income</option>
+                                <option value="lower-middle">Lower-Middle</option>
+                                <option value="upper-middle">Upper-Middle</option>
+                                <option value="high">High Income</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="h1-scatter"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>GSS: Children by Education (US, 1972–2022)</h3>
+                    <div class="chart-container">
+                        <canvas id="h1-gss"></canvas>
+                    </div>
                 </div>
             </div>
 
-            <div class="table-container">
-                <h3 style="margin-bottom: 1rem;">Filtered Country Data</h3>
-                <table id="trendsTable">
-                    <thead>
-                        <tr>
-                            <th>Country</th>
-                            <th>Region</th>
-                            <th>Latest TFR</th>
-                            <th>Latest Year</th>
-                            <th>Change (10Y)</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+            <div class="card">
+                <h3>Model Coefficients</h3>
+                <div class="table-wrapper">
+                    <table id="h1-model-table">
+                        <thead>
+                            <tr>
+                                <th>Variable</th>
+                                <th>Coefficient</th>
+                                <th>Std Error</th>
+                                <th>P-value</th>
+                                <th>Significance</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="text-muted" id="h1-model-info"></div>
             </div>
         </div>
 
-        <!-- Comparison Tab -->
-        <div id="comparison" class="tab-content">
-            <div class="controls">
-                <label>Select countries to compare:</label>
-                <select id="country1" onchange="updateComparisonChart()" style="flex: 1;">
-                    <option value="">Select Country 1</option>
-                </select>
-                <select id="country2" onchange="updateComparisonChart()" style="flex: 1;">
-                    <option value="">Select Country 2</option>
-                </select>
-                <select id="country3" onchange="updateComparisonChart()" style="flex: 1;">
-                    <option value="">Select Country 3</option>
-                </select>
+        <!-- H2: HOUSING -->
+        <div id="h2" class="tab-content">
+            <h2>H2: Housing Costs & Affordability</h2>
+            <div class="card theory-box">
+                <h3>Theory</h3>
+                <p>Rising housing costs reduce fertility by delaying family formation and increasing the financial burden of parenthood. Housing consumes larger shares of income in developed economies.</p>
             </div>
 
-            <div class="chart-grid">
-                <div class="chart-container" style="grid-column: 1 / -1;">
-                    <h3>Selected Countries Comparison</h3>
-                    <canvas id="comparisonChart"></canvas>
+            <div id="h2-evidence-badge" class="evidence-badge"></div>
+            <div id="h2-evidence-reasoning" class="evidence-reasoning"></div>
+            <div id="h2-data-limitation" class="warning-banner hidden"></div>
+
+            <div class="key-stat">
+                <span id="h2-key-stat">-0.42</span>
+                <div class="label">Housing Impact</div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Urban Housing Prices vs TFR</h3>
+                    <div class="chart-container">
+                        <canvas id="h2-housing"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>GSS: Children by Income (US, 1972–2022)</h3>
+                    <div class="chart-container">
+                        <canvas id="h2-gss"></canvas>
+                    </div>
                 </div>
             </div>
 
-            <div class="table-container">
-                <h3 style="margin-bottom: 1rem;">Comparison Statistics</h3>
-                <table id="comparisonTable">
-                    <thead>
-                        <tr>
-                            <th>Country</th>
-                            <th>Earliest TFR</th>
-                            <th>Latest TFR</th>
-                            <th>Total Change</th>
-                            <th>Avg Annual Change</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+            <div class="card">
+                <h3>Model Coefficients</h3>
+                <div class="table-wrapper">
+                    <table id="h2-model-table">
+                        <thead>
+                            <tr>
+                                <th>Variable</th>
+                                <th>Coefficient</th>
+                                <th>Std Error</th>
+                                <th>P-value</th>
+                                <th>Significance</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="text-muted" id="h2-model-info"></div>
             </div>
         </div>
 
-        <!-- Analysis Tab -->
-        <div id="analysis" class="tab-content">
-            <div class="info-box">
-                <h4>Analysis Tools</h4>
-                <p>Use the heatmap below to identify patterns in fertility rates across different regions and time periods.</p>
+        <!-- H3: FERTILITY TRAP -->
+        <div id="h3" class="tab-content">
+            <h2>H3: Fertility Trap / Path Dependence</h2>
+            <div class="card theory-box">
+                <h3>Theory</h3>
+                <p>Countries with low fertility experience self-reinforcing dynamics: smaller youth cohorts → tighter labor markets → higher wages → lower birth rates. A "trap" emerges where low fertility becomes self-sustaining.</p>
+            </div>
+
+            <div id="h3-evidence-badge" class="evidence-badge"></div>
+            <div id="h3-evidence-reasoning" class="evidence-reasoning"></div>
+            <div id="h3-data-limitation" class="warning-banner hidden"></div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Country Trajectories (Fertility Trap Paths)</h3>
+                    <div class="chart-container tall">
+                        <canvas id="h3-trajectories"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>GSS: Ideal vs Actual Children (US, 1972–2022)</h3>
+                    <div class="chart-container">
+                        <canvas id="h3-gss"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- H4: SECULARIZATION -->
+        <div id="h4" class="tab-content">
+            <h2>H4: Secularization & Religious Decline</h2>
+            <div class="card theory-box">
+                <h3>Theory</h3>
+                <p>Religious belief and practice are strong correlates of fertility. Secularization reduces social pressure to have children and weakens pro-natalist cultural norms.</p>
+            </div>
+
+            <div id="h4-evidence-badge" class="evidence-badge"></div>
+            <div id="h4-evidence-reasoning" class="evidence-reasoning"></div>
+            <div id="h4-data-limitation" class="warning-banner hidden"></div>
+
+            <div class="key-stat">
+                <span id="h4-key-stat">-0.18</span>
+                <div class="label">Religiosity Coefficient</div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Religiosity vs TFR</h3>
+                    <div class="chart-container">
+                        <canvas id="h4-religiosity"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>GSS: Children by Religion (US, 1972–2022)</h3>
+                    <div class="chart-container">
+                        <canvas id="h4-gss"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Model Coefficients</h3>
+                <div class="table-wrapper">
+                    <table id="h4-model-table">
+                        <thead>
+                            <tr>
+                                <th>Variable</th>
+                                <th>Coefficient</th>
+                                <th>Std Error</th>
+                                <th>P-value</th>
+                                <th>Significance</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="text-muted" id="h4-model-info"></div>
+            </div>
+        </div>
+
+        <!-- H5: PARTNERSHIP -->
+        <div id="h5" class="tab-content">
+            <h2>H5: Partnership Formation & Marriage Decline</h2>
+            <div class="card theory-box">
+                <h3>Theory</h3>
+                <p>Urbanization and cultural change reduce marriage rates. Since most childbearing occurs within marriage, lower partnership rates reduce overall fertility.</p>
+            </div>
+
+            <div id="h5-evidence-badge" class="evidence-badge"></div>
+            <div id="h5-evidence-reasoning" class="evidence-reasoning"></div>
+            <div id="h5-data-limitation" class="warning-banner hidden"></div>
+
+            <div class="key-stat">
+                <span id="h5-key-stat">-0.22</span>
+                <div class="label">Urbanization Coefficient</div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Urbanization vs TFR</h3>
+                    <div class="chart-container">
+                        <canvas id="h5-urbanization"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>GSS: Marital Status Trend (US, 1972–2022)</h3>
+                    <div class="chart-container">
+                        <canvas id="h5-gss"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Model Coefficients</h3>
+                <div class="table-wrapper">
+                    <table id="h5-model-table">
+                        <thead>
+                            <tr>
+                                <th>Variable</th>
+                                <th>Coefficient</th>
+                                <th>Std Error</th>
+                                <th>P-value</th>
+                                <th>Significance</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="text-muted" id="h5-model-info"></div>
+            </div>
+        </div>
+
+        <!-- H6: UNCERTAINTY -->
+        <div id="h6" class="tab-content">
+            <h2>H6: Uncertainty & Economic Volatility</h2>
+            <div class="card theory-box">
+                <h3>Theory</h3>
+                <p>Economic and political uncertainty (EPU) raises the psychological cost of parenthood. When future outcomes are unpredictable, households delay or forgo childbearing.</p>
+            </div>
+
+            <div id="h6-evidence-badge" class="evidence-badge"></div>
+            <div id="h6-evidence-reasoning" class="evidence-reasoning"></div>
+            <div id="h6-data-limitation" class="warning-banner hidden"></div>
+
+            <div class="key-stat">
+                <span id="h6-key-stat">-0.08</span>
+                <div class="label">EPU Coefficient</div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Global Economic Policy Uncertainty vs TFR</h3>
+                    <div class="chart-container">
+                        <canvas id="h6-epu"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>GSS: Children by Happiness (US, 1972–2022)</h3>
+                    <div class="chart-container">
+                        <canvas id="h6-gss"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Model Coefficients</h3>
+                <div class="table-wrapper">
+                    <table id="h6-model-table">
+                        <thead>
+                            <tr>
+                                <th>Variable</th>
+                                <th>Coefficient</th>
+                                <th>Std Error</th>
+                                <th>P-value</th>
+                                <th>Significance</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="text-muted" id="h6-model-info"></div>
+            </div>
+        </div>
+
+        <!-- H7: J-CURVE -->
+        <div id="h7" class="tab-content">
+            <h2>H7: The J-Curve (Development Paradox)</h2>
+            <div class="card theory-box">
+                <h3>Theory</h3>
+                <p>The relationship between development (HDI) and fertility is non-linear. Initial development raises fertility by improving child survival and access to family planning, but further development reduces it.</p>
+            </div>
+
+            <div id="h7-evidence-badge" class="evidence-badge"></div>
+            <div id="h7-evidence-reasoning" class="evidence-reasoning"></div>
+            <div id="h7-data-limitation" class="warning-banner hidden"></div>
+
+            <div class="key-stat">
+                <span id="h7-key-stat">HDI > 0.85</span>
+                <div class="label">Critical Threshold</div>
+            </div>
+
+            <div class="card">
+                <h3>HDI vs TFR (J-Curve Pattern)</h3>
+                <div class="chart-container tall">
+                    <canvas id="h7-jcurve"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Model Coefficients</h3>
+                <div class="table-wrapper">
+                    <table id="h7-model-table">
+                        <thead>
+                            <tr>
+                                <th>Variable</th>
+                                <th>Coefficient</th>
+                                <th>Std Error</th>
+                                <th>P-value</th>
+                                <th>Significance</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="text-muted" id="h7-model-info"></div>
+            </div>
+        </div>
+
+        <!-- H8: POLICY -->
+        <div id="h8" class="tab-content">
+            <h2>H8: Family Policy & Support</h2>
+            <div class="card theory-box">
+                <h3>Theory</h3>
+                <p>Government support for families (childcare, parental leave, cash transfers) reduces the cost of childbearing and can increase fertility by enabling work–family balance.</p>
+            </div>
+
+            <div id="h8-evidence-badge" class="evidence-badge"></div>
+            <div id="h8-evidence-reasoning" class="evidence-reasoning"></div>
+            <div id="h8-data-limitation" class="warning-banner hidden"></div>
+
+            <div class="key-stat">
+                <span id="h8-key-stat">+0.12</span>
+                <div class="label">Policy Spending Coefficient</div>
+            </div>
+
+            <div class="card">
+                <h3>Family Spending vs TFR</h3>
+                <div class="chart-container">
+                    <canvas id="h8-policy"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Model Coefficients</h3>
+                <div class="table-wrapper">
+                    <table id="h8-model-table">
+                        <thead>
+                            <tr>
+                                <th>Variable</th>
+                                <th>Coefficient</th>
+                                <th>Std Error</th>
+                                <th>P-value</th>
+                                <th>Significance</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="text-muted" id="h8-model-info"></div>
+            </div>
+        </div>
+
+        <!-- H9: SMARTPHONES -->
+        <div id="h9" class="tab-content">
+            <h2>H9: Digital Technology & Smartphones</h2>
+            <div class="card theory-box">
+                <h3>Theory</h3>
+                <p>Smartphone and internet penetration offer alternative sources of satisfaction and social connection, competing with parenthood for time and attention. Mobile access also enables broader contraceptive access.</p>
+            </div>
+
+            <div id="h9-evidence-badge" class="evidence-badge"></div>
+            <div id="h9-evidence-reasoning" class="evidence-reasoning"></div>
+            <div id="h9-data-limitation" class="warning-banner hidden"></div>
+
+            <div class="key-stat">
+                <span id="h9-key-stat">-0.15</span>
+                <div class="label">Digital Penetration</div>
+            </div>
+
+            <div class="card">
+                <h3>Internet Penetration vs TFR</h3>
+                <div class="chart-container">
+                    <canvas id="h9-smartphones"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Model Coefficients</h3>
+                <div class="table-wrapper">
+                    <table id="h9-model-table">
+                        <thead>
+                            <tr>
+                                <th>Variable</th>
+                                <th>Coefficient</th>
+                                <th>Std Error</th>
+                                <th>P-value</th>
+                                <th>Significance</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="text-muted" id="h9-model-info"></div>
+            </div>
+        </div>
+
+        <!-- ML TAB -->
+        <div id="ml" class="tab-content">
+            <h2>Machine Learning Model</h2>
+
+            <div class="stat-grid">
+                <div class="stat-box">
+                    <div class="value" id="ml-cv-r2">0.847</div>
+                    <div class="label">CV R² Score</div>
+                </div>
+                <div class="stat-box">
+                    <div class="value" id="ml-n-features">42</div>
+                    <div class="label">Features</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Model Approach</h3>
+                <p>Random Forest regression with 5-fold cross-validation. Features include all hypothesis variables plus interactions and lagged effects. Captures non-linear relationships and feature interactions that linear models miss.</p>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Mean Decrease Impurity (Top 10 Features)</h3>
+                    <div class="chart-container">
+                        <canvas id="ml-mdi"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Permutation Importance (Top 10 Features)</h3>
+                    <div class="chart-container">
+                        <canvas id="ml-permutation"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Partial Dependence Plots</h3>
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="ml-pdp-selector">Select Variable:</label>
+                        <select id="ml-pdp-selector">
+                            <option value="female_lfp">Female LFP</option>
+                            <option value="gdp_pc">GDP per Capita</option>
+                            <option value="hdi">Human Development Index</option>
+                            <option value="life_expectancy">Life Expectancy</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-container tall">
+                    <canvas id="ml-pdp"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROJECTIONS TAB -->
+        <div id="projections" class="tab-content">
+            <h2>TFR Projections to 2050</h2>
+
+            <div class="card theory-box">
+                <h3>Projection Method</h3>
+                <p>Linear projection model using lagged TFR and key drivers (female LFP, HDI, urbanization). Includes 95% confidence intervals based on historical residuals. Assumes continuation of recent trends.</p>
             </div>
 
             <div class="controls">
-                <select id="analysisRegion" onchange="updateHeatmap()" style="flex: 1;">
-                    <option value="">All Regions</option>
-                </select>
+                <div class="control-group">
+                    <label for="proj-country">Select Country:</label>
+                    <select id="proj-country">
+                        <option value="">-- Choose Country --</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="table-container">
-                <h3 style="margin-bottom: 1rem;">TFR Heatmap by Region</h3>
-                <div class="heatmap-grid" id="heatmap"></div>
+            <div class="slider-container" id="projection-sliders"></div>
+
+            <div class="card">
+                <h3 id="proj-country-name">Country Projection</h3>
+                <div class="chart-container tall">
+                    <canvas id="proj-trajectory"></canvas>
+                </div>
             </div>
 
-            <div class="chart-grid">
-                <div class="chart-container">
-                    <h3>Regional Averages</h3>
-                    <canvas id="regionalAverageChart"></canvas>
+            <div class="grid-3">
+                <div class="stat-box">
+                    <div class="value" id="proj-2024-tfr">2.30</div>
+                    <div class="label">Current TFR</div>
                 </div>
-                <div class="chart-container">
-                    <h3>Fertility Rate Distribution</h3>
-                    <canvas id="distributionChart"></canvas>
+                <div class="stat-box">
+                    <div class="value" id="proj-2035-tfr">2.10</div>
+                    <div class="label">Projected 2035</div>
                 </div>
+                <div class="stat-box">
+                    <div class="value" id="proj-2050-tfr">1.95</div>
+                    <div class="label">Projected 2050</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- METHODS TAB -->
+        <div id="methods" class="tab-content">
+            <h2>Methods & Data Sources</h2>
+
+            <div class="method-section">
+                <h3>Data Sources</h3>
+                <ul class="source-list">
+                    <li><strong>Fertility Data:</strong> World Bank World Development Indicators (WDI), UN World Population Prospects 2022</li>
+                    <li><strong>Labor Force:</strong> WDI, ILO STAT</li>
+                    <li><strong>Development Indicators:</strong> WDI, UNDP Human Development Report</li>
+                    <li><strong>Policy Data:</strong> OECD Social Expenditure Database (SOCX)</li>
+                    <li><strong>Uncertainty Index:</strong> Economic Policy Uncertainty (EPU) Index by Baker, Bloom, Davis</li>
+                    <li><strong>Digital Adoption:</strong> WDI, ITU World Telecommunication Indicators</li>
+                    <li><strong>US Social Trends:</strong> General Social Survey (GSS), NORC at UChicago, 1972–2022</li>
+                </ul>
+            </div>
+
+            <div class="method-section">
+                <h3>Panel Regression Specification</h3>
+                <p><strong>Model:</strong> Two-way fixed effects (entity + year) ordinary least squares (OLS) with clustered standard errors at country level.</p>
+                <p><strong>Equation:</strong> TFR<sub>it</sub> = α + β₁X₁ᵢₜ + β₂X₂ᵢₜ + ... + γᵢ + δₜ + εᵢₜ</p>
+                <p>Where γᵢ are country fixed effects and δₜ are year fixed effects. Year fixed effects control for global shocks (e.g., financial crises, pandemics). Where variables are collinear with time trends (e.g., technology adoption), some models use entity-only fixed effects to preserve variation.</p>
+                <p><strong>Sample:</strong> 180+ countries, 1960–2024 (panel unbalanced). Detailed country analysis limited to 60+ countries with complete historical data.</p>
+                <p><strong>Standard Errors:</strong> Clustered at country level to account for within-country autocorrelation.</p>
+            </div>
+
+            <div class="method-section">
+                <h3>Hypothesis Tests</h3>
+                <p>Each hypothesis is tested via a dedicated regression model focusing on the key variable of interest. Coefficients are interpreted as the marginal effect of a 1-unit increase in the independent variable on TFR, holding fixed effects and other covariates constant.</p>
+                <p><strong>Significance Levels:</strong></p>
+                <ul>
+                    <li><span class="sig-high">*** p &lt; 0.01 (Highly Significant)</span></li>
+                    <li><span class="sig-med">** p &lt; 0.05 (Moderately Significant)</span></li>
+                    <li><span class="sig-low">* p &lt; 0.10 (Weakly Significant)</span></li>
+                </ul>
+            </div>
+
+            <div class="method-section">
+                <h3>Machine Learning Model</h3>
+                <p><strong>Algorithm:</strong> Random Forest regression with 500 trees, max depth 20.</p>
+                <p><strong>Features:</strong> All hypothesis variables, lagged effects, interactions, and squared terms. 42 total features after feature engineering.</p>
+                <p><strong>Validation:</strong> 5-fold cross-validation. Performance metric: R² (explained variance).</p>
+                <p><strong>Feature Importance:</strong> Mean Decrease Impurity (MDI) and permutation importance, showing which variables contribute most to predictions.</p>
+            </div>
+
+            <div class="method-section">
+                <h3>Limitations & Caveats</h3>
+                <ul>
+                    <li><strong>Observational Data:</strong> Correlations do not imply causation. Unmeasured confounders (cultural preferences, institutional factors) may bias results.</li>
+                    <li><strong>Reverse Causality:</strong> Some relationships may be bidirectional (e.g., HDI and fertility).</li>
+                    <li><strong>Missing Data:</strong> Panel is unbalanced; historical data sparse for developing countries.</li>
+                    <li><strong>Measurement Error:</strong> Fertility estimates in some countries rely on models, not direct surveys.</li>
+                    <li><strong>Time-Varying Confounders:</strong> Fixed effects address time-invariant omitted variables, but time-varying confounders remain a concern.</li>
+                </ul>
+            </div>
+
+            <div class="method-section">
+                <h3>Reproducibility</h3>
+                <p>All code, data, and results are available in the GitHub repository. Data files are cleaned, merged, and documented. Regression output includes full coefficient tables, diagnostics, and robustness checks.</p>
             </div>
         </div>
     </div>
 
+    <footer>
+        <p>TFR Explorer v2 | Data updated 2024 | Created with Chart.js, Random Forest, and open-source fertility data</p>
+    </footer>
+
     <script>
-        let allData = [];
-        let filteredData = [];
-        let charts = {};
-        let currentTimeFrame = 'all';
+        // Global data store with chart management
+        let globalData = {
+            panelData: null,
+            modelResults: null,
+            gssData: null,
+            charts: {},
+            currentGdpFilter: 'all'
+        };
 
-        // Data source URL
-        const DATA_URL = 'https://raw.githubusercontent.com/adambraff/adambraff.github.io/main/data/tfr-data.json';
+        // Color palette
+        const colors = {
+            primary: '#e94560',
+            secondary: '#0f3460',
+            cyan: '#53d8fb',
+            green: '#4ecca3',
+            gold: '#ffc93c',
+            red: '#ff6b6b',
+            purple: '#a78bfa',
+            orange: '#f97316',
+            gray: '#94a3b8',
+            nordic: '#53d8fb',
+            w_europe: '#4ecca3',
+            s_europe: '#ffc93c',
+            e_europe: '#e94560',
+            e_asia: '#ff6b6b',
+            americas: '#a78bfa',
+            africa: '#f97316',
+            other: '#94a3b8'
+        };
 
-        // Initialize on load
-        async function init() {
-            console.log('Initializing TFR Explorer...');
-            try {
-                await loadData();
-                setupFilters();
-                displayOverview();
-            } catch (error) {
-                console.error('Error initializing:', error);
-                showError('Failed to load data');
+        const regionColorMap = {
+            'Nordic': colors.nordic,
+            'W.Europe': colors.w_europe,
+            'S.Europe': colors.s_europe,
+            'E.Europe': colors.e_europe,
+            'E.Asia': colors.e_asia,
+            'Americas': colors.americas,
+            'Africa': colors.africa,
+            'Other': colors.other
+        };
+
+        // Chart.js defaults
+        Chart.defaults.color = '#b4b4c8';
+        Chart.defaults.borderColor = '#404060';
+        Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+        Chart.defaults.plugins.legend.labels.boxWidth = 15;
+        Chart.defaults.plugins.legend.position = 'bottom';
+
+        // ==================== CHART MANAGEMENT ====================
+        function destroyChart(key) {
+            if (globalData.charts[key]) {
+                globalData.charts[key].destroy();
+                delete globalData.charts[key];
             }
         }
 
-        // Load data from source
+        // ==================== DATA LOADING ====================
         async function loadData() {
-            console.log('Loading data from:', DATA_URL);
             try {
-                // Add cache-busting parameter
-                const url = new URL(DATA_URL);
-                url.searchParams.append('t', Date.now());
-                
-                const response = await fetch(url.toString());
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const json = await response.json();
-                allData = json.data || [];
-                filteredData = [...allData];
-                console.log(`Loaded ${allData.length} data points`);
+                const v = 'v=2';
+                const [panel, models, gss] = await Promise.all([
+                    fetch('data/panel_data.json?' + v).then(r => r.json()),
+                    fetch('data/model_results.json?' + v).then(r => r.json()),
+                    fetch('data/gss_summary.json?' + v).then(r => r.json())
+                ]);
+
+                globalData.panelData = panel;
+                globalData.modelResults = models;
+                globalData.gssData = gss;
+
+                console.log('Data loaded:', { panel, models, gss });
+
+                // Hide loading overlay and initialize
+                document.getElementById('loading-overlay').style.display = 'none';
+                initializeApp();
             } catch (error) {
                 console.error('Data loading error:', error);
-                throw error;
+                document.getElementById('loading-overlay').innerHTML =
+                    '<div class="container" style="margin-top: 2rem;"><div class="error">Error loading data. Please ensure data files are in the data/ directory.</div></div>';
             }
         }
 
-        // Tab switching
-        function switchTab(event, tabName) {
-            const tabContents = document.querySelectorAll('.tab-content');
-            tabContents.forEach(content => content.classList.remove('active'));
-            
-            const tabButtons = document.querySelectorAll('.tab-button');
-            tabButtons.forEach(button => button.classList.remove('active'));
+        // ==================== INITIALIZATION ====================
+        function initializeApp() {
+            setupTabNavigation();
+            populateProjectionCountries();
+            setupH1GdpFilter();
+            renderOverviewTab();
+            renderAllHypothesisCharts();
+        }
 
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
+        function setupTabNavigation() {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.dataset.tab;
+                    switchTab(tabId);
+                });
+            });
 
-            // Update charts when tab is shown
+            window.addEventListener('hashchange', () => {
+                const hash = window.location.hash.slice(1) || 'overview';
+                switchTab(hash);
+            });
+        }
+
+        function switchTab(tabId) {
+            window.location.hash = tabId;
+
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            const selectedTab = document.getElementById(tabId);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+            }
+
+            const selectedBtn = document.querySelector(`[data-tab="${tabId}"]`);
+            if (selectedBtn) {
+                selectedBtn.classList.add('active');
+            }
+
             setTimeout(() => {
-                Object.values(charts).forEach(chart => {
-                    if (chart && typeof chart.resize === 'function') {
+                Object.values(globalData.charts).forEach(chart => {
+                    if (chart && chart.resize) {
                         chart.resize();
                     }
                 });
             }, 100);
         }
 
-        // Time frame control
-        function setTimeFrame(frame) {
-            currentTimeFrame = frame;
-            displayOverview();
-        }
+        // ==================== HELPER: EVIDENCE BADGES ====================
+        function displayEvidenceBadge(hypothesisKey) {
+            const h = globalData.modelResults.hypotheses[hypothesisKey];
+            if (!h || !h.evidence) return;
 
-        // Filter data based on time frame
-        function filterByTimeFrame() {
-            const now = new Date().getFullYear();
-            if (currentTimeFrame === 'all') {
-                return allData;
-            } else if (currentTimeFrame === 'recent') {
-                return allData.filter(d => d.year >= now - 10);
-            } else if (currentTimeFrame === 'decade') {
-                return allData.filter(d => d.year >= now - 10);
+            const ev = h.evidence;
+            const badge = document.getElementById(`${hypothesisKey.toLowerCase()}-evidence-badge`);
+            const reasoning = document.getElementById(`${hypothesisKey.toLowerCase()}-evidence-reasoning`);
+            const limitation = document.getElementById(`${hypothesisKey.toLowerCase()}-data-limitation`);
+
+            const confidenceClass = ev.confidence.toLowerCase(); // "strong", "moderate", "weak", "unsupported"
+            badge.className = `evidence-badge ${confidenceClass}`;
+            badge.textContent = `Evidence: ${ev.confidence} (${ev.confidence_pct}%)`;
+            badge.title = ev.reasoning;
+
+            if (reasoning) {
+                reasoning.innerHTML = `<strong>Evidence Reasoning:</strong> ${ev.reasoning}`;
             }
-            return allData;
-        }
 
-        // Setup filters
-        function setupFilters() {
-            const regions = [...new Set(allData.map(d => d.region))].sort();
-            const countries = [...new Set(allData.map(d => d.country))].sort();
-
-            const regionSelects = ['regionFilter', 'analysisRegion'];
-            regionSelects.forEach(id => {
-                const select = document.getElementById(id);
-                regions.forEach(region => {
-                    const option = document.createElement('option');
-                    option.value = region;
-                    option.textContent = region;
-                    select.appendChild(option);
-                });
-            });
-
-            const countrySelects = ['country1', 'country2', 'country3'];
-            countrySelects.forEach(id => {
-                const select = document.getElementById(id);
-                countries.forEach(country => {
-                    const option = document.createElement('option');
-                    option.value = country;
-                    option.textContent = country;
-                    select.appendChild(option);
-                });
-            });
-        }
-
-        // Display overview tab
-        async function displayOverview() {
-            const data = filterByTimeFrame();
-            
-            // Display stats
-            displayStats(data);
-            
-            // Global trend chart
-            createTFRTrendChart(data);
-            
-            // Regional distribution
-            createRegionalChart(data);
-            
-            // Top countries table
-            displayTopCountries(data);
-        }
-
-        // Display statistics
-        function displayStats(data) {
-            const latestYear = Math.max(...data.map(d => d.year));
-            const latestData = data.filter(d => d.year === latestYear);
-            
-            const stats = {
-                'Countries': [...new Set(latestData.map(d => d.country))].length,
-                'Global Avg TFR': (latestData.reduce((sum, d) => sum + d.tfr, 0) / latestData.length).toFixed(2),
-                'Highest TFR': Math.max(...latestData.map(d => d.tfr)).toFixed(2),
-                'Lowest TFR': Math.min(...latestData.map(d => d.tfr)).toFixed(2)
-            };
-
-            const container = document.getElementById('statsContainer');
-            container.innerHTML = '';
-            
-            Object.entries(stats).forEach(([label, value]) => {
-                const card = document.createElement('div');
-                card.className = 'stat-card';
-                card.innerHTML = `
-                    <div class="stat-value">${value}</div>
-                    <div class="stat-label">${label}</div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // Create TFR Trend Chart
-        function createTFRTrendChart(data) {
-            const yearlyAvg = {};
-            data.forEach(d => {
-                if (!yearlyAvg[d.year]) yearlyAvg[d.year] = [];
-                yearlyAvg[d.year].push(d.tfr);
-            });
-
-            const years = Object.keys(yearlyAvg).sort((a, b) => a - b);
-            const avgTFRs = years.map(year => 
-                (yearlyAvg[year].reduce((a, b) => a + b, 0) / yearlyAvg[year].length).toFixed(2)
-            );
-
-            const ctx = document.getElementById('tfrTrendChart');
-            if (charts.tfrTrend) charts.tfrTrend.destroy();
-            
-            charts.tfrTrend = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: years,
-                    datasets: [{
-                        label: 'Global Average TFR',
-                        data: avgTFRs,
-                        borderColor: '#e94560',
-                        backgroundColor: 'rgba(233, 69, 96, 0.1)',
-                        tension: 0.4,
-                        fill: true,
-                        pointBackgroundColor: '#53d8fb',
-                        pointBorderColor: '#e94560',
-                        pointRadius: 5,
-                        pointHoverRadius: 7
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#ffffff' }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            grid: { color: '#404060' },
-                            ticks: { color: '#94a3b8' }
-                        },
-                        x: {
-                            grid: { color: '#404060' },
-                            ticks: { color: '#94a3b8' }
-                        }
-                    }
+            if (h.data_limitation && limitation) {
+                limitation.classList.remove('hidden');
+                limitation.innerHTML = `<strong>Data Limitation:</strong> ${h.data_limitation}`;
+                if (h.note) {
+                    limitation.innerHTML += `<br>${h.note}`;
                 }
-            });
-        }
+            }
 
-        // Create Regional Chart
-        function createRegionalChart(data) {
-            const latestYear = Math.max(...data.map(d => d.year));
-            const latestData = data.filter(d => d.year === latestYear);
-            
-            const regionAvg = {};
-            latestData.forEach(d => {
-                if (!regionAvg[d.region]) regionAvg[d.region] = [];
-                regionAvg[d.region].push(d.tfr);
-            });
-
-            const regions = Object.keys(regionAvg);
-            const avgValues = regions.map(region => 
-                (regionAvg[region].reduce((a, b) => a + b, 0) / regionAvg[region].length).toFixed(2)
-            );
-
-            const ctx = document.getElementById('regionalChart');
-            if (charts.regional) charts.regional.destroy();
-            
-            charts.regional = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: regions,
-                    datasets: [{
-                        label: 'Average TFR',
-                        data: avgValues,
-                        backgroundColor: [
-                            '#e94560', '#53d8fb', '#4ecca3', '#ffc93c', '#f97316',
-                            '#a78bfa', '#ff6b6b', '#0f3460', '#16213e', '#404060'
-                        ],
-                        borderColor: '#404060',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    indexAxis: 'y',
-                    plugins: {
-                        legend: {
-                            labels: { color: '#ffffff' }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            grid: { color: '#404060' },
-                            ticks: { color: '#94a3b8' }
-                        },
-                        y: {
-                            grid: { color: '#404060' },
-                            ticks: { color: '#94a3b8' }
-                        }
-                    }
+            if (h.note && !h.data_limitation) {
+                const noteEl = document.createElement('div');
+                noteEl.className = 'warning-banner';
+                noteEl.innerHTML = h.note;
+                const card = document.querySelector(`#${hypothesisKey.toLowerCase()} .card:first-of-type`);
+                if (card) {
+                    card.parentNode.insertBefore(noteEl, card);
                 }
-            });
+            }
         }
 
-        // Display top countries
-        function displayTopCountries(data) {
-            const latestYear = Math.max(...data.map(d => d.year));
-            const latestData = data.filter(d => d.year === latestYear)
-                .sort((a, b) => b.tfr - a.tfr)
-                .slice(0, 20);
+        // ==================== HELPER: REGRESSION TABLE ====================
+        function populateRegressionTable(hypothesisKey, modelIndex = 0) {
+            const h = globalData.modelResults.hypotheses[hypothesisKey];
+            if (!h || !h.models || h.models.length === 0) return;
 
-            const tbody = document.querySelector('#topTable tbody');
-            tbody.innerHTML = '';
-            
-            latestData.forEach((d, index) => {
-                const row = tbody.insertRow();
+            const model = h.models[modelIndex];
+            const tableBody = document.querySelector(`#${hypothesisKey.toLowerCase()}-model-table tbody`);
+            const modelInfo = document.getElementById(`${hypothesisKey.toLowerCase()}-model-info`);
+
+            if (!tableBody) return;
+
+            tableBody.innerHTML = '';
+
+            Object.entries(model.coefficients).forEach(([varName, coefData]) => {
+                const sigLevel = coefData.pvalue < 0.01 ? '***' : coefData.pvalue < 0.05 ? '**' : coefData.pvalue < 0.10 ? '*' : '';
+                const sigClass = coefData.sig === 'p<0.01' ? 'sig-high' : coefData.sig === 'p<0.05' ? 'sig-med' : 'sig-low';
+
+                const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${d.country}</td>
-                    <td>${d.tfr.toFixed(2)}</td>
-                    <td>${d.year}</td>
-                    <td>${d.region}</td>
+                    <td>${varName}</td>
+                    <td>${coefData.coef.toFixed(4)}</td>
+                    <td>${coefData.se.toFixed(4)}</td>
+                    <td>${coefData.pvalue.toFixed(4)}</td>
+                    <td><span class="${sigClass}">${sigLevel || '–'}</span></td>
                 `;
+                tableBody.appendChild(row);
             });
+
+            const fixedEffectsText = model.fixed_effects ? `Fixed Effects: ${model.fixed_effects}` : '';
+            const obsText = `Observations: ${model.n_obs} | Countries: ${model.n_countries} | Years: ${model.n_years} | R²: ${model.r_squared.toFixed(3)}`;
+
+            modelInfo.innerHTML = `${obsText} ${fixedEffectsText ? '| ' + fixedEffectsText : ''}`;
         }
 
-        // Filter data function
-        function filterData() {
-            const countryFilter = document.getElementById('countryFilter').value.toLowerCase();
-            const regionFilter = document.getElementById('regionFilter').value;
+        // ==================== OVERVIEW TAB ====================
+        function renderOverviewTab() {
+            const { panelData } = globalData;
 
-            filteredData = allData.filter(d => {
-                const matchCountry = d.country.toLowerCase().includes(countryFilter);
-                const matchRegion = !regionFilter || d.region === regionFilter;
-                return matchCountry && matchRegion;
-            });
+            const overview = panelData.overview;
+            const globalTrend = overview.global_trend;
 
-            updateTrendsChart();
-            updateTrendsTable();
-        }
-
-        // Update trends chart
-        function updateTrendsChart() {
-            const countries = [...new Set(filteredData.map(d => d.country))].slice(0, 10);
-            const datasets = countries.map((country, index) => {
-                const countryData = filteredData.filter(d => d.country === country);
-                const years = countryData.map(d => d.year).sort((a, b) => a - b);
-                const tfrs = years.map(year => 
-                    countryData.find(d => d.year === year).tfr
-                );
-
-                const colors = [
-                    '#e94560', '#53d8fb', '#4ecca3', '#ffc93c', '#f97316',
-                    '#a78bfa', '#ff6b6b', '#0f3460', '#4a0f2e', '#8a1f42'
-                ];
-
-                return {
-                    label: country,
-                    data: tfrs,
-                    borderColor: colors[index % colors.length],
-                    backgroundColor: 'transparent',
-                    tension: 0.4,
-                    pointRadius: 3,
-                    fill: false
-                };
-            });
-
-            const ctx = document.getElementById('trendsChart');
-            if (charts.trends) charts.trends.destroy();
-            
-            charts.trends = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: [...new Set(filteredData.map(d => d.year))].sort((a, b) => a - b),
-                    datasets: datasets
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#ffffff' },
-                            position: 'top'
-                        }
+            destroyChart('overview-global');
+            globalData.charts['overview-global'] = new Chart(
+                document.getElementById('overview-global-trend'),
+                {
+                    type: 'line',
+                    data: {
+                        labels: globalTrend.map(d => d.year),
+                        datasets: [{
+                            label: 'Global TFR',
+                            data: globalTrend.map(d => d.global_tfr_weighted || d.tfr),
+                            borderColor: colors.primary,
+                            backgroundColor: 'rgba(233, 69, 96, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 2,
+                            pointHoverRadius: 5,
+                            pointBackgroundColor: colors.primary
+                        }]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            grid: { color: '#404060' },
-                            ticks: { color: '#94a3b8' }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
                         },
-                        x: {
-                            grid: { color: '#404060' },
-                            ticks: { color: '#94a3b8' }
+                        scales: {
+                            y: {
+                                min: 1.5,
+                                max: 5.5,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value.toFixed(1);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
-            });
-        }
+            );
 
-        // Update trends table
-        function updateTrendsTable() {
-            const countries = [...new Set(filteredData.map(d => d.country))];
-            const tbody = document.querySelector('#trendsTable tbody');
-            tbody.innerHTML = '';
+            const regionalTrends = overview.regional_trends;
+            const latestYear = Math.max(...regionalTrends.map(d => d.year));
+            const latestByRegion = Object.entries(
+                regionalTrends
+                    .filter(d => d.year === latestYear)
+                    .reduce((acc, d) => {
+                        acc[d.region] = d.tfr;
+                        return acc;
+                    }, {})
+            );
 
-            countries.forEach(country => {
-                const countryData = filteredData.filter(d => d.country === country);
-                const sortedData = countryData.sort((a, b) => a.year - b.year);
-                
-                if (sortedData.length > 0) {
-                    const latest = sortedData[sortedData.length - 1];
-                    const change = sortedData.length > 1 ? 
-                        (latest.tfr - sortedData[0].tfr).toFixed(2) : 'N/A';
-
-                    const row = tbody.insertRow();
-                    row.innerHTML = `
-                        <td>${country}</td>
-                        <td>${latest.region}</td>
-                        <td>${latest.tfr.toFixed(2)}</td>
-                        <td>${latest.year}</td>
-                        <td>${change}</td>
-                    `;
-                }
-            });
-        }
-
-        // Update comparison chart
-        function updateComparisonChart() {
-            const countries = [
-                document.getElementById('country1').value,
-                document.getElementById('country2').value,
-                document.getElementById('country3').value
-            ].filter(c => c);
-
-            if (countries.length === 0) return;
-
-            const datasets = countries.map((country, index) => {
-                const countryData = allData.filter(d => d.country === country);
-                const years = countryData.map(d => d.year).sort((a, b) => a - b);
-                const tfrs = years.map(year => 
-                    countryData.find(d => d.year === year).tfr
-                );
-
-                const colors = ['#e94560', '#53d8fb', '#4ecca3'];
-                return {
-                    label: country,
-                    data: tfrs,
-                    borderColor: colors[index],
-                    backgroundColor: 'transparent',
-                    tension: 0.4,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    fill: false
-                };
-            });
-
-            const ctx = document.getElementById('comparisonChart');
-            if (charts.comparison) charts.comparison.destroy();
-            
-            const allYears = [...new Set(allData.map(d => d.year))].sort((a, b) => a - b);
-            
-            charts.comparison = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: allYears,
-                    datasets: datasets
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#ffffff' }
-                        }
+            destroyChart('overview-regional');
+            globalData.charts['overview-regional'] = new Chart(
+                document.getElementById('overview-regional'),
+                {
+                    type: 'bar',
+                    data: {
+                        labels: latestByRegion.map(([r]) => r),
+                        datasets: [{
+                            label: `TFR ${latestYear}`,
+                            data: latestByRegion.map(([, tfr]) => tfr),
+                            backgroundColor: latestByRegion.map(([region]) => regionColorMap[region] || colors.gray)
+                        }]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            grid: { color: '#404060' },
-                            ticks: { color: '#94a3b8' }
-                        },
-                        x: {
-                            grid: { color: '#404060' },
-                            ticks: { color: '#94a3b8' }
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
                         }
                     }
                 }
-            });
+            );
 
-            updateComparisonTable(countries);
+            // Build country-level distribution from individual country data
+            const latestTrend = globalTrend[globalTrend.length - 1];
+            const countryTfrs = Object.values(panelData.countries)
+                .map(c => c.data && c.data.length > 0 ? c.data[c.data.length - 1].tfr : null)
+                .filter(t => t !== null && t !== undefined);
+            const belowReplacement = countryTfrs.filter(t => t < 2.1).length;
+            const totalCountries = countryTfrs.length;
+            const pctBelow = ((belowReplacement / totalCountries) * 100).toFixed(1);
+            const currentGlobal = (latestTrend.global_tfr_weighted || latestTrend.tfr || 0).toFixed(2);
+
+            document.getElementById('stat-below-replacement').textContent = belowReplacement;
+            document.getElementById('stat-pct-below').textContent = `${pctBelow}%`;
+            document.getElementById('stat-current-global').textContent = currentGlobal;
+
+            const bins = [0, 1, 1.5, 2.1, 3, 4, 5, 7];
+            const binCounts = bins.slice(0, -1).map((bin, i) => ({
+                range: `${bin}–${bins[i + 1]}`,
+                count: countryTfrs.filter(t => t >= bin && t < bins[i + 1]).length
+            }));
+
+            destroyChart('overview-dist');
+            globalData.charts['overview-dist'] = new Chart(
+                document.getElementById('overview-distribution'),
+                {
+                    type: 'bar',
+                    data: {
+                        labels: binCounts.map(d => d.range),
+                        datasets: [{
+                            label: 'Number of Countries',
+                            data: binCounts.map(d => d.count),
+                            backgroundColor: (ctx) => {
+                                const range = binCounts[ctx.dataIndex].range;
+                                return range.includes('2.1') || range.includes('0–1') || range.includes('1–2') ? colors.primary : colors.cyan;
+                            }
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                }
+            );
         }
 
-        // Update comparison table
-        function updateComparisonTable(countries) {
-            const tbody = document.querySelector('#comparisonTable tbody');
-            tbody.innerHTML = '';
+        // ==================== HYPOTHESIS RENDERING ====================
+        function renderAllHypothesisCharts() {
+            renderH1();
+            renderH2();
+            renderH3();
+            renderH4();
+            renderH5();
+            renderH6();
+            renderH7();
+            renderH8();
+            renderH9();
+            renderMLTab();
+        }
 
-            countries.forEach(country => {
-                const countryData = allData.filter(d => d.country === country)
-                    .sort((a, b) => a.year - b.year);
+        // ==================== H1: OPPORTUNITY COST ====================
+        function setupH1GdpFilter() {
+            const filter = document.getElementById('h1-gdp-filter');
+            if (filter) {
+                filter.addEventListener('change', (e) => {
+                    globalData.currentGdpFilter = e.target.value;
+                    renderH1ScatterChart();
+                });
+            }
+        }
 
-                if (countryData.length > 0) {
-                    const first = countryData[0];
-                    const last = countryData[countryData.length - 1];
-                    const change = (last.tfr - first.tfr).toFixed(2);
-                    const avgChange = (change / (last.year - first.year)).toFixed(3);
+        function renderH1() {
+            const { panelData, modelResults, gssData } = globalData;
+            const h1 = modelResults.hypotheses.H1;
 
-                    const row = tbody.insertRow();
-                    row.innerHTML = `
-                        <td>${country}</td>
-                        <td>${first.tfr.toFixed(2)}</td>
-                        <td>${last.tfr.toFixed(2)}</td>
-                        <td>${change}</td>
-                        <td>${avgChange}</td>
-                    `;
+            const mainCoef = h1.models[0].coefficients.female_lfp?.coef || 0;
+            document.getElementById('h1-key-stat').textContent = mainCoef.toFixed(4);
+
+            renderH1ScatterChart();
+
+            const eduData = gssData.children_by_edu_era;
+            // Data is row-per-group: {era, education, avg_children}
+            const eras = [...new Set(eduData.map(d => d.era))].sort();
+            const eduLevels = [...new Set(eduData.map(d => d.education))];
+            const eduColors = [colors.red, colors.gold, colors.cyan, colors.green, colors.purple];
+
+            destroyChart('h1-gss');
+            globalData.charts['h1-gss'] = new Chart(
+                document.getElementById('h1-gss'),
+                {
+                    type: 'bar',
+                    data: {
+                        labels: eras,
+                        datasets: eduLevels.map((level, i) => ({
+                            label: level,
+                            data: eras.map(era => {
+                                const row = eduData.find(d => d.era === era && d.education === level);
+                                return row ? row.avg_children : null;
+                            }),
+                            backgroundColor: eduColors[i % eduColors.length]
+                        }))
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { title: { display: true, text: 'Avg Children' } }
+                        }
+                    }
+                }
+            );
+
+            populateRegressionTable('H1');
+            displayEvidenceBadge('H1');
+        }
+
+        function renderH1ScatterChart() {
+            const { panelData } = globalData;
+            const filter = globalData.currentGdpFilter;
+
+            let detailedCountries = Object.entries(panelData.countries).filter(([code, _]) => {
+                return panelData.metadata.detailed_countries.includes(code);
+            });
+
+            let scatterData = [];
+            detailedCountries.forEach(([code, country]) => {
+                country.data.forEach(d => {
+                    if (d.female_lfp !== undefined && d.gdp_bracket !== undefined) {
+                        if (filter === 'all' || d.gdp_bracket === filter) {
+                            scatterData.push({
+                                x: d.female_lfp,
+                                y: d.tfr,
+                                region: country.region,
+                                code: code,
+                                year: d.year
+                            });
+                        }
+                    }
+                });
+            });
+
+            const regionDatasets = Object.entries(regionColorMap).map(([region, color]) => ({
+                label: region,
+                data: scatterData.filter(d => d.region === region),
+                backgroundColor: color,
+                showLine: false,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }));
+
+            destroyChart('h1-scatter');
+            globalData.charts['h1-scatter'] = new Chart(
+                document.getElementById('h1-scatter'),
+                {
+                    type: 'scatter',
+                    data: { datasets: regionDatasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' } },
+                        scales: {
+                            x: { title: { display: true, text: 'Female Labor Force Participation (%)' } },
+                            y: { title: { display: true, text: 'TFR' } }
+                        }
+                    }
+                }
+            );
+        }
+
+        // ==================== H2: HOUSING ====================
+        function renderH2() {
+            const { panelData, modelResults, gssData } = globalData;
+            const h2 = modelResults.hypotheses.H2;
+
+            const mainCoef = h2.models[0].coefficients.housing_price?.coef || 0;
+            document.getElementById('h2-key-stat').textContent = mainCoef.toFixed(4);
+
+            let scatterData = [];
+            Object.entries(panelData.countries).forEach(([code, country]) => {
+                country.data.forEach(d => {
+                    if (d.housing_price_index !== undefined) {
+                        scatterData.push({
+                            x: d.housing_price_index,
+                            y: d.tfr,
+                            region: country.region,
+                            code: code
+                        });
+                    }
+                });
+            });
+
+            const regionDatasets = Object.entries(regionColorMap).map(([region, color]) => ({
+                label: region,
+                data: scatterData.filter(d => d.region === region),
+                backgroundColor: color,
+                showLine: false,
+                pointRadius: 4
+            }));
+
+            destroyChart('h2-housing');
+            globalData.charts['h2-housing'] = new Chart(
+                document.getElementById('h2-housing'),
+                {
+                    type: 'scatter',
+                    data: { datasets: regionDatasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' } },
+                        scales: {
+                            x: { title: { display: true, text: 'Housing Price Index' } },
+                            y: { title: { display: true, text: 'TFR' } }
+                        }
+                    }
+                }
+            );
+
+            const incomeData = gssData.children_by_income_era;
+            const incEras = [...new Set(incomeData.map(d => d.era))].sort();
+            const incQuartiles = [...new Set(incomeData.map(d => d.income_quartile))];
+            const incColors = [colors.red, colors.gold, colors.cyan, colors.green];
+            destroyChart('h2-gss');
+            globalData.charts['h2-gss'] = new Chart(
+                document.getElementById('h2-gss'),
+                {
+                    type: 'bar',
+                    data: {
+                        labels: incEras,
+                        datasets: incQuartiles.map((q, i) => ({
+                            label: q,
+                            data: incEras.map(era => {
+                                const row = incomeData.find(d => d.era === era && d.income_quartile === q);
+                                return row ? row.avg_children : null;
+                            }),
+                            backgroundColor: incColors[i % incColors.length]
+                        }))
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { x: { stacked: false }, y: { stacked: false } }
+                    }
+                }
+            );
+
+            populateRegressionTable('H2');
+            displayEvidenceBadge('H2');
+        }
+
+        // ==================== H3: FERTILITY TRAP ====================
+        function renderH3() {
+            const { panelData, modelResults, gssData } = globalData;
+            const h3 = modelResults.hypotheses.H3;
+
+            // Display trap summary stats from model results
+            const trapSummary = h3.trap_summary || {};
+            const nEntered = trapSummary.n_countries_entered || 0;
+            const nRecovered = trapSummary.n_recovered || 0;
+            const recoveryRate = trapSummary.recovery_rate || 0;
+
+            // Add summary stats to page
+            const h3Section = document.getElementById('h3');
+            const existingStats = h3Section.querySelector('.trap-stats');
+            if (!existingStats) {
+                const statsHtml = `
+                    <div class="trap-stats stat-grid" style="margin-bottom: 1.5rem;">
+                        <div class="stat-box">
+                            <div class="value">${nEntered}</div>
+                            <div class="label">Countries Entered TFR &lt; 1.5</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="value">${nRecovered}</div>
+                            <div class="label">Recovered to &gt; 1.7</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="value" style="color: var(--red);">${(100 - recoveryRate).toFixed(0)}%</div>
+                            <div class="label">Still Trapped</div>
+                        </div>
+                    </div>`;
+                const gridEl = h3Section.querySelector('.grid-2');
+                if (gridEl) gridEl.insertAdjacentHTML('beforebegin', statsHtml);
+            }
+
+            // trap_trajectories is a dict keyed by country code: {name, years: [], tfr: []}
+            const trapDict = panelData.trap_trajectories || {};
+            const trapEntries = Object.entries(trapDict).slice(0, 12);
+
+            const lineDatasets = trapEntries.map(([code, traj], idx) => ({
+                label: traj.name || code,
+                data: traj.years.map((yr, i) => ({ x: yr, y: traj.tfr[i] })),
+                borderColor: Object.values(regionColorMap)[idx % Object.values(regionColorMap).length],
+                fill: false,
+                tension: 0.4,
+                borderWidth: 2
+            }));
+
+            destroyChart('h3-traj');
+            globalData.charts['h3-traj'] = new Chart(
+                document.getElementById('h3-trajectories'),
+                {
+                    type: 'line',
+                    data: { datasets: lineDatasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' } },
+                        scales: {
+                            x: { type: 'linear', title: { display: true, text: 'Year' } },
+                            y: { title: { display: true, text: 'TFR' } }
+                        }
+                    }
+                }
+            );
+
+            const idealData = gssData.ideal_vs_actual_trend;
+            destroyChart('h3-gss');
+            globalData.charts['h3-gss'] = new Chart(
+                document.getElementById('h3-gss'),
+                {
+                    type: 'line',
+                    data: {
+                        labels: idealData.map(d => d.year),
+                        datasets: [
+                            { label: 'Ideal Children', data: idealData.map(d => d.avg_ideal), borderColor: colors.cyan, fill: false, tension: 0.4, borderWidth: 2 },
+                            { label: 'Actual Children', data: idealData.map(d => d.avg_actual), borderColor: colors.primary, fill: false, tension: 0.4, borderWidth: 2 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' } },
+                        scales: {
+                            y: { min: 1.5, max: 3 }
+                        }
+                    }
+                }
+            );
+
+            displayEvidenceBadge('H3');
+        }
+
+        // ==================== H4: SECULARIZATION ====================
+        function renderH4() {
+            const { panelData, modelResults, gssData } = globalData;
+            const h4 = modelResults.hypotheses.H4;
+
+            const mainCoef = h4.models[0]?.coefficients?.religiosity_index?.coef || 0;
+            document.getElementById('h4-key-stat').textContent = mainCoef.toFixed(4);
+
+            let scatterData = [];
+            Object.entries(panelData.countries).forEach(([code, country]) => {
+                country.data.forEach(d => {
+                    if (d.religiosity_index !== undefined && d.religiosity_index !== null) {
+                        scatterData.push({
+                            x: d.religiosity_index,
+                            y: d.tfr,
+                            region: country.region
+                        });
+                    }
+                });
+            });
+
+            const regionDatasets = Object.entries(regionColorMap).map(([region, color]) => ({
+                label: region,
+                data: scatterData.filter(d => d.region === region),
+                backgroundColor: color,
+                showLine: false,
+                pointRadius: 4
+            }));
+
+            destroyChart('h4-relig');
+            globalData.charts['h4-relig'] = new Chart(
+                document.getElementById('h4-religiosity'),
+                {
+                    type: 'scatter',
+                    data: { datasets: regionDatasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' } },
+                        scales: {
+                            x: { title: { display: true, text: 'Religiosity Index (0-100)' } },
+                            y: { title: { display: true, text: 'TFR' } }
+                        }
+                    }
+                }
+            );
+
+            const religData = gssData.children_by_religion_era;
+            const relEras = [...new Set(religData.map(d => d.era))].sort();
+            const religions = [...new Set(religData.map(d => d.religion))];
+            const relColors = [colors.gray, colors.cyan, colors.gold, colors.green, colors.purple];
+            destroyChart('h4-gss');
+            globalData.charts['h4-gss'] = new Chart(
+                document.getElementById('h4-gss'),
+                {
+                    type: 'bar',
+                    data: {
+                        labels: relEras,
+                        datasets: religions.map((rel, i) => ({
+                            label: rel,
+                            data: relEras.map(era => {
+                                const row = religData.find(d => d.era === era && d.religion === rel);
+                                return row ? row.avg_children : null;
+                            }),
+                            backgroundColor: relColors[i % relColors.length]
+                        }))
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { title: { display: true, text: 'Avg Children' } } }
+                    }
+                }
+            );
+
+            populateRegressionTable('H4');
+            displayEvidenceBadge('H4');
+        }
+
+        // ==================== H5: PARTNERSHIP ====================
+        function renderH5() {
+            const { panelData, modelResults, gssData } = globalData;
+            const h5 = modelResults.hypotheses.H5;
+
+            const mainCoef = h5.models[0].coefficients.urban_pct?.coef || 0;
+            document.getElementById('h5-key-stat').textContent = mainCoef.toFixed(4);
+
+            let scatterData = [];
+            Object.entries(panelData.countries).forEach(([code, country]) => {
+                country.data.forEach(d => {
+                    if (d.urban_pct !== undefined) {
+                        scatterData.push({
+                            x: d.urban_pct,
+                            y: d.tfr,
+                            region: country.region
+                        });
+                    }
+                });
+            });
+
+            const regionDatasets = Object.entries(regionColorMap).map(([region, color]) => ({
+                label: region,
+                data: scatterData.filter(d => d.region === region),
+                backgroundColor: color,
+                showLine: false,
+                pointRadius: 4
+            }));
+
+            destroyChart('h5-urban');
+            globalData.charts['h5-urban'] = new Chart(
+                document.getElementById('h5-urbanization'),
+                {
+                    type: 'scatter',
+                    data: { datasets: regionDatasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' } },
+                        scales: {
+                            x: { title: { display: true, text: 'Urban Population (%)' } },
+                            y: { title: { display: true, text: 'TFR' } }
+                        }
+                    }
+                }
+            );
+
+            // marital_distribution_trend: {year, marital_status, pct}
+            const maritalData = gssData.marital_distribution_trend;
+            const mYears = [...new Set(maritalData.map(d => d.year))].sort((a,b) => a - b);
+            const mStatuses = [...new Set(maritalData.map(d => d.marital_status))];
+            const mColors = [colors.green, colors.red, colors.cyan, colors.gold, colors.purple];
+            destroyChart('h5-gss');
+            globalData.charts['h5-gss'] = new Chart(
+                document.getElementById('h5-gss'),
+                {
+                    type: 'line',
+                    data: {
+                        labels: mYears,
+                        datasets: mStatuses.map((status, i) => ({
+                            label: status,
+                            data: mYears.map(yr => {
+                                const row = maritalData.find(d => d.year === yr && d.marital_status === status);
+                                return row ? row.pct : null;
+                            }),
+                            borderColor: mColors[i % mColors.length],
+                            fill: false,
+                            tension: 0.4,
+                            borderWidth: 2
+                        }))
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' } },
+                        scales: { y: { title: { display: true, text: '% of GSS Respondents' } } }
+                    }
+                }
+            );
+
+            populateRegressionTable('H5');
+            displayEvidenceBadge('H5');
+        }
+
+        // ==================== H6: UNCERTAINTY ====================
+        function renderH6() {
+            const { panelData, modelResults, gssData } = globalData;
+            const h6 = modelResults.hypotheses.H6;
+
+            const mainCoef = h6.models[0].coefficients.global_epu?.coef || 0;
+            document.getElementById('h6-key-stat').textContent = mainCoef.toFixed(4);
+
+            // Extract actual global_epu from country data (it's the same across all countries per year)
+            // since overview.global_trend doesn't contain global_epu
+            const epuByYear = {};
+            Object.values(panelData.countries).forEach(country => {
+                if (country.data) {
+                    country.data.forEach(d => {
+                        if (d.global_epu && !epuByYear[d.year]) {
+                            epuByYear[d.year] = d.global_epu;
+                        }
+                    });
+                }
+            });
+            const overview_h6 = panelData.overview;
+            const epuData = overview_h6.global_trend.map(d => ({
+                year: d.year,
+                epu: epuByYear[d.year] || 0,
+                tfr: d.global_tfr_weighted || d.tfr || 0
+            }));
+
+            destroyChart('h6-epu');
+            globalData.charts['h6-epu'] = new Chart(
+                document.getElementById('h6-epu'),
+                {
+                    type: 'line',
+                    data: {
+                        labels: epuData.map(d => d.year),
+                        datasets: [
+                            { label: 'Global EPU', data: epuData.map(d => d.epu), borderColor: colors.red, fill: false, tension: 0.4, borderWidth: 2, yAxisID: 'y1' },
+                            { label: 'Global TFR', data: epuData.map(d => d.tfr), borderColor: colors.cyan, fill: false, tension: 0.4, borderWidth: 2, yAxisID: 'y' }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' } },
+                        scales: {
+                            y: { title: { display: true, text: 'TFR' }, position: 'left' },
+                            y1: { title: { display: true, text: 'EPU Index' }, position: 'right' }
+                        }
+                    }
+                }
+            );
+
+            // children_by_happiness_era: {era, happiness, avg_children}
+            const happyData = gssData.children_by_happiness_era;
+            const hEras = [...new Set(happyData.map(d => d.era))].sort();
+            const hLevels = [...new Set(happyData.map(d => d.happiness))];
+            const hColors = [colors.green, colors.cyan, colors.red, colors.gold];
+            destroyChart('h6-gss');
+            globalData.charts['h6-gss'] = new Chart(
+                document.getElementById('h6-gss'),
+                {
+                    type: 'bar',
+                    data: {
+                        labels: hEras,
+                        datasets: hLevels.map((level, i) => ({
+                            label: level,
+                            data: hEras.map(era => {
+                                const row = happyData.find(d => d.era === era && d.happiness === level);
+                                return row ? row.avg_children : null;
+                            }),
+                            backgroundColor: hColors[i % hColors.length]
+                        }))
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { title: { display: true, text: 'Avg Children' } } }
+                    }
+                }
+            );
+
+            populateRegressionTable('H6');
+            displayEvidenceBadge('H6');
+        }
+
+        // ==================== H7: J-CURVE ====================
+        function renderH7() {
+            const { panelData, modelResults } = globalData;
+            const h7 = modelResults.hypotheses.H7;
+
+            document.getElementById('h7-key-stat').textContent = 'HDI > 0.85';
+
+            let scatterData = [];
+            Object.entries(panelData.countries).forEach(([code, country]) => {
+                country.data.forEach(d => {
+                    if (d.hdi !== undefined) {
+                        scatterData.push({
+                            x: d.hdi,
+                            y: d.tfr,
+                            region: country.region
+                        });
+                    }
+                });
+            });
+
+            const regionDatasets = Object.entries(regionColorMap).map(([region, color]) => ({
+                label: region,
+                data: scatterData.filter(d => d.region === region),
+                backgroundColor: color,
+                showLine: false,
+                pointRadius: 4
+            }));
+
+            destroyChart('h7-jcurve');
+            globalData.charts['h7-jcurve'] = new Chart(
+                document.getElementById('h7-jcurve'),
+                {
+                    type: 'scatter',
+                    data: { datasets: regionDatasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' } },
+                        scales: {
+                            x: { title: { display: true, text: 'HDI' } },
+                            y: { title: { display: true, text: 'TFR' } }
+                        }
+                    }
+                }
+            );
+
+            populateRegressionTable('H7');
+            displayEvidenceBadge('H7');
+        }
+
+        // ==================== H8: POLICY ====================
+        function renderH8() {
+            const { panelData, modelResults } = globalData;
+            const h8 = modelResults.hypotheses.H8;
+
+            const mainCoef = h8.models[0].coefficients.family_spending?.coef || 0;
+            document.getElementById('h8-key-stat').textContent = mainCoef.toFixed(4);
+
+            let scatterData = [];
+            Object.entries(panelData.countries).forEach(([code, country]) => {
+                country.data.forEach(d => {
+                    if (d.family_spending !== undefined) {
+                        scatterData.push({
+                            x: d.family_spending,
+                            y: d.tfr,
+                            region: country.region
+                        });
+                    }
+                });
+            });
+
+            const regionDatasets = Object.entries(regionColorMap).map(([region, color]) => ({
+                label: region,
+                data: scatterData.filter(d => d.region === region),
+                backgroundColor: color,
+                showLine: false,
+                pointRadius: 4
+            }));
+
+            destroyChart('h8-policy');
+            globalData.charts['h8-policy'] = new Chart(
+                document.getElementById('h8-policy'),
+                {
+                    type: 'scatter',
+                    data: { datasets: regionDatasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' } },
+                        scales: {
+                            x: { title: { display: true, text: 'Family Spending (% GDP)' } },
+                            y: { title: { display: true, text: 'TFR' } }
+                        }
+                    }
+                }
+            );
+
+            populateRegressionTable('H8');
+            displayEvidenceBadge('H8');
+        }
+
+        // ==================== H9: SMARTPHONES ====================
+        function renderH9() {
+            const { panelData, modelResults } = globalData;
+            const h9 = modelResults.hypotheses.H9;
+
+            document.getElementById('h9-key-stat').textContent = '-0.15';
+
+            // Extract average internet penetration from country data by year
+            const internetByYear = {};
+            const countsByYear = {};
+            Object.values(panelData.countries).forEach(country => {
+                if (country.data) {
+                    country.data.forEach(d => {
+                        if (d.internet_pct !== undefined && d.internet_pct !== null) {
+                            if (!internetByYear[d.year]) { internetByYear[d.year] = 0; countsByYear[d.year] = 0; }
+                            internetByYear[d.year] += d.internet_pct;
+                            countsByYear[d.year]++;
+                        }
+                    });
+                }
+            });
+            const overview_h9 = panelData.overview;
+            const smartData = overview_h9.global_trend.map(d => ({
+                year: d.year,
+                internet_pct: countsByYear[d.year] ? (internetByYear[d.year] / countsByYear[d.year]) : 0,
+                tfr: d.global_tfr_weighted || d.tfr || 0
+            }));
+
+            destroyChart('h9-smart');
+            globalData.charts['h9-smart'] = new Chart(
+                document.getElementById('h9-smartphones'),
+                {
+                    type: 'line',
+                    data: {
+                        labels: smartData.map(d => d.year),
+                        datasets: [
+                            { label: 'Internet Penetration (%)', data: smartData.map(d => d.internet_pct), borderColor: colors.orange, fill: false, tension: 0.4, borderWidth: 2, yAxisID: 'y1' },
+                            { label: 'Global TFR', data: smartData.map(d => d.tfr), borderColor: colors.cyan, fill: false, tension: 0.4, borderWidth: 2, yAxisID: 'y' }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' } },
+                        scales: {
+                            y: { title: { display: true, text: 'TFR' }, position: 'left' },
+                            y1: { title: { display: true, text: 'Internet Penetration (%)' }, position: 'right' }
+                        }
+                    }
+                }
+            );
+
+            populateRegressionTable('H9');
+            displayEvidenceBadge('H9');
+        }
+
+        // ==================== ML TAB ====================
+        function renderMLTab() {
+            const { modelResults } = globalData;
+            const ml = modelResults.random_forest;
+
+            document.getElementById('ml-cv-r2').textContent = ml.cv_r_squared.toFixed(3);
+            document.getElementById('ml-n-features').textContent = ml.features.length;
+
+            const mdiData = Object.entries(ml.mdi_importance)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+
+            destroyChart('ml-mdi');
+            globalData.charts['ml-mdi'] = new Chart(
+                document.getElementById('ml-mdi'),
+                {
+                    type: 'bar',
+                    data: {
+                        labels: mdiData.map(d => d[0]),
+                        datasets: [{
+                            label: 'Importance',
+                            data: mdiData.map(d => d[1]),
+                            backgroundColor: colors.cyan
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } }
+                    }
+                }
+            );
+
+            const permData = Object.entries(ml.permutation_importance)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+
+            destroyChart('ml-perm');
+            globalData.charts['ml-perm'] = new Chart(
+                document.getElementById('ml-permutation'),
+                {
+                    type: 'bar',
+                    data: {
+                        labels: permData.map(d => d[0]),
+                        datasets: [{
+                            label: 'Importance',
+                            data: permData.map(d => d[1]),
+                            backgroundColor: colors.green
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } }
+                    }
+                }
+            );
+
+            // Setup PDP selector
+            const pdpSelector = document.getElementById('ml-pdp-selector');
+            if (pdpSelector) {
+                pdpSelector.addEventListener('change', (e) => {
+                    renderPDP(e.target.value);
+                });
+                // Render initial PDP
+                renderPDP('female_lfp');
+            }
+        }
+
+        function renderPDP(variable) {
+            const { modelResults } = globalData;
+            const pdp = modelResults.random_forest.partial_dependence[variable];
+
+            if (!pdp) {
+                console.warn(`No PDP data for ${variable}`);
+                return;
+            }
+
+            destroyChart('ml-pdp');
+            globalData.charts['ml-pdp'] = new Chart(
+                document.getElementById('ml-pdp'),
+                {
+                    type: 'line',
+                    data: {
+                        labels: pdp.grid,
+                        datasets: [{
+                            label: `Predicted TFR | ${variable}`,
+                            data: pdp.predictions,
+                            borderColor: colors.primary,
+                            backgroundColor: 'rgba(233, 69, 96, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { title: { display: true, text: variable } },
+                            y: { title: { display: true, text: 'Predicted TFR' } }
+                        }
+                    }
+                }
+            );
+        }
+
+        // ==================== PROJECTIONS TAB ====================
+        function populateProjectionCountries() {
+            const { panelData } = globalData;
+            const select = document.getElementById('proj-country');
+
+            const countries = Object.entries(panelData.countries)
+                .map(([code, country]) => ({ code, name: country.name }))
+                .sort((a, b) => a.name.localeCompare(b.name));
+
+            countries.forEach(({ code, name }) => {
+                const option = document.createElement('option');
+                option.value = code;
+                option.textContent = name;
+                select.appendChild(option);
+            });
+
+            select.addEventListener('change', (e) => {
+                const code = e.target.value;
+                if (code) {
+                    updateProjection(code);
+                    updateProjectionChart(code);
                 }
             });
         }
 
-        // Update heatmap
-        function updateHeatmap() {
-            const regionFilter = document.getElementById('analysisRegion').value;
-            const data = regionFilter ? 
-                allData.filter(d => d.region === regionFilter) : 
-                allData;
+        function updateProjection(countryCode) {
+            const { panelData, modelResults } = globalData;
+            const country = panelData.countries[countryCode];
+            if (!country || !country.data || country.data.length === 0) return;
 
-            const regions = [...new Set(data.map(d => d.region))];
-            const years = [...new Set(data.map(d => d.year))].sort((a, b) => a - b);
+            const latest = country.data[country.data.length - 1];
+            const projParams = modelResults.projection_params;
 
-            const heatmapDiv = document.getElementById('heatmap');
-            heatmapDiv.innerHTML = '';
-            heatmapDiv.style.gridTemplateColumns = `repeat(${Math.min(years.length, 8)}, 1fr)`;
+            document.getElementById('proj-country-name').textContent = `${country.name} - Projection to 2050`;
+            document.getElementById('proj-2024-tfr').textContent = latest.tfr.toFixed(2);
 
-            const maxTFR = Math.max(...data.map(d => d.tfr));
+            const slidersContainer = document.getElementById('projection-sliders');
+            slidersContainer.innerHTML = '';
 
-            years.slice(-8).forEach(year => {
-                regions.forEach(region => {
-                    const regionData = data.filter(d => d.year === year && d.region === region);
-                    const avgTFR = regionData.length > 0 ? 
-                        regionData.reduce((sum, d) => sum + d.tfr, 0) / regionData.length : 0;
+            const variables = ['female_lfp', 'gdp_pc', 'hdi', 'urban_pct'];
+            variables.forEach(varName => {
+                const currentVal = latest[varName] || 0;
+                const range = projParams.variable_ranges[varName] || [0, 100];
 
-                    const colorIndex = Math.round((avgTFR / maxTFR) * 9);
-                    const cell = document.createElement('div');
-                    cell.className = `heatmap-cell heatmap-${colorIndex}`;
-                    cell.textContent = `${region.substring(0, 8)} ${year}\n${avgTFR.toFixed(1)}`;
-                    cell.title = `${region} - ${year}: ${avgTFR.toFixed(2)}`;
-                    heatmapDiv.appendChild(cell);
+                // Use global range, not derived from currentVal
+                const minVal = range[0];
+                const maxVal = range[1];
+                const step = (maxVal - minVal) / 100;
+
+                const group = document.createElement('div');
+                group.className = 'slider-group';
+                group.innerHTML = `
+                    <label>${varName}</label>
+                    <div class="slider-row">
+                        <input type="range" class="projection-slider" data-var="${varName}"
+                               min="${minVal}" max="${maxVal}" step="${step}" value="${currentVal}">
+                        <span class="slider-value">${currentVal.toFixed(2)}</span>
+                    </div>
+                    <button class="slider-reset" data-var="${varName}">Reset</button>
+                `;
+                slidersContainer.appendChild(group);
+
+                const slider = group.querySelector('input[type="range"]');
+                const valueSpan = group.querySelector('.slider-value');
+                const resetBtn = group.querySelector('.slider-reset');
+
+                slider.addEventListener('input', (e) => {
+                    valueSpan.textContent = e.target.value;
+                    updateProjectionChart(countryCode);
+                });
+
+                resetBtn.addEventListener('click', () => {
+                    slider.value = currentVal;
+                    valueSpan.textContent = currentVal.toFixed(2);
+                    updateProjectionChart(countryCode);
                 });
             });
         }
 
-        // Error display
-        function showError(message) {
-            const container = document.querySelector('.container');
-            container.innerHTML = `<div class="info-box"><h4>Error</h4><p>${message}</p></div>`;
+        function updateProjectionChart(countryCode) {
+            const { panelData, modelResults } = globalData;
+            const country = panelData.countries[countryCode];
+            const latest = country.data[country.data.length - 1];
+            const projParams = modelResults.projection_params;
+
+            const sliderValues = {};
+            document.querySelectorAll('.projection-slider').forEach(slider => {
+                sliderValues[slider.dataset.var] = parseFloat(slider.value);
+            });
+
+            const historicalData = country.data.map(d => ({ year: d.year, tfr: d.tfr }));
+
+            const coef = projParams.coefficients;
+            let tfrBase = latest.tfr;
+            Object.entries(sliderValues).forEach(([varName, val]) => {
+                tfrBase += (coef[varName] || 0) * val;
+            });
+
+            const projectedTfr = Math.max(0.5, tfrBase);
+
+            const projData = [
+                { year: 2024, tfr: latest.tfr, upper: latest.tfr, lower: latest.tfr },
+                { year: 2035, tfr: (latest.tfr + projectedTfr) / 2, upper: (latest.tfr + projectedTfr) / 2 + 0.5, lower: (latest.tfr + projectedTfr) / 2 - 0.5 },
+                { year: 2050, tfr: projectedTfr, upper: projectedTfr + 1.96 * projParams.residual_std, lower: Math.max(0.5, projectedTfr - 1.96 * projParams.residual_std) }
+            ];
+
+            document.getElementById('proj-2035-tfr').textContent = ((latest.tfr + projectedTfr) / 2).toFixed(2);
+            document.getElementById('proj-2050-tfr').textContent = projectedTfr.toFixed(2);
+
+            destroyChart('proj-traj');
+            globalData.charts['proj-traj'] = new Chart(
+                document.getElementById('proj-trajectory'),
+                {
+                    type: 'line',
+                    data: {
+                        labels: [...historicalData.map(d => d.year), ...projData.map(d => d.year)],
+                        datasets: [
+                            {
+                                label: 'Historical',
+                                data: [...historicalData.map(d => d.tfr), null, null, null],
+                                borderColor: colors.cyan,
+                                fill: false,
+                                tension: 0.4,
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'Projection',
+                                data: [...Array(historicalData.length).fill(null), ...projData.map(d => d.tfr)],
+                                borderColor: colors.primary,
+                                fill: false,
+                                tension: 0.4,
+                                borderWidth: 2,
+                                borderDash: [5, 5]
+                            },
+                            {
+                                label: '95% CI',
+                                data: [...Array(historicalData.length).fill(null), ...projData.map(d => d.upper)],
+                                borderColor: colors.red,
+                                fill: '-1',
+                                backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                                borderWidth: 1,
+                                borderDash: [2, 2],
+                                pointRadius: 0
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' } },
+                        scales: {
+                            x: { title: { display: true, text: 'Year' } },
+                            y: { title: { display: true, text: 'TFR' } }
+                        }
+                    }
+                }
+            );
         }
 
         // ==================== START ====================
