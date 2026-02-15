@@ -4345,5 +4345,31 @@
       }
     },
     "note": "Projection uses entity FE only (not two-way FE) since we are projecting forward and year effects are not available for future years. This is a simple linear sensitivity analysis, not a forecast."
+  },
+  "variable_labels": {
+    "female_lfp": "Female Labor Force Participation (%)",
+    "female_edu_secondary": "Female Secondary Education Enrollment (%)",
+    "urban_pct": "Urbanization Rate (%)",
+    "log_gdp_pc": "Log GDP per Capita",
+    "gdp_pc": "GDP per Capita (current USD)",
+    "internet_pct": "Internet Users (% of population)",
+    "mobile_per100": "Mobile Subscriptions per 100 people",
+    "inflation_vol": "Inflation Volatility",
+    "global_epu": "Global Economic Policy Uncertainty Index",
+    "epu_country": "Country-level EPU Index",
+    "epu_volatility": "EPU Volatility",
+    "housing_cost_proxy": "Housing Cost Proxy (Price-to-Income)",
+    "family_spending_gdp_pct": "Family Policy Spending (% of GDP)",
+    "family_spending_sq": "Family Spending Squared",
+    "parental_leave_weeks": "Parental Leave (weeks)",
+    "religiosity_index": "Religiosity Index (0-100)",
+    "life_satisfaction": "Life Satisfaction Score",
+    "consumer_confidence": "Consumer Confidence Index",
+    "hdi_proxy": "Human Development Index Proxy",
+    "post_smartphone": "Post-Smartphone Era (2010+)",
+    "internet_x_post_smart": "Internet \u00d7 Post-Smartphone Interaction",
+    "tfr": "Total Fertility Rate",
+    "tfr_change": "Year-over-Year TFR Change",
+    "below_1_5": "Below 1.5 TFR (binary)"
   }
 }
