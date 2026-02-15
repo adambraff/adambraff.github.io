@@ -707,20 +707,16 @@
                     <select id="demo-dimension">
                         <option value="education">Education</option>
                         <option value="religion">Religion</option>
-                        <option value="race">Race</option>
                         <option value="marital">Marital Status</option>
+                        <option value="income">Income</option>
                         <option value="party">Political Party</option>
-                        <option value="region">Region</option>
-                        <option value="sex">Sex</option>
-                        <option value="employment">Employment</option>
-                        <option value="age">Age</option>
+                        <option value="happiness">Happiness</option>
                     </select>
                 </div>
                 <div class="control-item">
                     <label for="demo-metric">Select Metric:</label>
                     <select id="demo-metric">
                         <option value="actual">Actual Children</option>
-                        <option value="ideal">Ideal Children</option>
                     </select>
                 </div>
             </div>
@@ -762,20 +758,12 @@
                 <canvas id="gap-over-time-chart"></canvas>
             </div>
 
-            <div class="card">
+            <div class="card" id="gap-heatmap-section" style="display:none;">
                 <h3 style="margin-bottom: 1rem;">Desire Gap Heatmap (by Demographic & Decade)</h3>
                 <div class="control-item" style="margin-bottom: 1rem;">
                     <label for="gap-heatmap-dimension">Dimension:</label>
                     <select id="gap-heatmap-dimension">
                         <option value="education">Education</option>
-                        <option value="religion">Religion</option>
-                        <option value="race">Race</option>
-                        <option value="marital">Marital Status</option>
-                        <option value="party">Political Party</option>
-                        <option value="region">Region</option>
-                        <option value="sex">Sex</option>
-                        <option value="employment">Employment</option>
-                        <option value="age">Age</option>
                     </select>
                 </div>
                 <table class="heatmap-table" id="gap-heatmap-table">
@@ -1594,20 +1582,30 @@
             const metricSelect = document.getElementById('demo-metric');
             const gapHeatmapSelect = document.getElementById('gap-heatmap-dimension');
 
+            // Mapping from dropdown value to actual GSS table key and group field name
+            const dimMapping = {
+                education:  { table: 'children_by_edu_era',       field: 'education' },
+                religion:   { table: 'children_by_religion_era',  field: 'religion' },
+                marital:    { table: 'children_by_marital_era',   field: 'marital_status' },
+                income:     { table: 'children_by_income_era',    field: 'income_quartile' },
+                party:      { table: 'children_by_party_era',     field: 'party' },
+                happiness:  { table: 'children_by_happiness_era', field: 'happiness' }
+            };
+
             function renderDemographicsTrend() {
                 const dim = demoSelect.value;
-                const metric = metricSelect.value;
-                const tableName = `demographics_${dim}`;
-                const data = gss?.[tableName] || [];
+                const mapping = dimMapping[dim];
+                if (!mapping) return;
+
+                const data = gss?.[mapping.table] || [];
+                const groupField = mapping.field;
 
                 const eras = [...new Set(data.map(d => d.era))].sort();
-                const groups = [...new Set(data.map(d => d.group))];
-
-                const metricField = metric === 'actual' ? 'avg_children' : 'avg_ideal';
+                const groups = [...new Set(data.map(d => d[groupField]))];
 
                 const datasets = groups.map((group, idx) => ({
                     label: group,
-                    data: eras.map(era => data.find(d => d.era === era && d.group === group)?.[metricField] || 0),
+                    data: eras.map(era => data.find(d => d.era === era && d[groupField] === group)?.avg_children || 0),
                     borderColor: ['#6c8cff', '#ff9d4d', '#4ae04a', '#9d8fff', '#ff5555', '#00d9ff', '#fbbf24', '#e94560', '#53d8fb'][idx % 9],
                     borderWidth: 2,
                     fill: false,
@@ -1630,8 +1628,8 @@
                 const earliestEra = eras[0];
 
                 const changeData = groups.map(group => {
-                    const latest = data.find(d => d.era === latestEra && d.group === group)?.[metricField] || 0;
-                    const earliest = data.find(d => d.era === earliestEra && d.group === group)?.[metricField] || 0;
+                    const latest = data.find(d => d.era === latestEra && d[groupField] === group)?.avg_children || 0;
+                    const earliest = data.find(d => d.era === earliestEra && d[groupField] === group)?.avg_children || 0;
                     return latest - earliest;
                 });
 
@@ -1685,101 +1683,73 @@
                 }
             });
 
-            function renderGapHeatmap() {
-                const dim = gapHeatmapSelect.value;
-                const tableName = `gap_heatmap_${dim}`;
-                const data = gss?.[tableName] || [];
-
-                const groups = [...new Set(data.map(d => d.group))];
-                const decades = [...new Set(data.map(d => d.decade))].sort();
-
-                const thead = document.getElementById('gap-heatmap-thead');
-                // FIX: decade is already a string like "1972-79", don't append "s"
-                thead.innerHTML = `<tr><th>Group</th>${decades.map(d => `<th>${d}</th>`).join('')}</tr>`;
-
-                const tbody = document.getElementById('gap-heatmap-tbody');
-                tbody.innerHTML = '';
-
-                const values = data.map(d => d.avg_gap);
-                const minVal = Math.min(...values);
-                const maxVal = Math.max(...values);
-
-                groups.forEach(group => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `<td style="font-weight: 600; color: var(--blue);">${group}</td>`;
-
-                    decades.forEach(decade => {
-                        const cell = document.createElement('td');
-                        const val = data.find(d => d.group === group && d.decade === decade)?.avg_gap || 0;
-                        const color = getColorForValue(val, minVal, maxVal);
-                        cell.textContent = val.toFixed(2);
-                        cell.style.backgroundColor = color;
-                        cell.className = 'heatmap-cell';
-                        row.appendChild(cell);
-                    });
-
-                    tbody.appendChild(row);
-                });
+            // Gap heatmap data not available in current dataset — section hidden
+            function renderGapHeatmap() {}
+            if (gapHeatmapSelect) {
+                gapHeatmapSelect.addEventListener('change', renderGapHeatmap);
             }
 
-            gapHeatmapSelect.addEventListener('change', renderGapHeatmap);
-            renderGapHeatmap();
-
-            const cohortData = gss?.cohort_curves || [];
+            // Cohort curves not available in current dataset — show completed fertility trend instead
+            const completedTrendData = gss?.completed_fertility_trend || [];
             destroyChart('cohort-curves-chart');
             const ctx2 = document.getElementById('cohort-curves-chart').getContext('2d');
-
-            const datasets2 = cohortData.map((cohort, idx) => ({
-                label: cohort.cohort,
-                data: cohort.points.map(p => ({ x: p.age_bin, y: p.avg_children })),
-                borderColor: `hsl(${idx * 360 / cohortData.length}, 70%, 50%)`,
-                borderWidth: 2,
-                fill: false,
-                tension: 0.4,
-                showLine: true
-            }));
-
             globalData.charts['cohort-curves-chart'] = new Chart(ctx2, {
-                type: 'scatter',
-                data: { datasets: datasets2 },
+                type: 'line',
+                data: {
+                    labels: completedTrendData.map(d => d.year),
+                    datasets: [{
+                        label: 'Completed Fertility (age 45+)',
+                        data: completedTrendData.map(d => d.completed_fertility),
+                        borderColor: '#6c8cff',
+                        backgroundColor: 'rgba(108, 140, 255, 0.05)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: true }, title: { display: true, text: 'Cumulative Fertility by Birth Cohort' } }
+                    plugins: { legend: { display: false }, title: { display: true, text: 'Completed Fertility Over Time (GSS, age 45+)' } }
                 }
             });
 
-            // FIX: key is completed_fertility, not completed_fertility_by_cohort
-            const completedData = gss?.completed_fertility || [];
+            // Completed fertility bar chart — same data but grouped by decade
+            const decadeMap = {};
+            completedTrendData.forEach(d => {
+                const decade = Math.floor(d.year / 10) * 10 + 's';
+                if (!decadeMap[decade]) decadeMap[decade] = { sum: 0, count: 0 };
+                decadeMap[decade].sum += d.completed_fertility;
+                decadeMap[decade].count++;
+            });
+            const decadeLabels = Object.keys(decadeMap).sort();
+            const decadeAvgs = decadeLabels.map(d => decadeMap[d].sum / decadeMap[d].count);
+
             destroyChart('completed-fertility-chart');
             const ctx3 = document.getElementById('completed-fertility-chart').getContext('2d');
             globalData.charts['completed-fertility-chart'] = new Chart(ctx3, {
                 type: 'bar',
                 data: {
-                    labels: completedData.map(d => d.cohort),
-                    datasets: [{ label: 'Completed Fertility (age 45+)', data: completedData.map(d => d.avg_children), backgroundColor: '#6c8cff' }]
+                    labels: decadeLabels,
+                    datasets: [{ label: 'Avg Completed Fertility', data: decadeAvgs, backgroundColor: '#6c8cff' }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, title: { display: true, text: 'Completed Fertility by Cohort' } }
+                    plugins: { legend: { display: false }, title: { display: true, text: 'Completed Fertility by Decade (GSS)' } }
                 }
             });
 
-            // FIX: key is childlessness_by_cohort, field is childless_pct (already %), not pct * 100
-            const childlessData = gss?.childlessness_by_cohort || [];
+            // Childlessness data not available — show placeholder message
             destroyChart('childlessness-rate-chart');
             const ctx4 = document.getElementById('childlessness-rate-chart').getContext('2d');
             globalData.charts['childlessness-rate-chart'] = new Chart(ctx4, {
                 type: 'bar',
-                data: {
-                    labels: childlessData.map(d => d.cohort),
-                    datasets: [{ label: 'Childlessness Rate (%)', data: childlessData.map(d => d.childless_pct), backgroundColor: '#ff5555' }]
-                },
+                data: { labels: ['Data not available'], datasets: [{ data: [0], backgroundColor: '#333' }] },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, title: { display: true, text: 'Childlessness Rate by Cohort' } }
+                    plugins: { legend: { display: false }, title: { display: true, text: 'Childlessness Rate (data pending)' } }
                 }
             });
         }
@@ -1789,72 +1759,87 @@
             const model = globalData.modelResults;
             const gss = globalData.gssSummary;
 
-            // FIX: coefs is an array of {name, label, beta}, not a key-value object
-            const gssCoefs = gss?.regression?.overall?.coefs || [];
-            document.getElementById('pred-n').textContent = (gss?.regression?.overall?.n || 75699).toLocaleString();
-            // FIX: field is r2, not r_squared
-            document.getElementById('pred-r2').textContent = (gss?.regression?.overall?.r2 || 0).toFixed(3);
+            // GSS regression data may not be available
+            const gssRegression = gss?.regression;
+            const gssCoefs = gssRegression?.overall?.coefs || [];
+            const predNEl = document.getElementById('pred-n');
+            const predR2El = document.getElementById('pred-r2');
+            if (predNEl) predNEl.textContent = gssRegression ? (gssRegression.overall?.n || 0).toLocaleString() : 'N/A';
+            if (predR2El) predR2El.textContent = gssRegression ? (gssRegression.overall?.r2 || 0).toFixed(3) : 'N/A';
 
             destroyChart('coefficients-chart');
             const ctx1 = document.getElementById('coefficients-chart').getContext('2d');
 
-            // coefs is [{name, label, beta}, ...]
-            const coefEntries = [...gssCoefs]
-                .sort((a, b) => Math.abs(b.beta) - Math.abs(a.beta))
-                .slice(0, 15);
+            if (gssCoefs.length > 0) {
+                const coefEntries = [...gssCoefs]
+                    .sort((a, b) => Math.abs(b.beta) - Math.abs(a.beta))
+                    .slice(0, 15);
 
-            globalData.charts['coefficients-chart'] = new Chart(ctx1, {
-                type: 'bar',
-                data: {
-                    labels: coefEntries.map(e => e.label || e.name),
-                    datasets: [{
-                        label: 'Standardized Coefficient',
-                        data: coefEntries.map(e => e.beta),
-                        backgroundColor: coefEntries.map(e => e.beta >= 0 ? '#4ae04a' : '#ff5555')
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, title: { display: true, text: 'GSS OLS Standardized Coefficients' } }
-                }
-            });
+                globalData.charts['coefficients-chart'] = new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: coefEntries.map(e => e.label || e.name),
+                        datasets: [{
+                            label: 'Standardized Coefficient',
+                            data: coefEntries.map(e => e.beta),
+                            backgroundColor: coefEntries.map(e => e.beta >= 0 ? '#4ae04a' : '#ff5555')
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, title: { display: true, text: 'GSS OLS Standardized Coefficients' } }
+                    }
+                });
+            } else {
+                globalData.charts['coefficients-chart'] = new Chart(ctx1, {
+                    type: 'bar',
+                    data: { labels: ['GSS regression data not available'], datasets: [{ data: [0], backgroundColor: '#333' }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'GSS OLS Coefficients (data pending)' } } }
+                });
+            }
 
-            // FIX: by_decade structure is {era: {coefs: [{name, beta}], r2, n}}
-            const decadeTrends = gss?.regression?.by_decade || {};
+            const decadeTrends = gssRegression?.by_decade || {};
             destroyChart('decade-trends-chart');
             const ctx2 = document.getElementById('decade-trends-chart').getContext('2d');
 
-            // Get top 5 variables by absolute beta from overall
-            const topVars = [...gssCoefs]
-                .sort((a, b) => Math.abs(b.beta) - Math.abs(a.beta))
-                .slice(0, 5);
-
             const decades = Object.keys(decadeTrends).sort();
 
-            const datasets2 = topVars.map((v, idx) => ({
-                label: v.label || v.name,
-                data: decades.map(d => {
-                    const decadeCoefs = decadeTrends[d]?.coefs || [];
-                    const match = decadeCoefs.find(c => c.name === v.name);
-                    return match?.beta || 0;
-                }),
-                borderColor: ['#6c8cff', '#ff9d4d', '#4ae04a', '#9d8fff', '#ff5555'][idx % 5],
-                borderWidth: 2,
-                fill: false,
-                tension: 0.4
-            }));
+            if (gssCoefs.length > 0 && decades.length > 0) {
+                const topVars = [...gssCoefs]
+                    .sort((a, b) => Math.abs(b.beta) - Math.abs(a.beta))
+                    .slice(0, 5);
 
-            globalData.charts['decade-trends-chart'] = new Chart(ctx2, {
-                type: 'line',
-                data: { labels: decades, datasets: datasets2 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: true }, title: { display: true, text: 'How Predictor Effects Changed Over Decades' } }
-                }
-            });
+                const datasets2 = topVars.map((v, idx) => ({
+                    label: v.label || v.name,
+                    data: decades.map(d => {
+                        const decadeCoefs = decadeTrends[d]?.coefs || [];
+                        const match = decadeCoefs.find(c => c.name === v.name);
+                        return match?.beta || 0;
+                    }),
+                    borderColor: ['#6c8cff', '#ff9d4d', '#4ae04a', '#9d8fff', '#ff5555'][idx % 5],
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.4
+                }));
+
+                globalData.charts['decade-trends-chart'] = new Chart(ctx2, {
+                    type: 'line',
+                    data: { labels: decades, datasets: datasets2 },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: true }, title: { display: true, text: 'How Predictor Effects Changed Over Decades' } }
+                    }
+                });
+            } else {
+                globalData.charts['decade-trends-chart'] = new Chart(ctx2, {
+                    type: 'bar',
+                    data: { labels: ['Decade trend data not available'], datasets: [{ data: [0], backgroundColor: '#333' }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'Decade Trends (data pending)' } } }
+                });
+            }
 
             // FIX: model uses random_forest, not ml_model
             const rf = model?.random_forest || {};
@@ -1917,7 +1902,10 @@
 
             function renderPDP() {
                 const selectedVar = pdpSelect.value;
-                const pdpPoints = pdpData[selectedVar] || [];
+                const pdpObj = pdpData[selectedVar] || {};
+                // PDP data is {grid: [...], predictions: [...]}
+                const gridVals = pdpObj.grid || [];
+                const predVals = pdpObj.predictions || [];
 
                 destroyChart('pdp-chart');
                 const ctx = document.getElementById('pdp-chart').getContext('2d');
@@ -1925,10 +1913,10 @@
                 globalData.charts['pdp-chart'] = new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: pdpPoints.map(p => typeof p.value === 'number' ? p.value.toFixed(1) : p.value),
+                        labels: gridVals.map(v => typeof v === 'number' ? v.toFixed(1) : v),
                         datasets: [{
                             label: getVariableLabel(selectedVar),
-                            data: pdpPoints.map(p => p.predicted_tfr),
+                            data: predVals,
                             borderColor: '#6c8cff',
                             backgroundColor: 'rgba(108, 140, 255, 0.05)',
                             borderWidth: 2,
