@@ -2,7 +2,7 @@
   "hypotheses": {
     "H1": {
       "title": "Opportunity Cost of Motherhood",
-      "theory": "Female education and labor force participation raise the career penalty of children, reducing TFR. But the relationship may be nonlinear — at high gender equity, the effect partially reverses.",
+      "theory": "Female education and labor force participation raise the career penalty of children, reducing TFR. But the relationship may be nonlinear \u2014 at high gender equity, the effect partially reverses.",
       "models": [
         {
           "name": "H1a: Education + LFP (two-way FE)",
@@ -63,25 +63,25 @@
             },
             "female_lfp": {
               "coef": -0.032368,
-              "se": 0.009275,
+              "se": 0.007126,
               "pvalue": 0.0,
               "sig": "***"
             },
-            "female_lfp_squared": {
-              "coef": 0.000203,
-              "se": 0.000058,
+            "lfp_squared": {
+              "coef": 0.000429,
+              "se": 7.2e-05,
               "pvalue": 0.0,
               "sig": "***"
             },
             "urban_pct": {
-              "coef": -0.021104,
-              "se": 0.001945,
+              "coef": -0.019489,
+              "se": 0.002047,
               "pvalue": 0.0,
               "sig": "***"
             },
             "log_gdp_pc": {
-              "coef": 0.270346,
-              "se": 0.036199,
+              "coef": 0.280256,
+              "se": 0.036938,
               "pvalue": 0.0,
               "sig": "***"
             }
@@ -90,47 +90,47 @@
           "x_vars": [
             "female_edu_secondary",
             "female_lfp",
-            "female_lfp_squared",
+            "lfp_squared",
             "urban_pct",
             "log_gdp_pc"
           ]
         },
         {
-          "name": "H1c: Education + LFP interactions (two-way FE)",
+          "name": "H1c: LFP \u00d7 GDP interaction (two-way FE)",
           "n_obs": 4127,
           "n_countries": 214,
           "n_years": 24,
-          "r_squared": 0.2089,
-          "r_squared_adj": 0.2079,
+          "r_squared": 0.1983,
+          "r_squared_adj": 0.1973,
           "fixed_effects": "Two-way (entity + year)",
           "coefficients": {
             "female_edu_secondary": {
-              "coef": -0.012584,
-              "se": 0.000983,
+              "coef": -0.011196,
+              "se": 0.000738,
               "pvalue": 0.0,
               "sig": "***"
             },
             "female_lfp": {
-              "coef": 0.005231,
-              "se": 0.002581,
-              "pvalue": 0.0396,
+              "coef": 0.033933,
+              "se": 0.013232,
+              "pvalue": 0.0103,
               "sig": "*"
             },
-            "female_edu_x_lfp": {
-              "coef": 0.000089,
-              "se": 0.000015,
-              "pvalue": 0.0,
-              "sig": "***"
+            "lfp_x_gdp": {
+              "coef": -0.002458,
+              "se": 0.001342,
+              "pvalue": 0.067,
+              "sig": ""
             },
             "urban_pct": {
-              "coef": -0.020816,
-              "se": 0.001976,
+              "coef": -0.02069,
+              "se": 0.002004,
               "pvalue": 0.0,
               "sig": "***"
             },
             "log_gdp_pc": {
-              "coef": 0.283847,
-              "se": 0.036673,
+              "coef": 0.410372,
+              "se": 0.073954,
               "pvalue": 0.0,
               "sig": "***"
             }
@@ -139,389 +139,4211 @@
           "x_vars": [
             "female_edu_secondary",
             "female_lfp",
-            "female_edu_x_lfp",
+            "lfp_x_gdp",
             "urban_pct",
             "log_gdp_pc"
           ]
         }
-      ]
+      ],
+      "evidence": {
+        "confidence": "strong",
+        "confidence_pct": 83,
+        "reasoning": "Key variables statistically significant (p<0.05); Large cross-country sample (214 countries); Direct measurement of key concept"
+      }
     },
     "H2": {
-      "title": "Family Planning Access & Contraceptive Use",
-      "theory": "Contraceptive availability directly reduces TFR by enabling birth spacing and smaller family norms. Effect should be large and immediate.",
+      "title": "Housing Affordability Trap",
+      "theory": "Housing cost-to-income ratio delays family formation. One study attributes 51% of the U.S. fertility decline to rising housing costs.",
       "models": [
         {
-          "name": "H2a: Contraceptive prevalence (two-way FE)",
-          "n_obs": 2891,
-          "n_countries": 156,
-          "n_years": 19,
-          "r_squared": 0.3612,
-          "r_squared_adj": 0.3607,
+          "name": "H2a: Housing proxy (two-way FE)",
+          "n_obs": 279,
+          "n_countries": 12,
+          "n_years": 24,
+          "r_squared": 0.0865,
+          "r_squared_adj": 0.0765,
           "fixed_effects": "Two-way (entity + year)",
           "coefficients": {
-            "contraceptive_prev": {
-              "coef": -0.016245,
-              "se": 0.000623,
-              "pvalue": 0.0,
-              "sig": "***"
-            },
-            "urban_pct": {
-              "coef": -0.008932,
-              "se": 0.001647,
-              "pvalue": 0.0,
-              "sig": "***"
+            "housing_cost_proxy": {
+              "coef": -0.022505,
+              "se": 0.008396,
+              "pvalue": 0.0074,
+              "sig": "**"
             },
             "log_gdp_pc": {
-              "coef": 0.141265,
-              "se": 0.028156,
-              "pvalue": 0.0,
-              "sig": "***"
+              "coef": -0.209397,
+              "se": 0.144726,
+              "pvalue": 0.1479,
+              "sig": ""
+            },
+            "urban_pct": {
+              "coef": 0.014717,
+              "se": 0.008161,
+              "pvalue": 0.0713,
+              "sig": ""
             }
           },
           "y_var": "tfr",
           "x_vars": [
-            "contraceptive_prev",
-            "urban_pct",
-            "log_gdp_pc"
+            "housing_cost_proxy",
+            "log_gdp_pc",
+            "urban_pct"
           ]
         },
         {
-          "name": "H2b: Contraceptive + Health Services (two-way FE)",
-          "n_obs": 2891,
-          "n_countries": 156,
-          "n_years": 19,
-          "r_squared": 0.3721,
-          "r_squared_adj": 0.3715,
-          "fixed_effects": "Two-way (entity + year)",
+          "name": "H2b: Housing proxy (entity FE only)",
+          "n_obs": 279,
+          "n_countries": 12,
+          "n_years": 24,
+          "r_squared": 0.1047,
+          "r_squared_adj": 0.0949,
+          "fixed_effects": "Entity only",
           "coefficients": {
-            "contraceptive_prev": {
-              "coef": -0.014876,
-              "se": 0.000712,
-              "pvalue": 0.0,
-              "sig": "***"
-            },
-            "maternal_mortality_ratio": {
-              "coef": -0.000156,
-              "se": 0.000031,
-              "pvalue": 0.0,
-              "sig": "***"
-            },
-            "urban_pct": {
-              "coef": -0.008105,
-              "se": 0.001612,
-              "pvalue": 0.0,
-              "sig": "***"
+            "housing_cost_proxy": {
+              "coef": -0.017278,
+              "se": 0.006881,
+              "pvalue": 0.012,
+              "sig": "*"
             },
             "log_gdp_pc": {
-              "coef": 0.096847,
-              "se": 0.030472,
-              "pvalue": 0.0,
-              "sig": "***"
+              "coef": -0.332366,
+              "se": 0.156331,
+              "pvalue": 0.0335,
+              "sig": "*"
+            },
+            "urban_pct": {
+              "coef": 0.003848,
+              "se": 0.007308,
+              "pvalue": 0.5985,
+              "sig": ""
             }
           },
           "y_var": "tfr",
           "x_vars": [
-            "contraceptive_prev",
-            "maternal_mortality_ratio",
-            "urban_pct",
-            "log_gdp_pc"
+            "housing_cost_proxy",
+            "log_gdp_pc",
+            "urban_pct"
           ]
         }
-      ]
+      ],
+      "evidence": {
+        "confidence": "weak",
+        "confidence_pct": 43,
+        "reasoning": "Key variables statistically significant (p<0.05); Small sample (12 countries) \u2014 results may not generalize; Poor proxy for key concept (gov consumption/GDP is a poor proxy for actual housing costs); Limited data coverage"
+      },
+      "note": "IMPORTANT LIMITATION: Our \"housing_cost_proxy\" is government consumption as % of GDP \u2014 NOT actual housing prices or rent-to-income ratios. This is a weak proxy at best. The academic evidence (using actual housing data) is stronger than what we can show here. Only 12 countries available.",
+      "data_limitation": "critical"
     },
     "H3": {
-      "title": "Child Survival & Replacement Fertility",
-      "theory": "When child mortality falls, parents need fewer births to achieve desired family size. This is mechanistic—couples rationally adjust down.",
+      "title": "Cultural Sticky Equilibria (Low Fertility Trap)",
+      "theory": "Once TFR drops below ~1.5, intergenerational norm transmission locks in low fertility. Recovery is extremely difficult.",
       "models": [
         {
-          "name": "H3a: Infant mortality rate (two-way FE)",
-          "n_obs": 4108,
-          "n_countries": 213,
-          "n_years": 24,
-          "r_squared": 0.4521,
-          "r_squared_adj": 0.4516,
+          "name": "H3a: Trap persistence (two-way FE)",
+          "n_obs": 1097,
+          "n_countries": 71,
+          "n_years": 22,
+          "r_squared": 0.264,
+          "r_squared_adj": 0.2619,
           "fixed_effects": "Two-way (entity + year)",
           "coefficients": {
-            "infant_mortality": {
-              "coef": 0.008156,
-              "se": 0.000267,
+            "tfr_lag1": {
+              "coef": -0.269218,
+              "se": 0.021225,
               "pvalue": 0.0,
               "sig": "***"
             },
-            "urban_pct": {
-              "coef": -0.009876,
-              "se": 0.001523,
+            "below_1_5": {
+              "coef": -0.079774,
+              "se": 0.006134,
               "pvalue": 0.0,
               "sig": "***"
             },
-            "log_gdp_pc": {
-              "coef": -0.032145,
-              "se": 0.028934,
-              "pvalue": 0.2987,
-              "sig": ""
+            "years_below_1_5": {
+              "coef": -0.002443,
+              "se": 0.000553,
+              "pvalue": 0.0,
+              "sig": "***"
             }
           },
-          "y_var": "tfr",
+          "y_var": "tfr_change",
           "x_vars": [
-            "infant_mortality",
-            "urban_pct",
-            "log_gdp_pc"
+            "tfr_lag1",
+            "below_1_5",
+            "years_below_1_5"
           ]
         },
         {
-          "name": "H3b: Child mortality rate (two-way FE)",
-          "n_obs": 4096,
-          "n_countries": 212,
-          "n_years": 24,
-          "r_squared": 0.4687,
-          "r_squared_adj": 0.4682,
-          "fixed_effects": "Two-way (entity + year)",
+          "name": "H3b: Trap persistence (entity FE)",
+          "n_obs": 1097,
+          "n_countries": 71,
+          "n_years": 22,
+          "r_squared": 0.2765,
+          "r_squared_adj": 0.2745,
+          "fixed_effects": "Entity only",
           "coefficients": {
-            "child_mortality": {
-              "coef": 0.007834,
-              "se": 0.000189,
+            "tfr_lag1": {
+              "coef": -0.263528,
+              "se": 0.021315,
               "pvalue": 0.0,
               "sig": "***"
             },
-            "urban_pct": {
-              "coef": -0.009234,
-              "se": 0.001501,
+            "below_1_5": {
+              "coef": -0.085533,
+              "se": 0.006435,
               "pvalue": 0.0,
               "sig": "***"
             },
-            "log_gdp_pc": {
-              "coef": -0.054782,
-              "se": 0.028167,
-              "pvalue": 0.0541,
-              "sig": ""
+            "years_below_1_5": {
+              "coef": -0.002051,
+              "se": 0.000287,
+              "pvalue": 0.0,
+              "sig": "***"
             }
           },
-          "y_var": "tfr",
+          "y_var": "tfr_change",
           "x_vars": [
-            "child_mortality",
-            "urban_pct",
-            "log_gdp_pc"
+            "tfr_lag1",
+            "below_1_5",
+            "years_below_1_5"
           ]
         }
-      ]
+      ],
+      "evidence": {
+        "confidence": "strong",
+        "confidence_pct": 83,
+        "reasoning": "Key variables statistically significant (p<0.05); Large cross-country sample (71 countries); Direct measurement of key concept"
+      },
+      "trap_summary": {
+        "n_countries_entered": 79,
+        "n_recovered": 11,
+        "recovery_rate": 13.9,
+        "countries": [
+          {
+            "country": "ALB",
+            "year_entered": 2017,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.348,
+            "latest_tfr": 1.348
+          },
+          {
+            "country": "AND",
+            "year_entered": 2000,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.028,
+            "latest_tfr": 1.082
+          },
+          {
+            "country": "ARE",
+            "year_entered": 2014,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.148,
+            "latest_tfr": 1.2
+          },
+          {
+            "country": "ARG",
+            "year_entered": 2022,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.5,
+            "latest_tfr": 1.5
+          },
+          {
+            "country": "ARM",
+            "year_entered": 2000,
+            "recovered_to_1_7": true,
+            "min_tfr_post": 1.2,
+            "latest_tfr": 1.9
+          },
+          {
+            "country": "ATG",
+            "year_entered": 2016,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.371,
+            "latest_tfr": 1.578
+          },
+          {
+            "country": "AUT",
+            "year_entered": 2000,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.32,
+            "latest_tfr": 1.32
+          },
+          {
+            "country": "BEL",
+            "year_entered": 2023,
+            "recovered_to_1_7": false,
+            "min_tfr_post": null,
+            "latest_tfr": 1.47
+          },
+          {
+            "country": "BGR",
+            "year_entered": 2000,
+            "recovered_to_1_7": true,
+            "min_tfr_post": 1.21,
+            "latest_tfr": 1.81
+          },
+          {
+            "country": "BHS",
+            "year_entered": 2016,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.373,
+            "latest_tfr": 1.373
+          },
+          {
+            "country": "BIH",
+            "year_entered": 2000,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.18,
+            "latest_tfr": 1.486
+          },
+          {
+            "country": "BLR",
+            "year_entered": 2000,
+            "recovered_to_1_7": true,
+            "min_tfr_post": 1.208,
+            "latest_tfr": 1.208
+          },
+          {
+            "country": "BMU",
+            "year_entered": 2014,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.374,
+            "latest_tfr": 1.401
+          },
+          {
+            "country": "BTN",
+            "year_entered": 2019,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.462,
+            "latest_tfr": 1.462
+          },
+          {
+            "country": "CAN",
+            "year_entered": 2019,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.26,
+            "latest_tfr": 1.26
+          },
+          {
+            "country": "CEB",
+            "year_entered": 2000,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.251,
+            "latest_tfr": 1.407
+          },
+          {
+            "country": "CHE",
+            "year_entered": 2001,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.33,
+            "latest_tfr": 1.33
+          },
+          {
+            "country": "CHI",
+            "year_entered": 2000,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.33,
+            "latest_tfr": 1.37
+          },
+          {
+            "country": "CHL",
+            "year_entered": 2019,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.167,
+            "latest_tfr": 1.167
+          },
+          {
+            "country": "CHN",
+            "year_entered": 2019,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 0.999,
+            "latest_tfr": 0.999
+          },
+          {
+            "country": "CRI",
+            "year_entered": 2020,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.33,
+            "latest_tfr": 1.33
+          },
+          {
+            "country": "CUB",
+            "year_entered": 2005,
+            "recovered_to_1_7": true,
+            "min_tfr_post": 1.402,
+            "latest_tfr": 1.439
+          },
+          {
+            "country": "CUW",
+            "year_entered": 2020,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.2,
+            "latest_tfr": 1.2
+          },
+          {
+            "country": "CYM",
+            "year_entered": 2013,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.222,
+            "latest_tfr": 1.531
+          },
+          {
+            "country": "CYP",
+            "year_entered": 2002,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.304,
+            "latest_tfr": 1.389
+          },
+          {
+            "country": "CZE",
+            "year_entered": 2000,
+            "recovered_to_1_7": true,
+            "min_tfr_post": 1.15,
+            "latest_tfr": 1.45
+          },
+          {
+            "country": "DEU",
+            "year_entered": 2000,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.33,
+            "latest_tfr": 1.39
+          },
+          {
+            "country": "DMA",
+            "year_entered": 2020,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.482,
+            "latest_tfr": 1.484
+          },
+          {
+            "country": "EAP",
+            "year_entered": 2021,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.361,
+            "latest_tfr": 1.361
+          },
+          {
+            "country": "EAS",
+            "year_entered": 2020,
+            "recovered_to_1_7": false,
+            "min_tfr_post": 1.336,
+            "latest_tfr": 1.336
+          }
+        ]
+      },
+      "note": "The regression tests whether TFR change is more negative when below 1.5 (mean reversion + trap stickiness). The descriptive statistic (86% of countries that fell below 1.5 have NOT recovered to 1.7) is the more compelling evidence \u2014 but this could partly reflect mean reversion dynamics rather than a cultural trap per se."
     },
     "H4": {
-      "title": "Institutional & Cultural Barriers",
-      "theory": "Religious conservatism and weak property/inheritance rights for women keep TFR high by limiting women's autonomous choices and economic incentives to reduce family size.",
+      "title": "Secularization",
+      "theory": "Societal-level religiosity decline predicts TFR decline. Very religious individuals in secular societies have fewer children than equivalent individuals in religious societies.",
       "models": [
         {
-          "name": "H4a: Gender development index (two-way FE)",
-          "n_obs": 3456,
-          "n_countries": 187,
-          "n_years": 18,
-          "r_squared": 0.2856,
-          "r_squared_adj": 0.2849,
+          "name": "H4a: Religiosity + controls (two-way FE)",
+          "n_obs": 206,
+          "n_countries": 12,
+          "n_years": 24,
+          "r_squared": 0.2701,
+          "r_squared_adj": 0.2556,
           "fixed_effects": "Two-way (entity + year)",
           "coefficients": {
-            "gender_dev_index": {
-              "coef": -1.247563,
-              "se": 0.156789,
+            "religiosity_index": {
+              "coef": 0.002192,
+              "se": 0.002458,
+              "pvalue": 0.3727,
+              "sig": ""
+            },
+            "female_edu_secondary": {
+              "coef": -0.006535,
+              "se": 0.001154,
               "pvalue": 0.0,
               "sig": "***"
             },
             "urban_pct": {
-              "coef": -0.010234,
-              "se": 0.001876,
-              "pvalue": 0.0,
-              "sig": "***"
-            },
-            "log_gdp_pc": {
-              "coef": 0.198456,
-              "se": 0.031234,
-              "pvalue": 0.0,
-              "sig": "***"
-            }
-          },
-          "y_var": "tfr",
-          "x_vars": [
-            "gender_dev_index",
-            "urban_pct",
-            "log_gdp_pc"
-          ]
-        },
-        {
-          "name": "H4b: Women's empowerment components (two-way FE)",
-          "n_obs": 2987,
-          "n_countries": 164,
-          "n_years": 17,
-          "r_squared": 0.3145,
-          "r_squared_adj": 0.3137,
-          "fixed_effects": "Two-way (entity + year)",
-          "coefficients": {
-            "women_in_parliament": {
-              "coef": -0.018756,
-              "se": 0.003421,
-              "pvalue": 0.0,
-              "sig": "***"
-            },
-            "female_to_male_wage": {
-              "coef": -0.897234,
-              "se": 0.187654,
-              "pvalue": 0.0,
-              "sig": "***"
-            },
-            "urban_pct": {
-              "coef": -0.011543,
-              "se": 0.001945,
-              "pvalue": 0.0,
-              "sig": "***"
-            },
-            "log_gdp_pc": {
-              "coef": 0.175892,
-              "se": 0.033456,
-              "pvalue": 0.0,
-              "sig": "***"
-            }
-          },
-          "y_var": "tfr",
-          "x_vars": [
-            "women_in_parliament",
-            "female_to_male_wage",
-            "urban_pct",
-            "log_gdp_pc"
-          ]
-        }
-      ]
-    },
-    "H5": {
-      "title": "Economic Uncertainty & Precarity",
-      "theory": "Economic volatility and job insecurity raise TFR in some contexts (insurance motive) but reduce it where welfare systems are weak and unmet fertility persists. Nonlinear relationship.",
-      "models": [
-        {
-          "name": "H5a: GDP growth volatility (two-way FE)",
-          "n_obs": 3987,
-          "n_countries": 208,
-          "n_years": 23,
-          "r_squared": 0.1834,
-          "r_squared_adj": 0.1826,
-          "fixed_effects": "Two-way (entity + year)",
-          "coefficients": {
-            "gdp_growth_volatility": {
-              "coef": 0.045678,
-              "se": 0.012345,
-              "pvalue": 0.0003,
-              "sig": "***"
-            },
-            "urban_pct": {
-              "coef": -0.011876,
-              "se": 0.002123,
-              "pvalue": 0.0,
-              "sig": "***"
-            },
-            "log_gdp_pc": {
-              "coef": 0.156234,
-              "se": 0.035678,
-              "pvalue": 0.0,
-              "sig": "***"
-            }
-          },
-          "y_var": "tfr",
-          "x_vars": [
-            "gdp_growth_volatility",
-            "urban_pct",
-            "log_gdp_pc"
-          ]
-        },
-        {
-          "name": "H5b: Unemployment rate (two-way FE)",
-          "n_obs": 3654,
-          "n_countries": 195,
-          "n_years": 20,
-          "r_squared": 0.2076,
-          "r_squared_adj": 0.2068,
-          "fixed_effects": "Two-way (entity + year)",
-          "coefficients": {
-            "unemployment_rate": {
-              "coef": 0.062341,
-              "se": 0.015678,
-              "pvalue": 0.0001,
-              "sig": "***"
-            },
-            "urban_pct": {
-              "coef": -0.010543,
-              "se": 0.002345,
-              "pvalue": 0.0,
-              "sig": "***"
-            },
-            "log_gdp_pc": {
-              "coef": 0.132456,
-              "se": 0.032145,
-              "pvalue": 0.0,
-              "sig": "***"
-            }
-          },
-          "y_var": "tfr",
-          "x_vars": [
-            "unemployment_rate",
-            "urban_pct",
-            "log_gdp_pc"
-          ]
-        }
-      ]
-    },
-    "H6": {
-      "title": "Institutional Childcare & Parental Leave",
-      "theory": "Public childcare and paid parental leave reduce opportunity costs of children, raising TFR (especially at high development). Effect strongest in high-income democracies.",
-      "models": [
-        {
-          "name": "H6a: Childcare spending (two-way FE, high-income subset)",
-          "n_obs": 892,
-          "n_countries": 32,
-          "n_years": 28,
-          "r_squared": 0.5432,
-          "r_squared_adj": 0.5421,
-          "fixed_effects": "Two-way (entity + year)",
-          "subset": "High-income countries (GDP > $20k pc)",
-          "coefficients": {
-            "childcare_public_pct_gdp": {
-              "coef": 0.876543,
-              "se": 0.145678,
-              "pvalue": 0.0,
-              "sig": "***"
-            },
-            "parental_leave_weeks": {
-              "coef": 0.001234,
-              "se": 0.000456,
-              "pvalue": 0.0079,
-              "sig": "**"
-            },
-            "urban_pct": {
-              "coef": -0.005432,
-              "se": 0.003456,
-              "pvalue": 0.1243,
+              "coef": 0.02506,
+              "se": 0.01779,
+              "pvalue": 0.1589,
               "sig": ""
             },
             "log_gdp_pc": {
-              "coef": 0.234567,
-              "se": 0.087654,
-              "pvalue": 0.0089,
+              "coef": -0.447881,
+              "se": 0.182136,
+              "pvalue": 0.0139,
+              "sig": "*"
+            }
+          },
+          "y_var": "tfr",
+          "x_vars": [
+            "religiosity_index",
+            "female_edu_secondary",
+            "urban_pct",
+            "log_gdp_pc"
+          ]
+        },
+        {
+          "name": "H4b: Religiosity + controls (entity FE)",
+          "n_obs": 206,
+          "n_countries": 12,
+          "n_years": 24,
+          "r_squared": 0.3338,
+          "r_squared_adj": 0.3205,
+          "fixed_effects": "Entity only",
+          "coefficients": {
+            "religiosity_index": {
+              "coef": 0.002826,
+              "se": 0.002589,
+              "pvalue": 0.275,
+              "sig": ""
+            },
+            "female_edu_secondary": {
+              "coef": -0.006331,
+              "se": 0.000986,
+              "pvalue": 0.0,
+              "sig": "***"
+            },
+            "urban_pct": {
+              "coef": 0.005041,
+              "se": 0.01918,
+              "pvalue": 0.7927,
+              "sig": ""
+            },
+            "log_gdp_pc": {
+              "coef": -0.383163,
+              "se": 0.207539,
+              "pvalue": 0.0649,
+              "sig": ""
+            }
+          },
+          "y_var": "tfr",
+          "x_vars": [
+            "religiosity_index",
+            "female_edu_secondary",
+            "urban_pct",
+            "log_gdp_pc"
+          ]
+        }
+      ],
+      "evidence": {
+        "confidence": "moderate",
+        "confidence_pct": 58,
+        "reasoning": "Key variables statistically significant (p<0.05); Small sample (12 countries) \u2014 results may not generalize; Reasonable proxy for key concept; Limited data coverage"
+      },
+      "note": "Limited to 12 countries with religiosity index data. With only 12 countries, statistical power is very low \u2014 a non-significant result here does NOT disprove the hypothesis. The GSS micro-evidence (religious Americans have more children) is consistent with the theory even if the macro regression lacks power."
+    },
+    "H5": {
+      "title": "Partnership Decline",
+      "theory": "Declining marriage and cohabitation rates mechanically reduce aggregate fertility. Since 2001, marital status changes explain most of the fertility decline in several countries.",
+      "models": [
+        {
+          "name": "H5a: Urbanization proxy (two-way FE)",
+          "n_obs": 4375,
+          "n_countries": 231,
+          "n_years": 24,
+          "r_squared": 0.2118,
+          "r_squared_adj": 0.2111,
+          "fixed_effects": "Two-way (entity + year)",
+          "coefficients": {
+            "urban_pct": {
+              "coef": -0.080858,
+              "se": 0.00502,
+              "pvalue": 0.0,
+              "sig": "***"
+            },
+            "urban_squared": {
+              "coef": 0.000506,
+              "se": 4.1e-05,
+              "pvalue": 0.0,
+              "sig": "***"
+            },
+            "female_edu_secondary": {
+              "coef": -0.00868,
+              "se": 0.000606,
+              "pvalue": 0.0,
+              "sig": "***"
+            },
+            "log_gdp_pc": {
+              "coef": 0.350896,
+              "se": 0.034962,
+              "pvalue": 0.0,
+              "sig": "***"
+            }
+          },
+          "y_var": "tfr",
+          "x_vars": [
+            "urban_pct",
+            "urban_squared",
+            "female_edu_secondary",
+            "log_gdp_pc"
+          ]
+        }
+      ],
+      "evidence": {
+        "confidence": "moderate",
+        "confidence_pct": 68,
+        "reasoning": "Key variables statistically significant (p<0.05); Large cross-country sample (231 countries); Poor proxy for key concept (urbanization is a very indirect proxy for marriage/partnership rates)"
+      },
+      "note": "CRITICAL LIMITATION: We have NO direct marriage or partnership rate data in our panel. Urbanization is used as a very rough proxy. The GSS micro-evidence (dramatic shift from married to never-married, with large fertility differences by marital status) provides much stronger support for this hypothesis than the macro regression.",
+      "data_limitation": "critical"
+    },
+    "H6": {
+      "title": "Economic Uncertainty / Pessimism",
+      "theory": "Not just income levels but economic uncertainty (policy uncertainty, inflation volatility, consumer pessimism) suppresses fertility intentions and realization.",
+      "models": [
+        {
+          "name": "H6a: Global EPU (entity FE only \u2014 cannot use year FE)",
+          "n_obs": 5187,
+          "n_countries": 234,
+          "n_years": 23,
+          "r_squared": 0.4434,
+          "r_squared_adj": 0.443,
+          "fixed_effects": "Entity only",
+          "coefficients": {
+            "global_epu": {
+              "coef": -0.0019,
+              "se": 7.1e-05,
+              "pvalue": 0.0,
+              "sig": "***"
+            },
+            "inflation_vol": {
+              "coef": 0.000244,
+              "se": 0.000343,
+              "pvalue": 0.4767,
+              "sig": ""
+            },
+            "log_gdp_pc": {
+              "coef": 0.020507,
+              "se": 0.029973,
+              "pvalue": 0.4939,
+              "sig": ""
+            },
+            "urban_pct": {
+              "coef": -0.035211,
+              "se": 0.001555,
+              "pvalue": 0.0,
+              "sig": "***"
+            }
+          },
+          "y_var": "tfr",
+          "x_vars": [
+            "global_epu",
+            "inflation_vol",
+            "log_gdp_pc",
+            "urban_pct"
+          ]
+        },
+        {
+          "name": "H6b: Country EPU + confidence (two-way FE)",
+          "n_obs": 167,
+          "n_countries": 7,
+          "n_years": 24,
+          "r_squared": 0.1055,
+          "r_squared_adj": 0.0834,
+          "fixed_effects": "Two-way (entity + year)",
+          "coefficients": {
+            "epu_country": {
+              "coef": 2.2e-05,
+              "se": 0.000108,
+              "pvalue": 0.8372,
+              "sig": ""
+            },
+            "consumer_confidence": {
+              "coef": 0.023365,
+              "se": 0.006685,
+              "pvalue": 0.0005,
+              "sig": "***"
+            },
+            "log_gdp_pc": {
+              "coef": -0.009729,
+              "se": 0.165237,
+              "pvalue": 0.953,
+              "sig": ""
+            },
+            "urban_pct": {
+              "coef": 0.000806,
+              "se": 0.005574,
+              "pvalue": 0.885,
+              "sig": ""
+            }
+          },
+          "y_var": "tfr",
+          "x_vars": [
+            "epu_country",
+            "consumer_confidence",
+            "log_gdp_pc",
+            "urban_pct"
+          ]
+        },
+        {
+          "name": "H6c: Country EPU + confidence (entity FE)",
+          "n_obs": 166,
+          "n_countries": 7,
+          "n_years": 24,
+          "r_squared": 0.1734,
+          "r_squared_adj": 0.1476,
+          "fixed_effects": "Entity only",
+          "coefficients": {
+            "epu_country": {
+              "coef": -0.000816,
+              "se": 0.000253,
+              "pvalue": 0.0013,
+              "sig": "**"
+            },
+            "epu_volatility": {
+              "coef": 0.000783,
+              "se": 0.000715,
+              "pvalue": 0.2729,
+              "sig": ""
+            },
+            "consumer_confidence": {
+              "coef": -0.00481,
+              "se": 0.003342,
+              "pvalue": 0.15,
+              "sig": ""
+            },
+            "log_gdp_pc": {
+              "coef": -0.54323,
+              "se": 0.197324,
+              "pvalue": 0.0059,
+              "sig": "**"
+            },
+            "urban_pct": {
+              "coef": 0.00833,
+              "se": 0.003588,
+              "pvalue": 0.0203,
+              "sig": "*"
+            }
+          },
+          "y_var": "tfr",
+          "x_vars": [
+            "epu_country",
+            "epu_volatility",
+            "consumer_confidence",
+            "log_gdp_pc",
+            "urban_pct"
+          ]
+        },
+        {
+          "name": "H6d: Lagged Global EPU (entity FE)",
+          "n_obs": 4966,
+          "n_countries": 234,
+          "n_years": 22,
+          "r_squared": 0.4472,
+          "r_squared_adj": 0.4468,
+          "fixed_effects": "Entity only",
+          "coefficients": {
+            "global_epu_lag1": {
+              "coef": -0.001875,
+              "se": 7.2e-05,
+              "pvalue": 0.0,
+              "sig": "***"
+            },
+            "inflation_vol_lag1": {
+              "coef": 0.000536,
+              "se": 0.000362,
+              "pvalue": 0.1394,
+              "sig": ""
+            },
+            "log_gdp_pc": {
+              "coef": -0.000281,
+              "se": 0.030485,
+              "pvalue": 0.9926,
+              "sig": ""
+            },
+            "urban_pct": {
+              "coef": -0.03478,
+              "se": 0.001575,
+              "pvalue": 0.0,
+              "sig": "***"
+            }
+          },
+          "y_var": "tfr",
+          "x_vars": [
+            "global_epu_lag1",
+            "inflation_vol_lag1",
+            "log_gdp_pc",
+            "urban_pct"
+          ]
+        }
+      ],
+      "evidence": {
+        "confidence": "strong",
+        "confidence_pct": 90,
+        "reasoning": "Key variables statistically significant (p<0.05); Large cross-country sample (234 countries); Direct measurement of key concept"
+      },
+      "note": "Global EPU is constant across countries within a year, so it is absorbed by year fixed effects. We show it with entity FE only (which risks time-trend confounding). Country-specific EPU (12 countries only) can use two-way FE. The honest interpretation: EPU effects are hard to separate from the common downward time trend in TFR."
+    },
+    "H7": {
+      "title": "J-Curve Reversal (Contested)",
+      "theory": "At very high HDI (>0.86), further development may increase fertility, reversing the traditional negative relationship. Myrskyl\u00e4 et al. (2009) claimed this; later research disputes it.",
+      "models": [
+        {
+          "name": "H7a: HDI quadratic (two-way FE)",
+          "n_obs": 206,
+          "n_countries": 12,
+          "n_years": 24,
+          "r_squared": 0.4209,
+          "r_squared_adj": 0.4152,
+          "fixed_effects": "Two-way (entity + year)",
+          "coefficients": {
+            "hdi_proxy": {
+              "coef": -16.994782,
+              "se": 3.009353,
+              "pvalue": 0.0,
+              "sig": "***"
+            },
+            "hdi_squared": {
+              "coef": 9.778634,
+              "se": 2.276973,
+              "pvalue": 0.0,
+              "sig": "***"
+            }
+          },
+          "y_var": "tfr",
+          "x_vars": [
+            "hdi_proxy",
+            "hdi_squared"
+          ]
+        },
+        {
+          "name": "H7b: HDI piecewise threshold=0.86 (two-way FE)",
+          "n_obs": 206,
+          "n_countries": 12,
+          "n_years": 24,
+          "r_squared": 0.3497,
+          "r_squared_adj": 0.3433,
+          "fixed_effects": "Two-way (entity + year)",
+          "coefficients": {
+            "hdi_proxy": {
+              "coef": -3.734645,
+              "se": 0.555143,
+              "pvalue": 0.0,
+              "sig": "***"
+            },
+            "hdi_x_high": {
+              "coef": 0.143242,
+              "se": 0.068679,
+              "pvalue": 0.037,
+              "sig": "*"
+            }
+          },
+          "y_var": "tfr",
+          "x_vars": [
+            "hdi_proxy",
+            "hdi_x_high"
+          ]
+        },
+        {
+          "name": "H7c: HDI quadratic (entity FE)",
+          "n_obs": 206,
+          "n_countries": 12,
+          "n_years": 24,
+          "r_squared": 0.3542,
+          "r_squared_adj": 0.3479,
+          "fixed_effects": "Entity only",
+          "coefficients": {
+            "hdi_proxy": {
+              "coef": -13.566143,
+              "se": 2.801232,
+              "pvalue": 0.0,
+              "sig": "***"
+            },
+            "hdi_squared": {
+              "coef": 7.027484,
+              "se": 2.027853,
+              "pvalue": 0.0005,
+              "sig": "***"
+            }
+          },
+          "y_var": "tfr",
+          "x_vars": [
+            "hdi_proxy",
+            "hdi_squared"
+          ]
+        }
+      ],
+      "evidence": {
+        "confidence": "moderate",
+        "confidence_pct": 55,
+        "reasoning": "Key variables statistically significant (p<0.05); Small sample (12 countries) \u2014 results may not generalize; Poor proxy for key concept (HDI proxy computed from components \u2014 not official UNDP HDI)"
+      },
+      "note": "The J-curve claim is highly contested in the literature. Our HDI proxy is computed from education, life expectancy, and GDP components \u2014 NOT official UNDP HDI values. HDI also heavily overlaps with H1 variables (education, GDP). Even if the quadratic term is significant, it could reflect compositional effects rather than a true reversal."
+    },
+    "H8": {
+      "title": "Policy Effectiveness Ceiling",
+      "theory": "Pro-natalist policies (childcare subsidies, parental leave) have modest positive effects but diminishing returns, especially below TFR ~1.5.",
+      "models": [
+        {
+          "name": "H8b: Family spending quadratic (two-way FE)",
+          "n_obs": 56,
+          "n_countries": 8,
+          "n_years": 7,
+          "r_squared": 0.4312,
+          "r_squared_adj": 0.3866,
+          "fixed_effects": "Two-way (entity + year)",
+          "coefficients": {
+            "family_spending_gdp_pct": {
+              "coef": 0.99848,
+              "se": 0.431141,
+              "pvalue": 0.0206,
+              "sig": "*"
+            },
+            "family_spending_sq": {
+              "coef": -0.004375,
+              "se": 0.065772,
+              "pvalue": 0.947,
+              "sig": ""
+            },
+            "female_lfp": {
+              "coef": 0.014906,
+              "se": 0.006069,
+              "pvalue": 0.014,
+              "sig": "*"
+            },
+            "log_gdp_pc": {
+              "coef": 1.779451,
+              "se": 0.598441,
+              "pvalue": 0.0029,
               "sig": "**"
             }
           },
           "y_var": "tfr",
           "x_vars": [
-            "childcare_public_pct_gdp",
-            "parental_leave_weeks",
+            "family_spending_gdp_pct",
+            "family_spending_sq",
+            "female_lfp",
+            "log_gdp_pc"
+          ]
+        }
+      ],
+      "evidence": {
+        "confidence": "moderate",
+        "confidence_pct": 65,
+        "reasoning": "Key variables statistically significant (p<0.05); Small sample (8 countries) \u2014 results may not generalize; Direct measurement of key concept; Limited data coverage"
+      },
+      "note": "Limited to 12 countries with OECD-style policy data. Policy endogeneity is a serious concern: countries with LOW TFR adopt MORE family spending (reverse causality). This biases the coefficient toward zero or even negative."
+    },
+    "H9": {
+      "title": "Smartphone / Social Media Effect",
+      "theory": "Algorithmic social media content amplifies fertility anxiety and displaces relationship formation. The post-2010 fertility decline in developed countries coincides with smartphone adoption.",
+      "models": [
+        {
+          "name": "H9a: Internet \u00d7 post-smartphone (two-way FE)",
+          "n_obs": 3762,
+          "n_countries": 212,
+          "n_years": 24,
+          "r_squared": 0.2187,
+          "r_squared_adj": 0.2176,
+          "fixed_effects": "Two-way (entity + year)",
+          "coefficients": {
+            "internet_pct": {
+              "coef": -0.001344,
+              "se": 0.000463,
+              "pvalue": 0.0037,
+              "sig": "**"
+            },
+            "internet_x_post_smart": {
+              "coef": 0.003699,
+              "se": 0.000247,
+              "pvalue": 0.0,
+              "sig": "***"
+            },
+            "female_edu_secondary": {
+              "coef": -0.008939,
+              "se": 0.000619,
+              "pvalue": 0.0,
+              "sig": "***"
+            },
+            "urban_pct": {
+              "coef": -0.02516,
+              "se": 0.001999,
+              "pvalue": 0.0,
+              "sig": "***"
+            },
+            "log_gdp_pc": {
+              "coef": 0.173737,
+              "se": 0.039519,
+              "pvalue": 0.0,
+              "sig": "***"
+            }
+          },
+          "y_var": "tfr",
+          "x_vars": [
+            "internet_pct",
+            "internet_x_post_smart",
+            "female_edu_secondary",
+            "urban_pct",
+            "log_gdp_pc"
+          ]
+        },
+        {
+          "name": "H9b: Internet \u00d7 post-smartphone (entity FE)",
+          "n_obs": 3762,
+          "n_countries": 212,
+          "n_years": 24,
+          "r_squared": 0.4548,
+          "r_squared_adj": 0.4539,
+          "fixed_effects": "Entity only",
+          "coefficients": {
+            "internet_pct": {
+              "coef": -0.003882,
+              "se": 0.000403,
+              "pvalue": 0.0,
+              "sig": "***"
+            },
+            "post_smartphone": {
+              "coef": -0.294926,
+              "se": 0.018717,
+              "pvalue": 0.0,
+              "sig": "***"
+            },
+            "internet_x_post_smart": {
+              "coef": 0.004201,
+              "se": 0.000284,
+              "pvalue": 0.0,
+              "sig": "***"
+            },
+            "female_edu_secondary": {
+              "coef": -0.007989,
+              "se": 0.000598,
+              "pvalue": 0.0,
+              "sig": "***"
+            },
+            "urban_pct": {
+              "coef": -0.028174,
+              "se": 0.002104,
+              "pvalue": 0.0,
+              "sig": "***"
+            },
+            "log_gdp_pc": {
+              "coef": 0.169154,
+              "se": 0.040643,
+              "pvalue": 0.0,
+              "sig": "***"
+            }
+          },
+          "y_var": "tfr",
+          "x_vars": [
+            "internet_pct",
+            "post_smartphone",
+            "internet_x_post_smart",
+            "female_edu_secondary",
+            "urban_pct",
+            "log_gdp_pc"
+          ]
+        },
+        {
+          "name": "H9c: Mobile quadratic + internet (two-way FE)",
+          "n_obs": 4971,
+          "n_countries": 228,
+          "n_years": 24,
+          "r_squared": 0.2057,
+          "r_squared_adj": 0.2049,
+          "fixed_effects": "Two-way (entity + year)",
+          "coefficients": {
+            "mobile_per100": {
+              "coef": -0.006264,
+              "se": 0.000554,
+              "pvalue": 0.0,
+              "sig": "***"
+            },
+            "mobile_sq": {
+              "coef": 2e-05,
+              "se": 3e-06,
+              "pvalue": 0.0,
+              "sig": "***"
+            },
+            "internet_pct": {
+              "coef": 0.005754,
+              "se": 0.000457,
+              "pvalue": 0.0,
+              "sig": "***"
+            },
+            "urban_pct": {
+              "coef": -0.025211,
+              "se": 0.001545,
+              "pvalue": 0.0,
+              "sig": "***"
+            },
+            "log_gdp_pc": {
+              "coef": 0.275017,
+              "se": 0.035097,
+              "pvalue": 0.0,
+              "sig": "***"
+            }
+          },
+          "y_var": "tfr",
+          "x_vars": [
+            "mobile_per100",
+            "mobile_sq",
+            "internet_pct",
             "urban_pct",
             "log_gdp_pc"
           ]
         }
-      ]
+      ],
+      "evidence": {
+        "confidence": "strong",
+        "confidence_pct": 75,
+        "reasoning": "Key variables statistically significant (p<0.05); Large cross-country sample (228 countries); Poor proxy for key concept (internet/mobile penetration is proxy for social media \u2014 not direct measure)"
+      },
+      "note": "The post_smartphone dummy is absorbed by year FE (it's the same for all countries in a given year). The interaction (internet \u00d7 post_smartphone) survives two-way FE because it varies across countries. However, internet penetration also proxies for general development \u2014 so the \"smartphone effect\" may partly reflect development trends."
     }
   },
-  "summary": {
-    "total_hypotheses": 6,
-    "total_models": 13,
-    "average_r_squared": 0.3079,
-    "strongest_predictor": "Infant and child mortality (H3a & H3b: R² = 0.45+)",
-    "weakest_predictor": "Economic volatility (H5a: R² = 0.18)",
-    "sample_note": "Panel structure: 156–214 countries over 17–28 years; two-way fixed effects (entity + year) control for time-invariant country heterogeneity and global time trends.",
-    "data_quality": "Missing data handled via listwise deletion; results robust to multiple imputation (available on request).",
-    "interpretation_note": "All coefficients signed as expected from theory. Standard errors are clustered at country level (not shown but available). Significance threshold: p < 0.05."
+  "random_forest": {
+    "cv_r_squared": 0.7957,
+    "cv_r_squared_std": 0.0939,
+    "n_obs": 3326,
+    "n_countries": 200,
+    "features": [
+      "female_edu_secondary",
+      "female_lfp",
+      "urban_pct",
+      "log_gdp_pc",
+      "internet_pct",
+      "mobile_per100",
+      "inflation_vol",
+      "global_epu",
+      "post_smartphone"
+    ],
+    "mdi_importance": {
+      "female_edu_secondary": 0.7965,
+      "female_lfp": 0.0369,
+      "urban_pct": 0.0232,
+      "log_gdp_pc": 0.1169,
+      "internet_pct": 0.0086,
+      "mobile_per100": 0.0089,
+      "inflation_vol": 0.0035,
+      "global_epu": 0.0048,
+      "post_smartphone": 0.0005
+    },
+    "permutation_importance": {
+      "female_edu_secondary": 1.0059,
+      "female_lfp": 0.0863,
+      "urban_pct": 0.0454,
+      "log_gdp_pc": 0.3537,
+      "internet_pct": 0.0153,
+      "mobile_per100": 0.0112,
+      "inflation_vol": 0.0043,
+      "global_epu": 0.0068,
+      "post_smartphone": 0.0005
+    },
+    "partial_dependence": {
+      "female_edu_secondary": {
+        "grid": [
+          26.727,
+          31.598,
+          36.47,
+          41.341,
+          46.212,
+          51.084,
+          55.955,
+          60.826,
+          65.698,
+          70.569,
+          75.44,
+          80.312,
+          85.183,
+          90.055,
+          94.926,
+          99.797,
+          104.669,
+          109.54,
+          114.411,
+          119.283
+        ],
+        "predictions": [
+          5.233,
+          4.917,
+          4.591,
+          4.253,
+          3.678,
+          3.05,
+          2.78,
+          2.732,
+          2.645,
+          2.613,
+          2.556,
+          2.49,
+          2.355,
+          2.33,
+          2.315,
+          2.303,
+          2.302,
+          2.303,
+          2.304,
+          2.304
+        ]
+      },
+      "female_lfp": {
+        "grid": [
+          22.775,
+          25.329,
+          27.882,
+          30.436,
+          32.99,
+          35.543,
+          38.097,
+          40.65,
+          43.204,
+          45.758,
+          48.311,
+          50.865,
+          53.419,
+          55.972,
+          58.526,
+          61.079,
+          63.633,
+          66.187,
+          68.74,
+          71.294
+        ],
+        "predictions": [
+          3.136,
+          2.961,
+          2.949,
+          2.915,
+          2.697,
+          2.662,
+          2.62,
+          2.609,
+          2.616,
+          2.616,
+          2.614,
+          2.609,
+          2.615,
+          2.645,
+          2.668,
+          2.636,
+          2.638,
+          2.695,
+          2.952,
+          2.953
+        ]
+      },
+      "urban_pct": {
+        "grid": [
+          21.85,
+          25.567,
+          29.284,
+          33.001,
+          36.718,
+          40.435,
+          44.152,
+          47.869,
+          51.586,
+          55.303,
+          59.02,
+          62.737,
+          66.454,
+          70.171,
+          73.888,
+          77.605,
+          81.322,
+          85.039,
+          88.756,
+          92.473
+        ],
+        "predictions": [
+          2.701,
+          2.665,
+          2.608,
+          2.598,
+          2.604,
+          2.612,
+          2.629,
+          2.629,
+          2.627,
+          2.62,
+          2.628,
+          2.648,
+          2.643,
+          2.664,
+          2.688,
+          2.714,
+          2.712,
+          2.72,
+          2.747,
+          2.754
+        ]
+      },
+      "log_gdp_pc": {
+        "grid": [
+          7.665,
+          7.847,
+          8.029,
+          8.212,
+          8.394,
+          8.576,
+          8.758,
+          8.941,
+          9.123,
+          9.305,
+          9.487,
+          9.669,
+          9.852,
+          10.034,
+          10.216,
+          10.398,
+          10.581,
+          10.763,
+          10.945,
+          11.127
+        ],
+        "predictions": [
+          3.902,
+          3.905,
+          3.893,
+          3.772,
+          3.741,
+          3.665,
+          3.421,
+          2.872,
+          2.873,
+          2.846,
+          2.808,
+          2.68,
+          2.549,
+          2.506,
+          2.488,
+          2.469,
+          2.48,
+          2.483,
+          2.488,
+          2.497
+        ]
+      },
+      "internet_pct": {
+        "grid": [
+          1.115,
+          5.926,
+          10.736,
+          15.547,
+          20.358,
+          25.169,
+          29.979,
+          34.79,
+          39.601,
+          44.412,
+          49.222,
+          54.033,
+          58.844,
+          63.655,
+          68.465,
+          73.276,
+          78.087,
+          82.897,
+          87.708,
+          92.519
+        ],
+        "predictions": [
+          2.751,
+          2.766,
+          2.76,
+          2.757,
+          2.755,
+          2.722,
+          2.701,
+          2.683,
+          2.68,
+          2.676,
+          2.671,
+          2.667,
+          2.664,
+          2.661,
+          2.66,
+          2.658,
+          2.655,
+          2.648,
+          2.645,
+          2.644
+        ]
+      },
+      "mobile_per100": {
+        "grid": [
+          6.49,
+          14.172,
+          21.854,
+          29.536,
+          37.219,
+          44.901,
+          52.583,
+          60.265,
+          67.948,
+          75.63,
+          83.312,
+          90.994,
+          98.677,
+          106.359,
+          114.041,
+          121.723,
+          129.406,
+          137.088,
+          144.77,
+          152.452
+        ],
+        "predictions": [
+          2.653,
+          2.657,
+          2.663,
+          2.672,
+          2.679,
+          2.69,
+          2.697,
+          2.697,
+          2.695,
+          2.694,
+          2.693,
+          2.695,
+          2.699,
+          2.703,
+          2.696,
+          2.695,
+          2.683,
+          2.683,
+          2.681,
+          2.681
+        ]
+      },
+      "inflation_vol": {
+        "grid": [
+          0.243,
+          0.605,
+          0.967,
+          1.329,
+          1.692,
+          2.054,
+          2.416,
+          2.778,
+          3.141,
+          3.503,
+          3.865,
+          4.227,
+          4.59,
+          4.952,
+          5.314,
+          5.676,
+          6.039,
+          6.401,
+          6.763,
+          7.125
+        ],
+        "predictions": [
+          2.655,
+          2.656,
+          2.662,
+          2.67,
+          2.672,
+          2.672,
+          2.673,
+          2.674,
+          2.675,
+          2.675,
+          2.677,
+          2.68,
+          2.681,
+          2.681,
+          2.679,
+          2.679,
+          2.679,
+          2.679,
+          2.679,
+          2.679
+        ]
+      },
+      "global_epu": {
+        "grid": [
+          67.491,
+          78.089,
+          88.688,
+          99.286,
+          109.884,
+          120.482,
+          131.08,
+          141.678,
+          152.277,
+          162.875,
+          173.473,
+          184.071,
+          194.669,
+          205.267,
+          215.866,
+          226.464,
+          237.062,
+          247.66,
+          258.258,
+          268.857
+        ],
+        "predictions": [
+          2.647,
+          2.647,
+          2.646,
+          2.647,
+          2.689,
+          2.692,
+          2.692,
+          2.692,
+          2.692,
+          2.689,
+          2.683,
+          2.682,
+          2.672,
+          2.672,
+          2.657,
+          2.657,
+          2.657,
+          2.657,
+          2.657,
+          2.657
+        ]
+      },
+      "post_smartphone": {
+        "grid": [
+          0.0,
+          0.053,
+          0.105,
+          0.158,
+          0.211,
+          0.263,
+          0.316,
+          0.368,
+          0.421,
+          0.474,
+          0.526,
+          0.579,
+          0.632,
+          0.684,
+          0.737,
+          0.789,
+          0.842,
+          0.895,
+          0.947,
+          1.0
+        ],
+        "predictions": [
+          2.671,
+          2.671,
+          2.671,
+          2.671,
+          2.671,
+          2.671,
+          2.671,
+          2.671,
+          2.671,
+          2.671,
+          2.672,
+          2.672,
+          2.672,
+          2.672,
+          2.672,
+          2.672,
+          2.672,
+          2.672,
+          2.672,
+          2.672
+        ]
+      }
+    },
+    "note": "RF does NOT use fixed effects \u2014 it uses raw (non-demeaned) data. Feature importance reflects both between-country and within-country variation. This means high-importance variables may be important for explaining cross-country differences rather than within-country changes over time."
+  },
+  "projection_params": {
+    "coefficients": {
+      "female_edu_secondary": {
+        "coef": -0.007919,
+        "se": 0.000597
+      },
+      "female_lfp": {
+        "coef": 0.009214,
+        "se": 0.001508
+      },
+      "urban_pct": {
+        "coef": -0.025158,
+        "se": 0.001772
+      },
+      "log_gdp_pc": {
+        "coef": 0.128717,
+        "se": 0.034932
+      },
+      "internet_pct": {
+        "coef": 0.000891,
+        "se": 0.00039
+      },
+      "mobile_per100": {
+        "coef": -0.001103,
+        "se": 0.000197
+      },
+      "inflation_vol": {
+        "coef": 0.001921,
+        "se": 0.000962
+      },
+      "global_epu": {
+        "coef": -0.001387,
+        "se": 9.5e-05
+      }
+    },
+    "residual_std": 0.2113,
+    "r_squared_within": 0.4569,
+    "n_obs": 3326,
+    "current_values": {
+      "ABW": {
+        "urban_pct": 61.835,
+        "log_gdp_pc": 10.645,
+        "global_epu": 237.178,
+        "tfr": 1.602
+      },
+      "AFE": {
+        "female_lfp": 64.076,
+        "urban_pct": 37.772,
+        "log_gdp_pc": 8.315,
+        "internet_pct": 27.8,
+        "mobile_per100": 82.3,
+        "inflation_vol": 2.196,
+        "global_epu": 237.178,
+        "tfr": 4.224
+      },
+      "AFG": {
+        "female_lfp": 5.155,
+        "urban_pct": 25.473,
+        "log_gdp_pc": 7.593,
+        "internet_pct": 17.709,
+        "mobile_per100": 55.547,
+        "inflation_vol": 9.185,
+        "global_epu": 237.178,
+        "tfr": 4.84
+      },
+      "AFW": {
+        "female_edu_secondary": 46.113,
+        "female_lfp": 66.349,
+        "urban_pct": 52.283,
+        "log_gdp_pc": 8.678,
+        "internet_pct": 38.5,
+        "mobile_per100": 101.4,
+        "inflation_vol": 2.133,
+        "global_epu": 237.178,
+        "tfr": 4.498
+      },
+      "AGO": {
+        "female_edu_secondary": 48.118,
+        "female_lfp": 73.224,
+        "urban_pct": 69.852,
+        "log_gdp_pc": 9.081,
+        "internet_pct": 44.758,
+        "mobile_per100": 70.052,
+        "inflation_vol": 6.13,
+        "global_epu": 237.178,
+        "tfr": 5.124
+      },
+      "ALB": {
+        "female_edu_secondary": 92.668,
+        "female_lfp": 53.207,
+        "urban_pct": 58.211,
+        "log_gdp_pc": 9.927,
+        "internet_pct": 83.136,
+        "mobile_per100": 92.997,
+        "inflation_vol": 2.352,
+        "global_epu": 237.178,
+        "tfr": 1.348
+      },
+      "AND": {
+        "female_edu_secondary": 99.469,
+        "urban_pct": 88.82,
+        "log_gdp_pc": 11.076,
+        "internet_pct": 95.446,
+        "mobile_per100": 156.097,
+        "global_epu": 237.178,
+        "tfr": 1.082
+      },
+      "ARB": {
+        "female_edu_secondary": 67.676,
+        "female_lfp": 18.286,
+        "urban_pct": 59.57,
+        "log_gdp_pc": 9.729,
+        "inflation_vol": 1.156,
+        "global_epu": 237.178,
+        "tfr": 3.09
+      },
+      "ARE": {
+        "female_edu_secondary": 102.195,
+        "female_lfp": 53.475,
+        "urban_pct": 85.668,
+        "log_gdp_pc": 11.16,
+        "internet_pct": 100.0,
+        "mobile_per100": 199.424,
+        "inflation_vol": 2.635,
+        "global_epu": 237.178,
+        "tfr": 1.2
+      },
+      "ARG": {
+        "female_edu_secondary": 107.981,
+        "female_lfp": 52.957,
+        "urban_pct": 92.195,
+        "log_gdp_pc": 10.212,
+        "internet_pct": 89.229,
+        "mobile_per100": 137.706,
+        "inflation_vol": 43.863,
+        "global_epu": 237.178,
+        "tfr": 1.5
+      },
+      "ARM": {
+        "female_edu_secondary": 88.223,
+        "female_lfp": 56.786,
+        "urban_pct": 65.696,
+        "log_gdp_pc": 9.873,
+        "internet_pct": 79.997,
+        "mobile_per100": 134.52,
+        "inflation_vol": 3.502,
+        "global_epu": 237.178,
+        "tfr": 1.9
+      },
+      "ASM": {
+        "urban_pct": 81.372,
+        "global_epu": 237.178,
+        "tfr": 2.286
+      },
+      "ATG": {
+        "female_edu_secondary": 109.004,
+        "urban_pct": 24.45,
+        "log_gdp_pc": 10.257,
+        "internet_pct": 77.576,
+        "inflation_vol": 2.738,
+        "global_epu": 237.178,
+        "tfr": 1.578
+      },
+      "AUS": {
+        "female_edu_secondary": 131.097,
+        "female_lfp": 62.374,
+        "urban_pct": 87.487,
+        "log_gdp_pc": 11.013,
+        "internet_pct": 97.063,
+        "mobile_per100": 112.513,
+        "inflation_vol": 1.931,
+        "global_epu": 237.178,
+        "tfr": 1.5
+      },
+      "AUT": {
+        "female_edu_secondary": 99.539,
+        "female_lfp": 55.812,
+        "urban_pct": 69.227,
+        "log_gdp_pc": 11.075,
+        "internet_pct": 95.335,
+        "mobile_per100": 121.746,
+        "inflation_vol": 3.147,
+        "global_epu": 237.178,
+        "tfr": 1.32
+      },
+      "AZE": {
+        "female_edu_secondary": 90.95,
+        "female_lfp": 60.952,
+        "urban_pct": 58.508,
+        "log_gdp_pc": 9.967,
+        "internet_pct": 89.0,
+        "mobile_per100": 107.687,
+        "inflation_vol": 3.699,
+        "global_epu": 237.178,
+        "tfr": 1.55
+      },
+      "BDI": {
+        "female_lfp": 80.138,
+        "urban_pct": 23.553,
+        "log_gdp_pc": 6.943,
+        "internet_pct": 11.078,
+        "mobile_per100": 63.163,
+        "inflation_vol": 9.291,
+        "global_epu": 237.178,
+        "tfr": 4.878
+      },
+      "BEL": {
+        "female_edu_secondary": 152.578,
+        "female_lfp": 49.831,
+        "urban_pct": 87.551,
+        "log_gdp_pc": 11.052,
+        "internet_pct": 94.626,
+        "mobile_per100": 103.196,
+        "inflation_vol": 3.755,
+        "global_epu": 237.178,
+        "tfr": 1.47
+      },
+      "BEN": {
+        "female_lfp": 74.183,
+        "urban_pct": 51.746,
+        "log_gdp_pc": 8.222,
+        "internet_pct": 32.208,
+        "mobile_per100": 116.036,
+        "inflation_vol": 0.717,
+        "global_epu": 237.178,
+        "tfr": 4.556
+      },
+      "BFA": {
+        "female_edu_secondary": 33.646,
+        "female_lfp": 41.294,
+        "urban_pct": 27.787,
+        "log_gdp_pc": 7.819,
+        "internet_pct": 17.023,
+        "inflation_vol": 7.131,
+        "global_epu": 237.178,
+        "tfr": 4.186
+      },
+      "BGD": {
+        "female_edu_secondary": 71.546,
+        "female_lfp": 43.712,
+        "urban_pct": 32.158,
+        "log_gdp_pc": 9.017,
+        "internet_pct": 44.503,
+        "mobile_per100": 114.355,
+        "inflation_vol": 2.169,
+        "global_epu": 237.178,
+        "tfr": 2.163
+      },
+      "BGR": {
+        "female_edu_secondary": 94.607,
+        "female_lfp": 51.043,
+        "urban_pct": 73.732,
+        "log_gdp_pc": 10.407,
+        "internet_pct": 80.39,
+        "mobile_per100": 117.933,
+        "inflation_vol": 6.014,
+        "global_epu": 237.178,
+        "tfr": 1.81
+      },
+      "BHR": {
+        "female_edu_secondary": 101.917,
+        "female_lfp": 43.096,
+        "urban_pct": 100.0,
+        "log_gdp_pc": 10.965,
+        "internet_pct": 100.0,
+        "mobile_per100": 153.9,
+        "inflation_vol": 2.272,
+        "global_epu": 237.178,
+        "tfr": 1.824
+      },
+      "BHS": {
+        "female_edu_secondary": 95.182,
+        "female_lfp": 66.733,
+        "urban_pct": 81.321,
+        "log_gdp_pc": 10.469,
+        "internet_pct": 94.819,
+        "mobile_per100": 100.048,
+        "inflation_vol": 1.518,
+        "global_epu": 237.178,
+        "tfr": 1.373
+      },
+      "BIH": {
+        "female_edu_secondary": 90.437,
+        "female_lfp": 39.533,
+        "urban_pct": 51.566,
+        "log_gdp_pc": 9.894,
+        "internet_pct": 83.377,
+        "mobile_per100": 117.734,
+        "inflation_vol": 6.118,
+        "global_epu": 237.178,
+        "tfr": 1.486
+      },
+      "BLR": {
+        "female_edu_secondary": 97.184,
+        "female_lfp": 57.385,
+        "urban_pct": 78.815,
+        "log_gdp_pc": 10.232,
+        "internet_pct": 91.513,
+        "mobile_per100": 128.979,
+        "inflation_vol": 5.118,
+        "global_epu": 237.178,
+        "tfr": 1.208
+      },
+      "BLZ": {
+        "female_edu_secondary": 84.573,
+        "female_lfp": 49.182,
+        "urban_pct": 41.946,
+        "log_gdp_pc": 9.423,
+        "internet_pct": 72.359,
+        "inflation_vol": 1.535,
+        "global_epu": 237.178,
+        "tfr": 2.007
+      },
+      "BMU": {
+        "female_edu_secondary": 79.973,
+        "urban_pct": 100.0,
+        "log_gdp_pc": 11.543,
+        "global_epu": 237.178,
+        "tfr": 1.401
+      },
+      "BOL": {
+        "female_edu_secondary": 91.288,
+        "female_lfp": 71.909,
+        "urban_pct": 70.915,
+        "log_gdp_pc": 9.36,
+        "internet_pct": 70.237,
+        "inflation_vol": 0.921,
+        "global_epu": 237.178,
+        "tfr": 2.547
+      },
+      "BRA": {
+        "female_lfp": 53.205,
+        "urban_pct": 87.616,
+        "log_gdp_pc": 9.856,
+        "internet_pct": 84.151,
+        "mobile_per100": 101.02,
+        "inflation_vol": 2.472,
+        "global_epu": 237.178,
+        "tfr": 1.619
+      },
+      "BRB": {
+        "female_edu_secondary": 104.055,
+        "female_lfp": 60.124,
+        "urban_pct": 59.424,
+        "log_gdp_pc": 9.967,
+        "internet_pct": 79.992,
+        "global_epu": 237.178,
+        "tfr": 1.708
+      },
+      "BRN": {
+        "female_edu_secondary": 93.273,
+        "female_lfp": 53.527,
+        "urban_pct": 74.82,
+        "log_gdp_pc": 11.247,
+        "internet_pct": 99.034,
+        "mobile_per100": 127.012,
+        "inflation_vol": 1.671,
+        "global_epu": 237.178,
+        "tfr": 1.747
+      },
+      "BTN": {
+        "female_edu_secondary": 94.915,
+        "female_lfp": 56.619,
+        "urban_pct": 41.735,
+        "log_gdp_pc": 9.589,
+        "internet_pct": 88.426,
+        "mobile_per100": 95.626,
+        "inflation_vol": 1.561,
+        "global_epu": 237.178,
+        "tfr": 1.462
+      },
+      "BWA": {
+        "female_lfp": 63.426,
+        "urban_pct": 67.021,
+        "log_gdp_pc": 9.849,
+        "internet_pct": 81.36,
+        "mobile_per100": 179.027,
+        "inflation_vol": 3.362,
+        "global_epu": 237.178,
+        "tfr": 2.732
+      },
+      "CAF": {
+        "female_lfp": 65.845,
+        "urban_pct": 43.698,
+        "log_gdp_pc": 7.032,
+        "inflation_vol": 1.302,
+        "global_epu": 237.178,
+        "tfr": 6.012
+      },
+      "CAN": {
+        "female_edu_secondary": 104.424,
+        "female_lfp": 61.134,
+        "urban_pct": 82.525,
+        "log_gdp_pc": 10.96,
+        "internet_pct": 93.956,
+        "mobile_per100": 94.15,
+        "inflation_vol": 1.844,
+        "global_epu": 237.178,
+        "tfr": 1.26
+      },
+      "CEB": {
+        "female_edu_secondary": 99.341,
+        "female_lfp": 50.728,
+        "urban_pct": 61.697,
+        "log_gdp_pc": 10.648,
+        "inflation_vol": 5.386,
+        "global_epu": 237.178,
+        "tfr": 1.407
+      },
+      "CHE": {
+        "female_edu_secondary": 101.319,
+        "female_lfp": 62.294,
+        "urban_pct": 85.185,
+        "log_gdp_pc": 11.318,
+        "internet_pct": 97.344,
+        "mobile_per100": 128.64,
+        "inflation_vol": 1.153,
+        "global_epu": 237.178,
+        "tfr": 1.33
+      },
+      "CHI": {
+        "female_lfp": 50.687,
+        "urban_pct": 32.755,
+        "global_epu": 237.178,
+        "tfr": 1.37
+      },
+      "CHL": {
+        "female_edu_secondary": 104.63,
+        "female_lfp": 51.963,
+        "urban_pct": 88.816,
+        "log_gdp_pc": 10.294,
+        "internet_pct": 94.457,
+        "mobile_per100": 135.871,
+        "inflation_vol": 3.571,
+        "global_epu": 237.178,
+        "tfr": 1.167
+      },
+      "CHN": {
+        "female_lfp": 59.948,
+        "urban_pct": 65.53,
+        "log_gdp_pc": 10.03,
+        "internet_pct": 90.6,
+        "mobile_per100": 128.247,
+        "inflation_vol": 0.872,
+        "global_epu": 237.178,
+        "tfr": 0.999
+      },
+      "CIV": {
+        "female_edu_secondary": 63.095,
+        "female_lfp": 58.864,
+        "urban_pct": 53.408,
+        "log_gdp_pc": 8.783,
+        "internet_pct": 40.653,
+        "mobile_per100": 171.989,
+        "inflation_vol": 0.569,
+        "global_epu": 237.178,
+        "tfr": 4.283
+      },
+      "CMR": {
+        "female_edu_secondary": 42.494,
+        "female_lfp": 57.148,
+        "urban_pct": 55.129,
+        "log_gdp_pc": 8.492,
+        "internet_pct": 41.909,
+        "mobile_per100": 96.482,
+        "inflation_vol": 2.684,
+        "global_epu": 237.178,
+        "tfr": 4.322
+      },
+      "COD": {
+        "female_lfp": 62.309,
+        "urban_pct": 44.375,
+        "log_gdp_pc": 7.352,
+        "internet_pct": 30.548,
+        "mobile_per100": 53.189,
+        "global_epu": 237.178,
+        "tfr": 6.051
+      },
+      "COG": {
+        "female_lfp": 66.341,
+        "urban_pct": 63.663,
+        "log_gdp_pc": 8.728,
+        "internet_pct": 38.379,
+        "mobile_per100": 94.871,
+        "inflation_vol": 1.293,
+        "global_epu": 237.178,
+        "tfr": 4.157
+      },
+      "COL": {
+        "female_lfp": 51.859,
+        "urban_pct": 78.276,
+        "log_gdp_pc": 9.819,
+        "internet_pct": 77.337,
+        "mobile_per100": 166.98,
+        "inflation_vol": 4.378,
+        "global_epu": 237.178,
+        "tfr": 1.645
+      },
+      "COM": {
+        "female_lfp": 41.143,
+        "urban_pct": 33.15,
+        "log_gdp_pc": 8.142,
+        "internet_pct": 35.668,
+        "mobile_per100": 109.856,
+        "inflation_vol": 6.385,
+        "global_epu": 237.178,
+        "tfr": 3.878
+      },
+      "CPV": {
+        "female_lfp": 50.419,
+        "urban_pct": 75.906,
+        "log_gdp_pc": 9.13,
+        "internet_pct": 73.539,
+        "mobile_per100": 113.023,
+        "inflation_vol": 3.109,
+        "global_epu": 237.178,
+        "tfr": 1.522
+      },
+      "CRI": {
+        "female_edu_secondary": 130.602,
+        "female_lfp": 44.088,
+        "urban_pct": 78.882,
+        "log_gdp_pc": 10.165,
+        "internet_pct": 85.395,
+        "mobile_per100": 145.789,
+        "inflation_vol": 4.171,
+        "global_epu": 237.178,
+        "tfr": 1.33
+      },
+      "CSS": {
+        "female_edu_secondary": 87.53,
+        "female_lfp": 50.604,
+        "urban_pct": 50.102,
+        "log_gdp_pc": 10.296,
+        "inflation_vol": 1.818,
+        "global_epu": 237.178,
+        "tfr": 1.832
+      },
+      "CUB": {
+        "female_edu_secondary": 96.348,
+        "female_lfp": 39.947,
+        "urban_pct": 77.126,
+        "internet_pct": 71.275,
+        "mobile_per100": 69.577,
+        "global_epu": 237.178,
+        "tfr": 1.439
+      },
+      "CUW": {
+        "female_edu_secondary": 128.63,
+        "urban_pct": 91.408,
+        "log_gdp_pc": 10.226,
+        "mobile_per100": 93.798,
+        "global_epu": 237.178,
+        "tfr": 1.2
+      },
+      "CYM": {
+        "female_edu_secondary": 86.518,
+        "urban_pct": 100.0,
+        "log_gdp_pc": 11.286,
+        "global_epu": 237.178,
+        "tfr": 1.531
+      },
+      "CYP": {
+        "female_edu_secondary": 102.09,
+        "female_lfp": 62.475,
+        "urban_pct": 66.674,
+        "log_gdp_pc": 10.848,
+        "internet_pct": 91.221,
+        "mobile_per100": 155.696,
+        "inflation_vol": 3.166,
+        "global_epu": 237.178,
+        "tfr": 1.389
+      },
+      "CZE": {
+        "female_edu_secondary": 98.02,
+        "female_lfp": 53.235,
+        "urban_pct": 72.735,
+        "log_gdp_pc": 10.77,
+        "internet_pct": 85.994,
+        "mobile_per100": 126.005,
+        "inflation_vol": 5.672,
+        "global_epu": 237.178,
+        "tfr": 1.45
+      },
+      "DEU": {
+        "female_edu_secondary": 97.678,
+        "female_lfp": 55.848,
+        "urban_pct": 81.903,
+        "log_gdp_pc": 11.052,
+        "internet_pct": 92.476,
+        "mobile_per100": 124.663,
+        "inflation_vol": 1.985,
+        "global_epu": 237.178,
+        "tfr": 1.39
+      },
+      "DJI": {
+        "female_lfp": 18.669,
+        "urban_pct": 72.841,
+        "log_gdp_pc": 8.781,
+        "internet_pct": 65.025,
+        "mobile_per100": 48.45,
+        "inflation_vol": 2.223,
+        "global_epu": 237.178,
+        "tfr": 2.609
+      },
+      "DMA": {
+        "female_edu_secondary": 96.327,
+        "urban_pct": 73.111,
+        "log_gdp_pc": 9.813,
+        "internet_pct": 83.826,
+        "inflation_vol": 1.497,
+        "global_epu": 237.178,
+        "tfr": 1.484
+      },
+      "DNK": {
+        "female_edu_secondary": 126.259,
+        "female_lfp": 59.812,
+        "urban_pct": 88.553,
+        "log_gdp_pc": 11.147,
+        "internet_pct": 98.776,
+        "mobile_per100": 126.919,
+        "inflation_vol": 3.042,
+        "global_epu": 237.178,
+        "tfr": 1.5
+      },
+      "DOM": {
+        "female_edu_secondary": 79.048,
+        "female_lfp": 52.482,
+        "urban_pct": 72.358,
+        "log_gdp_pc": 10.055,
+        "internet_pct": 84.616,
+        "mobile_per100": 91.868,
+        "inflation_vol": 2.179,
+        "global_epu": 237.178,
+        "tfr": 2.243
+      },
+      "DZA": {
+        "female_edu_secondary": 103.221,
+        "female_lfp": 14.132,
+        "urban_pct": 74.733,
+        "log_gdp_pc": 9.626,
+        "internet_pct": 76.908,
+        "mobile_per100": 111.606,
+        "inflation_vol": 1.194,
+        "global_epu": 237.178,
+        "tfr": 2.766
+      },
+      "EAP": {
+        "female_edu_secondary": 91.741,
+        "female_lfp": 58.696,
+        "urban_pct": 61.228,
+        "log_gdp_pc": 9.879,
+        "internet_pct": 84.2,
+        "mobile_per100": 126.9,
+        "inflation_vol": 1.746,
+        "global_epu": 237.178,
+        "tfr": 1.361
+      },
+      "EAR": {
+        "female_edu_secondary": 77.28,
+        "female_lfp": 36.895,
+        "urban_pct": 47.017,
+        "log_gdp_pc": 9.379,
+        "inflation_vol": 1.541,
+        "global_epu": 237.178,
+        "tfr": 2.298
+      },
+      "EAS": {
+        "female_edu_secondary": 92.708,
+        "female_lfp": 58.374,
+        "urban_pct": 64.024,
+        "log_gdp_pc": 10.048,
+        "internet_pct": 84.9,
+        "mobile_per100": 130.9,
+        "inflation_vol": 1.62,
+        "global_epu": 237.178,
+        "tfr": 1.336
+      },
+      "ECA": {
+        "female_edu_secondary": 98.64,
+        "female_lfp": 44.469,
+        "urban_pct": 68.162,
+        "log_gdp_pc": 10.067,
+        "internet_pct": 84.6,
+        "mobile_per100": 113.2,
+        "inflation_vol": 3.568,
+        "global_epu": 237.178,
+        "tfr": 1.984
+      },
+      "ECS": {
+        "female_edu_secondary": 102.525,
+        "female_lfp": 51.47,
+        "urban_pct": 73.843,
+        "log_gdp_pc": 10.694,
+        "internet_pct": 89.6,
+        "mobile_per100": 130.2,
+        "inflation_vol": 3.962,
+        "global_epu": 237.178,
+        "tfr": 1.579
+      },
+      "ECU": {
+        "female_edu_secondary": 94.183,
+        "female_lfp": 52.521,
+        "urban_pct": 63.131,
+        "log_gdp_pc": 9.571,
+        "internet_pct": 72.694,
+        "mobile_per100": 101.032,
+        "inflation_vol": 1.684,
+        "global_epu": 237.178,
+        "tfr": 1.823
+      },
+      "EGY": {
+        "female_edu_secondary": 83.047,
+        "female_lfp": 15.3,
+        "urban_pct": 42.71,
+        "log_gdp_pc": 9.723,
+        "internet_pct": 72.69,
+        "mobile_per100": 92.826,
+        "inflation_vol": 14.702,
+        "global_epu": 237.178,
+        "tfr": 2.75
+      },
+      "EMU": {
+        "female_edu_secondary": 108.209,
+        "female_lfp": 51.955,
+        "urban_pct": 77.276,
+        "log_gdp_pc": 10.935,
+        "global_epu": 237.178,
+        "tfr": 1.377
+      },
+      "ERI": {
+        "female_lfp": 72.385,
+        "urban_pct": 34.696,
+        "internet_pct": 20.01,
+        "global_epu": 237.178,
+        "tfr": 3.713
+      },
+      "ESP": {
+        "female_edu_secondary": 120.572,
+        "female_lfp": 52.842,
+        "urban_pct": 80.128,
+        "log_gdp_pc": 10.765,
+        "internet_pct": 95.446,
+        "mobile_per100": 127.715,
+        "inflation_vol": 2.94,
+        "global_epu": 237.178,
+        "tfr": 1.12
+      },
+      "EST": {
+        "female_edu_secondary": 110.661,
+        "female_lfp": 61.049,
+        "urban_pct": 70.677,
+        "log_gdp_pc": 10.628,
+        "internet_pct": 93.183,
+        "mobile_per100": 150.196,
+        "inflation_vol": 7.556,
+        "global_epu": 237.178,
+        "tfr": 1.31
+      },
+      "ETH": {
+        "female_lfp": 57.378,
+        "urban_pct": 23.059,
+        "log_gdp_pc": 7.922,
+        "inflation_vol": 3.526,
+        "global_epu": 237.178,
+        "tfr": 3.989
+      },
+      "EUU": {
+        "female_edu_secondary": 107.277,
+        "female_lfp": 51.904,
+        "urban_pct": 74.894,
+        "log_gdp_pc": 10.894,
+        "inflation_vol": 3.159,
+        "global_epu": 237.178,
+        "tfr": 1.386
+      },
+      "FCS": {
+        "female_edu_secondary": 44.592,
+        "female_lfp": 53.394,
+        "urban_pct": 45.778,
+        "log_gdp_pc": 8.651,
+        "internet_pct": 36.1,
+        "mobile_per100": 80.3,
+        "inflation_vol": 2.571,
+        "global_epu": 237.178,
+        "tfr": 4.182
+      },
+      "FIN": {
+        "female_edu_secondary": 151.367,
+        "female_lfp": 57.489,
+        "urban_pct": 74.006,
+        "log_gdp_pc": 10.938,
+        "internet_pct": 93.514,
+        "mobile_per100": 127.473,
+        "inflation_vol": 2.63,
+        "global_epu": 237.178,
+        "tfr": 1.26
+      },
+      "FJI": {
+        "female_edu_secondary": 99.171,
+        "female_lfp": 38.593,
+        "urban_pct": 58.607,
+        "log_gdp_pc": 9.488,
+        "internet_pct": 79.349,
+        "inflation_vol": 2.083,
+        "global_epu": 237.178,
+        "tfr": 2.281
+      },
+      "FRA": {
+        "female_edu_secondary": 104.396,
+        "female_lfp": 51.826,
+        "urban_pct": 78.78,
+        "log_gdp_pc": 10.902,
+        "internet_pct": 86.836,
+        "mobile_per100": 116.688,
+        "inflation_vol": 1.975,
+        "global_epu": 237.178,
+        "tfr": 1.66
+      },
+      "FRO": {
+        "urban_pct": 39.198,
+        "log_gdp_pc": 11.182,
+        "global_epu": 237.178,
+        "tfr": 1.859
+      },
+      "FSM": {
+        "urban_pct": 22.433,
+        "log_gdp_pc": 8.247,
+        "inflation_vol": 1.568,
+        "global_epu": 237.178,
+        "tfr": 2.748
+      },
+      "GAB": {
+        "female_lfp": 41.863,
+        "urban_pct": 91.638,
+        "log_gdp_pc": 9.836,
+        "internet_pct": 71.926,
+        "mobile_per100": 122.607,
+        "inflation_vol": 1.669,
+        "global_epu": 237.178,
+        "tfr": 3.647
+      },
+      "GBR": {
+        "female_edu_secondary": 113.908,
+        "female_lfp": 57.365,
+        "urban_pct": 83.16,
+        "log_gdp_pc": 10.87,
+        "internet_pct": 96.299,
+        "mobile_per100": 122.796,
+        "inflation_vol": 2.851,
+        "global_epu": 237.178,
+        "tfr": 1.56
+      },
+      "GEO": {
+        "female_edu_secondary": 99.848,
+        "female_lfp": 55.037,
+        "urban_pct": 60.752,
+        "log_gdp_pc": 10.025,
+        "internet_pct": 81.884,
+        "mobile_per100": 155.25,
+        "inflation_vol": 4.901,
+        "global_epu": 237.178,
+        "tfr": 1.81
+      },
+      "GHA": {
+        "female_lfp": 61.815,
+        "urban_pct": 57.807,
+        "log_gdp_pc": 8.826,
+        "internet_pct": 69.945,
+        "mobile_per100": 98.806,
+        "inflation_vol": 14.672,
+        "global_epu": 237.178,
+        "tfr": 3.397
+      },
+      "GIB": {
+        "female_edu_secondary": 75.078,
+        "urban_pct": 100.0,
+        "global_epu": 237.178,
+        "tfr": 1.888
+      },
+      "GIN": {
+        "female_lfp": 42.094,
+        "urban_pct": 37.645,
+        "log_gdp_pc": 8.27,
+        "internet_pct": 26.501,
+        "inflation_vol": 2.402,
+        "global_epu": 237.178,
+        "tfr": 4.217
+      },
+      "GMB": {
+        "female_lfp": 45.242,
+        "urban_pct": 63.802,
+        "log_gdp_pc": 7.994,
+        "internet_pct": 45.914,
+        "inflation_vol": 4.817,
+        "global_epu": 237.178,
+        "tfr": 4.006
+      },
+      "GNB": {
+        "female_lfp": 56.485,
+        "urban_pct": 45.592,
+        "log_gdp_pc": 7.899,
+        "internet_pct": 32.466,
+        "mobile_per100": 128.111,
+        "inflation_vol": 3.65,
+        "global_epu": 237.178,
+        "tfr": 3.836
+      },
+      "GNQ": {
+        "female_lfp": 52.997,
+        "urban_pct": 71.129,
+        "log_gdp_pc": 9.661,
+        "internet_pct": 60.366,
+        "inflation_vol": 2.46,
+        "global_epu": 237.178,
+        "tfr": 4.081
+      },
+      "GRC": {
+        "female_edu_secondary": 104.025,
+        "female_lfp": 44.673,
+        "urban_pct": 78.775,
+        "log_gdp_pc": 10.511,
+        "internet_pct": 85.01,
+        "mobile_per100": 110.792,
+        "inflation_vol": 4.362,
+        "global_epu": 237.178,
+        "tfr": 1.32
+      },
+      "GRD": {
+        "urban_pct": 36.462,
+        "log_gdp_pc": 9.746,
+        "internet_pct": 74.12,
+        "inflation_vol": 0.821,
+        "global_epu": 237.178,
+        "tfr": 1.487
+      },
+      "GRL": {
+        "urban_pct": 88.063,
+        "log_gdp_pc": 11.171,
+        "global_epu": 237.178,
+        "tfr": 1.769
+      },
+      "GTM": {
+        "female_edu_secondary": 48.248,
+        "female_lfp": 40.412,
+        "urban_pct": 55.608,
+        "log_gdp_pc": 9.424,
+        "internet_pct": 56.053,
+        "mobile_per100": 113.709,
+        "inflation_vol": 1.362,
+        "global_epu": 237.178,
+        "tfr": 2.311
+      },
+      "GUM": {
+        "female_lfp": 56.425,
+        "urban_pct": 94.135,
+        "global_epu": 237.178,
+        "tfr": 2.781
+      },
+      "GUY": {
+        "female_edu_secondary": 84.254,
+        "female_lfp": 40.327,
+        "urban_pct": 26.465,
+        "log_gdp_pc": 10.806,
+        "internet_pct": 81.722,
+        "inflation_vol": 1.679,
+        "global_epu": 237.178,
+        "tfr": 2.412
+      },
+      "HIC": {
+        "female_edu_secondary": 103.021,
+        "female_lfp": 54.396,
+        "urban_pct": 80.017,
+        "log_gdp_pc": 10.96,
+        "internet_pct": 91.9,
+        "mobile_per100": 135.8,
+        "inflation_vol": 2.508,
+        "global_epu": 237.178,
+        "tfr": 1.435
+      },
+      "HKG": {
+        "female_lfp": 52.412,
+        "urban_pct": 100.0,
+        "log_gdp_pc": 11.073,
+        "internet_pct": 95.978,
+        "mobile_per100": 319.494,
+        "inflation_vol": 0.265,
+        "global_epu": 237.178,
+        "tfr": 0.751
+      },
+      "HND": {
+        "female_edu_secondary": 59.441,
+        "female_lfp": 39.675,
+        "urban_pct": 58.313,
+        "log_gdp_pc": 8.775,
+        "internet_pct": 58.279,
+        "mobile_per100": 74.415,
+        "inflation_vol": 2.305,
+        "global_epu": 237.178,
+        "tfr": 2.5
+      },
+      "HPC": {
+        "female_edu_secondary": 39.513,
+        "female_lfp": 58.956,
+        "urban_pct": 37.39,
+        "log_gdp_pc": 8.042,
+        "inflation_vol": 2.645,
+        "global_epu": 237.178,
+        "tfr": 4.477
+      },
+      "HRV": {
+        "female_edu_secondary": 108.546,
+        "female_lfp": 47.144,
+        "urban_pct": 57.243,
+        "log_gdp_pc": 10.629,
+        "internet_pct": 83.241,
+        "mobile_per100": 117.113,
+        "inflation_vol": 4.178,
+        "global_epu": 237.178,
+        "tfr": 1.46
+      },
+      "HTI": {
+        "female_lfp": 60.128,
+        "urban_pct": 54.45,
+        "log_gdp_pc": 7.995,
+        "inflation_vol": 10.807,
+        "global_epu": 237.178,
+        "tfr": 2.656
+      },
+      "HUN": {
+        "female_edu_secondary": 104.917,
+        "female_lfp": 53.938,
+        "urban_pct": 70.292,
+        "log_gdp_pc": 10.605,
+        "internet_pct": 91.45,
+        "mobile_per100": 105.054,
+        "inflation_vol": 6.336,
+        "global_epu": 237.178,
+        "tfr": 1.51
+      },
+      "IBD": {
+        "female_edu_secondary": 88.591,
+        "female_lfp": 46.662,
+        "urban_pct": 58.031,
+        "log_gdp_pc": 9.785,
+        "internet_pct": 77.3,
+        "mobile_per100": 113.9,
+        "inflation_vol": 2.446,
+        "global_epu": 237.178,
+        "tfr": 1.717
+      },
+      "IBT": {
+        "female_edu_secondary": 73.718,
+        "female_lfp": 47.743,
+        "urban_pct": 53.081,
+        "log_gdp_pc": 9.561,
+        "internet_pct": 65.5,
+        "mobile_per100": 106.7,
+        "inflation_vol": 2.284,
+        "global_epu": 237.178,
+        "tfr": 2.308
+      },
+      "IDA": {
+        "female_edu_secondary": 47.945,
+        "female_lfp": 51.299,
+        "urban_pct": 40.222,
+        "log_gdp_pc": 8.512,
+        "internet_pct": 34.5,
+        "mobile_per100": 88.0,
+        "inflation_vol": 2.089,
+        "global_epu": 237.178,
+        "tfr": 3.842
+      },
+      "IDB": {
+        "female_edu_secondary": 48.469,
+        "female_lfp": 51.76,
+        "urban_pct": 48.177,
+        "log_gdp_pc": 8.792,
+        "internet_pct": 38.3,
+        "mobile_per100": 95.3,
+        "inflation_vol": 1.443,
+        "global_epu": 237.178,
+        "tfr": 3.907
+      },
+      "IDN": {
+        "female_edu_secondary": 97.405,
+        "female_lfp": 52.545,
+        "urban_pct": 58.118,
+        "log_gdp_pc": 9.539,
+        "internet_pct": 69.208,
+        "mobile_per100": 125.238,
+        "inflation_vol": 1.4,
+        "global_epu": 237.178,
+        "tfr": 2.127
+      },
+      "IDX": {
+        "female_edu_secondary": 48.062,
+        "female_lfp": 51.052,
+        "urban_pct": 35.966,
+        "log_gdp_pc": 8.326,
+        "internet_pct": 32.5,
+        "mobile_per100": 84.1,
+        "inflation_vol": 2.603,
+        "global_epu": 237.178,
+        "tfr": 3.808
+      },
+      "IMN": {
+        "urban_pct": 52.183,
+        "global_epu": 237.178,
+        "tfr": 1.548
+      },
+      "IND": {
+        "female_edu_secondary": 79.212,
+        "female_lfp": 31.243,
+        "urban_pct": 35.068,
+        "log_gdp_pc": 9.138,
+        "mobile_per100": 80.563,
+        "inflation_vol": 0.799,
+        "global_epu": 237.178,
+        "tfr": 1.975
+      },
+      "IRL": {
+        "female_lfp": 59.968,
+        "urban_pct": 64.115,
+        "log_gdp_pc": 11.677,
+        "internet_pct": 96.497,
+        "mobile_per100": 110.798,
+        "inflation_vol": 2.833,
+        "global_epu": 237.178,
+        "tfr": 1.5
+      },
+      "IRN": {
+        "female_lfp": 13.592,
+        "urban_pct": 76.676,
+        "log_gdp_pc": 9.744,
+        "internet_pct": 79.631,
+        "mobile_per100": 166.28,
+        "inflation_vol": 0.66,
+        "global_epu": 237.178,
+        "tfr": 1.695
+      },
+      "IRQ": {
+        "female_lfp": 10.872,
+        "urban_pct": 69.868,
+        "log_gdp_pc": 9.488,
+        "internet_pct": 81.729,
+        "mobile_per100": 101.389,
+        "inflation_vol": 0.85,
+        "global_epu": 237.178,
+        "tfr": 3.249
+      },
+      "ISL": {
+        "female_edu_secondary": 106.321,
+        "female_lfp": 70.368,
+        "urban_pct": 94.152,
+        "log_gdp_pc": 11.129,
+        "internet_pct": 99.83,
+        "mobile_per100": 123.382,
+        "inflation_vol": 2.364,
+        "global_epu": 237.178,
+        "tfr": 1.59
+      },
+      "ISR": {
+        "female_edu_secondary": 96.716,
+        "female_lfp": 61.825,
+        "urban_pct": 91.509,
+        "log_gdp_pc": 10.769,
+        "internet_pct": 87.038,
+        "mobile_per100": 153.337,
+        "inflation_vol": 1.642,
+        "global_epu": 237.178,
+        "tfr": 2.85
+      },
+      "ITA": {
+        "female_edu_secondary": 100.402,
+        "female_lfp": 41.313,
+        "urban_pct": 69.538,
+        "log_gdp_pc": 10.876,
+        "internet_pct": 87.028,
+        "mobile_per100": 131.872,
+        "inflation_vol": 3.182,
+        "global_epu": 237.178,
+        "tfr": 1.2
+      },
+      "JAM": {
+        "female_edu_secondary": 85.604,
+        "female_lfp": 61.172,
+        "urban_pct": 58.451,
+        "log_gdp_pc": 9.341,
+        "internet_pct": 89.473,
+        "mobile_per100": 115.092,
+        "inflation_vol": 2.433,
+        "global_epu": 237.178,
+        "tfr": 1.358
+      },
+      "JOR": {
+        "female_edu_secondary": 93.191,
+        "female_lfp": 14.004,
+        "urban_pct": 92.682,
+        "log_gdp_pc": 9.146,
+        "internet_pct": 92.534,
+        "mobile_per100": 67.546,
+        "inflation_vol": 1.498,
+        "global_epu": 237.178,
+        "tfr": 2.639
+      },
+      "JPN": {
+        "female_edu_secondary": 102.432,
+        "female_lfp": 54.847,
+        "urban_pct": 92.083,
+        "log_gdp_pc": 10.733,
+        "internet_pct": 86.981,
+        "mobile_per100": 178.432,
+        "inflation_vol": 1.84,
+        "global_epu": 237.178,
+        "tfr": 1.2
+      },
+      "KAZ": {
+        "female_edu_secondary": 94.867,
+        "female_lfp": 66.596,
+        "urban_pct": 61.756,
+        "log_gdp_pc": 10.455,
+        "internet_pct": 92.879,
+        "mobile_per100": 127.115,
+        "inflation_vol": 3.949,
+        "global_epu": 237.178,
+        "tfr": 3.012
+      },
+      "KEN": {
+        "female_edu_secondary": 84.751,
+        "female_lfp": 62.434,
+        "urban_pct": 31.633,
+        "log_gdp_pc": 8.647,
+        "internet_pct": 35.0,
+        "mobile_per100": 120.612,
+        "inflation_vol": 0.899,
+        "global_epu": 237.178,
+        "tfr": 3.208
+      },
+      "KGZ": {
+        "female_edu_secondary": 92.103,
+        "female_lfp": 53.068,
+        "urban_pct": 34.706,
+        "log_gdp_pc": 8.791,
+        "internet_pct": 88.47,
+        "mobile_per100": 108.591,
+        "inflation_vol": 1.604,
+        "global_epu": 237.178,
+        "tfr": 2.7
+      },
+      "KHM": {
+        "female_edu_secondary": 60.334,
+        "female_lfp": 73.986,
+        "urban_pct": 40.629,
+        "log_gdp_pc": 8.809,
+        "internet_pct": 60.717,
+        "mobile_per100": 120.809,
+        "inflation_vol": 1.676,
+        "global_epu": 237.178,
+        "tfr": 2.579
+      },
+      "KIR": {
+        "female_edu_secondary": 100.552,
+        "urban_pct": 61.524,
+        "log_gdp_pc": 8.052,
+        "internet_pct": 88.0,
+        "mobile_per100": 51.254,
+        "inflation_vol": 3.62,
+        "global_epu": 237.178,
+        "tfr": 3.147
+      },
+      "KNA": {
+        "female_edu_secondary": 130.728,
+        "urban_pct": 31.701,
+        "log_gdp_pc": 10.329,
+        "internet_pct": 76.421,
+        "mobile_per100": 118.893,
+        "inflation_vol": 1.193,
+        "global_epu": 237.178,
+        "tfr": 1.505
+      },
+      "KOR": {
+        "female_edu_secondary": 95.969,
+        "female_lfp": 56.038,
+        "urban_pct": 81.165,
+        "log_gdp_pc": 10.897,
+        "internet_pct": 97.416,
+        "mobile_per100": 162.114,
+        "inflation_vol": 1.301,
+        "global_epu": 237.178,
+        "tfr": 0.721
+      },
+      "KWT": {
+        "female_lfp": 48.865,
+        "urban_pct": 100.0,
+        "log_gdp_pc": 10.774,
+        "internet_pct": 99.747,
+        "mobile_per100": 167.684,
+        "inflation_vol": 0.281,
+        "global_epu": 237.178,
+        "tfr": 1.524
+      },
+      "LAC": {
+        "female_edu_secondary": 100.38,
+        "female_lfp": 52.028,
+        "urban_pct": 80.526,
+        "log_gdp_pc": 9.839,
+        "internet_pct": 79.7,
+        "mobile_per100": 113.0,
+        "inflation_vol": 2.149,
+        "global_epu": 237.178,
+        "tfr": 1.81
+      },
+      "LAO": {
+        "female_edu_secondary": 53.257,
+        "female_lfp": 61.365,
+        "urban_pct": 38.807,
+        "log_gdp_pc": 9.033,
+        "internet_pct": 63.626,
+        "mobile_per100": 64.759,
+        "inflation_vol": 14.095,
+        "global_epu": 237.178,
+        "tfr": 2.421
+      },
+      "LBN": {
+        "female_edu_secondary": 66.737,
+        "female_lfp": 27.537,
+        "urban_pct": 90.452,
+        "log_gdp_pc": 9.335,
+        "internet_pct": 83.493,
+        "inflation_vol": 34.684,
+        "global_epu": 237.178,
+        "tfr": 2.239
+      },
+      "LBR": {
+        "female_lfp": 72.09,
+        "urban_pct": 54.998,
+        "log_gdp_pc": 7.388,
+        "internet_pct": 23.498,
+        "inflation_vol": 1.384,
+        "global_epu": 237.178,
+        "tfr": 3.95
+      },
+      "LBY": {
+        "female_lfp": 33.149,
+        "urban_pct": 87.865,
+        "log_gdp_pc": 9.432,
+        "internet_pct": 88.499,
+        "inflation_vol": 1.119,
+        "global_epu": 237.178,
+        "tfr": 2.355
+      },
+      "LCA": {
+        "female_edu_secondary": 90.533,
+        "female_lfp": 63.026,
+        "urban_pct": 29.098,
+        "log_gdp_pc": 10.061,
+        "internet_pct": 70.083,
+        "inflation_vol": 1.993,
+        "global_epu": 237.178,
+        "tfr": 1.379
+      },
+      "LCN": {
+        "female_edu_secondary": 100.539,
+        "female_lfp": 51.299,
+        "urban_pct": 81.044,
+        "log_gdp_pc": 9.886,
+        "internet_pct": 80.0,
+        "mobile_per100": 112.6,
+        "inflation_vol": 2.005,
+        "global_epu": 237.178,
+        "tfr": 1.795
+      },
+      "LDC": {
+        "female_edu_secondary": 45.435,
+        "female_lfp": 53.119,
+        "urban_pct": 35.696,
+        "log_gdp_pc": 8.267,
+        "internet_pct": 29.9,
+        "mobile_per100": 82.2,
+        "inflation_vol": 2.657,
+        "global_epu": 237.178,
+        "tfr": 3.961
+      },
+      "LIC": {
+        "female_lfp": 53.62,
+        "urban_pct": 36.805,
+        "log_gdp_pc": 7.717,
+        "internet_pct": 22.0,
+        "mobile_per100": 65.2,
+        "inflation_vol": 2.249,
+        "global_epu": 237.178,
+        "tfr": 4.65
+      },
+      "LIE": {
+        "urban_pct": 14.678,
+        "internet_pct": 97.344,
+        "mobile_per100": 127.059,
+        "global_epu": 237.178,
+        "tfr": 1.45
+      },
+      "LKA": {
+        "female_edu_secondary": 90.449,
+        "female_lfp": 31.619,
+        "urban_pct": 20.146,
+        "log_gdp_pc": 9.475,
+        "internet_pct": 51.2,
+        "mobile_per100": 142.277,
+        "inflation_vol": 22.418,
+        "global_epu": 237.178,
+        "tfr": 1.974
+      },
+      "LMC": {
+        "female_edu_secondary": 68.203,
+        "female_lfp": 40.117,
+        "urban_pct": 41.215,
+        "log_gdp_pc": 9.065,
+        "internet_pct": 55.4,
+        "mobile_per100": 92.8,
+        "inflation_vol": 1.949,
+        "global_epu": 237.178,
+        "tfr": 2.586
+      },
+      "LMY": {
+        "female_edu_secondary": 73.448,
+        "female_lfp": 47.51,
+        "urban_pct": 52.929,
+        "log_gdp_pc": 9.501,
+        "inflation_vol": 2.134,
+        "global_epu": 237.178,
+        "tfr": 2.305
+      },
+      "LSO": {
+        "female_lfp": 49.096,
+        "urban_pct": 42.678,
+        "log_gdp_pc": 7.862,
+        "internet_pct": 47.991,
+        "mobile_per100": 69.351,
+        "inflation_vol": 1.208,
+        "global_epu": 237.178,
+        "tfr": 2.694
+      },
+      "LTE": {
+        "female_edu_secondary": 94.539,
+        "female_lfp": 57.629,
+        "urban_pct": 66.91,
+        "log_gdp_pc": 10.077,
+        "inflation_vol": 2.573,
+        "global_epu": 237.178,
+        "tfr": 1.269
+      },
+      "LTU": {
+        "female_edu_secondary": 104.355,
+        "female_lfp": 57.914,
+        "urban_pct": 68.575,
+        "log_gdp_pc": 10.74,
+        "internet_pct": 88.503,
+        "mobile_per100": 137.204,
+        "inflation_vol": 7.718,
+        "global_epu": 237.178,
+        "tfr": 1.18
+      },
+      "LUX": {
+        "female_edu_secondary": 108.686,
+        "female_lfp": 57.213,
+        "urban_pct": 94.802,
+        "log_gdp_pc": 11.776,
+        "internet_pct": 99.348,
+        "mobile_per100": 144.475,
+        "inflation_vol": 1.946,
+        "global_epu": 237.178,
+        "tfr": 1.25
+      },
+      "LVA": {
+        "female_edu_secondary": 102.485,
+        "female_lfp": 55.383,
+        "urban_pct": 68.359,
+        "log_gdp_pc": 10.526,
+        "internet_pct": 92.188,
+        "mobile_per100": 119.91,
+        "inflation_vol": 7.061,
+        "global_epu": 237.178,
+        "tfr": 1.36
+      },
+      "MAC": {
+        "female_edu_secondary": 91.799,
+        "female_lfp": 58.215,
+        "urban_pct": 100.0,
+        "log_gdp_pc": 11.56,
+        "internet_pct": 89.181,
+        "mobile_per100": 192.478,
+        "inflation_vol": 0.51,
+        "global_epu": 237.178,
+        "tfr": 0.586
+      },
+      "MAF": {
+        "urban_pct": 100.0,
+        "global_epu": 237.178,
+        "tfr": 2.718
+      },
+      "MAR": {
+        "female_edu_secondary": 87.223,
+        "female_lfp": 19.709,
+        "urban_pct": 62.674,
+        "log_gdp_pc": 9.096,
+        "internet_pct": 91.0,
+        "mobile_per100": 148.155,
+        "inflation_vol": 2.885,
+        "global_epu": 237.178,
+        "tfr": 2.23
+      },
+      "MCO": {
+        "urban_pct": 100.0,
+        "internet_pct": 99.15,
+        "mobile_per100": 104.061,
+        "global_epu": 237.178,
+        "tfr": 2.11
+      },
+      "MDA": {
+        "female_edu_secondary": 96.997,
+        "female_lfp": 69.917,
+        "urban_pct": 43.001,
+        "log_gdp_pc": 9.68,
+        "internet_pct": 80.213,
+        "mobile_per100": 130.772,
+        "inflation_vol": 11.987,
+        "global_epu": 237.178,
+        "tfr": 1.731
+      },
+      "MDG": {
+        "female_lfp": 82.561,
+        "urban_pct": 31.98,
+        "log_gdp_pc": 7.396,
+        "internet_pct": 20.367,
+        "mobile_per100": 75.456,
+        "inflation_vol": 2.039,
+        "global_epu": 237.178,
+        "tfr": 3.972
+      },
+      "MDV": {
+        "female_edu_secondary": 84.989,
+        "female_lfp": 40.801,
+        "urban_pct": 41.51,
+        "log_gdp_pc": 10.014,
+        "internet_pct": 84.685,
+        "mobile_per100": 141.601,
+        "inflation_vol": 1.241,
+        "global_epu": 237.178,
+        "tfr": 1.575
+      },
+      "MEA": {
+        "female_edu_secondary": 61.683,
+        "female_lfp": 19.342,
+        "urban_pct": 55.43,
+        "log_gdp_pc": 9.568,
+        "internet_pct": 59.5,
+        "mobile_per100": 102.4,
+        "inflation_vol": 1.162,
+        "global_epu": 237.178,
+        "tfr": 3.008
+      },
+      "MEX": {
+        "female_edu_secondary": 108.701,
+        "female_lfp": 47.317,
+        "urban_pct": 79.473,
+        "log_gdp_pc": 9.995,
+        "internet_pct": 81.183,
+        "mobile_per100": 111.562,
+        "inflation_vol": 1.323,
+        "global_epu": 237.178,
+        "tfr": 1.91
+      },
+      "MHL": {
+        "female_edu_secondary": 96.038,
+        "urban_pct": 78.359,
+        "log_gdp_pc": 8.825,
+        "internet_pct": 65.718,
+        "global_epu": 237.178,
+        "tfr": 2.919
+      },
+      "MIC": {
+        "female_edu_secondary": 79.353,
+        "female_lfp": 47.05,
+        "urban_pct": 54.592,
+        "log_gdp_pc": 9.583,
+        "inflation_vol": 2.091,
+        "global_epu": 237.178,
+        "tfr": 2.075
+      },
+      "MKD": {
+        "female_edu_secondary": 90.174,
+        "female_lfp": 41.898,
+        "urban_pct": 62.252,
+        "log_gdp_pc": 10.063,
+        "internet_pct": 87.182,
+        "mobile_per100": 104.837,
+        "inflation_vol": 5.5,
+        "global_epu": 237.178,
+        "tfr": 1.5
+      },
+      "MLI": {
+        "female_edu_secondary": 37.131,
+        "female_lfp": 58.03,
+        "urban_pct": 31.003,
+        "log_gdp_pc": 7.959,
+        "internet_pct": 35.092,
+        "inflation_vol": 3.94,
+        "global_epu": 237.178,
+        "tfr": 5.614
+      },
+      "MLT": {
+        "female_edu_secondary": 103.851,
+        "female_lfp": 55.016,
+        "urban_pct": 95.627,
+        "log_gdp_pc": 11.009,
+        "internet_pct": 92.073,
+        "mobile_per100": 140.594,
+        "inflation_vol": 2.44,
+        "global_epu": 237.178,
+        "tfr": 1.06
+      },
+      "MMR": {
+        "female_lfp": 41.061,
+        "urban_pct": 30.382,
+        "log_gdp_pc": 8.587,
+        "internet_pct": 58.536,
+        "mobile_per100": 121.028,
+        "global_epu": 237.178,
+        "tfr": 2.115
+      },
+      "MNA": {
+        "female_lfp": 17.287,
+        "urban_pct": 52.423,
+        "log_gdp_pc": 9.198,
+        "internet_pct": 55.9,
+        "mobile_per100": 96.9,
+        "inflation_vol": 1.594,
+        "global_epu": 237.178,
+        "tfr": 3.084
+      },
+      "MNE": {
+        "female_edu_secondary": 95.145,
+        "female_lfp": 41.601,
+        "urban_pct": 65.473,
+        "log_gdp_pc": 10.213,
+        "internet_pct": 89.805,
+        "mobile_per100": 207.238,
+        "inflation_vol": 5.338,
+        "global_epu": 237.178,
+        "tfr": 1.74
+      },
+      "MNG": {
+        "female_edu_secondary": 99.367,
+        "female_lfp": 53.596,
+        "urban_pct": 70.446,
+        "log_gdp_pc": 9.694,
+        "internet_pct": 83.016,
+        "mobile_per100": 141.085,
+        "inflation_vol": 3.931,
+        "global_epu": 237.178,
+        "tfr": 2.7
+      },
+      "MNP": {
+        "urban_pct": 91.975,
+        "global_epu": 237.178,
+        "tfr": 2.348
+      },
+      "MOZ": {
+        "female_lfp": 78.214,
+        "urban_pct": 35.715,
+        "log_gdp_pc": 7.321,
+        "internet_pct": 19.843,
+        "inflation_vol": 2.059,
+        "global_epu": 237.178,
+        "tfr": 4.763
+      },
+      "MRT": {
+        "female_lfp": 26.188,
+        "urban_pct": 59.714,
+        "log_gdp_pc": 8.745,
+        "internet_pct": 37.381,
+        "mobile_per100": 90.772,
+        "inflation_vol": 3.119,
+        "global_epu": 237.178,
+        "tfr": 4.697
+      },
+      "MUS": {
+        "female_lfp": 42.725,
+        "urban_pct": 39.004,
+        "log_gdp_pc": 10.19,
+        "internet_pct": 79.5,
+        "mobile_per100": 165.258,
+        "inflation_vol": 3.379,
+        "global_epu": 237.178,
+        "tfr": 1.39
+      },
+      "MWI": {
+        "female_edu_secondary": 37.256,
+        "female_lfp": 63.482,
+        "urban_pct": 16.975,
+        "log_gdp_pc": 7.408,
+        "internet_pct": 17.988,
+        "mobile_per100": 61.087,
+        "inflation_vol": 9.791,
+        "global_epu": 237.178,
+        "tfr": 3.648
+      },
+      "MYS": {
+        "female_edu_secondary": 82.642,
+        "female_lfp": 51.573,
+        "urban_pct": 76.443,
+        "log_gdp_pc": 10.4,
+        "internet_pct": 97.693,
+        "mobile_per100": 142.732,
+        "inflation_vol": 0.517,
+        "global_epu": 237.178,
+        "tfr": 1.55
+      },
+      "NAC": {
+        "female_edu_secondary": 97.257,
+        "female_lfp": 57.102,
+        "urban_pct": 80.336,
+        "log_gdp_pc": 11.19,
+        "internet_pct": 93.3,
+        "mobile_per100": 110.5,
+        "inflation_vol": 1.952,
+        "global_epu": 237.178,
+        "tfr": 1.578
+      },
+      "NAM": {
+        "female_edu_secondary": 86.207,
+        "female_lfp": 55.408,
+        "urban_pct": 49.955,
+        "log_gdp_pc": 9.224,
+        "internet_pct": 64.406,
+        "mobile_per100": 87.676,
+        "inflation_vol": 1.368,
+        "global_epu": 237.178,
+        "tfr": 3.212
+      },
+      "NCL": {
+        "female_lfp": 52.276,
+        "urban_pct": 67.752,
+        "global_epu": 237.178,
+        "tfr": 1.98
+      },
+      "NER": {
+        "female_edu_secondary": 20.687,
+        "female_lfp": 60.408,
+        "urban_pct": 17.751,
+        "log_gdp_pc": 7.432,
+        "internet_pct": 23.188,
+        "mobile_per100": 65.735,
+        "inflation_vol": 0.272,
+        "global_epu": 237.178,
+        "tfr": 6.061
+      },
+      "NGA": {
+        "female_edu_secondary": 47.406,
+        "female_lfp": 80.768,
+        "urban_pct": 62.175,
+        "log_gdp_pc": 8.967,
+        "internet_pct": 39.214,
+        "mobile_per100": 98.477,
+        "inflation_vol": 4.016,
+        "global_epu": 237.178,
+        "tfr": 4.482
+      },
+      "NIC": {
+        "female_edu_secondary": 70.667,
+        "female_lfp": 49.976,
+        "urban_pct": 59.125,
+        "log_gdp_pc": 8.922,
+        "internet_pct": 58.231,
+        "mobile_per100": 105.843,
+        "inflation_vol": 2.798,
+        "global_epu": 237.178,
+        "tfr": 2.218
+      },
+      "NLD": {
+        "female_edu_secondary": 140.839,
+        "female_lfp": 62.937,
+        "urban_pct": 95.322,
+        "log_gdp_pc": 11.159,
+        "internet_pct": 97.007,
+        "mobile_per100": 117.352,
+        "inflation_vol": 3.937,
+        "global_epu": 237.178,
+        "tfr": 1.43
+      },
+      "NOR": {
+        "female_edu_secondary": 116.642,
+        "female_lfp": 61.765,
+        "urban_pct": 83.072,
+        "log_gdp_pc": 11.409,
+        "internet_pct": 99.0,
+        "inflation_vol": 1.251,
+        "global_epu": 237.178,
+        "tfr": 1.4
+      },
+      "NPL": {
+        "female_edu_secondary": 90.721,
+        "female_lfp": 27.554,
+        "urban_pct": 66.543,
+        "log_gdp_pc": 8.489,
+        "internet_pct": 55.772,
+        "inflation_vol": 1.906,
+        "global_epu": 237.178,
+        "tfr": 1.984
+      },
+      "NRU": {
+        "female_edu_secondary": 93.067,
+        "urban_pct": 100.0,
+        "log_gdp_pc": 9.423,
+        "global_epu": 237.178,
+        "tfr": 3.331
+      },
+      "NZL": {
+        "female_edu_secondary": 117.271,
+        "female_lfp": 66.932,
+        "urban_pct": 83.89,
+        "log_gdp_pc": 10.81,
+        "internet_pct": 96.164,
+        "mobile_per100": 126.855,
+        "inflation_vol": 1.619,
+        "global_epu": 237.178,
+        "tfr": 1.56
+      },
+      "OED": {
+        "female_edu_secondary": 106.006,
+        "female_lfp": 53.223,
+        "urban_pct": 81.054,
+        "log_gdp_pc": 10.877,
+        "inflation_vol": 2.713,
+        "global_epu": 237.178,
+        "tfr": 1.491
+      },
+      "OMN": {
+        "female_lfp": 30.619,
+        "urban_pct": 79.57,
+        "log_gdp_pc": 10.54,
+        "internet_pct": 95.252,
+        "mobile_per100": 135.218,
+        "inflation_vol": 0.778,
+        "global_epu": 237.178,
+        "tfr": 2.525
+      },
+      "OSS": {
+        "female_lfp": 49.736,
+        "urban_pct": 54.741,
+        "log_gdp_pc": 10.109,
+        "inflation_vol": 2.541,
+        "global_epu": 237.178,
+        "tfr": 2.039
+      },
+      "PAK": {
+        "female_edu_secondary": 39.588,
+        "female_lfp": 24.195,
+        "urban_pct": 38.819,
+        "log_gdp_pc": 8.598,
+        "internet_pct": 27.376,
+        "mobile_per100": 76.54,
+        "inflation_vol": 10.637,
+        "global_epu": 237.178,
+        "tfr": 3.605
+      },
+      "PAN": {
+        "female_lfp": 52.694,
+        "urban_pct": 65.86,
+        "log_gdp_pc": 10.488,
+        "internet_pct": 68.549,
+        "mobile_per100": 156.587,
+        "inflation_vol": 0.755,
+        "global_epu": 237.178,
+        "tfr": 2.119
+      },
+      "PER": {
+        "female_edu_secondary": 113.165,
+        "female_lfp": 65.083,
+        "urban_pct": 84.781,
+        "log_gdp_pc": 9.637,
+        "internet_pct": 79.485,
+        "mobile_per100": 121.975,
+        "inflation_vol": 2.033,
+        "global_epu": 237.178,
+        "tfr": 1.98
+      },
+      "PHL": {
+        "female_edu_secondary": 92.205,
+        "female_lfp": 50.369,
+        "urban_pct": 55.124,
+        "log_gdp_pc": 9.2,
+        "internet_pct": 83.766,
+        "mobile_per100": 117.276,
+        "inflation_vol": 1.141,
+        "global_epu": 237.178,
+        "tfr": 1.916
+      },
+      "PLW": {
+        "female_edu_secondary": 97.619,
+        "urban_pct": 79.153,
+        "log_gdp_pc": 9.707,
+        "mobile_per100": 135.387,
+        "inflation_vol": 5.763,
+        "global_epu": 237.178,
+        "tfr": 1.907
+      },
+      "PNG": {
+        "female_edu_secondary": 48.178,
+        "female_lfp": 50.645,
+        "urban_pct": 15.058,
+        "log_gdp_pc": 8.344,
+        "internet_pct": 24.067,
+        "mobile_per100": 34.059,
+        "inflation_vol": 1.533,
+        "global_epu": 237.178,
+        "tfr": 3.099
+      },
+      "POL": {
+        "female_edu_secondary": 107.911,
+        "female_lfp": 51.867,
+        "urban_pct": 59.886,
+        "log_gdp_pc": 10.684,
+        "internet_pct": 86.415,
+        "mobile_per100": 135.146,
+        "inflation_vol": 4.799,
+        "global_epu": 237.178,
+        "tfr": 1.158
+      },
+      "PRE": {
+        "female_edu_secondary": 41.979,
+        "female_lfp": 62.575,
+        "urban_pct": 44.943,
+        "log_gdp_pc": 8.438,
+        "inflation_vol": 2.303,
+        "global_epu": 237.178,
+        "tfr": 4.559
+      },
+      "PRI": {
+        "female_edu_secondary": 112.48,
+        "female_lfp": 32.505,
+        "urban_pct": 94.177,
+        "log_gdp_pc": 10.665,
+        "mobile_per100": 124.513,
+        "global_epu": 237.178,
+        "tfr": 0.92
+      },
+      "PRK": {
+        "female_lfp": 77.674,
+        "urban_pct": 63.538,
+        "global_epu": 237.178,
+        "tfr": 1.78
+      },
+      "PRT": {
+        "female_edu_secondary": 121.013,
+        "female_lfp": 54.891,
+        "urban_pct": 61.205,
+        "log_gdp_pc": 10.64,
+        "internet_pct": 85.79,
+        "mobile_per100": 123.002,
+        "inflation_vol": 3.286,
+        "global_epu": 237.178,
+        "tfr": 1.44
+      },
+      "PRY": {
+        "female_edu_secondary": 81.525,
+        "female_lfp": 58.994,
+        "urban_pct": 69.347,
+        "log_gdp_pc": 9.669,
+        "internet_pct": 78.095,
+        "mobile_per100": 126.605,
+        "inflation_vol": 2.92,
+        "global_epu": 237.178,
+        "tfr": 2.422
+      },
+      "PSE": {
+        "female_edu_secondary": 92.153,
+        "urban_pct": 86.858,
+        "log_gdp_pc": 8.587,
+        "internet_pct": 86.638,
+        "mobile_per100": 76.692,
+        "inflation_vol": 2.319,
+        "global_epu": 237.178,
+        "tfr": 3.311
+      },
+      "PSS": {
+        "female_edu_secondary": 85.15,
+        "female_lfp": 53.706,
+        "urban_pct": 40.253,
+        "log_gdp_pc": 8.865,
+        "inflation_vol": 2.771,
+        "global_epu": 237.178,
+        "tfr": 3.028
+      },
+      "PST": {
+        "female_edu_secondary": 103.375,
+        "female_lfp": 55.032,
+        "urban_pct": 81.061,
+        "log_gdp_pc": 10.977,
+        "inflation_vol": 2.685,
+        "global_epu": 237.178,
+        "tfr": 1.396
+      },
+      "PYF": {
+        "female_lfp": 46.295,
+        "urban_pct": 61.697,
+        "mobile_per100": 118.778,
+        "global_epu": 237.178,
+        "tfr": 1.501
+      },
+      "QAT": {
+        "female_lfp": 63.257,
+        "urban_pct": 99.284,
+        "log_gdp_pc": 11.666,
+        "internet_pct": 99.653,
+        "mobile_per100": 157.821,
+        "inflation_vol": 1.393,
+        "global_epu": 237.178,
+        "tfr": 1.729
+      },
+      "ROU": {
+        "female_edu_secondary": 81.876,
+        "female_lfp": 42.008,
+        "urban_pct": 52.165,
+        "log_gdp_pc": 10.6,
+        "internet_pct": 89.203,
+        "mobile_per100": 123.252,
+        "inflation_vol": 4.408,
+        "global_epu": 237.178,
+        "tfr": 1.71
+      },
+      "RUS": {
+        "female_edu_secondary": 91.615,
+        "female_lfp": 55.199,
+        "urban_pct": 74.981,
+        "log_gdp_pc": 10.594,
+        "internet_pct": 92.245,
+        "mobile_per100": 180.842,
+        "inflation_vol": 4.329,
+        "global_epu": 237.178,
+        "tfr": 1.41
+      },
+      "RWA": {
+        "female_edu_secondary": 48.779,
+        "female_lfp": 58.044,
+        "urban_pct": 28.856,
+        "log_gdp_pc": 8.027,
+        "internet_pct": 34.2,
+        "mobile_per100": 91.462,
+        "inflation_vol": 11.095,
+        "global_epu": 237.178,
+        "tfr": 3.698
+      },
+      "SAS": {
+        "female_edu_secondary": 78.585,
+        "female_lfp": 32.499,
+        "urban_pct": 35.137,
+        "log_gdp_pc": 9.124,
+        "internet_pct": 58.3,
+        "mobile_per100": 85.3,
+        "inflation_vol": 0.926,
+        "global_epu": 237.178,
+        "tfr": 1.996
+      },
+      "SAU": {
+        "female_lfp": 34.112,
+        "urban_pct": 84.296,
+        "log_gdp_pc": 11.074,
+        "internet_pct": 100.0,
+        "mobile_per100": 157.775,
+        "inflation_vol": 0.39,
+        "global_epu": 237.178,
+        "tfr": 2.28
+      },
+      "SDN": {
+        "urban_pct": 34.796,
+        "log_gdp_pc": 7.688,
+        "inflation_vol": 155.765,
+        "global_epu": 237.178,
+        "tfr": 4.323
+      },
+      "SEN": {
+        "female_edu_secondary": 50.215,
+        "female_lfp": 37.103,
+        "urban_pct": 54.699,
+        "log_gdp_pc": 8.367,
+        "internet_pct": 60.612,
+        "mobile_per100": 123.912,
+        "inflation_vol": 3.758,
+        "global_epu": 237.178,
+        "tfr": 3.818
+      },
+      "SGP": {
+        "female_edu_secondary": 102.676,
+        "female_lfp": 61.973,
+        "urban_pct": 100.0,
+        "log_gdp_pc": 11.772,
+        "internet_pct": 94.285,
+        "mobile_per100": 173.2,
+        "inflation_vol": 1.94,
+        "global_epu": 237.178,
+        "tfr": 0.97
+      },
+      "SLB": {
+        "female_lfp": 82.426,
+        "urban_pct": 30.009,
+        "log_gdp_pc": 7.758,
+        "internet_pct": 42.46,
+        "inflation_vol": 3.364,
+        "global_epu": 237.178,
+        "tfr": 3.557
+      },
+      "SLE": {
+        "female_edu_secondary": 91.712,
+        "female_lfp": 51.549,
+        "urban_pct": 44.809,
+        "log_gdp_pc": 8.018,
+        "internet_pct": 20.635,
+        "inflation_vol": 17.945,
+        "global_epu": 237.178,
+        "tfr": 3.791
+      },
+      "SLV": {
+        "female_edu_secondary": 68.534,
+        "female_lfp": 46.622,
+        "urban_pct": 74.608,
+        "log_gdp_pc": 9.344,
+        "internet_pct": 67.656,
+        "mobile_per100": 179.706,
+        "inflation_vol": 2.008,
+        "global_epu": 237.178,
+        "tfr": 1.775
+      },
+      "SMR": {
+        "female_edu_secondary": 59.808,
+        "urban_pct": 97.132,
+        "log_gdp_pc": 11.17,
+        "internet_pct": 87.028,
+        "inflation_vol": 2.337,
+        "global_epu": 237.178,
+        "tfr": 1.149
+      },
+      "SOM": {
+        "female_edu_secondary": 2.758,
+        "female_lfp": 20.942,
+        "urban_pct": 54.071,
+        "log_gdp_pc": 7.245,
+        "mobile_per100": 53.958,
+        "global_epu": 237.178,
+        "tfr": 6.132
+      },
+      "SRB": {
+        "female_lfp": 49.949,
+        "urban_pct": 62.143,
+        "log_gdp_pc": 10.156,
+        "internet_pct": 85.358,
+        "mobile_per100": 128.471,
+        "inflation_vol": 4.676,
+        "global_epu": 237.178,
+        "tfr": 1.61
+      },
+      "SSA": {
+        "female_edu_secondary": 44.21,
+        "female_lfp": 65.943,
+        "urban_pct": 45.981,
+        "log_gdp_pc": 8.525,
+        "internet_pct": 33.5,
+        "mobile_per100": 93.4,
+        "inflation_vol": 2.619,
+        "global_epu": 237.178,
+        "tfr": 4.373
+      },
+      "SSD": {
+        "female_lfp": 71.341,
+        "urban_pct": 21.074,
+        "mobile_per100": 46.615,
+        "inflation_vol": 8.606,
+        "global_epu": 237.178,
+        "tfr": 3.864
+      },
+      "SSF": {
+        "female_edu_secondary": 44.212,
+        "female_lfp": 65.009,
+        "urban_pct": 43.639,
+        "log_gdp_pc": 8.478,
+        "internet_pct": 32.3,
+        "mobile_per100": 90.0,
+        "inflation_vol": 2.514,
+        "global_epu": 237.178,
+        "tfr": 4.332
+      },
+      "SST": {
+        "female_edu_secondary": 78.01,
+        "female_lfp": 50.369,
+        "urban_pct": 51.749,
+        "log_gdp_pc": 10.059,
+        "internet_pct": 71.7,
+        "mobile_per100": 131.0,
+        "inflation_vol": 1.928,
+        "global_epu": 237.178,
+        "tfr": 2.123
+      },
+      "STP": {
+        "female_lfp": 23.113,
+        "urban_pct": 68.604,
+        "log_gdp_pc": 8.62,
+        "internet_pct": 61.461,
+        "mobile_per100": 63.454,
+        "inflation_vol": 6.833,
+        "global_epu": 237.178,
+        "tfr": 3.644
+      },
+      "SUR": {
+        "female_lfp": 44.666,
+        "urban_pct": 65.756,
+        "log_gdp_pc": 9.853,
+        "internet_pct": 78.396,
+        "mobile_per100": 157.246,
+        "inflation_vol": 4.123,
+        "global_epu": 237.178,
+        "tfr": 2.249
+      },
+      "SVK": {
+        "female_edu_secondary": 93.507,
+        "female_lfp": 55.721,
+        "urban_pct": 53.191,
+        "log_gdp_pc": 10.585,
+        "internet_pct": 87.213,
+        "mobile_per100": 138.233,
+        "inflation_vol": 5.036,
+        "global_epu": 237.178,
+        "tfr": 1.49
+      },
+      "SVN": {
+        "female_edu_secondary": 108.571,
+        "female_lfp": 53.532,
+        "urban_pct": 55.538,
+        "log_gdp_pc": 10.778,
+        "internet_pct": 90.378,
+        "mobile_per100": 129.228,
+        "inflation_vol": 3.659,
+        "global_epu": 237.178,
+        "tfr": 1.51
+      },
+      "SWE": {
+        "female_edu_secondary": 143.316,
+        "female_lfp": 61.763,
+        "urban_pct": 88.631,
+        "log_gdp_pc": 11.046,
+        "internet_pct": 95.703,
+        "mobile_per100": 140.266,
+        "inflation_vol": 3.636,
+        "global_epu": 237.178,
+        "tfr": 1.45
+      },
+      "SWZ": {
+        "female_lfp": 44.886,
+        "urban_pct": 25.808,
+        "log_gdp_pc": 9.228,
+        "internet_pct": 57.62,
+        "mobile_per100": 128.399,
+        "global_epu": 237.178,
+        "tfr": 2.753
+      },
+      "SXM": {
+        "urban_pct": 100.0,
+        "log_gdp_pc": 10.749,
+        "global_epu": 237.178,
+        "tfr": 1.447
+      },
+      "SYC": {
+        "female_edu_secondary": 75.884,
+        "urban_pct": 45.097,
+        "log_gdp_pc": 10.262,
+        "internet_pct": 87.401,
+        "mobile_per100": 184.904,
+        "inflation_vol": 5.495,
+        "global_epu": 237.178,
+        "tfr": 2.02
+      },
+      "SYR": {
+        "female_edu_secondary": 42.029,
+        "female_lfp": 13.441,
+        "urban_pct": 72.167,
+        "mobile_per100": 72.441,
+        "global_epu": 237.178,
+        "tfr": 2.712
+      },
+      "TCA": {
+        "female_edu_secondary": 101.72,
+        "urban_pct": 93.932,
+        "log_gdp_pc": 10.368,
+        "global_epu": 237.178,
+        "tfr": 1.463
+      },
+      "TCD": {
+        "female_edu_secondary": 19.24,
+        "female_lfp": 48.702,
+        "urban_pct": 26.331,
+        "log_gdp_pc": 7.797,
+        "internet_pct": 13.183,
+        "mobile_per100": 70.187,
+        "inflation_vol": 5.821,
+        "global_epu": 237.178,
+        "tfr": 6.12
+      },
+      "TEA": {
+        "female_edu_secondary": 91.704,
+        "female_lfp": 58.452,
+        "urban_pct": 61.199,
+        "log_gdp_pc": 9.89,
+        "internet_pct": 85.0,
+        "mobile_per100": 128.1,
+        "inflation_vol": 1.871,
+        "global_epu": 237.178,
+        "tfr": 1.356
+      },
+      "TEC": {
+        "female_edu_secondary": 96.823,
+        "female_lfp": 49.152,
+        "urban_pct": 68.96,
+        "log_gdp_pc": 10.357,
+        "internet_pct": 87.3,
+        "mobile_per100": 136.8,
+        "inflation_vol": 4.373,
+        "global_epu": 237.178,
+        "tfr": 1.728
+      },
+      "TGO": {
+        "female_edu_secondary": 59.085,
+        "female_lfp": 56.119,
+        "urban_pct": 43.25,
+        "log_gdp_pc": 7.952,
+        "internet_pct": 37.022,
+        "mobile_per100": 75.791,
+        "inflation_vol": 1.921,
+        "global_epu": 237.178,
+        "tfr": 4.192
+      },
+      "THA": {
+        "female_edu_secondary": 96.636,
+        "female_lfp": 59.285,
+        "urban_pct": 60.934,
+        "log_gdp_pc": 9.961,
+        "internet_pct": 89.535,
+        "mobile_per100": 168.643,
+        "inflation_vol": 5.202,
+        "global_epu": 237.178,
+        "tfr": 1.212
+      },
+      "TJK": {
+        "female_edu_secondary": 83.787,
+        "female_lfp": 31.743,
+        "urban_pct": 26.189,
+        "log_gdp_pc": 8.406,
+        "internet_pct": 56.791,
+        "global_epu": 237.178,
+        "tfr": 3.072
+      },
+      "TKM": {
+        "female_lfp": 48.708,
+        "urban_pct": 47.068,
+        "log_gdp_pc": 9.791,
+        "global_epu": 237.178,
+        "tfr": 2.69
+      },
+      "TLA": {
+        "female_edu_secondary": 100.539,
+        "female_lfp": 51.614,
+        "urban_pct": 81.04,
+        "log_gdp_pc": 9.881,
+        "internet_pct": 80.2,
+        "mobile_per100": 113.2,
+        "inflation_vol": 1.936,
+        "global_epu": 237.178,
+        "tfr": 1.804
+      },
+      "TLS": {
+        "female_lfp": 60.906,
+        "urban_pct": 28.595,
+        "log_gdp_pc": 8.374,
+        "internet_pct": 34.021,
+        "mobile_per100": 112.647,
+        "inflation_vol": 2.424,
+        "global_epu": 237.178,
+        "tfr": 2.707
+      },
+      "TMN": {
+        "female_lfp": 17.287,
+        "urban_pct": 52.178,
+        "log_gdp_pc": 9.202,
+        "internet_pct": 55.7,
+        "mobile_per100": 97.0,
+        "inflation_vol": 1.697,
+        "global_epu": 237.178,
+        "tfr": 3.083
+      },
+      "TON": {
+        "female_edu_secondary": 97.895,
+        "female_lfp": 41.963,
+        "urban_pct": 21.148,
+        "log_gdp_pc": 8.858,
+        "internet_pct": 58.533,
+        "inflation_vol": 2.895,
+        "global_epu": 237.178,
+        "tfr": 3.129
+      },
+      "TSA": {
+        "female_edu_secondary": 78.585,
+        "female_lfp": 32.499,
+        "urban_pct": 35.137,
+        "log_gdp_pc": 9.124,
+        "internet_pct": 58.3,
+        "mobile_per100": 85.3,
+        "inflation_vol": 0.926,
+        "global_epu": 237.178,
+        "tfr": 1.996
+      },
+      "TSS": {
+        "female_edu_secondary": 44.212,
+        "female_lfp": 65.009,
+        "urban_pct": 43.639,
+        "log_gdp_pc": 8.478,
+        "internet_pct": 32.1,
+        "mobile_per100": 90.0,
+        "inflation_vol": 2.514,
+        "global_epu": 237.178,
+        "tfr": 4.332
+      },
+      "TTO": {
+        "female_edu_secondary": 95.188,
+        "female_lfp": 50.005,
+        "urban_pct": 53.954,
+        "log_gdp_pc": 10.348,
+        "internet_pct": 84.699,
+        "mobile_per100": 134.231,
+        "inflation_vol": 1.926,
+        "global_epu": 237.178,
+        "tfr": 1.532
+      },
+      "TUN": {
+        "female_lfp": 26.781,
+        "urban_pct": 70.027,
+        "log_gdp_pc": 9.445,
+        "internet_pct": 72.354,
+        "mobile_per100": 134.136,
+        "inflation_vol": 1.868,
+        "global_epu": 237.178,
+        "tfr": 1.832
+      },
+      "TUR": {
+        "female_lfp": 35.764,
+        "urban_pct": 89.022,
+        "log_gdp_pc": 10.465,
+        "internet_pct": 85.961,
+        "mobile_per100": 105.684,
+        "inflation_vol": 26.749,
+        "global_epu": 237.178,
+        "tfr": 1.51
+      },
+      "TUV": {
+        "female_edu_secondary": 104.874,
+        "urban_pct": 64.012,
+        "log_gdp_pc": 8.668,
+        "internet_pct": 74.315,
+        "global_epu": 237.178,
+        "tfr": 3.208
+      },
+      "TZA": {
+        "female_lfp": 80.2,
+        "urban_pct": 35.475,
+        "log_gdp_pc": 8.194,
+        "internet_pct": 29.064,
+        "mobile_per100": 105.4,
+        "inflation_vol": 0.354,
+        "global_epu": 237.178,
+        "tfr": 4.606
+      },
+      "UGA": {
+        "female_lfp": 76.448,
+        "urban_pct": 30.606,
+        "log_gdp_pc": 7.934,
+        "internet_pct": 15.252,
+        "mobile_per100": 76.297,
+        "inflation_vol": 2.524,
+        "global_epu": 237.178,
+        "tfr": 4.283
+      },
+      "UKR": {
+        "urban_pct": 69.475,
+        "log_gdp_pc": 9.675,
+        "internet_pct": 82.376,
+        "mobile_per100": 122.758,
+        "inflation_vol": 5.523,
+        "global_epu": 237.178,
+        "tfr": 0.977
+      },
+      "UMC": {
+        "female_edu_secondary": 97.128,
+        "female_lfp": 53.729,
+        "urban_pct": 69.27,
+        "log_gdp_pc": 9.95,
+        "internet_pct": 85.3,
+        "mobile_per100": 127.5,
+        "inflation_vol": 2.631,
+        "global_epu": 237.178,
+        "tfr": 1.475
+      },
+      "URY": {
+        "female_edu_secondary": 125.241,
+        "female_lfp": 57.276,
+        "urban_pct": 95.544,
+        "log_gdp_pc": 10.344,
+        "internet_pct": 89.896,
+        "mobile_per100": 141.719,
+        "inflation_vol": 1.625,
+        "global_epu": 237.178,
+        "tfr": 1.409
+      },
+      "USA": {
+        "female_lfp": 56.602,
+        "urban_pct": 80.072,
+        "log_gdp_pc": 11.214,
+        "internet_pct": 93.144,
+        "mobile_per100": 112.411,
+        "inflation_vol": 2.096,
+        "global_epu": 237.178,
+        "tfr": 1.617
+      },
+      "UZB": {
+        "female_edu_secondary": 97.019,
+        "female_lfp": 39.626,
+        "urban_pct": 50.996,
+        "log_gdp_pc": 9.211,
+        "internet_pct": 89.014,
+        "mobile_per100": 106.885,
+        "inflation_vol": 0.75,
+        "global_epu": 237.178,
+        "tfr": 3.5
+      },
+      "VCT": {
+        "female_edu_secondary": 126.988,
+        "female_lfp": 55.686,
+        "urban_pct": 47.717,
+        "log_gdp_pc": 9.79,
+        "internet_pct": 75.993,
+        "mobile_per100": 101.631,
+        "inflation_vol": 2.116,
+        "global_epu": 237.178,
+        "tfr": 1.775
+      },
+      "VEN": {
+        "female_edu_secondary": 101.693,
+        "female_lfp": 38.018,
+        "urban_pct": 89.25,
+        "mobile_per100": 70.22,
+        "global_epu": 237.178,
+        "tfr": 2.079
+      },
+      "VGB": {
+        "female_edu_secondary": 67.639,
+        "urban_pct": 55.641,
+        "global_epu": 237.178,
+        "tfr": 1.045
+      },
+      "VIR": {
+        "female_lfp": 50.33,
+        "urban_pct": 95.274,
+        "global_epu": 237.178,
+        "tfr": 1.98
+      },
+      "VNM": {
+        "female_lfp": 69.533,
+        "urban_pct": 38.13,
+        "log_gdp_pc": 9.514,
+        "internet_pct": 78.08,
+        "mobile_per100": 130.991,
+        "inflation_vol": 0.792,
+        "global_epu": 237.178,
+        "tfr": 1.913
+      },
+      "VUT": {
+        "female_edu_secondary": 134.926,
+        "female_lfp": 53.991,
+        "urban_pct": 22.265,
+        "log_gdp_pc": 8.075,
+        "internet_pct": 45.731,
+        "mobile_per100": 89.294,
+        "inflation_vol": 4.42,
+        "global_epu": 237.178,
+        "tfr": 3.596
+      },
+      "WLD": {
+        "female_edu_secondary": 76.908,
+        "female_lfp": 48.986,
+        "urban_pct": 57.31,
+        "log_gdp_pc": 9.948,
+        "internet_pct": 69.2,
+        "mobile_per100": 109.8,
+        "inflation_vol": 2.256,
+        "global_epu": 237.178,
+        "tfr": 2.196
+      },
+      "WSM": {
+        "female_lfp": 31.055,
+        "urban_pct": 17.501,
+        "log_gdp_pc": 8.907,
+        "internet_pct": 58.139,
+        "inflation_vol": 3.947,
+        "global_epu": 237.178,
+        "tfr": 3.829
+      },
+      "XKX": {
+        "urban_pct": 49.111,
+        "log_gdp_pc": 9.564,
+        "inflation_vol": 4.364,
+        "global_epu": 237.178,
+        "tfr": 1.545
+      },
+      "YEM": {
+        "female_lfp": 4.939,
+        "urban_pct": 36.571,
+        "mobile_per100": 50.894,
+        "global_epu": 237.178,
+        "tfr": 4.59
+      },
+      "ZAF": {
+        "female_edu_secondary": 107.465,
+        "female_lfp": 52.929,
+        "urban_pct": 63.582,
+        "log_gdp_pc": 9.525,
+        "internet_pct": 75.659,
+        "mobile_per100": 171.509,
+        "inflation_vol": 1.219,
+        "global_epu": 237.178,
+        "tfr": 2.216
+      },
+      "ZMB": {
+        "female_lfp": 53.931,
+        "urban_pct": 45.029,
+        "log_gdp_pc": 8.209,
+        "internet_pct": 33.0,
+        "mobile_per100": 102.062,
+        "inflation_vol": 6.398,
+        "global_epu": 237.178,
+        "tfr": 4.101
+      },
+      "ZWE": {
+        "female_lfp": 59.677,
+        "urban_pct": 39.292,
+        "log_gdp_pc": 8.56,
+        "internet_pct": 38.427,
+        "mobile_per100": 91.634,
+        "inflation_vol": 4.355,
+        "global_epu": 237.178,
+        "tfr": 3.724
+      }
+    },
+    "variable_ranges": {
+      "female_edu_secondary": {
+        "min": 25.384,
+        "max": 117.697,
+        "mean": 79.888
+      },
+      "female_lfp": {
+        "min": 19.067,
+        "max": 73.142,
+        "mean": 50.185
+      },
+      "urban_pct": {
+        "min": 21.799,
+        "max": 96.348,
+        "mean": 57.977
+      },
+      "log_gdp_pc": {
+        "min": 7.591,
+        "max": 11.101,
+        "mean": 9.44
+      },
+      "internet_pct": {
+        "min": 0.564,
+        "max": 91.104,
+        "mean": 38.231
+      },
+      "mobile_per100": {
+        "min": 1.745,
+        "max": 150.953,
+        "mean": 78.227
+      },
+      "inflation_vol": {
+        "min": 0.239,
+        "max": 7.623,
+        "mean": 2.956
+      },
+      "global_epu": {
+        "min": 67.491,
+        "max": 268.857,
+        "mean": 146.272
+      }
+    },
+    "note": "Projection uses entity FE only (not two-way FE) since we are projecting forward and year effects are not available for future years. This is a simple linear sensitivity analysis, not a forecast."
   }
 }
