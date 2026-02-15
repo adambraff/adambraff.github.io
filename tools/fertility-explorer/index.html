@@ -1346,7 +1346,7 @@ function renderGapHeatmap() {
         const r = Math.round(80 + t * 175);
         const g = Math.round(140 - t * 80);
         const b = Math.round(200 - t * 140);
-        html += `<td style="background:rgba(${r},${g},${b},0.25);color:var(--text)" title="n=${cell.n}">+${cell.val.toFixed(2)}</td>`;
+        html += `<td style="background:rgba(${r},${g},${b},0.25);color:var(--text)" title="n=${cell.n}">${cell.val >= 0 ? '+' : ''}${cell.val.toFixed(2)}</td>`;
       }
     }
     html += `<td style="color:var(--text-dim)">${row.totalN.toLocaleString()}</td></tr>`;
