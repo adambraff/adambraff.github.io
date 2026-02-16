@@ -157,6 +157,10 @@
         <div class="chart-wrap"><canvas id="religion-area-chart"></canvas></div>
         <div class="chart-wrap"><canvas id="religion-line-chart"></canvas></div>
     </div>
+    <div style="margin-bottom:1rem">
+        <label for="rel-region-filter" style="font-size:0.9rem;color:var(--text-secondary)">Filter by region: </label>
+        <select id="rel-region-filter"><option value="All">All Regions</option></select>
+    </div>
     <div class="chart-wrap"><canvas id="religiosity-scatter"></canvas></div>
     <div class="finding"><strong>Finding:</strong> Internationally, more religious countries have higher TFR, but the effect is largely mediated through development and education. Within the US, religion's direct effect on fertility (beta = −0.041 for non-religious) is modest compared to marriage.</div>
 </section>
@@ -348,14 +352,18 @@ function hexToRgb(hex) {
 function buildTimeShadeScatter(xField, yField, regionFilter) {
     const countries = G.panel.countries;
     let minYear = 9999, maxYear = 0;
-    Object.values(countries).forEach(c => c.data.forEach(d => {
-        if (d[xField] != null && d[yField] != null) { minYear = Math.min(minYear, d.year); maxYear = Math.max(maxYear, d.year); }
-    }));
+    Object.values(countries).forEach(c => {
+        if ((c.region || 'Other') === 'Other') return; // skip Other region globally
+        c.data.forEach(d => {
+            if (d[xField] != null && d[yField] != null) { minYear = Math.min(minYear, d.year); maxYear = Math.max(maxYear, d.year); }
+        });
+    });
     const yearRange = maxYear - minYear || 1;
 
     const byRegion = {};
     Object.values(countries).forEach(c => {
         const reg = c.region || 'Other';
+        if (reg === 'Other') return; // skip Other region globally
         if (regionFilter && regionFilter !== 'All' && reg !== regionFilter) return;
         if (!byRegion[reg]) byRegion[reg] = [];
         c.data.forEach(d => {
@@ -377,10 +385,10 @@ function buildTimeShadeScatter(xField, yField, regionFilter) {
     });
 }
 
-// Populate region filter dropdown from panel data
+// Populate region filter dropdown from panel data (excludes "Other")
 function populateRegionFilter(selectId) {
     const regions = new Set();
-    Object.values(G.panel.countries).forEach(c => { if (c.region) regions.add(c.region); });
+    Object.values(G.panel.countries).forEach(c => { if (c.region && c.region !== 'Other') regions.add(c.region); });
     const sel = document.getElementById(selectId);
     const sorted = [...regions].sort();
     sel.innerHTML = '<option value="All">All Regions</option>' + sorted.map(r => `<option value="${r}">${r}</option>`).join('');
@@ -447,7 +455,7 @@ function renderCollapse() {
     // Regional bar chart
     const rt = G.panel.overview.regional_trends;
     const latestYear = Math.max(...rt.map(d => d.year));
-    const regData = rt.filter(d => d.year === latestYear).sort((a, b) => b.tfr - a.tfr);
+    const regData = rt.filter(d => d.year === latestYear && d.region !== 'Other').sort((a, b) => b.tfr - a.tfr);
     destroy('regional-tfr-chart');
     G.charts['regional-tfr-chart'] = new Chart(document.getElementById('regional-tfr-chart'), {
         type: 'bar',
@@ -514,7 +522,7 @@ function renderMarriage() {
     const years = [...new Set(distData.map(d => d.year))].sort();
     const statuses = [...new Set(distData.map(d => d.marital_status))];
 
-    // LEFT: stacked area of marital composition
+    // LEFT: 100% stacked area of marital composition
     destroy('marital-area-chart');
     G.charts['marital-area-chart'] = new Chart(document.getElementById('marital-area-chart'), {
         type: 'line',
@@ -522,11 +530,11 @@ function renderMarriage() {
             labels: years,
             datasets: statuses.map((s, i) => ({
                 label: s, data: years.map(y => { const r = distData.find(d => d.year === y && d.marital_status === s); return r ? r.pct : 0; }),
-                backgroundColor: demoColors[i % demoColors.length] + '60', borderColor: demoColors[i % demoColors.length],
+                backgroundColor: demoColors[i % demoColors.length] + '99', borderColor: demoColors[i % demoColors.length],
                 fill: true, pointRadius: 0, tension: 0.3
             }))
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Marital Status Composition (%)', color: '#e4e6ef' } }, scales: { y: { title: { display: true, text: '% of Population' }, stacked: false } } }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Marital Status Composition (%)', color: '#e4e6ef' } }, scales: { y: { title: { display: true, text: '% of Population' }, stacked: true, max: 100 } } }
     });
 
     // RIGHT: line chart of avg children by marital status over eras
@@ -554,7 +562,7 @@ function renderCulture() {
     const years = [...new Set(distData.map(d => d.year))].sort();
     const religions = [...new Set(distData.map(d => d.religion))];
 
-    // LEFT: stacked area of religious composition
+    // LEFT: 100% stacked area of religious composition
     destroy('religion-area-chart');
     G.charts['religion-area-chart'] = new Chart(document.getElementById('religion-area-chart'), {
         type: 'line',
@@ -563,11 +571,11 @@ function renderCulture() {
             datasets: religions.map((rel, i) => ({
                 label: rel,
                 data: years.map(y => { const r = distData.find(d => d.year === y && d.religion === rel); return r ? r.pct : 0; }),
-                backgroundColor: demoColors[i % demoColors.length] + '60', borderColor: demoColors[i % demoColors.length],
+                backgroundColor: demoColors[i % demoColors.length] + '99', borderColor: demoColors[i % demoColors.length],
                 fill: true, pointRadius: 0, tension: 0.3
             }))
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Religious Composition (%)', color: '#e4e6ef' } }, scales: { y: { title: { display: true, text: '% of Population' }, stacked: false } } }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Religious Composition (%)', color: '#e4e6ef' } }, scales: { y: { title: { display: true, text: '% of Population' }, stacked: true, max: 100 } } }
     });
 
     // RIGHT: line chart of avg children by religion over eras
@@ -586,45 +594,61 @@ function renderCulture() {
         options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Avg Children by Religion (GSS)', color: '#e4e6ef' } }, scales: { y: { title: { display: true, text: 'Avg Children' } } } }
     });
 
-    // BOTTOM: Religiosity scatter (international) — country-year level, time-shaded
-    const countries = G.panel.countries;
-    let minYear = 9999, maxYear = 0;
-    const byRegion = {};
-    Object.values(countries).forEach(c => {
-        c.data.forEach(d => {
-            if (d.religiosity_index != null && d.tfr != null) {
-                minYear = Math.min(minYear, d.year); maxYear = Math.max(maxYear, d.year);
-                const reg = c.region || 'Other';
-                if (!byRegion[reg]) byRegion[reg] = [];
-                byRegion[reg].push({ x: d.religiosity_index, y: d.tfr, name: c.name, year: d.year });
+    // BOTTOM: Religiosity scatter (international) — country-year level, time-shaded, with region filter
+    // Populate region dropdown (only regions that have religiosity data)
+    const relRegions = new Set();
+    Object.values(G.panel.countries).forEach(c => {
+        const reg = c.region || 'Other';
+        if (reg === 'Other') return;
+        if (c.data.some(d => d.religiosity_index != null && d.tfr != null)) relRegions.add(reg);
+    });
+    const relSel = document.getElementById('rel-region-filter');
+    relSel.innerHTML = '<option value="All">All Regions</option>' + [...relRegions].sort().map(r => `<option value="${r}">${r}</option>`).join('');
+
+    function renderReligiosityScatter(regionFilter) {
+        const countries = G.panel.countries;
+        let minYear = 9999, maxYear = 0;
+        const byRegion = {};
+        Object.values(countries).forEach(c => {
+            const reg = c.region || 'Other';
+            if (reg === 'Other') return;
+            if (regionFilter && regionFilter !== 'All' && reg !== regionFilter) return;
+            c.data.forEach(d => {
+                if (d.religiosity_index != null && d.tfr != null) {
+                    minYear = Math.min(minYear, d.year); maxYear = Math.max(maxYear, d.year);
+                    if (!byRegion[reg]) byRegion[reg] = [];
+                    byRegion[reg].push({ x: d.religiosity_index, y: d.tfr, name: c.name, year: d.year });
+                }
+            });
+        });
+        const yearRange = maxYear - minYear || 1;
+        const datasets = Object.entries(byRegion).map(([reg, pts]) => {
+            const { r, g, b } = hexToRgb(regionColors[reg] || '#636e72');
+            pts.forEach(p => { p.alpha = 0.15 + 0.85 * ((p.year - minYear) / yearRange); });
+            return {
+                label: reg, data: pts,
+                backgroundColor: pts.map(p => `rgba(${r},${g},${b},${p.alpha})`),
+                borderColor: pts.map(p => `rgba(${r},${g},${b},${Math.min(1, p.alpha + 0.15)})`),
+                pointRadius: 4, borderWidth: 0.5
+            };
+        });
+
+        destroy('religiosity-scatter');
+        G.charts['religiosity-scatter'] = new Chart(document.getElementById('religiosity-scatter'), {
+            type: 'scatter',
+            data: { datasets },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    title: { display: true, text: 'Religiosity vs TFR (Country-Year, darker = older)', color: '#e4e6ef' },
+                    tooltip: timeScatterTooltip('Religiosity', 'TFR')
+                },
+                scales: { x: { title: { display: true, text: 'Religiosity Index' } }, y: { title: { display: true, text: 'TFR' } } }
             }
         });
-    });
-    const yearRange = maxYear - minYear || 1;
-    const relScatterDS = Object.entries(byRegion).map(([reg, pts]) => {
-        const { r, g, b } = hexToRgb(regionColors[reg] || '#636e72');
-        pts.forEach(p => { p.alpha = 0.15 + 0.85 * ((p.year - minYear) / yearRange); });
-        return {
-            label: reg, data: pts,
-            backgroundColor: pts.map(p => `rgba(${r},${g},${b},${p.alpha})`),
-            borderColor: pts.map(p => `rgba(${r},${g},${b},${Math.min(1, p.alpha + 0.15)})`),
-            pointRadius: 4, borderWidth: 0.5
-        };
-    });
-
-    destroy('religiosity-scatter');
-    G.charts['religiosity-scatter'] = new Chart(document.getElementById('religiosity-scatter'), {
-        type: 'scatter',
-        data: { datasets: relScatterDS },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: {
-                title: { display: true, text: 'Religiosity vs TFR (Country-Year, darker = older)', color: '#e4e6ef' },
-                tooltip: timeScatterTooltip('Religiosity', 'TFR')
-            },
-            scales: { x: { title: { display: true, text: 'Religiosity Index' } }, y: { title: { display: true, text: 'TFR' } } }
-        }
-    });
+    }
+    renderReligiosityScatter('All');
+    relSel.addEventListener('change', (e) => renderReligiosityScatter(e.target.value));
 }
 
 // ============================================================
@@ -700,6 +724,7 @@ function renderDevelopment() {
         const byRegion = {};
         Object.values(countries).forEach(c => {
             const reg = c.region || 'Other';
+            if (reg === 'Other') return;
             if (regionFilter && regionFilter !== 'All' && reg !== regionFilter) return;
             c.data.forEach(d => {
                 if (d.log_gdp_pc != null && d.tfr != null) {
@@ -747,9 +772,10 @@ function renderDevelopment() {
     renderGdpScatter('All');
     document.getElementById('dev-region-filter').addEventListener('change', (e) => renderGdpScatter(e.target.value));
 
-    // Binned bar (latest year only)
+    // Binned bar (latest year only, excluding Other)
     const bins = { '<$2K': [], '$2K–$5K': [], '$5K–$15K': [], '$15K–$40K': [], '>$40K': [] };
     Object.values(G.panel.countries).forEach(c => {
+        if ((c.region || 'Other') === 'Other') return;
         const d = c.data[c.data.length - 1];
         if (d?.gdp_pc != null && d?.tfr != null) {
             const gdp = d.gdp_pc;
