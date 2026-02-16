@@ -494,21 +494,20 @@
             <div class="metric-row">
                 <div class="metric-card">
                     <div class="label">Actual Children (1972)</div>
-                    <div class="value">2.30</div>
+                    <div class="value" id="gss-actual-early">--</div>
                 </div>
                 <div class="metric-card">
                     <div class="label">Actual Children (2024)</div>
-                    <div class="value">1.75</div>
-                    <div class="delta negative">-24%</div>
+                    <div class="value" id="gss-actual-late">--</div>
+                    <div class="delta negative" id="gss-actual-delta"></div>
                 </div>
                 <div class="metric-card">
                     <div class="label">Ideal Children (Latest)</div>
-                    <div class="value">2.53</div>
-                    <div class="delta neutral">+10%</div>
+                    <div class="value" id="gss-ideal-late">--</div>
                 </div>
                 <div class="metric-card">
                     <div class="label">Desire Gap (Latest)</div>
-                    <div class="value">+0.78</div>
+                    <div class="value" id="gss-desire-gap">--</div>
                     <div class="delta neutral">Children gap</div>
                 </div>
             </div>
@@ -734,22 +733,22 @@
             <div class="metric-row">
                 <div class="metric-card">
                     <div class="label">Want More Children</div>
-                    <div class="value">52%</div>
+                    <div class="value" id="want-more-pct">--</div>
                     <div class="delta neutral">Latest data</div>
                 </div>
                 <div class="metric-card">
                     <div class="label">Have More Children</div>
-                    <div class="value">19%</div>
+                    <div class="value" id="have-more-pct">--</div>
                     <div class="delta negative">Latest data</div>
                 </div>
                 <div class="metric-card">
                     <div class="label">Matched Desire</div>
-                    <div class="value">29%</div>
+                    <div class="value" id="matched-pct">--</div>
                     <div class="delta neutral">Latest data</div>
                 </div>
                 <div class="metric-card">
                     <div class="label">Mean Gap</div>
-                    <div class="value">+0.84</div>
+                    <div class="value" id="mean-gap">--</div>
                     <div class="delta neutral">Ideal - Actual</div>
                 </div>
             </div>
@@ -1034,9 +1033,27 @@
                 return lat && lat.tfr <= 2.1;
             }).length;
 
-            document.getElementById('global-tfr').textContent = (latest?.global_tfr_weighted || 2.30).toFixed(2);
+            document.getElementById('global-tfr').textContent = (latest?.global_tfr || latest?.global_tfr_weighted || 2.30).toFixed(2);
             document.getElementById('countries-below').textContent = `${latest?.n_below_replacement || below} of ${latest?.n_countries || countries.length}`;
             document.getElementById('share-below').textContent = (latest?.pct_below_replacement || ((below / countries.length) * 100)).toFixed(0) + '%';
+
+            // Populate GSS KPIs from actual/ideal by year data
+            const gssKpis = globalData.gssSummary?.overview_kpis;
+            const actualByYearKpi = globalData.gssSummary?.actual_children_by_year || [];
+            const idealByYearKpi = globalData.gssSummary?.ideal_children_by_year || [];
+            const earlyActual = actualByYearKpi.length > 0 ? actualByYearKpi[0].mean : null;
+            const lateActual = actualByYearKpi.length > 0 ? actualByYearKpi[actualByYearKpi.length - 1].mean : null;
+            const lateIdeal = idealByYearKpi.length > 0 ? idealByYearKpi[idealByYearKpi.length - 1].mean : null;
+            if (earlyActual != null) document.getElementById('gss-actual-early').textContent = earlyActual.toFixed(2);
+            if (lateActual != null) document.getElementById('gss-actual-late').textContent = lateActual.toFixed(2);
+            if (earlyActual != null && lateActual != null) {
+                const pctChange = ((lateActual - earlyActual) / earlyActual * 100).toFixed(0);
+                document.getElementById('gss-actual-delta').textContent = `${pctChange}%`;
+            }
+            if (lateIdeal != null) document.getElementById('gss-ideal-late').textContent = lateIdeal.toFixed(2);
+            if (lateActual != null && lateIdeal != null) {
+                document.getElementById('gss-desire-gap').textContent = '+' + (lateIdeal - lateActual).toFixed(2);
+            }
 
             destroyChart('global-tfr-chart');
             const ctx1 = document.getElementById('global-tfr-chart').getContext('2d');
@@ -1046,8 +1063,8 @@
                     labels: globalTrend.map(d => d.year),
                     datasets: [
                         {
-                            label: 'Global TFR (weighted)',
-                            data: globalTrend.map(d => d.global_tfr_weighted),
+                            label: 'Global Average TFR',
+                            data: globalTrend.map(d => d.global_tfr || d.global_tfr_unweighted),
                             borderColor: '#6c8cff',
                             backgroundColor: 'rgba(108, 140, 255, 0.05)',
                             borderWidth: 2,
@@ -1055,8 +1072,8 @@
                             tension: 0.4
                         },
                         {
-                            label: 'Global TFR (unweighted)',
-                            data: globalTrend.map(d => d.global_tfr_unweighted),
+                            label: 'Median TFR',
+                            data: globalTrend.map(d => d.global_tfr_median),
                             borderColor: '#9d8fff',
                             borderDash: [3, 3],
                             borderWidth: 1.5,
@@ -1080,31 +1097,39 @@
                 }
             });
 
-            // FIX: ideal_vs_actual_trend uses d.year, not d.era
-            const gssLatest = globalData.gssSummary?.ideal_vs_actual_trend || [];
+            // Use actual_children_by_year and ideal_children_by_year for clean separate series
+            const actualByYear = globalData.gssSummary?.actual_children_by_year || [];
+            const idealByYear = globalData.gssSummary?.ideal_children_by_year || [];
+            // Merge on year for consistent labels
+            const allGssYears = [...new Set([...actualByYear.map(d => d.year), ...idealByYear.map(d => d.year)])].sort((a, b) => a - b);
+            const actualMap = Object.fromEntries(actualByYear.map(d => [d.year, d.mean]));
+            const idealMap = Object.fromEntries(idealByYear.map(d => [d.year, d.mean]));
+
             destroyChart('us-actual-ideal-chart');
             const ctx2 = document.getElementById('us-actual-ideal-chart').getContext('2d');
             globalData.charts['us-actual-ideal-chart'] = new Chart(ctx2, {
                 type: 'line',
                 data: {
-                    labels: gssLatest.map(d => d.year),
+                    labels: allGssYears,
                     datasets: [
                         {
                             label: 'Actual Children',
-                            data: gssLatest.map(d => d.avg_actual),
+                            data: allGssYears.map(y => actualMap[y] ?? null),
                             borderColor: '#6c8cff',
                             backgroundColor: 'rgba(108, 140, 255, 0.05)',
                             borderWidth: 2,
                             fill: true,
-                            tension: 0.4
+                            tension: 0.4,
+                            spanGaps: true
                         },
                         {
                             label: 'Ideal Children',
-                            data: gssLatest.map(d => d.avg_ideal),
+                            data: allGssYears.map(y => idealMap[y] ?? null),
                             borderColor: '#ff9d4d',
                             borderWidth: 2,
                             fill: false,
-                            tension: 0.4
+                            tension: 0.4,
+                            spanGaps: true
                         }
                     ]
                 },
@@ -1299,8 +1324,8 @@
                 }
             });
 
-            // FIX: ideal_vs_actual_trend uses d.year, not d.era
-            const gapData = gss?.ideal_vs_actual_trend || [];
+            // Filter out years where ideal is null (GSS didn't ask that year)
+            const gapData = (gss?.ideal_vs_actual_trend || []).filter(d => d.avg_ideal != null);
             destroyChart('ideal-actual-gap-chart');
             const ctx3 = document.getElementById('ideal-actual-gap-chart').getContext('2d');
 
@@ -1310,7 +1335,7 @@
                     labels: gapData.map(d => d.year),
                     datasets: [{
                         label: 'Ideal - Actual Gap',
-                        data: gapData.map(d => (d.avg_ideal || 0) - (d.avg_actual || 0)),
+                        data: gapData.map(d => d.avg_ideal - d.avg_actual),
                         borderColor: '#ff5555',
                         backgroundColor: 'rgba(255, 85, 85, 0.05)',
                         borderWidth: 2,
@@ -1578,6 +1603,16 @@
         function renderUsDive() {
             const gss = globalData.gssSummary;
 
+            // Populate desire gap KPIs from data
+            const dgKpis = gss?.desire_gap_kpis;
+            if (dgKpis) {
+                const el = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+                el('want-more-pct', Math.round(dgKpis.want_more_pct) + '%');
+                el('have-more-pct', Math.round(dgKpis.have_more_pct) + '%');
+                el('matched-pct', Math.round(dgKpis.matched_pct) + '%');
+                el('mean-gap', '+' + dgKpis.latest_avg_gap.toFixed(2));
+            }
+
             const demoSelect = document.getElementById('demo-dimension');
             const metricSelect = document.getElementById('demo-metric');
             const gapHeatmapSelect = document.getElementById('gap-heatmap-dimension');
@@ -1658,8 +1693,8 @@
             metricSelect.addEventListener('change', renderDemographicsTrend);
             renderDemographicsTrend();
 
-            // FIX: ideal_vs_actual_trend uses d.year, not d.era
-            const gapTrendData = gss?.ideal_vs_actual_trend || [];
+            // Filter out years where ideal is null (GSS didn't ask that year)
+            const gapTrendData = (gss?.ideal_vs_actual_trend || []).filter(d => d.avg_ideal != null);
             destroyChart('gap-over-time-chart');
             const ctx = document.getElementById('gap-over-time-chart').getContext('2d');
             globalData.charts['gap-over-time-chart'] = new Chart(ctx, {
@@ -1668,7 +1703,7 @@
                     labels: gapTrendData.map(d => d.year),
                     datasets: [{
                         label: 'Ideal - Actual',
-                        data: gapTrendData.map(d => (d.avg_ideal || 0) - (d.avg_actual || 0)),
+                        data: gapTrendData.map(d => d.avg_ideal - d.avg_actual),
                         borderColor: '#ff9d4d',
                         backgroundColor: 'rgba(255, 157, 77, 0.05)',
                         borderWidth: 2,
@@ -1689,67 +1724,71 @@
                 gapHeatmapSelect.addEventListener('change', renderGapHeatmap);
             }
 
-            // Cohort curves not available in current dataset — show completed fertility trend instead
-            const completedTrendData = gss?.completed_fertility_trend || [];
+            // Cohort curves: show average children at each age for different birth cohorts
+            const cohortCurvesData = gss?.cohort_curves || [];
             destroyChart('cohort-curves-chart');
             const ctx2 = document.getElementById('cohort-curves-chart').getContext('2d');
+            const cohortColors = ['#6c8cff', '#ff9d4d', '#4ae04a', '#9d8fff', '#ff5555', '#00d9ff', '#fbbf24', '#e94560'];
+            const cohortDatasets = cohortCurvesData.map((cohort, idx) => ({
+                label: cohort.cohort,
+                data: cohort.points.map(p => ({ x: p.age_bin, y: p.avg_children })),
+                borderColor: cohortColors[idx % cohortColors.length],
+                borderWidth: 2,
+                fill: false,
+                tension: 0.4
+            }));
+            const allAgeBins = ['18-24','25-29','30-34','35-39','40-44','45-49','50-54','55-59','60-64','65-69','70-74'];
             globalData.charts['cohort-curves-chart'] = new Chart(ctx2, {
                 type: 'line',
                 data: {
-                    labels: completedTrendData.map(d => d.year),
-                    datasets: [{
-                        label: 'Completed Fertility (age 45+)',
-                        data: completedTrendData.map(d => d.completed_fertility),
-                        borderColor: '#6c8cff',
-                        backgroundColor: 'rgba(108, 140, 255, 0.05)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4
-                    }]
+                    labels: allAgeBins,
+                    datasets: cohortDatasets.map(ds => ({
+                        ...ds,
+                        data: allAgeBins.map(bin => {
+                            const pt = ds.data.find(d => d.x === bin);
+                            return pt ? pt.y : null;
+                        })
+                    }))
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, title: { display: true, text: 'Completed Fertility Over Time (GSS, age 45+)' } }
+                    spanGaps: true,
+                    plugins: { legend: { display: true }, title: { display: true, text: 'Cumulative Children by Age — Birth Cohort Curves (GSS)' } }
                 }
             });
 
-            // Completed fertility bar chart — same data but grouped by decade
-            const decadeMap = {};
-            completedTrendData.forEach(d => {
-                const decade = Math.floor(d.year / 10) * 10 + 's';
-                if (!decadeMap[decade]) decadeMap[decade] = { sum: 0, count: 0 };
-                decadeMap[decade].sum += d.completed_fertility;
-                decadeMap[decade].count++;
-            });
-            const decadeLabels = Object.keys(decadeMap).sort();
-            const decadeAvgs = decadeLabels.map(d => decadeMap[d].sum / decadeMap[d].count);
-
+            // Completed fertility bar chart by birth cohort decade
+            const completedData = gss?.completed_fertility || [];
             destroyChart('completed-fertility-chart');
             const ctx3 = document.getElementById('completed-fertility-chart').getContext('2d');
             globalData.charts['completed-fertility-chart'] = new Chart(ctx3, {
                 type: 'bar',
                 data: {
-                    labels: decadeLabels,
-                    datasets: [{ label: 'Avg Completed Fertility', data: decadeAvgs, backgroundColor: '#6c8cff' }]
+                    labels: completedData.map(d => d.cohort),
+                    datasets: [{ label: 'Completed Fertility (women 40-50)', data: completedData.map(d => d.avg_children), backgroundColor: '#6c8cff' }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, title: { display: true, text: 'Completed Fertility by Decade (GSS)' } }
+                    plugins: { legend: { display: false }, title: { display: true, text: 'Completed Fertility by Birth Cohort (GSS, women 40-50)' } }
                 }
             });
 
-            // Childlessness data not available — show placeholder message
+            // Childlessness by cohort
+            const childlessnessData = gss?.childlessness_by_cohort || [];
             destroyChart('childlessness-rate-chart');
             const ctx4 = document.getElementById('childlessness-rate-chart').getContext('2d');
             globalData.charts['childlessness-rate-chart'] = new Chart(ctx4, {
                 type: 'bar',
-                data: { labels: ['Data not available'], datasets: [{ data: [0], backgroundColor: '#333' }] },
+                data: {
+                    labels: childlessnessData.map(d => d.cohort),
+                    datasets: [{ label: 'Childless %', data: childlessnessData.map(d => d.pct_childless), backgroundColor: '#ff9d4d' }]
+                },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, title: { display: true, text: 'Childlessness Rate (data pending)' } }
+                    plugins: { legend: { display: false }, title: { display: true, text: 'Childlessness Rate by Birth Cohort (GSS, women 40-50)' } }
                 }
             });
         }
