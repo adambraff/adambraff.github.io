@@ -343,16 +343,8 @@ function initNav() {
 // RENDER ALL
 // ============================================================
 function renderAll() {
-    renderCollapse();
-    renderDesireGap();
-    renderMarriage();
-    renderCulture();
-    renderEconomics();
-    renderDevelopment();
-    renderTrap();
-    renderCohorts();
-    renderPredictors();
-    renderProjections();
+    const fns = [renderCollapse, renderDesireGap, renderMarriage, renderCulture, renderEconomics, renderDevelopment, renderTrap, renderCohorts, renderPredictors, renderProjections];
+    fns.forEach(fn => { try { fn(); } catch(e) { console.error(`${fn.name} failed:`, e); } });
 }
 
 // ============================================================
@@ -745,7 +737,9 @@ function renderTrap() {
     document.getElementById('kpi-trap-still').textContent = still;
     document.getElementById('kpi-trap-rate').textContent = rate + '%';
 
-    const selected = G.panel.trap_trajectories_selected || Object.values(traps).slice(0, 12);
+    // trap_trajectories_selected may be array of codes or array of objects
+    const rawSelected = G.panel.trap_trajectories_selected || Object.keys(traps).slice(0, 12);
+    const selected = rawSelected.map(item => typeof item === 'string' ? traps[item] : item).filter(Boolean);
     const datasets = selected.map((t, i) => {
         const hue = (i * 360 / selected.length) % 360;
         return {
