@@ -121,7 +121,7 @@
 <section id="desire-gap">
     <h2>The Desire Gap</h2>
     <div class="narrative">
-        <p>If people don't want kids, falling fertility wouldn't be a puzzle. But Americans consistently say they want about 2.5 children — and consistently have about 1.7. The gap between desired and actual fertility has widened since the 1990s. This isn't people changing their minds; it's structural barriers preventing them from achieving their desires.</p>
+        <p>If people don't want kids, falling fertility wouldn't be a puzzle. But Americans consistently say they want about 2.5 children — and consistently have about 1.7. The gap between desired and actual fertility has widened since the 1990s.</p>
     </div>
     <div class="metric-row">
         <div class="metric-card"><div class="label">Want More Than They Have</div><div class="value" id="kpi-want-more">--</div></div>
@@ -471,10 +471,10 @@ function renderDesireGap() {
     const gss = G.gss;
     const dgk = gss.desire_gap_kpis;
     if (dgk) {
-        document.getElementById('kpi-want-more').textContent = `${dgk.want_more_pct}%`;
-        document.getElementById('kpi-have-more').textContent = `${dgk.have_more_pct}%`;
-        document.getElementById('kpi-matched').textContent = `${dgk.matched_pct}%`;
-        document.getElementById('kpi-mean-gap').textContent = `+${dgk.latest_avg_gap?.toFixed(2) || '--'}`;
+        document.getElementById('kpi-want-more').textContent = `${Math.round(dgk.want_more_pct)}%`;
+        document.getElementById('kpi-have-more').textContent = `${Math.round(dgk.have_more_pct)}%`;
+        document.getElementById('kpi-matched').textContent = `${Math.round(dgk.matched_pct)}%`;
+        document.getElementById('kpi-mean-gap').textContent = `+${dgk.latest_avg_gap?.toFixed(1) || '--'}`;
     }
 
     // Ideal vs Actual
