@@ -243,10 +243,7 @@
     <div class="chart-wrap"><canvas id="coef-chart"></canvas></div>
     <div class="chart-wrap"><canvas id="decade-trends-chart"></canvas></div>
     <h3 class="section-title">International (Random Forest, 265 Countries)</h3>
-    <div class="chart-row">
-        <div class="chart-wrap"><canvas id="rf-importance-chart"></canvas></div>
-        <div class="chart-wrap"><canvas id="rf-permutation-chart"></canvas></div>
-    </div>
+    <div class="chart-wrap"><canvas id="rf-permutation-chart"></canvas></div>
     <div style="margin-bottom:1rem">
         <label for="pdp-var" style="font-size:0.9rem;color:var(--text-secondary)">Partial Dependence Plot: </label>
         <select id="pdp-var"></select>
@@ -258,7 +255,7 @@
 <section id="projections">
     <h2>Projections — What If?</h2>
     <div class="narrative">
-        <p>What happens to a country's fertility if its drivers change? Select a country and adjust the sliders to see how changes in education, urbanization, female labor participation, and income would affect projected TFR, based on the panel regression model.</p>
+        <p>What happens to a country's fertility if its drivers change? Select a country and adjust the sliders to see how changes in education, urbanization, female labor participation, and income would shift projected TFR. The shaded bands show uncertainty ranges (68% and 95%) based on the model's residual error, widening over time. This is a sensitivity analysis — "if X changed by Y, TFR would shift by Z" — not a time-series forecast.</p>
     </div>
     <div class="dropdown-wrap" style="margin-bottom:1.5rem">
         <input type="text" id="country-search" placeholder="Search country..." style="width:100%" autocomplete="off">
@@ -273,7 +270,7 @@
     <div class="card" id="slider-container"></div>
     <div class="chart-wrap"><canvas id="projection-chart"></canvas></div>
     <div class="card" style="overflow-x:auto">
-        <table id="scenario-table"><thead><tr><th>Scenario</th><th>2030</th><th>2040</th><th>2050</th></tr></thead><tbody></tbody></table>
+        <table id="scenario-table"><thead><tr><th>Estimate</th><th>+5 yr</th><th>+10 yr</th><th>+27 yr</th></tr></thead><tbody></tbody></table>
     </div>
 </section>
 
@@ -772,15 +769,14 @@ function renderDevelopment() {
     renderGdpScatter('All');
     document.getElementById('dev-region-filter').addEventListener('change', (e) => renderGdpScatter(e.target.value));
 
-    // Binned bar (latest year only, excluding Other)
-    const bins = { '<$2K': [], '$2K–$5K': [], '$5K–$15K': [], '$15K–$40K': [], '>$40K': [] };
+    // Binned horizontal bar (latest year only, excluding Other)
+    const bins = { '<$5K': [], '$5K–$15K': [], '$15K–$40K': [], '>$40K': [] };
     Object.values(G.panel.countries).forEach(c => {
         if ((c.region || 'Other') === 'Other') return;
         const d = c.data[c.data.length - 1];
         if (d?.gdp_pc != null && d?.tfr != null) {
             const gdp = d.gdp_pc;
-            if (gdp < 2000) bins['<$2K'].push(d.tfr);
-            else if (gdp < 5000) bins['$2K–$5K'].push(d.tfr);
+            if (gdp < 5000) bins['<$5K'].push(d.tfr);
             else if (gdp < 15000) bins['$5K–$15K'].push(d.tfr);
             else if (gdp < 40000) bins['$15K–$40K'].push(d.tfr);
             else bins['>$40K'].push(d.tfr);
@@ -792,7 +788,7 @@ function renderDevelopment() {
     G.charts['gdp-binned-chart'] = new Chart(document.getElementById('gdp-binned-chart'), {
         type: 'bar',
         data: { labels: binLabels, datasets: [{ label: 'Avg TFR', data: binAvgs, backgroundColor: '#6c8cff' }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Average TFR by GDP Bracket (Latest Year)', color: '#e4e6ef' }, legend: { display: false } }, scales: { y: { title: { display: true, text: 'TFR' } } } }
+        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Average TFR by GDP Bracket (Latest Year)', color: '#e4e6ef' }, legend: { display: false } }, scales: { x: { title: { display: true, text: 'TFR' } } } }
     });
 }
 
@@ -939,16 +935,7 @@ function renderPredictors() {
         const labels = G.model.variable_labels || {};
         const getLabel = (k) => labels[k] || k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
-        // MDI importance
-        const mdi = Object.entries(rf.mdi_importance || {}).sort((a, b) => b[1] - a[1]).slice(0, 12);
-        destroy('rf-importance-chart');
-        G.charts['rf-importance-chart'] = new Chart(document.getElementById('rf-importance-chart'), {
-            type: 'bar',
-            data: { labels: mdi.map(([k]) => getLabel(k)), datasets: [{ label: 'MDI Importance', data: mdi.map(([, v]) => v), backgroundColor: '#6c8cff' }] },
-            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Random Forest Feature Importance (MDI)', color: '#e4e6ef' }, legend: { display: false } } }
-        });
-
-        // Permutation importance
+        // Permutation importance (more trustworthy than MDI)
         const perm = Object.entries(rf.permutation_importance || {}).sort((a, b) => b[1] - a[1]).slice(0, 12);
         destroy('rf-permutation-chart');
         G.charts['rf-permutation-chart'] = new Chart(document.getElementById('rf-permutation-chart'), {
@@ -959,7 +946,7 @@ function renderPredictors() {
 
         // PDP
         const pdp = rf.partial_dependence || {};
-        const pdpVars = Object.keys(pdp);
+        const pdpVars = Object.keys(pdp).filter(v => v !== 'post_smartphone');
         const pdpSelect = document.getElementById('pdp-var');
         pdpSelect.innerHTML = pdpVars.map(v => `<option value="${v}">${getLabel(v)}</option>`).join('');
 
@@ -1069,6 +1056,9 @@ function renderProjections() {
         renderProjectionChart(country, latest.tfr, latest.tfr);
     }
 
+    // Model residual std for confidence bands
+    const residualStd = params?.residual_std || 0.21;
+
     function updateProjection(code, sliderState, baseTfr) {
         const currentVals = params?.current_values?.[code] || {};
         let delta = 0;
@@ -1087,56 +1077,81 @@ function renderProjections() {
         deltaEl.textContent = (change >= 0 ? '+' : '') + change.toFixed(2);
         deltaEl.style.color = change >= 0 ? 'var(--green)' : 'var(--red)';
 
-        renderProjectionChart(G.panel.countries[code], baseTfr, projected);
-        renderScenarioTable(baseTfr, projected);
+        renderProjectionChart(G.panel.countries[code], projected);
+        renderScenarioTable(projected);
     }
 
-    function renderProjectionChart(country, baseTfr, projectedTfr) {
+    function renderProjectionChart(country, projectedTfr) {
         const years = country.data.map(d => d.year);
         const tfrs = country.data.map(d => d.tfr);
         const lastYear = years[years.length - 1];
 
-        // Linear trend from last 5 years for baseline
-        const recent = country.data.slice(-5);
-        const trend = (recent[recent.length - 1].tfr - recent[0].tfr) / (recent.length - 1);
-
+        // Projection years
         const projYears = [lastYear + 5, lastYear + 10, lastYear + 27];
-        const baselineProj = projYears.map((_, i) => Math.max(0.3, baseTfr + trend * (i === 0 ? 5 : i === 1 ? 10 : 27)));
-        const scenarioProj = projYears.map((_, i) => {
-            const t = i === 0 ? 5 : i === 1 ? 10 : 27;
-            return Math.max(0.3, projectedTfr + (projectedTfr - baseTfr) * 0.1 * t / 5);
+        // Central estimate: projected TFR held flat (sensitivity analysis, not a time-series forecast)
+        const central = projYears.map(() => projectedTfr);
+        // Uncertainty grows with sqrt(time) — wider bands further out
+        const band1 = projYears.map((y, i) => {
+            const t = [5, 10, 27][i];
+            const spread = residualStd * Math.sqrt(t / 5);
+            return { upper: Math.max(0.3, projectedTfr + spread), lower: Math.max(0.3, projectedTfr - spread) };
         });
+        const band2 = projYears.map((y, i) => {
+            const t = [5, 10, 27][i];
+            const spread = 2 * residualStd * Math.sqrt(t / 5);
+            return { upper: Math.max(0.3, projectedTfr + spread), lower: Math.max(0.3, projectedTfr - spread) };
+        });
+
+        const allLabels = [...years, ...projYears];
+        const pad = Array(years.length - 1).fill(null);
 
         destroy('projection-chart');
         G.charts['projection-chart'] = new Chart(document.getElementById('projection-chart'), {
             type: 'line',
             data: {
-                labels: [...years, ...projYears],
+                labels: allLabels,
                 datasets: [
-                    { label: 'Historical', data: [...tfrs, ...Array(projYears.length).fill(null)], borderColor: '#6c8cff', backgroundColor: 'rgba(108,140,255,0.1)', fill: true, tension: 0.3 },
-                    { label: 'Baseline Projection', data: [...Array(years.length - 1).fill(null), baseTfr, ...baselineProj], borderColor: '#ff9d4d', borderDash: [6, 3], tension: 0.3, spanGaps: false },
-                    { label: 'Scenario Projection', data: [...Array(years.length - 1).fill(null), baseTfr, ...scenarioProj], borderColor: '#4ae04a', borderDash: [3, 3], tension: 0.3, spanGaps: false }
+                    // 95% band (±2 SD) — lightest fill
+                    { label: '95% Range', data: [...pad, tfrs[tfrs.length - 1], ...band2.map(b => b.upper)],
+                      borderColor: 'transparent', backgroundColor: 'rgba(108,140,255,0.08)', fill: '+1', tension: 0.3, pointRadius: 0 },
+                    { label: '_95lower', data: [...pad, tfrs[tfrs.length - 1], ...band2.map(b => b.lower)],
+                      borderColor: 'transparent', backgroundColor: 'transparent', fill: false, tension: 0.3, pointRadius: 0 },
+                    // 68% band (±1 SD) — medium fill
+                    { label: '68% Range', data: [...pad, tfrs[tfrs.length - 1], ...band1.map(b => b.upper)],
+                      borderColor: 'transparent', backgroundColor: 'rgba(108,140,255,0.18)', fill: '+1', tension: 0.3, pointRadius: 0 },
+                    { label: '_68lower', data: [...pad, tfrs[tfrs.length - 1], ...band1.map(b => b.lower)],
+                      borderColor: 'transparent', backgroundColor: 'transparent', fill: false, tension: 0.3, pointRadius: 0 },
+                    // Central projection
+                    { label: 'Scenario Projection', data: [...pad, tfrs[tfrs.length - 1], ...central],
+                      borderColor: '#ff9d4d', borderWidth: 2.5, borderDash: [6, 3], tension: 0.3, pointRadius: 3, fill: false },
+                    // Historical
+                    { label: 'Historical', data: [...tfrs, ...Array(projYears.length).fill(null)],
+                      borderColor: '#6c8cff', backgroundColor: 'rgba(108,140,255,0.1)', fill: true, tension: 0.3, pointRadius: 1 },
                 ]
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
-                plugins: { title: { display: true, text: `TFR Projection: ${country.name}`, color: '#e4e6ef' } },
+                plugins: {
+                    title: { display: true, text: `TFR Projection: ${country.name}`, color: '#e4e6ef' },
+                    legend: { labels: { filter: (item) => !item.text.startsWith('_') } }
+                },
                 scales: { y: { title: { display: true, text: 'TFR' } } }
             }
         });
     }
 
-    function renderScenarioTable(baseTfr, projectedTfr) {
+    function renderScenarioTable(projectedTfr) {
         const tbody = document.querySelector('#scenario-table tbody');
-        const delta = projectedTfr - baseTfr;
+        const horizons = [5, 10, 27];
         const rows = [
-            { name: 'Baseline (no change)', offsets: [0, 0, 0] },
-            { name: 'Your Scenario', offsets: [delta, delta * 1.2, delta * 1.5] },
-            { name: 'Optimistic (+0.15)', offsets: [0.05, 0.10, 0.15] },
-            { name: 'Pessimistic (−0.15)', offsets: [-0.05, -0.10, -0.15] }
+            { name: 'Central Estimate', vals: horizons.map(() => projectedTfr) },
+            { name: '68% Upper (+1 SD)', vals: horizons.map(t => projectedTfr + residualStd * Math.sqrt(t / 5)) },
+            { name: '68% Lower (−1 SD)', vals: horizons.map(t => projectedTfr - residualStd * Math.sqrt(t / 5)) },
+            { name: '95% Upper (+2 SD)', vals: horizons.map(t => projectedTfr + 2 * residualStd * Math.sqrt(t / 5)) },
+            { name: '95% Lower (−2 SD)', vals: horizons.map(t => projectedTfr - 2 * residualStd * Math.sqrt(t / 5)) },
         ];
         tbody.innerHTML = rows.map(r =>
-            `<tr><td>${r.name}</td>${r.offsets.map(o => `<td>${Math.max(0.3, baseTfr + o).toFixed(2)}</td>`).join('')}</tr>`
+            `<tr><td>${r.name}</td>${r.vals.map(v => `<td>${Math.max(0.3, v).toFixed(2)}</td>`).join('')}</tr>`
         ).join('');
     }
 
