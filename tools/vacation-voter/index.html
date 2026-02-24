@@ -1712,18 +1712,14 @@ function saveRankings() {
 // ===== SCOREBOARD =====
 function renderScoreboard() {
   var grid = document.getElementById('votes-grid');
-  var noVotes = document.getElementById('no-votes');
   var voteEntries = Object.entries(allVotes);
 
   if (voteEntries.length === 0) {
-    grid.innerHTML = '';
-    grid.appendChild(noVotes);
-    noVotes.style.display = 'block';
+    grid.innerHTML = '<div class="no-votes" id="no-votes"><p>No rankings yet. Someone go first.</p></div>';
     document.getElementById('consensus-section').classList.remove('active');
     return;
   }
 
-  noVotes.style.display = 'none';
   grid.innerHTML = '';
 
   voteEntries.forEach(function(entry) {
