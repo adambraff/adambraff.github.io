@@ -38,7 +38,6 @@ body {
 
 /* Hero */
 .hero {
-  min-height: 90vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -47,7 +46,7 @@ body {
   position: relative;
   background: linear-gradient(135deg, #0f1419 0%, #1a2332 50%, #0f1419 100%);
   overflow: hidden;
-  padding: 40px 24px;
+  padding: 60px 24px 40px;
 }
 .hero::before {
   content: '';
@@ -82,28 +81,10 @@ body {
 .hero-subtitle {
   font-size: 1.15rem;
   color: var(--text-dim);
-  margin-bottom: 40px;
+  margin-bottom: 32px;
   max-width: 600px;
   font-weight: 300;
 }
-.hero-family {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 48px;
-}
-.family-chip {
-  background: var(--card);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 12px;
-  padding: 10px 18px;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.family-chip .loc { color: var(--text-dim); font-size: 0.8rem; }
 .hero-cta {
   display: inline-block;
   background: linear-gradient(135deg, var(--accent), #6d9ef0);
@@ -122,7 +103,7 @@ body {
 /* Section headers */
 .section-header {
   text-align: center;
-  padding: 80px 0 48px;
+  padding: 48px 0 32px;
 }
 .section-header h2 {
   font-family: 'Playfair Display', serif;
@@ -499,6 +480,66 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 }
 .writein-add:hover { background: rgba(138,180,248,0.25); }
 
+/* Comments section */
+.comments-panel {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 24px;
+  margin-top: 24px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.comments-panel h3 {
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.comments-panel > p {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+}
+.comment-row {
+  margin-bottom: 14px;
+}
+.comment-row:last-child { margin-bottom: 0; }
+.comment-dest-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+.comment-input {
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.2s;
+  resize: vertical;
+  min-height: 36px;
+  max-height: 120px;
+}
+.comment-input:focus { border-color: var(--accent); }
+.comment-input::placeholder { color: var(--text-dim); }
+.vote-comment {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  font-style: italic;
+  padding: 4px 0 4px 34px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.vote-comment:last-child { border-bottom: none; }
+.vote-comment .comment-dest {
+  color: var(--accent);
+  font-style: normal;
+  font-weight: 500;
+}
+
 .save-rankings-btn {
   display: block;
   width: 100%;
@@ -733,8 +774,6 @@ html { scroll-behavior: smooth; }
 @media (max-width: 768px) {
   .destinations { grid-template-columns: 1fr; padding: 0 16px 40px; }
   .hero h1 { font-size: 2rem; }
-  .hero-family { gap: 8px; }
-  .family-chip { padding: 8px 12px; font-size: 0.8rem; }
   .slider-group { padding: 20px; }
   .comp-table th, .comp-table td { padding: 10px 8px; font-size: 0.78rem; }
   .voter-btn { padding: 10px 16px; font-size: 0.85rem; }
@@ -755,13 +794,6 @@ html { scroll-behavior: smooth; }
   <div class="hero-badge">Late August 2026</div>
   <h1>Giventer-Braff Vacation</h1>
   <p class="hero-subtitle">Five family members. Three destinations (plus write-ins). Rank them all. Change your mind whenever.</p>
-  <div class="hero-family">
-    <div class="family-chip">Adam <span class="loc">Providence</span></div>
-    <div class="family-chip">G&#248;r <span class="loc">Providence</span></div>
-    <div class="family-chip">Emma <span class="loc">Boston</span></div>
-    <div class="family-chip">Jeremy <span class="loc">NYC</span></div>
-    <div class="family-chip">Andrew <span class="loc">Chicago</span></div>
-  </div>
   <a href="#priorities" class="hero-cta">Set Your Priorities</a>
 </section>
 
@@ -961,6 +993,12 @@ html { scroll-behavior: smooth; }
       </div>
     </div>
 
+    <div class="comments-panel" id="comments-panel">
+      <h3>&#128172; Comments</h3>
+      <p>Optional notes on any destination &#8212; lobbying encouraged.</p>
+      <div id="comments-container"></div>
+    </div>
+
     <button class="save-rankings-btn" onclick="saveRankings()">Save My Rankings</button>
     <div class="save-status" id="save-status">Rankings saved &#10003;</div>
   </div>
@@ -1120,6 +1158,7 @@ var currentRankings = [];
 var firebaseReady = false;
 var dbVotesRef = null;
 var dbWriteInsRef = null;
+// (savePending removed - simplified Firebase sync)
 
 // ===== FIREBASE =====
 var FIREBASE_CONFIG = {
@@ -1174,6 +1213,7 @@ function hideAdminReset() {
 function confirmAdminReset() {
   var pw = document.getElementById('admin-password').value;
   if (pw === 'denovo') {
+    // Clear all votes and write-ins
     if (firebaseReady) {
       dbVotesRef.remove();
       dbWriteInsRef.remove();
@@ -1194,6 +1234,7 @@ function confirmAdminReset() {
   }
 }
 
+// Close modal on overlay click
 document.addEventListener('click', function(e) {
   if (e.target.id === 'admin-modal') hideAdminReset();
 });
@@ -1241,6 +1282,7 @@ function buildCompTable() {
     row.innerHTML = cells;
     tbody.appendChild(row);
   });
+  // Weather row
   var wrow = document.createElement('tr');
   var wlabels = ['Cool (55\u201365\u00b0F)', 'Mixed (50\u201377\u00b0F)', 'Hot (75\u201388\u00b0F)'];
   wrow.innerHTML = '<td>\u2600 Temperature</td>' +
@@ -1248,6 +1290,7 @@ function buildCompTable() {
     '<td>' + wlabels[1] + '</td>' +
     '<td>' + wlabels[2] + '</td>';
   tbody.appendChild(wrow);
+  // Totals
   var totals = ['norway', 'argentina', 'italy'].map(function(key) {
     var s = 0;
     for (var k in DESTINATIONS[key].scores) s += DESTINATIONS[key].scores[k];
@@ -1291,6 +1334,7 @@ function selectVoter(name) {
     b.classList.toggle('active', b.dataset.name === name);
   });
 
+  // Load existing data or defaults
   var existing = allVotes[name];
   if (existing && existing.weights) {
     weights = {};
@@ -1303,10 +1347,12 @@ function selectVoter(name) {
     weatherWeight = 5;
   }
 
+  loadComments(existing);
   buildSliders();
   document.getElementById('sliders-panel').classList.add('active');
   document.getElementById('rankings-panel').classList.add('active');
 
+  // Load existing rankings or calculate default order
   if (existing && existing.rankings) {
     currentRankings = existing.rankings.slice();
     // Add any write-ins that appeared after this vote was saved
@@ -1320,11 +1366,13 @@ function selectVoter(name) {
   } else {
     var scores = calculateScores();
     currentRankings = Object.keys(scores).sort(function(a, b) { return scores[b] - scores[a]; });
+    // Add any write-ins not in rankings
     getAllWriteInKeys().forEach(function(k) {
       if (currentRankings.indexOf(k) === -1) currentRankings.push(k);
     });
   }
   renderRankList();
+  buildCommentsForm();
   updateDestBadges();
 }
 
@@ -1347,6 +1395,7 @@ function buildSliders() {
     container.appendChild(div);
   });
 
+  // Set weather sliders
   document.getElementById('slider-temp-pref').value = weatherPref;
   document.getElementById('val-temp-pref').textContent = weatherPref + ' \u2014 ' + TEMP_LABELS[weatherPref];
   document.getElementById('slider-weather-wt').value = weatherWeight;
@@ -1431,6 +1480,7 @@ function getAllWriteInKeys() {
 function getDestName(key) {
   if (DESTINATIONS[key]) return DESTINATIONS[key].name;
   if (writeIns[key]) return writeIns[key].name;
+  // Fallback: convert slug to readable name
   if (key.indexOf('writein_') === 0) {
     return key.replace('writein_', '').replace(/_/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
   }
@@ -1464,6 +1514,7 @@ function renderRankList() {
         '<button class="rank-arrow" onclick="moveRank(\'' + key + '\', 1)"' + (idx === total - 1 ? ' disabled' : '') + '>\u25BC</button>' +
       '</div>';
 
+    // Drag events
     li.addEventListener('dragstart', function(e) {
       e.dataTransfer.setData('text/plain', key);
       li.classList.add('dragging');
@@ -1504,6 +1555,7 @@ function refreshRankList() {
     return DESTINATIONS[k] || writeIns[k];
   });
   renderRankList();
+  buildCommentsForm();
 }
 
 function moveRank(key, direction) {
@@ -1549,6 +1601,7 @@ function addWriteIn() {
     currentRankings.push(slug);
   }
   renderRankList();
+  buildCommentsForm();
   renderWriteInsDisplay();
   input.value = '';
 }
@@ -1577,33 +1630,83 @@ function renderWriteInsDisplay() {
   });
 }
 
+// ===== COMMENTS =====
+var currentComments = {};
+
+function buildCommentsForm() {
+  var container = document.getElementById('comments-container');
+  container.innerHTML = '';
+  // Show all destinations + write-ins
+  var allKeys = Object.keys(DESTINATIONS).concat(getAllWriteInKeys());
+  allKeys.forEach(function(key) {
+    var div = document.createElement('div');
+    div.className = 'comment-row';
+    div.innerHTML =
+      '<div class="comment-dest-label">' + getDestName(key) + '</div>' +
+      '<textarea class="comment-input" id="comment-' + key + '" placeholder="Any thoughts?" maxlength="200" rows="1"' +
+        ' oninput="currentComments[\'' + key + '\'] = this.value">' +
+        (currentComments[key] || '') +
+      '</textarea>';
+    container.appendChild(div);
+  });
+}
+
+function loadComments(vote) {
+  currentComments = {};
+  if (vote && vote.comments) {
+    for (var k in vote.comments) currentComments[k] = vote.comments[k];
+  }
+}
+
 // ===== SAVE RANKINGS =====
 function saveRankings() {
   if (!currentVoter) return;
+
+  // Collect comments from textareas (in case oninput didn't fire)
+  var allKeys = Object.keys(DESTINATIONS).concat(getAllWriteInKeys());
+  allKeys.forEach(function(key) {
+    var el = document.getElementById('comment-' + key);
+    if (el) currentComments[key] = el.value;
+  });
+
+  // Strip empty comments
+  var comments = {};
+  for (var k in currentComments) {
+    if (currentComments[k] && currentComments[k].trim()) comments[k] = currentComments[k].trim();
+  }
 
   var voteData = {
     rankings: currentRankings.slice(),
     weights: {},
     weatherPref: weatherPref,
     weatherWeight: weatherWeight,
+    comments: comments,
     timestamp: new Date().toISOString()
   };
   for (var k in weights) voteData.weights[k] = weights[k];
 
-  // Write to Firebase first (may trigger synchronous listener)
-  if (firebaseReady && dbVotesRef) {
-    dbVotesRef.child(currentVoter).set(voteData);
-  }
-
-  // Then set local state (overrides any stale listener data)
+  // Set local state immediately so renders are correct
   allVotes[currentVoter] = voteData;
+
+  // Render immediately with local data
+  renderScoreboard();
+  updateVoterPicker();
 
   var status = document.getElementById('save-status');
   status.classList.add('visible');
   setTimeout(function() { status.classList.remove('visible'); }, 2500);
 
-  renderScoreboard();
-  updateVoterPicker();
+  // Write to Firebase, then force re-read from server to ensure sync
+  if (firebaseReady && dbVotesRef) {
+    dbVotesRef.child(currentVoter).set(voteData).then(function() {
+      // Force authoritative re-read from server after write confirms
+      dbVotesRef.once('value', function(snapshot) {
+        allVotes = snapshot.val() || {};
+        renderScoreboard();
+        updateVoterPicker();
+      });
+    });
+  }
 }
 
 // ===== SCOREBOARD =====
@@ -1649,10 +1752,25 @@ function renderScoreboard() {
         '</li>';
     });
 
-    card.innerHTML = header + '<ul class="vote-ranking-list">' + rankItems + '</ul>';
+    // Build comments display
+    var commentsHtml = '';
+    if (vote.comments) {
+      var commentKeys = Object.keys(vote.comments);
+      if (commentKeys.length > 0) {
+        commentKeys.forEach(function(ck) {
+          if (vote.comments[ck] && vote.comments[ck].trim()) {
+            commentsHtml += '<div class="vote-comment"><span class="comment-dest">' +
+              getDestName(ck) + ':</span> ' + vote.comments[ck] + '</div>';
+          }
+        });
+      }
+    }
+
+    card.innerHTML = header + '<ul class="vote-ranking-list">' + rankItems + '</ul>' + commentsHtml;
     grid.appendChild(card);
   });
 
+  // Consensus (Borda count)
   if (voteEntries.length >= 1) {
     var allKeys = {};
     voteEntries.forEach(function(entry) {
