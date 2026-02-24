@@ -3,13 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Braff Family Vacation 2026</title>
+<title>Giventer-Braff Vacation, August 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.0/dist/confetti.browser.min.js"></script>
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
@@ -40,7 +38,7 @@ body {
 
 /* Hero */
 .hero {
-  min-height: 100vh;
+  min-height: 90vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -73,7 +71,7 @@ body {
 }
 .hero h1 {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-size: clamp(2.2rem, 5vw, 4rem);
   font-weight: 700;
   line-height: 1.1;
   margin-bottom: 16px;
@@ -82,7 +80,7 @@ body {
   -webkit-text-fill-color: transparent;
 }
 .hero-subtitle {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   color: var(--text-dim);
   margin-bottom: 40px;
   max-width: 600px;
@@ -133,6 +131,122 @@ body {
 }
 .section-header p { color: var(--text-dim); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
 
+/* Priorities section */
+.priorities-section {
+  padding: 0 0 60px;
+}
+.voter-picker {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+.voter-btn {
+  background: var(--card);
+  border: 2px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 12px 24px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.voter-btn:hover { border-color: var(--accent); background: rgba(138,180,248,0.08); }
+.voter-btn.active {
+  border-color: var(--accent);
+  background: rgba(138,180,248,0.15);
+  box-shadow: 0 0 20px rgba(138,180,248,0.15);
+}
+.voter-btn .voter-city { display: block; font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
+.voter-btn.has-rankings::after {
+  content: '\2713';
+  position: absolute;
+  top: -6px; right: -6px;
+  background: #34a853;
+  color: white;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sliders-panel {
+  display: none;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.sliders-panel.active { display: block; }
+
+.slider-group {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.slider-group h3 {
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.slider-group > p {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+}
+.slider-row { margin-bottom: 22px; }
+.slider-row:last-child { margin-bottom: 0; }
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.slider-label { font-weight: 500; font-size: 0.95rem; }
+.slider-value {
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-weight: 600;
+  min-width: 80px;
+  text-align: right;
+}
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.08);
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(138,180,248,0.4);
+  transition: transform 0.15s;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.slider-endpoints {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+.weather-slider-row .slider-label { color: #f4b400; }
+
 /* Destination Cards */
 .destinations {
   display: grid;
@@ -150,10 +264,27 @@ body {
   transition: transform 0.3s, box-shadow 0.3s;
 }
 .dest-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
-.dest-img {
+.dest-banner {
   width: 100%;
-  height: 220px;
-  object-fit: cover;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  position: relative;
+}
+.dest-banner.norway-bg { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8e 60%, #4a90d9 100%); }
+.dest-banner.argentina-bg { background: linear-gradient(135deg, #1a6b5f 0%, #2a9d8f 60%, #40c9b5 100%); }
+.dest-banner.italy-bg { background: linear-gradient(135deg, #c2553d 0%, #e76f51 60%, #f4a261 100%); }
+.dest-score-badge {
+  position: absolute;
+  top: 12px; right: 12px;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(8px);
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
 }
 .dest-body { padding: 24px; }
 .dest-tag {
@@ -238,222 +369,136 @@ body {
   vertical-align: middle;
 }
 
-/* Voting Section */
-.voting-section {
-  background: linear-gradient(180deg, rgba(26,35,50,0.5) 0%, var(--bg) 100%);
-  padding: 80px 0;
+/* Rankings section */
+.rankings-section {
+  padding: 0 0 80px;
 }
-.voter-picker {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: 48px;
+.rankings-panel {
+  display: none;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 24px;
 }
-.voter-btn {
+.rankings-panel.active { display: block; }
+
+.rank-list { list-style: none; }
+.rank-item {
   background: var(--card);
-  border: 2px solid rgba(255,255,255,0.08);
+  border: 2px solid rgba(255,255,255,0.06);
   border-radius: 14px;
-  padding: 12px 24px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.2s;
+  cursor: grab;
+}
+.rank-item:active { cursor: grabbing; }
+.rank-item.dragging { opacity: 0.5; border-color: var(--accent); }
+.rank-item.drag-over { border-color: var(--accent); background: rgba(138,180,248,0.08); }
+.rank-number {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--accent);
+  min-width: 36px;
+  text-align: center;
+}
+.rank-info { flex: 1; }
+.rank-name { font-weight: 600; font-size: 1.05rem; }
+.rank-score { font-size: 0.8rem; color: var(--text-dim); margin-top: 2px; }
+.rank-arrows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rank-arrow {
+  background: rgba(255,255,255,0.06);
+  border: none;
+  color: var(--text-dim);
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.rank-arrow:hover { background: rgba(138,180,248,0.15); color: var(--accent); }
+.rank-arrow:disabled { opacity: 0.2; cursor: not-allowed; }
+
+.writein-section {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 20px;
+  margin-top: 24px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.writein-section h4 { font-size: 0.95rem; margin-bottom: 12px; }
+.writein-row {
+  display: flex;
+  gap: 10px;
+}
+.writein-input {
+  flex: 1;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px 16px;
   color: var(--text);
   font-family: 'Inter', sans-serif;
   font-size: 0.95rem;
-  font-weight: 500;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.writein-input:focus { border-color: var(--accent); }
+.writein-input::placeholder { color: var(--text-dim); }
+.writein-add {
+  background: rgba(138,180,248,0.15);
+  border: 1px solid rgba(138,180,248,0.3);
+  color: var(--accent);
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
-.voter-btn:hover { border-color: var(--accent); background: rgba(138,180,248,0.08); }
-.voter-btn.active {
-  border-color: var(--accent);
-  background: rgba(138,180,248,0.15);
-  box-shadow: 0 0 20px rgba(138,180,248,0.15);
-}
-.voter-btn .voter-city { display: block; font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
-.voter-btn.voted-already { position: relative; }
-.voter-btn.voted-already::after {
-  content: '\2713';
-  position: absolute;
-  top: -6px; right: -6px;
-  background: #34a853;
-  color: white;
-  width: 20px; height: 20px;
-  border-radius: 50%;
-  font-size: 0.7rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+.writein-add:hover { background: rgba(138,180,248,0.25); }
 
-.sliders-panel {
-  display: none;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-.sliders-panel.active { display: block; }
-
-.slider-group {
-  background: var(--card);
-  border-radius: 16px;
-  padding: 32px;
-  margin-bottom: 32px;
-  border: 1px solid rgba(255,255,255,0.06);
-}
-.slider-group h3 {
-  font-size: 1.1rem;
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.slider-group p {
-  font-size: 0.85rem;
-  color: var(--text-dim);
-  margin-bottom: 20px;
-}
-.slider-row {
-  margin-bottom: 22px;
-}
-.slider-row:last-child { margin-bottom: 0; }
-.slider-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 8px;
-}
-.slider-label { font-weight: 500; font-size: 0.95rem; }
-.slider-value {
-  font-size: 0.85rem;
-  color: var(--accent);
-  font-weight: 600;
-  min-width: 80px;
-  text-align: right;
-}
-input[type="range"] {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 6px;
-  border-radius: 3px;
-  background: rgba(255,255,255,0.08);
-  outline: none;
-  cursor: pointer;
-}
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--accent);
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(138,180,248,0.4);
-  transition: transform 0.15s;
-}
-input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
-
-/* Results */
-.results-panel {
-  max-width: 800px;
-  margin: 32px auto 0;
-  padding: 0 24px;
-  display: none;
-}
-.results-panel.active { display: block; }
-.results-card {
-  background: var(--card);
-  border-radius: 16px;
-  padding: 32px;
-  border: 1px solid rgba(255,255,255,0.06);
-  margin-bottom: 24px;
-}
-.results-card h3 { margin-bottom: 24px; font-size: 1.2rem; }
-.result-bar-container { margin-bottom: 18px; }
-.result-bar-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 6px;
-}
-.result-bar-label { font-weight: 500; }
-.result-bar-score { font-weight: 700; color: var(--accent); }
-.result-bar-track {
-  height: 28px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 14px;
-  overflow: hidden;
-  position: relative;
-}
-.result-bar-fill {
-  height: 100%;
-  border-radius: 14px;
-  transition: width 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
-  display: flex;
-  align-items: center;
-  padding-left: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: rgba(0,0,0,0.7);
-  min-width: 0;
-}
-.bar-norway { background: linear-gradient(90deg, var(--norway), var(--norway-light)); }
-.bar-argentina { background: linear-gradient(90deg, var(--argentina), var(--argentina-light)); }
-.bar-italy { background: linear-gradient(90deg, var(--italy), var(--italy-light)); }
-
-.winner-banner {
-  text-align: center;
-  padding: 20px;
-  margin-bottom: 24px;
-  border-radius: 16px;
-  display: none;
-}
-.winner-banner.active { display: block; }
-.winner-banner h3 { font-size: 1.4rem; margin-bottom: 4px; }
-.winner-banner p { font-size: 0.95rem; opacity: 0.8; }
-
-.reasoning-box {
-  background: rgba(138,180,248,0.06);
-  border-left: 3px solid var(--accent);
-  padding: 20px 24px;
-  border-radius: 0 12px 12px 0;
-  margin-bottom: 24px;
-  font-size: 0.95rem;
-  line-height: 1.7;
-  color: var(--text);
-  display: none;
-}
-.reasoning-box.active { display: block; }
-
-.lock-btn {
+.save-rankings-btn {
   display: block;
   width: 100%;
   max-width: 400px;
-  margin: 0 auto;
+  margin: 28px auto 0;
   padding: 16px 32px;
   background: linear-gradient(135deg, #34a853, #2d9248);
   color: white;
   border: none;
   border-radius: 14px;
   font-family: 'Inter', sans-serif;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  display: none;
 }
-.lock-btn.active { display: block; }
-.lock-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(52,168,83,0.3); }
-.lock-btn:disabled {
-  background: rgba(255,255,255,0.1);
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+.save-rankings-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(52,168,83,0.3); }
+.save-status {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: #34a853;
+  opacity: 0;
+  transition: opacity 0.3s;
 }
+.save-status.visible { opacity: 1; }
 
 /* Scoreboard */
-.scoreboard {
-  padding: 80px 0;
-}
+.scoreboard { padding: 0 0 80px; }
 .votes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 20px;
   max-width: 1200px;
   margin: 0 auto;
@@ -469,7 +514,7 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 .vote-avatar {
   width: 44px; height: 44px;
@@ -482,32 +527,27 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
   color: white;
 }
 .vote-card-header h4 { font-size: 1.05rem; }
-.vote-card-header .vote-choice {
-  margin-left: auto;
-  font-weight: 600;
-  font-size: 0.9rem;
-  padding: 4px 12px;
-  border-radius: 8px;
+.vote-ranking-list {
+  list-style: none;
 }
-.vote-reasoning {
-  font-size: 0.9rem;
-  color: var(--text-dim);
-  line-height: 1.6;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255,255,255,0.06);
-}
-.vote-weights {
+.vote-ranking-item {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 12px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 0.9rem;
 }
-.weight-tag {
-  font-size: 0.72rem;
-  padding: 3px 8px;
-  border-radius: 6px;
-  background: rgba(255,255,255,0.05);
+.vote-ranking-item:last-child { border-bottom: none; }
+.vote-rank-num {
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--accent);
+  min-width: 24px;
+}
+.vote-ranking-item .dest-name { flex: 1; }
+.vote-ranking-item .borda-pts {
+  font-size: 0.75rem;
   color: var(--text-dim);
 }
 
@@ -515,12 +555,12 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
   text-align: center;
   padding: 60px;
   color: var(--text-dim);
+  grid-column: 1 / -1;
 }
-.no-votes p { font-size: 1.1rem; }
 
-/* Consensus bar */
+/* Consensus */
 .consensus-section {
-  max-width: 600px;
+  max-width: 700px;
   margin: 40px auto 0;
   padding: 0 24px;
   display: none;
@@ -534,24 +574,51 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
   border: 1px solid rgba(255,255,255,0.06);
 }
 .consensus-card h3 { margin-bottom: 20px; }
-.consensus-bar { margin-bottom: 12px; }
+.result-bar-container { margin-bottom: 14px; }
+.result-bar-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.result-bar-label { font-weight: 500; font-size: 0.95rem; }
+.result-bar-score { font-weight: 700; color: var(--accent); font-size: 0.95rem; }
+.result-bar-track {
+  height: 28px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.result-bar-fill {
+  height: 100%;
+  border-radius: 14px;
+  transition: width 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: flex;
+  align-items: center;
+  padding-left: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(0,0,0,0.7);
+}
+.bar-norway { background: linear-gradient(90deg, var(--norway), var(--norway-light)); }
+.bar-argentina { background: linear-gradient(90deg, var(--argentina), var(--argentina-light)); }
+.bar-italy { background: linear-gradient(90deg, var(--italy), var(--italy-light)); }
+.bar-writein { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
 
 /* Firebase banner */
 .firebase-banner {
   background: rgba(244,180,0,0.1);
   border: 1px solid rgba(244,180,0,0.2);
   border-radius: 12px;
-  padding: 16px 24px;
+  padding: 14px 24px;
   margin: 0 auto 32px;
   max-width: 700px;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #f4b400;
   display: none;
 }
 .firebase-banner.active { display: block; }
 
-/* Footer */
 footer {
   text-align: center;
   padding: 40px 24px;
@@ -560,13 +627,11 @@ footer {
   border-top: 1px solid rgba(255,255,255,0.04);
 }
 
-/* Smooth scroll */
 html { scroll-behavior: smooth; }
 
-/* Mobile responsive */
 @media (max-width: 768px) {
   .destinations { grid-template-columns: 1fr; padding: 0 16px 40px; }
-  .hero h1 { font-size: 2.2rem; }
+  .hero h1 { font-size: 2rem; }
   .hero-family { gap: 8px; }
   .family-chip { padding: 8px 12px; font-size: 0.8rem; }
   .slider-group { padding: 20px; }
@@ -575,31 +640,11 @@ html { scroll-behavior: smooth; }
   .votes-grid { grid-template-columns: 1fr; }
 }
 
-/* Animations */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-in { animation: fadeInUp 0.5s ease-out forwards; }
-
-/* Locked state */
-.locked-overlay {
-  position: relative;
-}
-.locked-overlay::after {
-  content: 'Vote Locked \2713';
-  position: absolute;
-  inset: 0;
-  background: rgba(15,20,25,0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #34a853;
-  border-radius: 16px;
-  z-index: 10;
-}
 </style>
 </head>
 <body>
@@ -607,8 +652,8 @@ html { scroll-behavior: smooth; }
 <!-- ============ HERO ============ -->
 <section class="hero" id="top">
   <div class="hero-badge">Late August 2026</div>
-  <h1>Braff Family Vacation</h1>
-  <p class="hero-subtitle">Five Braffs. Three destinations. One vote each. No take-backs (probably).</p>
+  <h1>Giventer-Braff Vacation</h1>
+  <p class="hero-subtitle">Five family members. Three destinations (plus write-ins). Rank them all. Change your mind whenever.</p>
   <div class="hero-family">
     <div class="family-chip">Adam, 56 <span class="age">Providence</span></div>
     <div class="family-chip">G&#248;r, 56 <span class="age">Providence</span></div>
@@ -616,19 +661,69 @@ html { scroll-behavior: smooth; }
     <div class="family-chip">Jeremy, 22 <span class="age">NYC</span></div>
     <div class="family-chip">Andrew, 19 <span class="age">Chicago</span></div>
   </div>
-  <a href="#destinations" class="hero-cta">Explore the Destinations</a>
+  <a href="#priorities" class="hero-cta">Set Your Priorities</a>
+</section>
+
+<!-- ============ PRIORITIES (SLIDERS FIRST) ============ -->
+<section class="priorities-section" id="priorities">
+  <div class="section-header">
+    <h2>Set Your Priorities</h2>
+    <p>Pick your name, then tell us what matters most. This shapes how the destinations are scored for you.</p>
+  </div>
+
+  <div id="firebase-banner" class="firebase-banner">
+    Shared voting is active &#8212; rankings sync across all family members in real time.
+  </div>
+
+  <div class="voter-picker" id="voter-picker"></div>
+
+  <div class="sliders-panel" id="sliders-panel">
+    <div class="slider-group">
+      <h3>How important is each factor?</h3>
+      <p>1 = "meh" &#8594; 10 = "deal-breaker." Scores below update live.</p>
+      <div id="sliders-container"></div>
+    </div>
+    <div class="slider-group">
+      <h3>&#9832; Temperature preference</h3>
+      <p>What weather do you actually want? Norway is cool, Argentina is mixed, Italy/Croatia is hot.</p>
+      <div class="slider-row weather-slider-row">
+        <div class="slider-header">
+          <span class="slider-label">Your ideal temperature</span>
+          <span class="slider-value" id="val-temp-pref">5 &#8212; Mild (70s&#176;F)</span>
+        </div>
+        <input type="range" min="1" max="10" value="5" id="slider-temp-pref"
+          oninput="updateTempPref(this.value)">
+        <div class="slider-endpoints">
+          <span>Cold (50s&#176;F)</span><span>Hot (85&#176;F+)</span>
+        </div>
+      </div>
+      <div class="slider-row" style="margin-top:22px;">
+        <div class="slider-header">
+          <span class="slider-label">How much does weather matter?</span>
+          <span class="slider-value" id="val-weather-wt">5 &#8212; Moderate</span>
+        </div>
+        <input type="range" min="1" max="10" value="5" id="slider-weather-wt"
+          oninput="updateWeatherWeight(this.value)">
+        <div class="slider-endpoints">
+          <span>Meh</span><span>Deal-breaker</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- ============ DESTINATIONS ============ -->
 <div class="section-header" id="destinations">
   <h2>The Contenders</h2>
-  <p>Each scored on real data. Hover, scroll, argue amongst yourselves.</p>
+  <p>Scores personalized to your priorities. No sliders set yet? You'll see unweighted defaults.</p>
 </div>
 
 <div class="destinations container">
   <!-- NORWAY -->
   <div class="dest-card">
-    <img class="dest-img" src="https://images.unsplash.com/photo-1513519245088-0e12902e35ca?w=600&h=400&fit=crop" alt="Norwegian Fjord" loading="lazy">
+    <div class="dest-banner norway-bg">&#127956;
+      <span class="dest-score-badge" id="badge-norway">&#8212;</span>
+    </div>
     <div class="dest-body">
       <span class="dest-tag norway">Nordic</span>
       <h3>Norway</h3>
@@ -637,9 +732,9 @@ html { scroll-behavior: smooth; }
       <div class="dest-stats">
         <div class="stat-item"><div class="stat-label">Late Aug Temp</div><div class="stat-value">55&#8211;65&#176;F</div></div>
         <div class="stat-item"><div class="stat-label">Flight (East Coast)</div><div class="stat-value">~8 hrs direct</div></div>
-        <div class="stat-item"><div class="stat-label">Daily Budget</div><div class="stat-value">$250&#8211;350/pp</div></div>
         <div class="stat-item"><div class="stat-label">English Spoken</div><div class="stat-value">95%+</div></div>
         <div class="stat-item"><div class="stat-label">Safety Index</div><div class="stat-value">Very High</div></div>
+        <div class="stat-item"><div class="stat-label">Sports Scene</div><div class="stat-value">Kayak, fish, hike</div></div>
         <div class="stat-item"><div class="stat-label">Currency</div><div class="stat-value">NOK (~11/$)</div></div>
       </div>
       <div class="dest-highlights">
@@ -647,9 +742,9 @@ html { scroll-behavior: smooth; }
         <ul class="highlight-list">
           <li>Cruise the Geirangerfjord (UNESCO)</li>
           <li>Hike Trolltunga or Preikestolen</li>
-          <li>Bergen's Bryggen wharf &amp; fish market</li>
+          <li>Bergen's Bryggen wharf &#38; fish market</li>
           <li>Lofoten Islands midnight sun remnants</li>
-          <li>Oslo's Munch Museum &amp; Viking Ship Museum</li>
+          <li>Oslo's Munch Museum &#38; Viking Ship Museum</li>
         </ul>
       </div>
     </div>
@@ -657,18 +752,20 @@ html { scroll-behavior: smooth; }
 
   <!-- ARGENTINA / BRAZIL -->
   <div class="dest-card">
-    <img class="dest-img" src="https://images.unsplash.com/photo-1516306580123-e6e52b1b7b5f?w=600&h=400&fit=crop" alt="Iguazu Falls" loading="lazy">
+    <div class="dest-banner argentina-bg">&#127754;
+      <span class="dest-score-badge" id="badge-argentina">&#8212;</span>
+    </div>
     <div class="dest-body">
       <span class="dest-tag argentina">South America</span>
-      <h3>Argentina &amp; Brazil</h3>
+      <h3>Argentina &#38; Brazil</h3>
       <p class="tagline">Steak, tango, waterfalls, and the southern hemisphere winter plot twist</p>
       <div id="map-argentina" class="dest-map"></div>
       <div class="dest-stats">
         <div class="stat-item"><div class="stat-label">Late Aug Temp</div><div class="stat-value">50&#8211;77&#176;F*</div></div>
         <div class="stat-item"><div class="stat-label">Flight (East Coast)</div><div class="stat-value">~10&#8211;11 hrs</div></div>
-        <div class="stat-item"><div class="stat-label">Daily Budget</div><div class="stat-value">$100&#8211;180/pp</div></div>
         <div class="stat-item"><div class="stat-label">English Spoken</div><div class="stat-value">Limited</div></div>
         <div class="stat-item"><div class="stat-label">Safety Index</div><div class="stat-value">Moderate</div></div>
+        <div class="stat-item"><div class="stat-label">Sports Scene</div><div class="stat-value">Football, polo, surf</div></div>
         <div class="stat-item"><div class="stat-label">Currency</div><div class="stat-value">ARS/BRL &#8595;&#8595;</div></div>
       </div>
       <p style="font-size:0.75rem;color:var(--text-dim);margin-top:8px;">*Buenos Aires 50&#8211;63&#176;F, Rio 68&#8211;77&#176;F. It's their winter.</p>
@@ -676,10 +773,10 @@ html { scroll-behavior: smooth; }
         <h4>Must-Do</h4>
         <ul class="highlight-list">
           <li>Iguazu Falls from both sides</li>
-          <li>Buenos Aires steakhouses &amp; tango shows</li>
+          <li>Buenos Aires steakhouses &#38; tango shows</li>
           <li>Mendoza wine country (Malbec season)</li>
-          <li>Rio's Sugarloaf &amp; Christ the Redeemer</li>
-          <li>Copacabana &amp; Ipanema (mild winter beach)</li>
+          <li>Rio's Sugarloaf &#38; Christ the Redeemer</li>
+          <li>Copacabana &#38; Ipanema (mild winter beach)</li>
         </ul>
       </div>
     </div>
@@ -687,24 +784,26 @@ html { scroll-behavior: smooth; }
 
   <!-- ITALY / CROATIA -->
   <div class="dest-card">
-    <img class="dest-img" src="https://images.unsplash.com/photo-1534113414509-0eec2bfb493f?w=600&h=400&fit=crop" alt="Dubrovnik Croatia" loading="lazy">
+    <div class="dest-banner italy-bg">&#9728;&#65039;
+      <span class="dest-score-badge" id="badge-italy">&#8212;</span>
+    </div>
     <div class="dest-body">
       <span class="dest-tag italy">Mediterranean</span>
-      <h3>Italy &amp; Croatia</h3>
+      <h3>Italy &#38; Croatia</h3>
       <p class="tagline">Pasta, Adriatic blues, ancient walls, and agreeable weather</p>
       <div id="map-italy" class="dest-map"></div>
       <div class="dest-stats">
         <div class="stat-item"><div class="stat-label">Late Aug Temp</div><div class="stat-value">75&#8211;88&#176;F</div></div>
         <div class="stat-item"><div class="stat-label">Flight (East Coast)</div><div class="stat-value">~8&#8211;9 hrs</div></div>
-        <div class="stat-item"><div class="stat-label">Daily Budget</div><div class="stat-value">$150&#8211;250/pp</div></div>
         <div class="stat-item"><div class="stat-label">English Spoken</div><div class="stat-value">Good (tourist)</div></div>
         <div class="stat-item"><div class="stat-label">Safety Index</div><div class="stat-value">High</div></div>
+        <div class="stat-item"><div class="stat-label">Sports Scene</div><div class="stat-value">Serie A, sailing, diving</div></div>
         <div class="stat-item"><div class="stat-label">Currency</div><div class="stat-value">EUR (both)</div></div>
       </div>
       <div class="dest-highlights">
         <h4>Must-Do</h4>
         <ul class="highlight-list">
-          <li>Rome's Colosseum, Vatican &amp; Trastevere</li>
+          <li>Rome's Colosseum, Vatican &#38; Trastevere</li>
           <li>Amalfi Coast drive (Positano, Ravello)</li>
           <li>Dubrovnik old town walls walk</li>
           <li>Split's Diocletian's Palace</li>
@@ -718,7 +817,7 @@ html { scroll-behavior: smooth; }
 <!-- ============ COMPARISON TABLE ============ -->
 <div class="section-header">
   <h2>Head-to-Head</h2>
-  <p>Objective scores on each factor (1&#8211;10 scale, sourced from real data).</p>
+  <p>Objective scores per factor (1&#8211;10). Weather shown as temperature rating (cold to hot).</p>
 </div>
 
 <div class="comparison">
@@ -735,35 +834,26 @@ html { scroll-behavior: smooth; }
   </table>
 </div>
 
-<!-- ============ VOTING ============ -->
-<section class="voting-section" id="vote">
+<!-- ============ RANKINGS ============ -->
+<section class="rankings-section" id="rankings">
   <div class="section-header">
-    <h2>Cast Your Vote</h2>
-    <p>Pick your name, set how much you care about each factor, and let the math do its thing.</p>
+    <h2>Rank Your Picks</h2>
+    <p>Drag or use arrows to rank all destinations. Add a write-in if none of these do it for you.</p>
   </div>
 
-  <div id="firebase-banner" class="firebase-banner">
-    Shared voting is active &#8212; votes sync across all family members in real time.
-  </div>
+  <div class="rankings-panel" id="rankings-panel">
+    <ul class="rank-list" id="rank-list"></ul>
 
-  <div class="voter-picker" id="voter-picker"></div>
-
-  <div class="sliders-panel" id="sliders-panel">
-    <div class="slider-group">
-      <h3>How important is each factor to you?</h3>
-      <p>Drag the sliders. 1 = "meh" &#8594; 10 = "deal-breaker." Your scores update live below.</p>
-      <div id="sliders-container"></div>
+    <div class="writein-section">
+      <h4>Write-in destination</h4>
+      <div class="writein-row">
+        <input type="text" class="writein-input" id="writein-input" placeholder="e.g. Greece, Japan, Portugal..." maxlength="40">
+        <button class="writein-add" onclick="addWriteIn()">Add</button>
+      </div>
     </div>
-  </div>
 
-  <div class="results-panel" id="results-panel">
-    <div id="winner-banner" class="winner-banner"></div>
-    <div class="results-card">
-      <h3>Your Weighted Scores</h3>
-      <div id="result-bars"></div>
-    </div>
-    <div id="reasoning-box" class="reasoning-box"></div>
-    <button id="lock-btn" class="lock-btn" onclick="lockVote()">Lock In My Vote</button>
+    <button class="save-rankings-btn" onclick="saveRankings()">Save My Rankings</button>
+    <div class="save-status" id="save-status">Rankings saved &#10003;</div>
   </div>
 </section>
 
@@ -771,21 +861,22 @@ html { scroll-behavior: smooth; }
 <section class="scoreboard" id="scoreboard">
   <div class="section-header">
     <h2>Family Scoreboard</h2>
-    <p>See who voted and why. Peer pressure strongly encouraged.</p>
+    <p>Everyone's rankings. Change yours whenever you want &#8212; no lock-ins.</p>
   </div>
   <div class="votes-grid" id="votes-grid">
-    <div class="no-votes" id="no-votes"><p>No votes yet. Someone go first.</p></div>
+    <div class="no-votes" id="no-votes"><p>No rankings yet. Someone go first.</p></div>
   </div>
   <div class="consensus-section" id="consensus-section">
     <div class="consensus-card">
-      <h3>Family Consensus</h3>
+      <h3>Borda Count Consensus</h3>
+      <p style="font-size:0.85rem;color:var(--text-dim);margin-bottom:20px;">1st place = most points, last = fewest. Aggregated across all voters.</p>
       <div id="consensus-bars"></div>
     </div>
   </div>
 </section>
 
 <footer>
-  <p>Braff Family Vacation Voter &#8212; Built with love, data, and a slight bias toward pasta. 2026.</p>
+  <p>Giventer-Braff Vacation Voter &#8212; Built with data and a slight bias toward pasta. 2026.</p>
 </footer>
 
 <script>
@@ -799,12 +890,10 @@ const FAMILY = [
 ];
 
 const CRITERIA = [
-  { id: 'adventure', label: 'Adventure & Outdoors', icon: '\u26f0', desc: 'Hiking, nature, once-in-a-lifetime scenery' },
-  { id: 'food', label: 'Food & Wine', icon: '\ud83c\udf77', desc: 'Culinary scene, local cuisine, dining culture' },
-  { id: 'culture', label: 'Cultural Richness', icon: '\ud83c\udfdb', desc: 'History, museums, architecture, local traditions' },
-  { id: 'budget', label: 'Budget-Friendliness', icon: '\ud83d\udcb0', desc: 'How far your dollar goes (accommodations, meals, activities)' },
-  { id: 'weather', label: 'Weather (Late August)', icon: '\u2600', desc: 'Temperature, sunshine, rain probability' },
-  { id: 'family', label: 'Family-Friendliness', icon: '\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67\u200d\ud83d\udc66', desc: 'Group activity variety, something for ages 19\u201356' },
+  { id: 'adventure', label: 'Adventure & Outdoors', icon: '\u26F0', desc: 'Hiking, nature, once-in-a-lifetime scenery' },
+  { id: 'food', label: 'Food & Wine', icon: '\uD83C\uDF77', desc: 'Culinary scene, local cuisine, dining culture' },
+  { id: 'culture', label: 'Cultural Richness', icon: '\uD83C\uDFDB', desc: 'History, museums, architecture, local traditions' },
+  { id: 'sports', label: 'Sports & Activities', icon: '\u26BD', desc: 'Spectator sports, water sports, athletic activities' },
   { id: 'travel', label: 'Ease of Travel', icon: '\u2708', desc: 'Flight time, language barrier, internal logistics' }
 ];
 
@@ -814,7 +903,6 @@ const DESTINATIONS = {
     short: 'Norway',
     color: 'var(--norway)',
     barClass: 'bar-norway',
-    tagClass: 'norway',
     mapCenter: [62.5, 8.5],
     mapZoom: 4,
     markers: [
@@ -823,15 +911,15 @@ const DESTINATIONS = {
       [62.10, 7.09, 'Geirangerfjord'],
       [68.23, 14.57, 'Lofoten']
     ],
-    scores: { adventure: 9, food: 6, culture: 7, budget: 3, weather: 6, family: 8, travel: 7 },
+    scores: { adventure: 10, food: 7, culture: 7, sports: 6, travel: 8 },
+    weatherTemp: 3,
     scoreNotes: {
-      adventure: 'Fjords, Trolltunga, Lofoten \u2014 world-class outdoor terrain',
-      food: 'Great seafood, but not a food-destination heavyweight',
-      culture: 'Viking heritage, modern museums, but narrower cultural breadth',
-      budget: '$18 beers, $30 lunches \u2014 wallet pain is real',
-      weather: '55\u201365\u00b0F, overcast possible, long daylight',
-      family: 'Extremely safe, easy logistics for groups of all ages',
-      travel: 'Direct flights, English everywhere, good rail'
+      adventure: 'Fjords, Trolltunga, Lofoten \u2014 world-class, peak outdoor tier',
+      food: 'Great seafood, emerging food scene, but not a global food capital',
+      culture: 'Viking heritage, modern museums, stunning architecture',
+      sports: 'Sea kayaking, fishing, some hiking overlap \u2014 solid but not a sports destination',
+      travel: 'Direct flights from East Coast, English everywhere, solid rail',
+      weather: '55\u201365\u00b0F, overcast possible, long daylight'
     }
   },
   argentina: {
@@ -839,7 +927,6 @@ const DESTINATIONS = {
     short: 'Arg/Brazil',
     color: 'var(--argentina)',
     barClass: 'bar-argentina',
-    tagClass: 'argentina',
     mapCenter: [-25.0, -52.0],
     mapZoom: 3,
     markers: [
@@ -848,15 +935,15 @@ const DESTINATIONS = {
       [-25.69, -54.44, 'Iguazu Falls'],
       [-32.89, -68.83, 'Mendoza']
     ],
-    scores: { adventure: 9, food: 9, culture: 9, budget: 9, weather: 5, family: 7, travel: 5 },
+    scores: { adventure: 9, food: 9, culture: 9, sports: 9, travel: 5 },
+    weatherTemp: 5,
     scoreNotes: {
       adventure: 'Iguazu, Patagonia teaser, beaches \u2014 nature overload',
-      food: 'World-class steak, Malbec, feijoada \u2014 10/10 for carnivores',
+      food: 'World-class steak, Malbec, feijoada \u2014 carnivore paradise',
       culture: 'Tango, samba, incredibly diverse urban culture',
-      budget: 'ARS collapse = your dollar is king; meals under $10',
-      weather: "It's their winter: BA 50\u201363\u00b0F, Rio 68\u201377\u00b0F \u2014 cool surprise",
-      family: 'Exciting but petty crime in cities requires awareness',
-      travel: '10\u201311hr flights, two countries, limited English outside hotels'
+      sports: 'Football mecca (Boca, Maracan\u00e3), polo, surfing, capoeira',
+      travel: '10\u201311hr flights, two countries, limited English outside hotels',
+      weather: 'Their winter: BA 50\u201363\u00b0F, Rio 68\u201377\u00b0F'
     }
   },
   italy: {
@@ -864,7 +951,6 @@ const DESTINATIONS = {
     short: 'Italy/Croatia',
     color: 'var(--italy)',
     barClass: 'bar-italy',
-    tagClass: 'italy',
     mapCenter: [42.5, 15.5],
     mapZoom: 5,
     markers: [
@@ -874,15 +960,15 @@ const DESTINATIONS = {
       [43.51, 16.44, 'Split'],
       [43.17, 16.44, 'Hvar']
     ],
-    scores: { adventure: 7, food: 10, culture: 10, budget: 6, weather: 9, family: 9, travel: 8 },
+    scores: { adventure: 7, food: 10, culture: 10, sports: 8, travel: 8 },
+    weatherTemp: 9,
     scoreNotes: {
-      adventure: 'Adriatic coast, island-hopping \u2014 good, not extreme',
+      adventure: 'Adriatic coast, island-hopping \u2014 great, not extreme',
       food: 'Italian cuisine + Croatian seafood = unmatched tier',
-      culture: 'Rome, Venice, Dubrovnik \u2014 millennia of civilization stacked up',
-      budget: 'Italy moderate-pricey, Croatia offsets; not cheap, not painful',
-      weather: '75\u201388\u00b0F, sunny, Mediterranean perfection for late Aug',
-      family: 'Safe, walkable cities, ferries, wine tastings \u2014 group gold',
-      travel: 'Direct flights to Rome, ferries to Croatia, EUR in both'
+      culture: 'Rome, Dubrovnik \u2014 millennia of civilization stacked up',
+      sports: 'Serie A starts late Aug, Adriatic sailing/diving, cycling, water polo',
+      travel: 'Direct flights to Rome, ferries to Croatia, EUR in both',
+      weather: '75\u201388\u00b0F, sunny Mediterranean perfection'
     }
   }
 };
@@ -890,12 +976,16 @@ const DESTINATIONS = {
 // ===== STATE =====
 let currentVoter = null;
 let weights = {};
-let votes = {}; // { name: { choice, weights, scores, reasoning, timestamp } }
+let weatherPref = 5;
+let weatherWeight = 5;
+let allVotes = {};
+let writeIns = {};
+let currentRankings = [];
 let firebaseReady = false;
-let dbRef = null;
+let dbVotesRef = null;
+let dbWriteInsRef = null;
 
-// ===== FIREBASE CONFIG =====
-// Replace with your Firebase config to enable shared voting
+// ===== FIREBASE =====
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBQvuUwYprKBWqeNsV2mSQ0YUfFgA2xxEU",
   authDomain: "braff-vacation-voter.firebaseapp.com",
@@ -907,368 +997,428 @@ const FIREBASE_CONFIG = {
 };
 
 function initFirebase() {
-  if (FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.databaseURL) {
-    try {
-      firebase.initializeApp(FIREBASE_CONFIG);
-      dbRef = firebase.database().ref('vacation-votes');
-      firebaseReady = true;
-      document.getElementById('firebase-banner').classList.add('active');
-      // Listen for changes
-      dbRef.on('value', (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          votes = data;
-          renderScoreboard();
-          updateVoterPicker();
-        }
-      });
-      console.log('Firebase connected \u2014 shared voting active');
-    } catch (e) {
-      console.log('Firebase init failed, using localStorage:', e);
-      loadLocalVotes();
-    }
-  } else {
-    loadLocalVotes();
-  }
-}
-
-function loadLocalVotes() {
   try {
-    const saved = localStorage.getItem('braff-vacation-votes');
-    if (saved) votes = JSON.parse(saved);
-  } catch(e) {}
-  renderScoreboard();
-  updateVoterPicker();
-}
+    firebase.initializeApp(FIREBASE_CONFIG);
+    dbVotesRef = firebase.database().ref('vacation-votes-v2');
+    dbWriteInsRef = firebase.database().ref('vacation-writeins');
+    firebaseReady = true;
+    document.getElementById('firebase-banner').classList.add('active');
 
-function saveVote(name, voteData) {
-  votes[name] = voteData;
-  if (firebaseReady && dbRef) {
-    dbRef.child(name).set(voteData);
-  } else {
-    localStorage.setItem('braff-vacation-votes', JSON.stringify(votes));
+    dbVotesRef.on('value', (snapshot) => {
+      const data = snapshot.val();
+      allVotes = data || {};
+      renderScoreboard();
+      updateVoterPicker();
+    });
+
+    dbWriteInsRef.on('value', (snapshot) => {
+      const data = snapshot.val();
+      writeIns = data || {};
+      if (currentVoter) refreshRankList();
+    });
+
+    console.log('Firebase connected');
+  } catch (e) {
+    console.log('Firebase failed, local only:', e);
   }
 }
 
 // ===== MAPS =====
 function initMaps() {
   const tileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-  const attribution = '&copy; OpenStreetMap contributors &copy; CARTO';
-
+  const attribution = '\u00a9 OpenStreetMap \u00a9 CARTO';
   Object.entries(DESTINATIONS).forEach(([key, dest]) => {
-    const mapEl = document.getElementById(`map-${key}`);
+    const mapEl = document.getElementById('map-' + key);
     if (!mapEl) return;
     const map = L.map(mapEl, {
       scrollWheelZoom: false,
       dragging: !L.Browser.mobile,
       zoomControl: false
     }).setView(dest.mapCenter, dest.mapZoom);
-
-    L.tileLayer(tileUrl, { attribution, maxZoom: 18 }).addTo(map);
-
-    dest.markers.forEach(([lat, lng, label]) => {
-      L.circleMarker([lat, lng], {
+    L.tileLayer(tileUrl, { attribution: attribution, maxZoom: 18 }).addTo(map);
+    dest.markers.forEach(function(m) {
+      L.circleMarker([m[0], m[1]], {
         radius: 6,
-        fillColor: getComputedStyle(document.documentElement).getPropertyValue(dest.color.replace('var(','').replace(')','')).trim() || '#8ab4f8',
+        fillColor: '#8ab4f8',
         fillOpacity: 0.9,
         color: '#fff',
         weight: 1
-      }).addTo(map).bindPopup(`<strong>${label}</strong>`);
+      }).addTo(map).bindPopup('<strong>' + m[2] + '</strong>');
     });
   });
 }
 
 // ===== COMPARISON TABLE =====
 function buildCompTable() {
-  const tbody = document.getElementById('comp-body');
-  CRITERIA.forEach(c => {
-    const row = document.createElement('tr');
-    const scores = [
+  var tbody = document.getElementById('comp-body');
+  CRITERIA.forEach(function(c) {
+    var row = document.createElement('tr');
+    var scores = [
       DESTINATIONS.norway.scores[c.id],
       DESTINATIONS.argentina.scores[c.id],
       DESTINATIONS.italy.scores[c.id]
     ];
-    const max = Math.max(...scores);
-    row.innerHTML = `
-      <td>${c.icon} ${c.label}</td>
-      ${scores.map((s, i) => {
-        const colors = ['var(--norway-light)', 'var(--argentina-light)', 'var(--italy-light)'];
-        const bold = s === max ? 'font-weight:700;color:' + colors[i] : '';
-        return `<td style="${bold}">${s}/10</td>`;
-      }).join('')}
-    `;
+    var max = Math.max.apply(null, scores);
+    var cells = '<td>' + c.icon + ' ' + c.label + '</td>';
+    var colors = ['var(--norway-light)', 'var(--argentina-light)', 'var(--italy-light)'];
+    for (var i = 0; i < scores.length; i++) {
+      var bold = scores[i] === max ? 'font-weight:700;color:' + colors[i] : '';
+      cells += '<td style="' + bold + '">' + scores[i] + '/10</td>';
+    }
+    row.innerHTML = cells;
     tbody.appendChild(row);
   });
-  // Totals row
-  const totals = ['norway', 'argentina', 'italy'].map(key =>
-    Object.values(DESTINATIONS[key].scores).reduce((a, b) => a + b, 0)
-  );
-  const maxT = Math.max(...totals);
-  const trow = document.createElement('tr');
+  // Weather row
+  var wrow = document.createElement('tr');
+  var wtemps = [DESTINATIONS.norway.weatherTemp, DESTINATIONS.argentina.weatherTemp, DESTINATIONS.italy.weatherTemp];
+  var wlabels = ['Cool (55\u201365\u00b0F)', 'Mixed (50\u201377\u00b0F)', 'Hot (75\u201388\u00b0F)'];
+  wrow.innerHTML = '<td>\u2600 Temperature</td>' +
+    '<td>' + wlabels[0] + '</td>' +
+    '<td>' + wlabels[1] + '</td>' +
+    '<td>' + wlabels[2] + '</td>';
+  tbody.appendChild(wrow);
+  // Totals
+  var totals = ['norway', 'argentina', 'italy'].map(function(key) {
+    var s = 0;
+    for (var k in DESTINATIONS[key].scores) s += DESTINATIONS[key].scores[k];
+    return s;
+  });
+  var maxT = Math.max.apply(null, totals);
+  var trow = document.createElement('tr');
   trow.style.fontWeight = '700';
-  trow.innerHTML = `
-    <td>Unweighted Total</td>
-    ${totals.map((t, i) => {
-      const colors = ['var(--norway-light)', 'var(--argentina-light)', 'var(--italy-light)'];
-      const style = t === maxT ? `color:${colors[i]}` : '';
-      return `<td style="${style}">${t}/70</td>`;
-    }).join('')}
-  `;
+  var tcells = '<td>Non-weather Total</td>';
+  var tcolors = ['var(--norway-light)', 'var(--argentina-light)', 'var(--italy-light)'];
+  for (var i = 0; i < totals.length; i++) {
+    var tstyle = totals[i] === maxT ? 'color:' + tcolors[i] : '';
+    tcells += '<td style="' + tstyle + '">' + totals[i] + '/50</td>';
+  }
+  trow.innerHTML = tcells;
   tbody.appendChild(trow);
 }
 
 // ===== VOTER PICKER =====
 function buildVoterPicker() {
-  const container = document.getElementById('voter-picker');
-  FAMILY.forEach(f => {
-    const btn = document.createElement('button');
+  var container = document.getElementById('voter-picker');
+  FAMILY.forEach(function(f) {
+    var btn = document.createElement('button');
     btn.className = 'voter-btn';
     btn.dataset.name = f.name;
-    btn.innerHTML = `${f.name}<span class="voter-city">${f.city}</span>`;
-    btn.onclick = () => selectVoter(f.name);
+    btn.innerHTML = f.name + '<span class="voter-city">' + f.city + '</span>';
+    btn.onclick = function() { selectVoter(f.name); };
     container.appendChild(btn);
   });
   updateVoterPicker();
 }
 
 function updateVoterPicker() {
-  document.querySelectorAll('.voter-btn').forEach(btn => {
-    const name = btn.dataset.name;
-    btn.classList.toggle('voted-already', !!votes[name]);
+  document.querySelectorAll('.voter-btn').forEach(function(btn) {
+    var name = btn.dataset.name;
+    var hasRankings = allVotes[name] && allVotes[name].rankings;
+    btn.classList.toggle('has-rankings', !!hasRankings);
   });
 }
 
 function selectVoter(name) {
-  if (votes[name]) {
-    // Already voted \u2014 show their results but don't allow changes
-    currentVoter = name;
-    document.querySelectorAll('.voter-btn').forEach(b => b.classList.toggle('active', b.dataset.name === name));
-    showLockedResults(name);
-    return;
-  }
   currentVoter = name;
-  document.querySelectorAll('.voter-btn').forEach(b => b.classList.toggle('active', b.dataset.name === name));
+  document.querySelectorAll('.voter-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.name === name);
+  });
 
-  // Reset weights to 5
-  CRITERIA.forEach(c => { weights[c.id] = 5; });
+  // Load existing data or defaults
+  var existing = allVotes[name];
+  if (existing && existing.weights) {
+    weights = Object.assign({}, existing.weights);
+    weatherPref = existing.weatherPref || 5;
+    weatherWeight = existing.weatherWeight || 5;
+  } else {
+    CRITERIA.forEach(function(c) { weights[c.id] = 5; });
+    weatherPref = 5;
+    weatherWeight = 5;
+  }
+
   buildSliders();
   document.getElementById('sliders-panel').classList.add('active');
-  document.getElementById('results-panel').classList.add('active');
-  document.getElementById('lock-btn').classList.add('active');
-  document.getElementById('lock-btn').disabled = false;
-  document.getElementById('lock-btn').textContent = `Lock In ${name}'s Vote`;
-  calculateScores();
-}
+  document.getElementById('rankings-panel').classList.add('active');
 
-function showLockedResults(name) {
-  const vote = votes[name];
-  document.getElementById('sliders-panel').classList.remove('active');
-  document.getElementById('results-panel').classList.add('active');
-  document.getElementById('lock-btn').classList.remove('active');
-
-  // Show their scores
-  renderBars(vote.scores);
-  showWinner(vote.choice, true);
-  document.getElementById('reasoning-box').innerHTML = vote.reasoning;
-  document.getElementById('reasoning-box').classList.add('active');
+  // Load existing rankings or calculate default order
+  if (existing && existing.rankings) {
+    currentRankings = existing.rankings.slice();
+  } else {
+    var scores = calculateScores();
+    currentRankings = Object.keys(scores).sort(function(a, b) { return scores[b] - scores[a]; });
+    // Add any write-ins not in rankings
+    getAllWriteInKeys().forEach(function(k) {
+      if (currentRankings.indexOf(k) === -1) currentRankings.push(k);
+    });
+  }
+  renderRankList();
+  updateDestBadges();
 }
 
 // ===== SLIDERS =====
 function buildSliders() {
-  const container = document.getElementById('sliders-container');
+  var container = document.getElementById('sliders-container');
   container.innerHTML = '';
-  CRITERIA.forEach(c => {
-    const div = document.createElement('div');
+  CRITERIA.forEach(function(c) {
+    var val = weights[c.id] || 5;
+    var div = document.createElement('div');
     div.className = 'slider-row';
-    div.innerHTML = `
-      <div class="slider-header">
-        <span class="slider-label">${c.icon} ${c.label}</span>
-        <span class="slider-value" id="val-${c.id}">5 \u2014 Moderate</span>
-      </div>
-      <input type="range" min="1" max="10" value="5" id="slider-${c.id}"
-        oninput="updateWeight('${c.id}', this.value)">
-      <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text-dim);margin-top:2px;">
-        <span>Meh</span><span>Deal-breaker</span>
-      </div>
-    `;
+    div.innerHTML =
+      '<div class="slider-header">' +
+        '<span class="slider-label">' + c.icon + ' ' + c.label + '</span>' +
+        '<span class="slider-value" id="val-' + c.id + '">' + val + ' \u2014 ' + WEIGHT_LABELS[val] + '</span>' +
+      '</div>' +
+      '<input type="range" min="1" max="10" value="' + val + '" id="slider-' + c.id + '" ' +
+        'oninput="updateWeight(\'' + c.id + '\', this.value)">' +
+      '<div class="slider-endpoints"><span>Meh</span><span>Deal-breaker</span></div>';
     container.appendChild(div);
   });
+
+  // Set weather sliders
+  document.getElementById('slider-temp-pref').value = weatherPref;
+  document.getElementById('val-temp-pref').textContent = weatherPref + ' \u2014 ' + TEMP_LABELS[weatherPref];
+  document.getElementById('slider-weather-wt').value = weatherWeight;
+  document.getElementById('val-weather-wt').textContent = weatherWeight + ' \u2014 ' + WEIGHT_LABELS[weatherWeight];
 }
 
-const WEIGHT_LABELS = {
+var WEIGHT_LABELS = {
   1: 'Irrelevant', 2: 'Barely care', 3: 'Minor factor', 4: 'Somewhat matters',
   5: 'Moderate', 6: 'Important', 7: 'Very important', 8: 'Major priority',
   9: 'Critical', 10: 'Non-negotiable'
 };
 
+var TEMP_LABELS = {
+  1: 'Cold (50s\u00b0F)', 2: 'Cold (50s\u00b0F)', 3: 'Cool (60s\u00b0F)', 4: 'Cool (60s\u00b0F)',
+  5: 'Mild (70s\u00b0F)', 6: 'Mild (70s\u00b0F)', 7: 'Warm (80s\u00b0F)', 8: 'Warm (80s\u00b0F)',
+  9: 'Hot (85\u00b0F+)', 10: 'Hot (85\u00b0F+)'
+};
+
 function updateWeight(id, val) {
   val = parseInt(val);
   weights[id] = val;
-  document.getElementById(`val-${id}`).textContent = `${val} \u2014 ${WEIGHT_LABELS[val]}`;
-  calculateScores();
+  document.getElementById('val-' + id).textContent = val + ' \u2014 ' + WEIGHT_LABELS[val];
+  onSlidersChanged();
+}
+
+function updateTempPref(val) {
+  weatherPref = parseInt(val);
+  document.getElementById('val-temp-pref').textContent = weatherPref + ' \u2014 ' + TEMP_LABELS[weatherPref];
+  onSlidersChanged();
+}
+
+function updateWeatherWeight(val) {
+  weatherWeight = parseInt(val);
+  document.getElementById('val-weather-wt').textContent = weatherWeight + ' \u2014 ' + WEIGHT_LABELS[weatherWeight];
+  onSlidersChanged();
+}
+
+function onSlidersChanged() {
+  updateDestBadges();
+  // If user hasn't manually reordered, re-sort by new scores
+  var scores = calculateScores();
+  // Re-sort only the base destinations by score, keep write-ins at their current positions
+  var baseDests = currentRankings.filter(function(k) { return DESTINATIONS[k]; });
+  var writeInDests = currentRankings.filter(function(k) { return !DESTINATIONS[k]; });
+  baseDests.sort(function(a, b) { return scores[b] - scores[a]; });
+  currentRankings = baseDests.concat(writeInDests);
+  renderRankList();
 }
 
 // ===== SCORING =====
 function calculateScores() {
-  const scores = {};
-  const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
+  var scores = {};
+  var totalWeight = 0;
+  CRITERIA.forEach(function(c) { totalWeight += (weights[c.id] || 5); });
+  totalWeight += weatherWeight;
 
-  Object.entries(DESTINATIONS).forEach(([key, dest]) => {
-    let weighted = 0;
-    CRITERIA.forEach(c => {
+  Object.entries(DESTINATIONS).forEach(function(entry) {
+    var key = entry[0], dest = entry[1];
+    var weighted = 0;
+    CRITERIA.forEach(function(c) {
       weighted += (weights[c.id] || 5) * dest.scores[c.id];
     });
+    // Weather: proximity to preference
+    var weatherMatch = 10 - Math.abs(dest.weatherTemp - weatherPref);
+    weighted += weatherWeight * weatherMatch;
     scores[key] = totalWeight > 0 ? (weighted / totalWeight) : 0;
   });
 
-  renderBars(scores);
-
-  // Find winner
-  const winner = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
-  showWinner(winner, false);
-
-  // Generate reasoning
-  const reasoning = generateReasoning(currentVoter, weights, winner, scores);
-  document.getElementById('reasoning-box').innerHTML = reasoning;
-  document.getElementById('reasoning-box').classList.add('active');
-
-  return { scores, winner, reasoning };
+  return scores;
 }
 
-function renderBars(scores) {
-  const container = document.getElementById('result-bars');
-  const maxScore = Math.max(...Object.values(scores));
-
-  container.innerHTML = Object.entries(DESTINATIONS).map(([key, dest]) => {
-    const score = scores[key];
-    const pct = maxScore > 0 ? (score / 10) * 100 : 0;
-    return `
-      <div class="result-bar-container">
-        <div class="result-bar-header">
-          <span class="result-bar-label">${dest.name}</span>
-          <span class="result-bar-score">${score.toFixed(2)}/10</span>
-        </div>
-        <div class="result-bar-track">
-          <div class="result-bar-fill ${dest.barClass}" style="width:${pct}%"></div>
-        </div>
-      </div>
-    `;
-  }).join('');
+function updateDestBadges() {
+  var scores = calculateScores();
+  Object.keys(DESTINATIONS).forEach(function(key) {
+    var badge = document.getElementById('badge-' + key);
+    if (badge) badge.textContent = scores[key].toFixed(1) + '/10';
+  });
 }
 
-function showWinner(winnerKey, locked) {
-  const banner = document.getElementById('winner-banner');
-  const dest = DESTINATIONS[winnerKey];
-  const colors = { norway: 'var(--norway)', argentina: 'var(--argentina)', italy: 'var(--italy)' };
-  banner.style.background = `linear-gradient(135deg, ${colors[winnerKey]}33, ${colors[winnerKey]}11)`;
-  banner.style.border = `1px solid ${colors[winnerKey]}55`;
-  banner.innerHTML = `
-    <h3>${locked ? '\ud83d\udd12' : '\ud83c\udfc6'} ${dest.name}</h3>
-    <p>${locked ? 'Vote locked' : 'Currently in the lead based on your priorities'}</p>
-  `;
-  banner.classList.add('active');
+// ===== RANKING LIST =====
+function getAllWriteInKeys() {
+  return Object.keys(writeIns);
 }
 
-// ===== REASONING GENERATOR =====
-function generateReasoning(name, w, winnerKey, scores) {
-  const dest = DESTINATIONS[winnerKey];
-  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
-  const runner = sorted[1];
-  const loser = sorted[2];
+function getDestName(key) {
+  if (DESTINATIONS[key]) return DESTINATIONS[key].name;
+  if (writeIns[key]) return writeIns[key].name;
+  return key;
+}
 
-  // Top priorities
-  const priorities = CRITERIA
-    .map(c => ({ ...c, weight: w[c.id] || 5 }))
-    .sort((a, b) => b.weight - a.weight);
+function renderRankList() {
+  var list = document.getElementById('rank-list');
+  list.innerHTML = '';
+  var scores = calculateScores();
+  var total = currentRankings.length;
 
-  const top2 = priorities.slice(0, 2);
-  const bottom = priorities[priorities.length - 1];
+  currentRankings.forEach(function(key, idx) {
+    var li = document.createElement('li');
+    li.className = 'rank-item';
+    li.dataset.key = key;
+    li.draggable = true;
 
-  // Name-specific flavor
-  const flavors = {
-    'Adam': 'The bookie has spoken.',
-    'G\u00f8r': 'G\u00f8r has weighed in.',
-    'Emma': 'Boston\'s finest has decided.',
-    'Jeremy': 'The New Yorker has cast judgment.',
-    'Andrew': 'Chicago\'s representative has voted.'
-  };
+    var isBase = !!DESTINATIONS[key];
+    var scoreText = isBase ? scores[key].toFixed(1) + '/10 weighted score' : 'Write-in';
+    var bordaPts = total - idx;
 
-  const winnerNotes = top2.map(c => DESTINATIONS[winnerKey].scoreNotes[c.id]).join(' ');
-  const runnerName = DESTINATIONS[runner[0]].name;
-  const loserName = DESTINATIONS[loser[0]].name;
+    li.innerHTML =
+      '<span class="rank-number">#' + (idx + 1) + '</span>' +
+      '<div class="rank-info">' +
+        '<div class="rank-name">' + getDestName(key) + '</div>' +
+        '<div class="rank-score">' + scoreText + ' \u00b7 ' + bordaPts + ' Borda pt' + (bordaPts !== 1 ? 's' : '') + '</div>' +
+      '</div>' +
+      '<div class="rank-arrows">' +
+        '<button class="rank-arrow" onclick="moveRank(\'' + key + '\', -1)"' + (idx === 0 ? ' disabled' : '') + '>\u25B2</button>' +
+        '<button class="rank-arrow" onclick="moveRank(\'' + key + '\', 1)"' + (idx === total - 1 ? ' disabled' : '') + '>\u25BC</button>' +
+      '</div>';
 
-  const gap = (sorted[0][1] - runner[1]).toFixed(1);
-  const closeCall = parseFloat(gap) < 0.5;
+    // Drag events
+    li.addEventListener('dragstart', function(e) {
+      e.dataTransfer.setData('text/plain', key);
+      li.classList.add('dragging');
+    });
+    li.addEventListener('dragend', function() {
+      li.classList.remove('dragging');
+      document.querySelectorAll('.rank-item').forEach(function(el) { el.classList.remove('drag-over'); });
+    });
+    li.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      li.classList.add('drag-over');
+    });
+    li.addEventListener('dragleave', function() {
+      li.classList.remove('drag-over');
+    });
+    li.addEventListener('drop', function(e) {
+      e.preventDefault();
+      li.classList.remove('drag-over');
+      var draggedKey = e.dataTransfer.getData('text/plain');
+      var fromIdx = currentRankings.indexOf(draggedKey);
+      var toIdx = currentRankings.indexOf(key);
+      if (fromIdx !== -1 && toIdx !== -1 && fromIdx !== toIdx) {
+        currentRankings.splice(fromIdx, 1);
+        currentRankings.splice(toIdx, 0, draggedKey);
+        renderRankList();
+      }
+    });
 
-  let text = `<strong>${flavors[name] || name + ' has voted.'}</strong> `;
+    list.appendChild(li);
+  });
+}
 
-  text += `With <em>${top2[0].label}</em> (${top2[0].weight}/10) and <em>${top2[1].label}</em> (${top2[1].weight}/10) as top priorities, `;
-  text += `<strong>${dest.name}</strong> pulls ahead at ${scores[winnerKey].toFixed(2)}/10. `;
+function refreshRankList() {
+  // Add any new write-ins not in current rankings
+  getAllWriteInKeys().forEach(function(k) {
+    if (currentRankings.indexOf(k) === -1) currentRankings.push(k);
+  });
+  // Remove write-ins that were deleted
+  currentRankings = currentRankings.filter(function(k) {
+    return DESTINATIONS[k] || writeIns[k];
+  });
+  renderRankList();
+}
 
-  if (closeCall) {
-    text += `It was tight though \u2014 ${runnerName} trailed by just ${gap} points. `;
-  } else {
-    text += `${runnerName} came in at ${runner[1].toFixed(2)} and ${loserName} at ${loser[1].toFixed(2)}. `;
+function moveRank(key, direction) {
+  var idx = currentRankings.indexOf(key);
+  var newIdx = idx + direction;
+  if (newIdx < 0 || newIdx >= currentRankings.length) return;
+  currentRankings.splice(idx, 1);
+  currentRankings.splice(newIdx, 0, key);
+  renderRankList();
+}
+
+// ===== WRITE-IN =====
+function addWriteIn() {
+  var input = document.getElementById('writein-input');
+  var name = input.value.trim();
+  if (!name) return;
+
+  // Check for duplicates
+  var slug = 'writein_' + name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+  var exists = false;
+  Object.keys(writeIns).forEach(function(k) {
+    if (writeIns[k].name.toLowerCase() === name.toLowerCase()) exists = true;
+  });
+  Object.keys(DESTINATIONS).forEach(function(k) {
+    if (DESTINATIONS[k].name.toLowerCase() === name.toLowerCase()) exists = true;
+  });
+  if (exists) {
+    input.value = '';
+    return;
   }
 
-  // Mention what hurt the loser
-  text += `${bottom.label} (weighted just ${bottom.weight}/10) was the factor ${name} cared least about. `;
-
-  // Destination-specific color
-  if (winnerKey === 'norway') {
-    text += `Apparently fjords and $18 beers are worth it. Pack layers.`;
-  } else if (winnerKey === 'argentina') {
-    text += `Steak, Malbec, and a favorable exchange rate \u2014 hard to argue with that math.`;
-  } else {
-    text += `Pasta and Dubrovnik sunsets win again. The Mediterranean doesn't lose many of these.`;
-  }
-
-  return text;
-}
-
-// ===== LOCK VOTE =====
-function lockVote() {
-  if (!currentVoter) return;
-  const result = calculateScores();
-  const voteData = {
-    choice: result.winner,
-    weights: { ...weights },
-    scores: result.scores,
-    reasoning: result.reasoning,
+  var writeInData = {
+    name: name,
+    addedBy: currentVoter || 'Unknown',
     timestamp: new Date().toISOString()
   };
 
-  saveVote(currentVoter, voteData);
+  if (firebaseReady && dbWriteInsRef) {
+    dbWriteInsRef.child(slug).set(writeInData);
+  }
+  writeIns[slug] = writeInData;
 
-  // Confetti!
-  const colors = { norway: ['#1e3a5f', '#7db4f0'], argentina: ['#2a9d8f', '#40c9b5'], italy: ['#e76f51', '#f4a261'] };
-  confetti({
-    particleCount: 120,
-    spread: 80,
-    origin: { y: 0.7 },
-    colors: colors[result.winner] || ['#8ab4f8', '#ffffff']
-  });
+  if (currentRankings.indexOf(slug) === -1) {
+    currentRankings.push(slug);
+  }
+  renderRankList();
+  input.value = '';
+}
 
-  // Disable
-  document.getElementById('lock-btn').disabled = true;
-  document.getElementById('lock-btn').textContent = 'Vote Locked \u2713';
+// ===== SAVE RANKINGS =====
+function saveRankings() {
+  if (!currentVoter) return;
+
+  var voteData = {
+    rankings: currentRankings.slice(),
+    weights: Object.assign({}, weights),
+    weatherPref: weatherPref,
+    weatherWeight: weatherWeight,
+    timestamp: new Date().toISOString()
+  };
+
+  allVotes[currentVoter] = voteData;
+
+  if (firebaseReady && dbVotesRef) {
+    dbVotesRef.child(currentVoter).set(voteData);
+  }
+
+  var status = document.getElementById('save-status');
+  status.classList.add('visible');
+  setTimeout(function() { status.classList.remove('visible'); }, 2500);
 
   renderScoreboard();
   updateVoterPicker();
-
-  // Scroll to scoreboard after a moment
-  setTimeout(() => {
-    document.getElementById('scoreboard').scrollIntoView({ behavior: 'smooth' });
-  }, 1500);
 }
 
 // ===== SCOREBOARD =====
 function renderScoreboard() {
-  const grid = document.getElementById('votes-grid');
-  const noVotes = document.getElementById('no-votes');
-  const voteEntries = Object.entries(votes);
+  var grid = document.getElementById('votes-grid');
+  var noVotes = document.getElementById('no-votes');
+  var voteEntries = Object.entries(allVotes);
 
   if (voteEntries.length === 0) {
+    grid.innerHTML = '';
+    grid.appendChild(noVotes);
     noVotes.style.display = 'block';
     document.getElementById('consensus-section').classList.remove('active');
     return;
@@ -1277,60 +1427,89 @@ function renderScoreboard() {
   noVotes.style.display = 'none';
   grid.innerHTML = '';
 
-  voteEntries.forEach(([name, vote]) => {
-    const member = FAMILY.find(f => f.name === name) || { color: '#666', initial: name[0] };
-    const dest = DESTINATIONS[vote.choice];
-    const destColors = { norway: 'var(--norway)', argentina: 'var(--argentina)', italy: 'var(--italy)' };
+  voteEntries.forEach(function(entry) {
+    var name = entry[0], vote = entry[1];
+    if (!vote.rankings) return;
+    var member = FAMILY.find(function(f) { return f.name === name; }) || { color: '#666', initial: name[0] };
+    var total = vote.rankings.length;
 
-    const card = document.createElement('div');
+    var card = document.createElement('div');
     card.className = 'vote-card animate-in';
-    card.innerHTML = `
-      <div class="vote-card-header">
-        <div class="vote-avatar" style="background:${member.color}">${member.initial}</div>
-        <h4>${name}</h4>
-        <span class="vote-choice" style="background:${destColors[vote.choice]}33;color:${destColors[vote.choice]}cc">${dest.short}</span>
-      </div>
-      <div class="vote-reasoning">${vote.reasoning}</div>
-      <div class="vote-weights">
-        ${CRITERIA.map(c => `<span class="weight-tag">${c.icon} ${c.label.split(' ')[0]}: ${vote.weights[c.id]}/10</span>`).join('')}
-      </div>
-    `;
+
+    var header =
+      '<div class="vote-card-header">' +
+        '<div class="vote-avatar" style="background:' + member.color + '">' + member.initial + '</div>' +
+        '<h4>' + name + '</h4>' +
+      '</div>';
+
+    var rankItems = '';
+    vote.rankings.forEach(function(key, idx) {
+      var pts = total - idx;
+      rankItems +=
+        '<li class="vote-ranking-item">' +
+          '<span class="vote-rank-num">' + (idx + 1) + '</span>' +
+          '<span class="dest-name">' + getDestName(key) + '</span>' +
+          '<span class="borda-pts">' + pts + ' pt' + (pts !== 1 ? 's' : '') + '</span>' +
+        '</li>';
+    });
+
+    card.innerHTML = header + '<ul class="vote-ranking-list">' + rankItems + '</ul>';
     grid.appendChild(card);
   });
 
-  // Consensus
+  // Consensus (Borda count)
   if (voteEntries.length >= 2) {
-    const tally = { norway: 0, argentina: 0, italy: 0 };
-    voteEntries.forEach(([_, v]) => { tally[v.choice]++; });
-    const total = voteEntries.length;
+    var allKeys = {};
+    voteEntries.forEach(function(entry) {
+      var vote = entry[1];
+      if (!vote.rankings) return;
+      vote.rankings.forEach(function(k) { allKeys[k] = true; });
+    });
 
-    const consensusDiv = document.getElementById('consensus-bars');
-    consensusDiv.innerHTML = Object.entries(DESTINATIONS).map(([key, dest]) => {
-      const count = tally[key];
-      const pct = (count / total * 100);
-      return `
-        <div class="result-bar-container" style="margin-bottom:12px;">
-          <div class="result-bar-header">
-            <span class="result-bar-label">${dest.name}</span>
-            <span class="result-bar-score">${count}/${total} votes</span>
-          </div>
-          <div class="result-bar-track">
-            <div class="result-bar-fill ${dest.barClass}" style="width:${pct}%">${count > 0 ? count + ' vote' + (count > 1 ? 's' : '') : ''}</div>
-          </div>
-        </div>
-      `;
+    var bordaTotals = {};
+    Object.keys(allKeys).forEach(function(k) { bordaTotals[k] = 0; });
+
+    voteEntries.forEach(function(entry) {
+      var vote = entry[1];
+      if (!vote.rankings) return;
+      var total = vote.rankings.length;
+      vote.rankings.forEach(function(key, idx) {
+        bordaTotals[key] = (bordaTotals[key] || 0) + (total - idx);
+      });
+    });
+
+    var maxPts = Math.max.apply(null, Object.values(bordaTotals));
+    var sorted = Object.entries(bordaTotals).sort(function(a, b) { return b[1] - a[1]; });
+    var maxPossible = voteEntries.length * Object.keys(allKeys).length; // theoretical max
+
+    var consensusBars = document.getElementById('consensus-bars');
+    consensusBars.innerHTML = sorted.map(function(entry) {
+      var key = entry[0], pts = entry[1];
+      var pct = maxPts > 0 ? (pts / maxPts * 100) : 0;
+      var barClass = DESTINATIONS[key] ? DESTINATIONS[key].barClass : 'bar-writein';
+      return '<div class="result-bar-container">' +
+        '<div class="result-bar-header">' +
+          '<span class="result-bar-label">' + getDestName(key) + '</span>' +
+          '<span class="result-bar-score">' + pts + ' pts</span>' +
+        '</div>' +
+        '<div class="result-bar-track">' +
+          '<div class="result-bar-fill ' + barClass + '" style="width:' + pct + '%"></div>' +
+        '</div>' +
+      '</div>';
     }).join('');
+
     document.getElementById('consensus-section').classList.add('active');
   }
 }
 
 // ===== INIT =====
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
   initFirebase();
   initMaps();
   buildCompTable();
   buildVoterPicker();
   renderScoreboard();
+  updateDestBadges();
 });
 </script>
 
