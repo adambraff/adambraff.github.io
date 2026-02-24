@@ -103,7 +103,7 @@ body {
   align-items: center;
   gap: 8px;
 }
-.family-chip .age { color: var(--text-dim); font-size: 0.8rem; }
+.family-chip .loc { color: var(--text-dim); font-size: 0.8rem; }
 .hero-cta {
   display: inline-block;
   background: linear-gradient(135deg, var(--accent), #6d9ef0);
@@ -266,25 +266,24 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 .dest-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
 .dest-banner {
   width: 100%;
-  height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 3rem;
+  height: 200px;
   position: relative;
+  background-size: cover;
+  background-position: center;
 }
-.dest-banner.norway-bg { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a8e 60%, #4a90d9 100%); }
-.dest-banner.argentina-bg { background: linear-gradient(135deg, #1a6b5f 0%, #2a9d8f 60%, #40c9b5 100%); }
-.dest-banner.italy-bg { background: linear-gradient(135deg, #c2553d 0%, #e76f51 60%, #f4a261 100%); }
+.dest-banner.norway-bg { background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Geirangerfjord_from_%C3%98rnesvingen%2C_2013_June.jpg/1280px-Geirangerfjord_from_%C3%98rnesvingen%2C_2013_June.jpg'); }
+.dest-banner.argentina-bg { background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/00_1838_Iguazu_Falls_from_the_Brazilian_side.jpg/1280px-00_1838_Iguazu_Falls_from_the_Brazilian_side.jpg'); }
+.dest-banner.italy-bg { background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Dubrovnik_Old_Town_1.jpg/1280px-Dubrovnik_Old_Town_1.jpg'); }
 .dest-score-badge {
   position: absolute;
   top: 12px; right: 12px;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.6);
   backdrop-filter: blur(8px);
   padding: 6px 14px;
   border-radius: 10px;
   font-size: 0.85rem;
   font-weight: 700;
+  color: white;
 }
 .dest-body { padding: 24px; }
 .dest-tag {
@@ -330,6 +329,39 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
   gap: 8px;
 }
 .highlight-list li::before { content: '\2192'; color: var(--accent); font-weight: 600; }
+
+/* Write-ins display */
+.writeins-display {
+  max-width: 700px;
+  margin: 0 auto 40px;
+  padding: 0 24px;
+}
+.writeins-display-card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.writeins-display-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.writein-display-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+.writein-display-item:last-child { margin-bottom: 0; }
+.writein-display-name { font-weight: 600; font-size: 1rem; }
+.writein-display-by { font-size: 0.8rem; color: var(--text-dim); }
+.no-writeins { color: var(--text-dim); font-size: 0.9rem; font-style: italic; }
 
 /* Comparison Table */
 .comparison {
@@ -619,6 +651,75 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 }
 .firebase-banner.active { display: block; }
 
+/* Admin reset */
+.admin-section {
+  max-width: 500px;
+  margin: 0 auto 40px;
+  padding: 0 24px;
+  text-align: center;
+}
+.admin-reset-btn {
+  background: rgba(234,67,53,0.12);
+  border: 1px solid rgba(234,67,53,0.3);
+  color: #ea4335;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.admin-reset-btn:hover { background: rgba(234,67,53,0.2); }
+.admin-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+.admin-modal-overlay.active { display: flex; }
+.admin-modal {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 400px;
+  width: 90%;
+  border: 1px solid rgba(255,255,255,0.1);
+  text-align: center;
+}
+.admin-modal h3 { margin-bottom: 8px; color: #ea4335; }
+.admin-modal p { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 20px; }
+.admin-modal input {
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  outline: none;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.admin-modal input:focus { border-color: var(--accent); }
+.admin-modal-btns { display: flex; gap: 12px; justify-content: center; }
+.admin-modal-btns button {
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  border: none;
+}
+.admin-confirm-btn { background: #ea4335; color: white; }
+.admin-cancel-btn { background: rgba(255,255,255,0.08); color: var(--text); }
+.admin-error { color: #ea4335; font-size: 0.8rem; margin-top: 8px; display: none; }
+
 footer {
   text-align: center;
   padding: 40px 24px;
@@ -655,11 +756,11 @@ html { scroll-behavior: smooth; }
   <h1>Giventer-Braff Vacation</h1>
   <p class="hero-subtitle">Five family members. Three destinations (plus write-ins). Rank them all. Change your mind whenever.</p>
   <div class="hero-family">
-    <div class="family-chip">Adam, 56 <span class="age">Providence</span></div>
-    <div class="family-chip">G&#248;r, 56 <span class="age">Providence</span></div>
-    <div class="family-chip">Emma, 25 <span class="age">Boston</span></div>
-    <div class="family-chip">Jeremy, 22 <span class="age">NYC</span></div>
-    <div class="family-chip">Andrew, 19 <span class="age">Chicago</span></div>
+    <div class="family-chip">Adam <span class="loc">Providence</span></div>
+    <div class="family-chip">G&#248;r <span class="loc">Providence</span></div>
+    <div class="family-chip">Emma <span class="loc">Boston</span></div>
+    <div class="family-chip">Jeremy <span class="loc">NYC</span></div>
+    <div class="family-chip">Andrew <span class="loc">Chicago</span></div>
   </div>
   <a href="#priorities" class="hero-cta">Set Your Priorities</a>
 </section>
@@ -721,7 +822,7 @@ html { scroll-behavior: smooth; }
 <div class="destinations container">
   <!-- NORWAY -->
   <div class="dest-card">
-    <div class="dest-banner norway-bg">&#127956;
+    <div class="dest-banner norway-bg">
       <span class="dest-score-badge" id="badge-norway">&#8212;</span>
     </div>
     <div class="dest-body">
@@ -733,8 +834,8 @@ html { scroll-behavior: smooth; }
         <div class="stat-item"><div class="stat-label">Late Aug Temp</div><div class="stat-value">55&#8211;65&#176;F</div></div>
         <div class="stat-item"><div class="stat-label">Flight (East Coast)</div><div class="stat-value">~8 hrs direct</div></div>
         <div class="stat-item"><div class="stat-label">English Spoken</div><div class="stat-value">95%+</div></div>
-        <div class="stat-item"><div class="stat-label">Safety Index</div><div class="stat-value">Very High</div></div>
-        <div class="stat-item"><div class="stat-label">Sports Scene</div><div class="stat-value">Kayak, fish, hike</div></div>
+        <div class="stat-item"><div class="stat-label">Safety</div><div class="stat-value">Very High</div></div>
+        <div class="stat-item"><div class="stat-label">Pro Sports</div><div class="stat-value">Limited (football)</div></div>
         <div class="stat-item"><div class="stat-label">Currency</div><div class="stat-value">NOK (~11/$)</div></div>
       </div>
       <div class="dest-highlights">
@@ -752,7 +853,7 @@ html { scroll-behavior: smooth; }
 
   <!-- ARGENTINA / BRAZIL -->
   <div class="dest-card">
-    <div class="dest-banner argentina-bg">&#127754;
+    <div class="dest-banner argentina-bg">
       <span class="dest-score-badge" id="badge-argentina">&#8212;</span>
     </div>
     <div class="dest-body">
@@ -764,8 +865,8 @@ html { scroll-behavior: smooth; }
         <div class="stat-item"><div class="stat-label">Late Aug Temp</div><div class="stat-value">50&#8211;77&#176;F*</div></div>
         <div class="stat-item"><div class="stat-label">Flight (East Coast)</div><div class="stat-value">~10&#8211;11 hrs</div></div>
         <div class="stat-item"><div class="stat-label">English Spoken</div><div class="stat-value">Limited</div></div>
-        <div class="stat-item"><div class="stat-label">Safety Index</div><div class="stat-value">Moderate</div></div>
-        <div class="stat-item"><div class="stat-label">Sports Scene</div><div class="stat-value">Football, polo, surf</div></div>
+        <div class="stat-item"><div class="stat-label">Safety</div><div class="stat-value">Moderate</div></div>
+        <div class="stat-item"><div class="stat-label">Pro Sports</div><div class="stat-value">Football, polo</div></div>
         <div class="stat-item"><div class="stat-label">Currency</div><div class="stat-value">ARS/BRL &#8595;&#8595;</div></div>
       </div>
       <p style="font-size:0.75rem;color:var(--text-dim);margin-top:8px;">*Buenos Aires 50&#8211;63&#176;F, Rio 68&#8211;77&#176;F. It's their winter.</p>
@@ -784,7 +885,7 @@ html { scroll-behavior: smooth; }
 
   <!-- ITALY / CROATIA -->
   <div class="dest-card">
-    <div class="dest-banner italy-bg">&#9728;&#65039;
+    <div class="dest-banner italy-bg">
       <span class="dest-score-badge" id="badge-italy">&#8212;</span>
     </div>
     <div class="dest-body">
@@ -796,8 +897,8 @@ html { scroll-behavior: smooth; }
         <div class="stat-item"><div class="stat-label">Late Aug Temp</div><div class="stat-value">75&#8211;88&#176;F</div></div>
         <div class="stat-item"><div class="stat-label">Flight (East Coast)</div><div class="stat-value">~8&#8211;9 hrs</div></div>
         <div class="stat-item"><div class="stat-label">English Spoken</div><div class="stat-value">Good (tourist)</div></div>
-        <div class="stat-item"><div class="stat-label">Safety Index</div><div class="stat-value">High</div></div>
-        <div class="stat-item"><div class="stat-label">Sports Scene</div><div class="stat-value">Serie A, sailing, diving</div></div>
+        <div class="stat-item"><div class="stat-label">Safety</div><div class="stat-value">High</div></div>
+        <div class="stat-item"><div class="stat-label">Pro Sports</div><div class="stat-value">Serie A, water polo</div></div>
         <div class="stat-item"><div class="stat-label">Currency</div><div class="stat-value">EUR (both)</div></div>
       </div>
       <div class="dest-highlights">
@@ -811,6 +912,14 @@ html { scroll-behavior: smooth; }
         </ul>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Write-ins display -->
+<div class="writeins-display" id="writeins-display" style="display:none;">
+  <div class="writeins-display-card">
+    <h3>&#9997; Write-in Candidates</h3>
+    <div id="writeins-list"></div>
   </div>
 </div>
 
@@ -863,41 +972,65 @@ html { scroll-behavior: smooth; }
     <h2>Family Scoreboard</h2>
     <p>Everyone's rankings. Change yours whenever you want &#8212; no lock-ins.</p>
   </div>
-  <div class="votes-grid" id="votes-grid">
-    <div class="no-votes" id="no-votes"><p>No rankings yet. Someone go first.</p></div>
-  </div>
+
+  <!-- Leaderboard (Borda count) FIRST -->
   <div class="consensus-section" id="consensus-section">
     <div class="consensus-card">
-      <h3>Borda Count Consensus</h3>
-      <p style="font-size:0.85rem;color:var(--text-dim);margin-bottom:20px;">1st place = most points, last = fewest. Aggregated across all voters.</p>
+      <h3>Leaderboard</h3>
+      <p style="font-size:0.85rem;color:var(--text-dim);margin-bottom:20px;">Borda count: 1st place = most points, last = fewest. Aggregated across all voters.</p>
       <div id="consensus-bars"></div>
     </div>
   </div>
+
+  <!-- Individual votes SECOND -->
+  <div class="votes-grid" id="votes-grid">
+    <div class="no-votes" id="no-votes"><p>No rankings yet. Someone go first.</p></div>
+  </div>
+
+  <!-- Admin reset -->
+  <div class="admin-section">
+    <button class="admin-reset-btn" onclick="showAdminReset()">&#128274; Admin: Reset All Votes</button>
+  </div>
 </section>
 
+<!-- Admin Reset Modal -->
+<div class="admin-modal-overlay" id="admin-modal">
+  <div class="admin-modal">
+    <h3>&#9888; Reset All Votes</h3>
+    <p>This will permanently delete all rankings and write-ins. Enter the admin password to confirm.</p>
+    <input type="password" id="admin-password" placeholder="Admin password">
+    <div class="admin-modal-btns">
+      <button class="admin-cancel-btn" onclick="hideAdminReset()">Cancel</button>
+      <button class="admin-confirm-btn" onclick="confirmAdminReset()">Reset Everything</button>
+    </div>
+    <div class="admin-error" id="admin-error">Incorrect password.</div>
+  </div>
+</div>
+
 <footer>
-  <p>Giventer-Braff Vacation Voter &#8212; Built with data and a slight bias toward pasta. 2026.</p>
+  <p>Built by Adam Braff and Claude Cowork, 2026.</p>
 </footer>
 
 <script>
 // ===== DATA =====
-const FAMILY = [
-  { name: 'Adam', age: 56, city: 'Providence', color: '#4285f4', initial: 'A' },
-  { name: 'G\u00f8r', age: 56, city: 'Providence', color: '#ea4335', initial: 'G' },
-  { name: 'Emma', age: 25, city: 'Boston', color: '#fbbc04', initial: 'E' },
-  { name: 'Jeremy', age: 22, city: 'NYC', color: '#34a853', initial: 'J' },
-  { name: 'Andrew', age: 19, city: 'Chicago', color: '#ff6d01', initial: 'An' }
+var FAMILY = [
+  { name: 'Adam', city: 'Providence', color: '#4285f4', initial: 'A' },
+  { name: 'G\u00f8r', city: 'Providence', color: '#ea4335', initial: 'G' },
+  { name: 'Emma', city: 'Boston', color: '#fbbc04', initial: 'E' },
+  { name: 'Jeremy', city: 'NYC', color: '#34a853', initial: 'J' },
+  { name: 'Andrew', city: 'Chicago', color: '#ff6d01', initial: 'An' }
 ];
 
-const CRITERIA = [
+var CRITERIA = [
   { id: 'adventure', label: 'Adventure & Outdoors', icon: '\u26F0', desc: 'Hiking, nature, once-in-a-lifetime scenery' },
   { id: 'food', label: 'Food & Wine', icon: '\uD83C\uDF77', desc: 'Culinary scene, local cuisine, dining culture' },
   { id: 'culture', label: 'Cultural Richness', icon: '\uD83C\uDFDB', desc: 'History, museums, architecture, local traditions' },
-  { id: 'sports', label: 'Sports & Activities', icon: '\u26BD', desc: 'Spectator sports, water sports, athletic activities' },
+  { id: 'sports', label: 'Pro Spectator Sports', icon: '\u26BD', desc: 'Watching live pro sports: football, basketball, tennis, etc.' },
+  { id: 'safety', label: 'Safety', icon: '\uD83D\uDEE1', desc: 'Low crime, personal safety, political stability' },
   { id: 'travel', label: 'Ease of Travel', icon: '\u2708', desc: 'Flight time, language barrier, internal logistics' }
 ];
 
-const DESTINATIONS = {
+var DESTINATIONS = {
   norway: {
     name: 'Norway',
     short: 'Norway',
@@ -911,13 +1044,14 @@ const DESTINATIONS = {
       [62.10, 7.09, 'Geirangerfjord'],
       [68.23, 14.57, 'Lofoten']
     ],
-    scores: { adventure: 10, food: 7, culture: 7, sports: 6, travel: 8 },
+    scores: { adventure: 10, food: 7, culture: 7, sports: 4, safety: 10, travel: 8 },
     weatherTemp: 3,
     scoreNotes: {
       adventure: 'Fjords, Trolltunga, Lofoten \u2014 world-class, peak outdoor tier',
       food: 'Great seafood, emerging food scene, but not a global food capital',
       culture: 'Viking heritage, modern museums, stunning architecture',
-      sports: 'Sea kayaking, fishing, some hiking overlap \u2014 solid but not a sports destination',
+      sports: 'Eliteserien football in summer; limited global-tier pro sports scene',
+      safety: 'Among the safest countries on Earth, negligible crime',
       travel: 'Direct flights from East Coast, English everywhere, solid rail',
       weather: '55\u201365\u00b0F, overcast possible, long daylight'
     }
@@ -935,13 +1069,14 @@ const DESTINATIONS = {
       [-25.69, -54.44, 'Iguazu Falls'],
       [-32.89, -68.83, 'Mendoza']
     ],
-    scores: { adventure: 9, food: 9, culture: 9, sports: 9, travel: 5 },
+    scores: { adventure: 9, food: 9, culture: 9, sports: 10, safety: 5, travel: 5 },
     weatherTemp: 5,
     scoreNotes: {
       adventure: 'Iguazu, Patagonia teaser, beaches \u2014 nature overload',
       food: 'World-class steak, Malbec, feijoada \u2014 carnivore paradise',
       culture: 'Tango, samba, incredibly diverse urban culture',
-      sports: 'Football mecca (Boca, Maracan\u00e3), polo, surfing, capoeira',
+      sports: 'Football mecca (Boca, Maracan\u00e3, La Bombonera), polo, tennis',
+      safety: 'Moderate \u2014 petty crime in cities, need street smarts, some no-go zones',
       travel: '10\u201311hr flights, two countries, limited English outside hotels',
       weather: 'Their winter: BA 50\u201363\u00b0F, Rio 68\u201377\u00b0F'
     }
@@ -960,13 +1095,14 @@ const DESTINATIONS = {
       [43.51, 16.44, 'Split'],
       [43.17, 16.44, 'Hvar']
     ],
-    scores: { adventure: 7, food: 10, culture: 10, sports: 8, travel: 8 },
+    scores: { adventure: 7, food: 10, culture: 10, sports: 8, safety: 8, travel: 8 },
     weatherTemp: 9,
     scoreNotes: {
       adventure: 'Adriatic coast, island-hopping \u2014 great, not extreme',
       food: 'Italian cuisine + Croatian seafood = unmatched tier',
       culture: 'Rome, Dubrovnik \u2014 millennia of civilization stacked up',
-      sports: 'Serie A starts late Aug, Adriatic sailing/diving, cycling, water polo',
+      sports: 'Serie A starts late Aug, water polo, Adriatic sailing, cycling',
+      safety: 'High \u2014 pickpocket risk in tourist areas, otherwise very safe',
       travel: 'Direct flights to Rome, ferries to Croatia, EUR in both',
       weather: '75\u201388\u00b0F, sunny Mediterranean perfection'
     }
@@ -974,19 +1110,20 @@ const DESTINATIONS = {
 };
 
 // ===== STATE =====
-let currentVoter = null;
-let weights = {};
-let weatherPref = 5;
-let weatherWeight = 5;
-let allVotes = {};
-let writeIns = {};
-let currentRankings = [];
-let firebaseReady = false;
-let dbVotesRef = null;
-let dbWriteInsRef = null;
+var currentVoter = null;
+var weights = {};
+var weatherPref = 5;
+var weatherWeight = 5;
+var allVotes = {};
+var writeIns = {};
+var currentRankings = [];
+var firebaseReady = false;
+var dbVotesRef = null;
+var dbWriteInsRef = null;
+var savePending = false;
 
 // ===== FIREBASE =====
-const FIREBASE_CONFIG = {
+var FIREBASE_CONFIG = {
   apiKey: "AIzaSyBQvuUwYprKBWqeNsV2mSQ0YUfFgA2xxEU",
   authDomain: "braff-vacation-voter.firebaseapp.com",
   databaseURL: "https://braff-vacation-voter-default-rtdb.firebaseio.com",
@@ -1004,16 +1141,26 @@ function initFirebase() {
     firebaseReady = true;
     document.getElementById('firebase-banner').classList.add('active');
 
-    dbVotesRef.on('value', (snapshot) => {
-      const data = snapshot.val();
-      allVotes = data || {};
+    dbVotesRef.on('value', function(snapshot) {
+      var data = snapshot.val();
+      if (savePending) {
+        var merged = data || {};
+        if (currentVoter && allVotes[currentVoter]) {
+          merged[currentVoter] = allVotes[currentVoter];
+        }
+        allVotes = merged;
+        savePending = false;
+      } else {
+        allVotes = data || {};
+      }
       renderScoreboard();
       updateVoterPicker();
     });
 
-    dbWriteInsRef.on('value', (snapshot) => {
-      const data = snapshot.val();
+    dbWriteInsRef.on('value', function(snapshot) {
+      var data = snapshot.val();
       writeIns = data || {};
+      renderWriteInsDisplay();
       if (currentVoter) refreshRankList();
     });
 
@@ -1023,14 +1170,54 @@ function initFirebase() {
   }
 }
 
+// ===== ADMIN RESET =====
+function showAdminReset() {
+  document.getElementById('admin-modal').classList.add('active');
+  document.getElementById('admin-password').value = '';
+  document.getElementById('admin-error').style.display = 'none';
+  document.getElementById('admin-password').focus();
+}
+
+function hideAdminReset() {
+  document.getElementById('admin-modal').classList.remove('active');
+}
+
+function confirmAdminReset() {
+  var pw = document.getElementById('admin-password').value;
+  if (pw === 'denovo') {
+    if (firebaseReady) {
+      dbVotesRef.remove();
+      dbWriteInsRef.remove();
+    }
+    allVotes = {};
+    writeIns = {};
+    currentRankings = [];
+    currentVoter = null;
+    document.getElementById('sliders-panel').classList.remove('active');
+    document.getElementById('rankings-panel').classList.remove('active');
+    document.querySelectorAll('.voter-btn').forEach(function(b) { b.classList.remove('active'); });
+    renderScoreboard();
+    updateVoterPicker();
+    renderWriteInsDisplay();
+    hideAdminReset();
+  } else {
+    document.getElementById('admin-error').style.display = 'block';
+  }
+}
+
+document.addEventListener('click', function(e) {
+  if (e.target.id === 'admin-modal') hideAdminReset();
+});
+
 // ===== MAPS =====
 function initMaps() {
-  const tileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-  const attribution = '\u00a9 OpenStreetMap \u00a9 CARTO';
-  Object.entries(DESTINATIONS).forEach(([key, dest]) => {
-    const mapEl = document.getElementById('map-' + key);
+  var tileUrl = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+  var attribution = '\u00a9 OpenStreetMap \u00a9 CARTO';
+  Object.entries(DESTINATIONS).forEach(function(entry) {
+    var key = entry[0], dest = entry[1];
+    var mapEl = document.getElementById('map-' + key);
     if (!mapEl) return;
-    const map = L.map(mapEl, {
+    var map = L.map(mapEl, {
       scrollWheelZoom: false,
       dragging: !L.Browser.mobile,
       zoomControl: false
@@ -1039,10 +1226,10 @@ function initMaps() {
     dest.markers.forEach(function(m) {
       L.circleMarker([m[0], m[1]], {
         radius: 6,
-        fillColor: '#8ab4f8',
+        fillColor: '#e76f51',
         fillOpacity: 0.9,
-        color: '#fff',
-        weight: 1
+        color: '#333',
+        weight: 2
       }).addTo(map).bindPopup('<strong>' + m[2] + '</strong>');
     });
   });
@@ -1068,16 +1255,13 @@ function buildCompTable() {
     row.innerHTML = cells;
     tbody.appendChild(row);
   });
-  // Weather row
   var wrow = document.createElement('tr');
-  var wtemps = [DESTINATIONS.norway.weatherTemp, DESTINATIONS.argentina.weatherTemp, DESTINATIONS.italy.weatherTemp];
   var wlabels = ['Cool (55\u201365\u00b0F)', 'Mixed (50\u201377\u00b0F)', 'Hot (75\u201388\u00b0F)'];
   wrow.innerHTML = '<td>\u2600 Temperature</td>' +
     '<td>' + wlabels[0] + '</td>' +
     '<td>' + wlabels[1] + '</td>' +
     '<td>' + wlabels[2] + '</td>';
   tbody.appendChild(wrow);
-  // Totals
   var totals = ['norway', 'argentina', 'italy'].map(function(key) {
     var s = 0;
     for (var k in DESTINATIONS[key].scores) s += DESTINATIONS[key].scores[k];
@@ -1090,7 +1274,7 @@ function buildCompTable() {
   var tcolors = ['var(--norway-light)', 'var(--argentina-light)', 'var(--italy-light)'];
   for (var i = 0; i < totals.length; i++) {
     var tstyle = totals[i] === maxT ? 'color:' + tcolors[i] : '';
-    tcells += '<td style="' + tstyle + '">' + totals[i] + '/50</td>';
+    tcells += '<td style="' + tstyle + '">' + totals[i] + '/60</td>';
   }
   trow.innerHTML = tcells;
   tbody.appendChild(trow);
@@ -1124,10 +1308,10 @@ function selectVoter(name) {
     b.classList.toggle('active', b.dataset.name === name);
   });
 
-  // Load existing data or defaults
   var existing = allVotes[name];
   if (existing && existing.weights) {
-    weights = Object.assign({}, existing.weights);
+    weights = {};
+    for (var k in existing.weights) weights[k] = existing.weights[k];
     weatherPref = existing.weatherPref || 5;
     weatherWeight = existing.weatherWeight || 5;
   } else {
@@ -1140,13 +1324,11 @@ function selectVoter(name) {
   document.getElementById('sliders-panel').classList.add('active');
   document.getElementById('rankings-panel').classList.add('active');
 
-  // Load existing rankings or calculate default order
   if (existing && existing.rankings) {
     currentRankings = existing.rankings.slice();
   } else {
     var scores = calculateScores();
     currentRankings = Object.keys(scores).sort(function(a, b) { return scores[b] - scores[a]; });
-    // Add any write-ins not in rankings
     getAllWriteInKeys().forEach(function(k) {
       if (currentRankings.indexOf(k) === -1) currentRankings.push(k);
     });
@@ -1174,7 +1356,6 @@ function buildSliders() {
     container.appendChild(div);
   });
 
-  // Set weather sliders
   document.getElementById('slider-temp-pref').value = weatherPref;
   document.getElementById('val-temp-pref').textContent = weatherPref + ' \u2014 ' + TEMP_LABELS[weatherPref];
   document.getElementById('slider-weather-wt').value = weatherWeight;
@@ -1214,9 +1395,7 @@ function updateWeatherWeight(val) {
 
 function onSlidersChanged() {
   updateDestBadges();
-  // If user hasn't manually reordered, re-sort by new scores
   var scores = calculateScores();
-  // Re-sort only the base destinations by score, keep write-ins at their current positions
   var baseDests = currentRankings.filter(function(k) { return DESTINATIONS[k]; });
   var writeInDests = currentRankings.filter(function(k) { return !DESTINATIONS[k]; });
   baseDests.sort(function(a, b) { return scores[b] - scores[a]; });
@@ -1237,7 +1416,6 @@ function calculateScores() {
     CRITERIA.forEach(function(c) {
       weighted += (weights[c.id] || 5) * dest.scores[c.id];
     });
-    // Weather: proximity to preference
     var weatherMatch = 10 - Math.abs(dest.weatherTemp - weatherPref);
     weighted += weatherWeight * weatherMatch;
     scores[key] = totalWeight > 0 ? (weighted / totalWeight) : 0;
@@ -1262,6 +1440,9 @@ function getAllWriteInKeys() {
 function getDestName(key) {
   if (DESTINATIONS[key]) return DESTINATIONS[key].name;
   if (writeIns[key]) return writeIns[key].name;
+  if (key.indexOf('writein_') === 0) {
+    return key.replace('writein_', '').replace(/_/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+  }
   return key;
 }
 
@@ -1292,7 +1473,6 @@ function renderRankList() {
         '<button class="rank-arrow" onclick="moveRank(\'' + key + '\', 1)"' + (idx === total - 1 ? ' disabled' : '') + '>\u25BC</button>' +
       '</div>';
 
-    // Drag events
     li.addEventListener('dragstart', function(e) {
       e.dataTransfer.setData('text/plain', key);
       li.classList.add('dragging');
@@ -1326,11 +1506,9 @@ function renderRankList() {
 }
 
 function refreshRankList() {
-  // Add any new write-ins not in current rankings
   getAllWriteInKeys().forEach(function(k) {
     if (currentRankings.indexOf(k) === -1) currentRankings.push(k);
   });
-  // Remove write-ins that were deleted
   currentRankings = currentRankings.filter(function(k) {
     return DESTINATIONS[k] || writeIns[k];
   });
@@ -1352,7 +1530,6 @@ function addWriteIn() {
   var name = input.value.trim();
   if (!name) return;
 
-  // Check for duplicates
   var slug = 'writein_' + name.toLowerCase().replace(/[^a-z0-9]/g, '_');
   var exists = false;
   Object.keys(writeIns).forEach(function(k) {
@@ -1381,7 +1558,32 @@ function addWriteIn() {
     currentRankings.push(slug);
   }
   renderRankList();
+  renderWriteInsDisplay();
   input.value = '';
+}
+
+// ===== WRITE-INS DISPLAY =====
+function renderWriteInsDisplay() {
+  var container = document.getElementById('writeins-display');
+  var list = document.getElementById('writeins-list');
+  var keys = Object.keys(writeIns);
+
+  if (keys.length === 0) {
+    container.style.display = 'none';
+    return;
+  }
+
+  container.style.display = 'block';
+  list.innerHTML = '';
+  keys.forEach(function(k) {
+    var wi = writeIns[k];
+    var item = document.createElement('div');
+    item.className = 'writein-display-item';
+    item.innerHTML =
+      '<span class="writein-display-name">' + wi.name + '</span>' +
+      '<span class="writein-display-by">Nominated by ' + (wi.addedBy || 'Unknown') + '</span>';
+    list.appendChild(item);
+  });
 }
 
 // ===== SAVE RANKINGS =====
@@ -1390,13 +1592,15 @@ function saveRankings() {
 
   var voteData = {
     rankings: currentRankings.slice(),
-    weights: Object.assign({}, weights),
+    weights: {},
     weatherPref: weatherPref,
     weatherWeight: weatherWeight,
     timestamp: new Date().toISOString()
   };
+  for (var k in weights) voteData.weights[k] = weights[k];
 
   allVotes[currentVoter] = voteData;
+  savePending = true;
 
   if (firebaseReady && dbVotesRef) {
     dbVotesRef.child(currentVoter).set(voteData);
@@ -1457,8 +1661,7 @@ function renderScoreboard() {
     grid.appendChild(card);
   });
 
-  // Consensus (Borda count)
-  if (voteEntries.length >= 2) {
+  if (voteEntries.length >= 1) {
     var allKeys = {};
     voteEntries.forEach(function(entry) {
       var vote = entry[1];
@@ -1480,7 +1683,6 @@ function renderScoreboard() {
 
     var maxPts = Math.max.apply(null, Object.values(bordaTotals));
     var sorted = Object.entries(bordaTotals).sort(function(a, b) { return b[1] - a[1]; });
-    var maxPossible = voteEntries.length * Object.keys(allKeys).length; // theoretical max
 
     var consensusBars = document.getElementById('consensus-bars');
     consensusBars.innerHTML = sorted.map(function(entry) {
@@ -1510,6 +1712,7 @@ document.addEventListener('DOMContentLoaded', function() {
   buildVoterPicker();
   renderScoreboard();
   updateDestBadges();
+  renderWriteInsDisplay();
 });
 </script>
 
