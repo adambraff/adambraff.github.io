@@ -1120,7 +1120,6 @@ var currentRankings = [];
 var firebaseReady = false;
 var dbVotesRef = null;
 var dbWriteInsRef = null;
-var savePending = false;
 
 // ===== FIREBASE =====
 var FIREBASE_CONFIG = {
@@ -1142,17 +1141,7 @@ function initFirebase() {
     document.getElementById('firebase-banner').classList.add('active');
 
     dbVotesRef.on('value', function(snapshot) {
-      var data = snapshot.val();
-      if (savePending) {
-        var merged = data || {};
-        if (currentVoter && allVotes[currentVoter]) {
-          merged[currentVoter] = allVotes[currentVoter];
-        }
-        allVotes = merged;
-        savePending = false;
-      } else {
-        allVotes = data || {};
-      }
+      allVotes = snapshot.val() || {};
       renderScoreboard();
       updateVoterPicker();
     });
@@ -1245,12 +1234,9 @@ function buildCompTable() {
       DESTINATIONS.argentina.scores[c.id],
       DESTINATIONS.italy.scores[c.id]
     ];
-    var max = Math.max.apply(null, scores);
     var cells = '<td>' + c.icon + ' ' + c.label + '</td>';
-    var colors = ['var(--norway-light)', 'var(--argentina-light)', 'var(--italy-light)'];
     for (var i = 0; i < scores.length; i++) {
-      var bold = scores[i] === max ? 'font-weight:700;color:' + colors[i] : '';
-      cells += '<td style="' + bold + '">' + scores[i] + '/10</td>';
+      cells += '<td>' + scores[i] + '/10</td>';
     }
     row.innerHTML = cells;
     tbody.appendChild(row);
@@ -1267,14 +1253,11 @@ function buildCompTable() {
     for (var k in DESTINATIONS[key].scores) s += DESTINATIONS[key].scores[k];
     return s;
   });
-  var maxT = Math.max.apply(null, totals);
   var trow = document.createElement('tr');
   trow.style.fontWeight = '700';
   var tcells = '<td>Non-weather Total</td>';
-  var tcolors = ['var(--norway-light)', 'var(--argentina-light)', 'var(--italy-light)'];
   for (var i = 0; i < totals.length; i++) {
-    var tstyle = totals[i] === maxT ? 'color:' + tcolors[i] : '';
-    tcells += '<td style="' + tstyle + '">' + totals[i] + '/60</td>';
+    tcells += '<td>' + totals[i] + '/60</td>';
   }
   trow.innerHTML = tcells;
   tbody.appendChild(trow);
@@ -1326,6 +1309,14 @@ function selectVoter(name) {
 
   if (existing && existing.rankings) {
     currentRankings = existing.rankings.slice();
+    // Add any write-ins that appeared after this vote was saved
+    getAllWriteInKeys().forEach(function(k) {
+      if (currentRankings.indexOf(k) === -1) currentRankings.push(k);
+    });
+    // Remove any write-ins that no longer exist
+    currentRankings = currentRankings.filter(function(k) {
+      return DESTINATIONS[k] || writeIns[k];
+    });
   } else {
     var scores = calculateScores();
     currentRankings = Object.keys(scores).sort(function(a, b) { return scores[b] - scores[a]; });
@@ -1599,12 +1590,13 @@ function saveRankings() {
   };
   for (var k in weights) voteData.weights[k] = weights[k];
 
-  allVotes[currentVoter] = voteData;
-  savePending = true;
-
+  // Write to Firebase first (may trigger synchronous listener)
   if (firebaseReady && dbVotesRef) {
     dbVotesRef.child(currentVoter).set(voteData);
   }
+
+  // Then set local state (overrides any stale listener data)
+  allVotes[currentVoter] = voteData;
 
   var status = document.getElementById('save-status');
   status.classList.add('visible');
