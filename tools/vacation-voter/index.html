@@ -198,7 +198,7 @@ body {
   align-items: center;
   gap: 8px;
 }
-.highlight-list li::before { content: '&#8594;'; color: var(--accent); font-weight: 600; }
+.highlight-list li::before { content: '\2192'; color: var(--accent); font-weight: 600; }
 
 /* Comparison Table */
 .comparison {
@@ -271,7 +271,7 @@ body {
 .voter-btn .voter-city { display: block; font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
 .voter-btn.voted-already { position: relative; }
 .voter-btn.voted-already::after {
-  content: '&#10003;';
+  content: '\2713';
   position: absolute;
   top: -6px; right: -6px;
   background: #34a853;
@@ -587,7 +587,7 @@ html { scroll-behavior: smooth; }
   position: relative;
 }
 .locked-overlay::after {
-  content: 'Vote Locked &#10003;';
+  content: 'Vote Locked \2713';
   position: absolute;
   inset: 0;
   background: rgba(15,20,25,0.85);
