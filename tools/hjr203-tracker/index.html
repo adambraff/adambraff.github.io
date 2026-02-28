@@ -622,63 +622,19 @@ function monthLabel(ym) {
 }
 
 // =========================================================
-// MAIN: Fetch all data and render charts
+// CHART RENDERING (reusable — called with fallback then live)
 // =========================================================
-(async function main() {
+let chartJoeXhb, chartSpread, chartReit; // stored so we can destroy & re-render
+
+function computeAndRender(tickerData, isFallback) {
   const statusBar = document.getElementById('data-status-bar');
-  const tickerData = {};
-  let usedFallback = false;
-
-  // 1. Fetch Manifold (instant, no rate limit)
-  try {
-    const mkt = await fetchJSON(`https://api.manifold.markets/v0/market/${MANIFOLD_MARKET_ID}`);
-    const prob = Math.round(mkt.probability * 100);
-    document.getElementById('manifold-prob').textContent = prob + '%';
-    document.getElementById('manifold-meta').innerHTML =
-      `${mkt.uniqueBettorCount} traders &middot; M$${Math.round(mkt.volume)} volume &middot; Created ${new Date(mkt.createdTime).toLocaleDateString()}`;
-    document.getElementById('sig-manifold').textContent = prob + '%';
-    document.getElementById('sig-manifold').style.color = prob > 30 ? 'var(--orange)' : prob > 15 ? 'var(--accent)' : 'var(--red)';
-  } catch(e) {
-    document.getElementById('manifold-prob').textContent = '?';
-    document.getElementById('manifold-meta').textContent = 'Failed to load market data';
-    document.getElementById('sig-manifold').textContent = 'N/A';
-  }
-
-  // 2. Fetch stock data with staggered requests
-  for (let i = 0; i < TICKERS.length; i++) {
-    const ticker = TICKERS[i];
-    statusBar.innerHTML = `<span class="live-dot"></span> Fetching ${ticker} (${i+1}/${TICKERS.length})...`;
-    try {
-      const data = await fetchJSON(
-        `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol=${ticker}&apikey=${AV_KEY}`
-      );
-      const prices = extractMonthlyPrices(data);
-      if (prices && Object.keys(prices).length > 0) {
-        tickerData[ticker] = prices;
-      } else {
-        throw new Error('No price data in response');
-      }
-    } catch(e) {
-      console.warn(`Failed to fetch ${ticker}, using fallback:`, e.message);
-      tickerData[ticker] = FALLBACK[ticker];
-      usedFallback = true;
-    }
-    // Rate limit delay (skip after last)
-    if (i < TICKERS.length - 1) await delay(AV_DELAY);
-  }
-
-  // 3. Compute indexed values
   const baseKey = '2025-03';
   const indexed = {};
   for (const t of TICKERS) {
     indexed[t] = indexPrices(tickerData[t], baseKey);
   }
-
-  // Get common month labels
   const months = getMonthKeys(tickerData['JOE']);
   const labels = months.map(monthLabel);
-
-  // Compute spreads
   const joeXhbSpread = months.map(m => Math.round(((indexed['JOE'][m] || 0) - (indexed['XHB'][m] || 0)) * 10) / 10);
   const latestMonth = months[months.length - 1];
 
@@ -694,15 +650,13 @@ function monthLabel(ym) {
   const mubReturn = Math.round(((indexed['MUB'][latestMonth] || 100) - 100) * 10) / 10;
   document.getElementById('sig-mub').textContent = (mubReturn > 0 ? '+' : '') + mubReturn.toFixed(1) + '%';
 
-  // Status
-  const now = new Date().toLocaleTimeString();
-  statusBar.innerHTML = usedFallback
-    ? `<span style="color:var(--orange);">\u26A0</span> Some data from fallback cache. Last attempt: ${now}`
-    : `<span class="live-dot"></span> All data live as of ${now}`;
+  // Destroy old charts if they exist
+  if (chartJoeXhb) { chartJoeXhb.destroy(); chartJoeXhb = null; }
+  if (chartSpread) { chartSpread.destroy(); chartSpread = null; }
+  if (chartReit) { chartReit.destroy(); chartReit = null; }
 
-  // 4. Render live charts
   // JOE vs XHB vs MUB
-  new Chart(document.getElementById('chart-joe-xhb'), {
+  chartJoeXhb = new Chart(document.getElementById('chart-joe-xhb'), {
     type: 'line',
     data: {
       labels: labels,
@@ -723,7 +677,7 @@ function monthLabel(ym) {
   });
 
   // JOE-XHB Spread
-  new Chart(document.getElementById('chart-spread'), {
+  chartSpread = new Chart(document.getElementById('chart-spread'), {
     type: 'bar',
     data: {
       labels: labels,
@@ -745,7 +699,7 @@ function monthLabel(ym) {
   });
 
   // REIT chart: CPT vs EQR
-  new Chart(document.getElementById('chart-reit'), {
+  chartReit = new Chart(document.getElementById('chart-reit'), {
     type: 'line',
     data: {
       labels: labels,
@@ -764,6 +718,72 @@ function monthLabel(ym) {
     }
   });
 
+  // Status
+  const now = new Date().toLocaleTimeString();
+  if (isFallback) {
+    statusBar.innerHTML = `<span style="color:var(--muted);">Showing cached data. Attempting live refresh...</span>`;
+  } else {
+    statusBar.innerHTML = `<span class="live-dot"></span> All data live as of ${now}`;
+  }
+}
+
+// =========================================================
+// MAIN: Render immediately, then try live data
+// =========================================================
+(async function main() {
+  const statusBar = document.getElementById('data-status-bar');
+
+  // STEP 1: Render charts IMMEDIATELY with fallback data (no waiting)
+  computeAndRender(FALLBACK, true);
+
+  // STEP 2: Fetch Manifold (instant, no rate limit)
+  try {
+    const mkt = await fetchJSON(`https://api.manifold.markets/v0/market/${MANIFOLD_MARKET_ID}`);
+    const prob = Math.round(mkt.probability * 100);
+    document.getElementById('manifold-prob').textContent = prob + '%';
+    document.getElementById('manifold-meta').innerHTML =
+      `${mkt.uniqueBettorCount} traders &middot; M$${Math.round(mkt.volume)} volume &middot; Created ${new Date(mkt.createdTime).toLocaleDateString()}`;
+    document.getElementById('sig-manifold').textContent = prob + '%';
+    document.getElementById('sig-manifold').style.color = prob > 30 ? 'var(--orange)' : prob > 15 ? 'var(--accent)' : 'var(--red)';
+  } catch(e) {
+    document.getElementById('manifold-prob').textContent = '?';
+    document.getElementById('manifold-meta').textContent = 'Failed to load market data';
+    document.getElementById('sig-manifold').textContent = 'N/A';
+  }
+
+  // STEP 3: Fetch live stock data with staggered requests
+  const liveData = {};
+  let anyLiveSuccess = false;
+  for (let i = 0; i < TICKERS.length; i++) {
+    const ticker = TICKERS[i];
+    statusBar.innerHTML = `<span class="live-dot"></span> Refreshing ${ticker} (${i+1}/${TICKERS.length})...`;
+    try {
+      const data = await fetchJSON(
+        `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol=${ticker}&apikey=${AV_KEY}`
+      );
+      const prices = extractMonthlyPrices(data);
+      if (prices && Object.keys(prices).length > 0) {
+        liveData[ticker] = prices;
+        anyLiveSuccess = true;
+      } else {
+        console.warn(`${ticker}: API returned no price data, keeping fallback`);
+        liveData[ticker] = FALLBACK[ticker];
+      }
+    } catch(e) {
+      console.warn(`Failed to fetch ${ticker}, keeping fallback:`, e.message);
+      liveData[ticker] = FALLBACK[ticker];
+    }
+    // Rate limit delay (skip after last)
+    if (i < TICKERS.length - 1) await delay(AV_DELAY);
+  }
+
+  // STEP 4: Re-render charts with whatever we got (live or fallback per ticker)
+  computeAndRender(liveData, !anyLiveSuccess);
+
+  if (!anyLiveSuccess) {
+    const now = new Date().toLocaleTimeString();
+    statusBar.innerHTML = `<span style="color:var(--orange);">\u26A0</span> API rate limit reached — showing cached data. Try again tomorrow. (${now})`;
+  }
 })();
 </script>
 </body>
