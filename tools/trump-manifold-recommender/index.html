@@ -49,19 +49,12 @@
     .controls {
       display: grid;
       gap: 10px;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       align-items: end;
     }
 
-    .field {
-      display: grid;
-      gap: 6px;
-    }
-
-    .field label {
-      font-size: 0.88rem;
-      color: var(--muted);
-    }
+    .field { display: grid; gap: 6px; }
+    .field label { font-size: 0.88rem; color: var(--muted); }
 
     input[type="text"],
     input[type="number"] {
@@ -83,23 +76,36 @@
       cursor: pointer;
     }
 
-    button.secondary {
-      background: #5d6771;
-    }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
+    button.secondary { background: #5d6771; }
+    button.danger-btn { background: var(--danger); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
 
     .status {
       min-height: 1.2em;
       font-size: 0.9rem;
       color: var(--muted);
+      margin-top: 6px;
     }
 
     .status.error { color: var(--danger); }
     .status.ok { color: var(--ok); }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      margin-top: 6px;
+      display: none;
+    }
+
+    .progress-bar .fill {
+      height: 100%;
+      background: var(--brand);
+      border-radius: 3px;
+      width: 0%;
+      transition: width 0.3s;
+    }
 
     .grid-2 {
       display: grid;
@@ -151,16 +157,15 @@
       vertical-align: top;
     }
 
+    .options-table th { font-weight: 600; }
+
     .sliders {
       display: grid;
       gap: 10px;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     }
 
-    .slider-row {
-      display: grid;
-      gap: 4px;
-    }
+    .slider-row { display: grid; gap: 4px; }
 
     .slider-row .head {
       display: flex;
@@ -169,11 +174,19 @@
       color: var(--muted);
     }
 
+    .slider-row .hint {
+      font-size: 0.75rem;
+      color: #999;
+      display: flex;
+      justify-content: space-between;
+    }
+
     .recommend-item {
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 10px;
       background: #fbfcff;
+      margin-bottom: 8px;
     }
 
     .recommend-item .edge {
@@ -184,6 +197,27 @@
 
     .small { font-size: 0.82rem; color: var(--muted); }
 
+    .trait-bar {
+      display: inline-block;
+      height: 8px;
+      border-radius: 4px;
+      vertical-align: middle;
+    }
+
+    .collapse-toggle {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.82rem;
+      padding: 4px 10px;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    .collapse-toggle:hover { background: #f0f0ee; }
+
+    .hidden { display: none !important; }
+
     @media (max-width: 700px) {
       .wrap { padding: 12px; }
       .panel { padding: 12px; }
@@ -192,45 +226,62 @@
 </head>
 <body>
   <main class="wrap">
+
+    <!-- Header / Controls -->
     <section class="panel">
       <h1>Trump Manifold Recommender</h1>
+      <p class="small" style="margin-top: -4px;">
+        Pulls Trump-related markets from Manifold, classifies them along four behavioral dimensions, and recommends bets based on your priors about how Trump operates.
+      </p>
       <div class="controls">
-        <div class="field" style="grid-column: 1 / -1;">
-          <label for="apiBase">Worker Base URL</label>
-          <input id="apiBase" type="text" placeholder="https://your-worker.your-subdomain.workers.dev" />
+        <div class="field">
+          <button id="syncBtn">Sync Markets</button>
         </div>
         <div class="field">
-          <button id="syncBtn">Sync</button>
+          <button id="recommendBtn">Run Recommendations</button>
         </div>
         <div class="field">
-          <button id="refreshBtn" class="secondary">Refresh Report</button>
+          <button id="clearBtn" class="danger-btn">Clear Cache</button>
         </div>
         <div class="field">
           <label>Last Sync</label>
           <div id="lastSync" class="small">Never</div>
         </div>
+        <div class="field">
+          <label>Cached Markets</label>
+          <div id="cachedCount" class="small">0</div>
+        </div>
       </div>
       <div id="status" class="status"></div>
+      <div id="progressBar" class="progress-bar"><div class="fill" id="progressFill"></div></div>
     </section>
 
+    <!-- Preference Sliders -->
     <section class="panel">
-      <h2>Preference Sliders</h2>
+      <h2>Your Trump Model</h2>
+      <p class="small" style="margin-top: -4px;">
+        Slide right if you think Trump leans heavily toward that trait; slide left if you think the opposite. The recommender looks for markets where your model disagrees with current market prices.
+      </p>
       <div class="sliders">
         <div class="slider-row">
           <div class="head"><span>Self-Interested</span><span id="v-self_interested">0.00</span></div>
           <input id="self_interested" type="range" min="-1" max="1" step="0.01" value="0" />
+          <div class="hint"><span>Altruistic</span><span>Self-serving</span></div>
         </div>
         <div class="slider-row">
           <div class="head"><span>Loyalty Demand</span><span id="v-loyalty_demand">0.00</span></div>
           <input id="loyalty_demand" type="range" min="-1" max="1" step="0.01" value="0" />
+          <div class="hint"><span>Tolerates dissent</span><span>Demands loyalty</span></div>
         </div>
         <div class="slider-row">
           <div class="head"><span>Executive Power</span><span id="v-exec_power">0.00</span></div>
           <input id="exec_power" type="range" min="-1" max="1" step="0.01" value="0" />
+          <div class="hint"><span>Constrained</span><span>Expansive</span></div>
         </div>
         <div class="slider-row">
           <div class="head"><span>Deal Making</span><span id="v-deal_making">0.00</span></div>
           <input id="deal_making" type="range" min="-1" max="1" step="0.01" value="0" />
+          <div class="hint"><span>Hardline</span><span>Dealmaker</span></div>
         </div>
       </div>
       <div class="controls" style="margin-top: 10px;">
@@ -238,189 +289,438 @@
           <label for="threshold">Edge Threshold</label>
           <input id="threshold" type="number" min="0" max="1" step="0.01" value="0.05" />
         </div>
-        <div class="field">
-          <button id="recommendBtn">Run Recommendations</button>
-        </div>
       </div>
     </section>
 
+    <!-- New / Ended -->
     <section class="panel grid-2">
       <div>
         <h2>New in Last 24h</h2>
-        <ul id="newMarkets" class="clean"></ul>
+        <ul id="newMarkets" class="clean"><li class="small">Sync to populate.</li></ul>
       </div>
       <div>
         <h2>Ended in Last 24h</h2>
-        <ul id="endedMarkets" class="clean"></ul>
+        <ul id="endedMarkets" class="clean"><li class="small">Sync to populate.</li></ul>
       </div>
     </section>
 
+    <!-- Recommendations -->
     <section class="panel">
       <h2>Recommendations</h2>
-      <div id="recommendations" class="clean"></div>
+      <div id="recommendations"><div class="small">Set your sliders and click Run Recommendations.</div></div>
     </section>
 
+    <!-- All Markets -->
     <section class="panel">
-      <h2>Tracked Markets</h2>
-      <div id="marketCount" class="small"></div>
-      <div id="allMarkets" class="clean" style="margin-top: 8px;"></div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <h2 style="margin:0;">Tracked Markets</h2>
+        <button id="toggleMarkets" class="collapse-toggle">Show</button>
+      </div>
+      <div id="marketCount" class="small" style="margin-top:4px;"></div>
+      <div id="allMarkets" class="clean hidden" style="margin-top: 8px;"></div>
     </section>
+
   </main>
 
   <script>
-    const traits = ['self_interested', 'loyalty_demand', 'exec_power', 'deal_making'];
+  (function () {
+    'use strict';
 
-    const els = {
-      apiBase: document.getElementById('apiBase'),
-      syncBtn: document.getElementById('syncBtn'),
-      refreshBtn: document.getElementById('refreshBtn'),
-      recommendBtn: document.getElementById('recommendBtn'),
-      threshold: document.getElementById('threshold'),
-      status: document.getElementById('status'),
-      lastSync: document.getElementById('lastSync'),
-      newMarkets: document.getElementById('newMarkets'),
-      endedMarkets: document.getElementById('endedMarkets'),
-      allMarkets: document.getElementById('allMarkets'),
-      marketCount: document.getElementById('marketCount'),
-      recommendations: document.getElementById('recommendations'),
+    /* -- Constants -- */
+    const MANIFOLD_BASE = 'https://api.manifold.markets';
+    const TRAITS = ['self_interested', 'loyalty_demand', 'exec_power', 'deal_making'];
+    const DAY_MS = 24 * 60 * 60 * 1000;
+    const RATE_MS = 150; // ms between Manifold API calls
+    const LS_KEY = 'tmr_data';
+
+    const RULES = {
+      self_interested: {
+        positive: ['self', 'personal', 'profit', 'brand', 'image', 'ego', 'pardon', 'immunity', 'indictment', 'wealth', 'mar-a-lago', 'trump org', 'business', 'golf', 'hotel', 'property', 'net worth'],
+        negative: ['country', 'nation', 'public', 'voters', 'citizens', 'community', 'patriot', 'sacrifice'],
+      },
+      loyalty_demand: {
+        positive: ['loyal', 'loyalty', 'ally', 'endorse', 'pledge', 'obedience', 'backing', 'supporter', 'betray', 'fire', 'firing', 'purge', 'replace', 'oust', 'remove'],
+        negative: ['independent', 'bipartisan', 'neutral', 'critic', 'whistleblower', 'dissent'],
+      },
+      exec_power: {
+        positive: ['executive', 'order', 'doj', 'fbi', 'military', 'federal', 'cabinet', 'agency', 'deport', 'tariff', 'ban', 'invoke', 'directive', 'unilateral', 'emergency', 'doge', 'epa', 'hhs'],
+        negative: ['court', 'congress', 'state', 'local', 'committee', 'senate', 'house', 'judicial', 'block', 'injunction', 'overturn'],
+      },
+      deal_making: {
+        positive: ['deal', 'negotiate', 'agreement', 'ceasefire', 'trade', 'summit', 'settlement', 'compromise', 'broker', 'bilateral', 'talks', 'concession'],
+        negative: ['standoff', 'deadlock', 'escalate', 'conflict', 'boycott', 'sanctions', 'withdraw', 'walk away'],
+      },
     };
 
-    function init() {
-      const stored = localStorage.getItem('workerBaseUrl') || '';
-      els.apiBase.value = stored;
+    /* -- DOM refs -- */
+    const $ = (id) => document.getElementById(id);
+    const els = {
+      syncBtn: $('syncBtn'),
+      recommendBtn: $('recommendBtn'),
+      clearBtn: $('clearBtn'),
+      toggleMarkets: $('toggleMarkets'),
+      threshold: $('threshold'),
+      status: $('status'),
+      progressBar: $('progressBar'),
+      progressFill: $('progressFill'),
+      lastSync: $('lastSync'),
+      cachedCount: $('cachedCount'),
+      newMarkets: $('newMarkets'),
+      endedMarkets: $('endedMarkets'),
+      allMarkets: $('allMarkets'),
+      marketCount: $('marketCount'),
+      recommendations: $('recommendations'),
+    };
 
-      for (const trait of traits) {
-        const input = document.getElementById(trait);
-        const label = document.getElementById(`v-${trait}`);
-        input.addEventListener('input', () => {
+    /* -- State (persisted in localStorage) -- */
+    let state = loadState();
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') return parsed;
+        }
+      } catch (_) {}
+      return { markets: {}, lastSyncTime: null };
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(LS_KEY, JSON.stringify(state));
+      } catch (_) {}
+    }
+
+    /* -- Init -- */
+    function init() {
+      for (const trait of TRAITS) {
+        const input = $(trait);
+        const label = $('v-' + trait);
+        const saved = localStorage.getItem('tmr_slider_' + trait);
+        if (saved !== null) { input.value = saved; }
+        label.textContent = Number(input.value).toFixed(2);
+        input.addEventListener('input', function() {
           label.textContent = Number(input.value).toFixed(2);
+          localStorage.setItem('tmr_slider_' + trait, input.value);
         });
       }
 
       els.syncBtn.addEventListener('click', onSync);
-      els.refreshBtn.addEventListener('click', onRefresh);
       els.recommendBtn.addEventListener('click', onRecommend);
-
-      onRefresh();
-    }
-
-    function setStatus(text, mode = '') {
-      els.status.textContent = text || '';
-      els.status.className = `status ${mode}`.trim();
-    }
-
-    function getApiBase() {
-      const base = (els.apiBase.value || '').trim().replace(/\/+$/, '');
-      if (!base) throw new Error('Set Worker Base URL first.');
-      localStorage.setItem('workerBaseUrl', base);
-      return base;
-    }
-
-    async function api(path, options = {}) {
-      const base = getApiBase();
-      const resp = await fetch(`${base}${path}`, {
-        ...options,
-        headers: {
-          'Content-Type': 'application/json',
-          ...(options.headers || {}),
-        },
+      els.clearBtn.addEventListener('click', onClear);
+      els.toggleMarkets.addEventListener('click', function() {
+        els.allMarkets.classList.toggle('hidden');
+        els.toggleMarkets.textContent = els.allMarkets.classList.contains('hidden') ? 'Show' : 'Hide';
       });
 
-      const payload = await resp.json().catch(() => ({}));
-      if (!resp.ok) {
-        throw new Error(payload.error || `Request failed (${resp.status})`);
-      }
-      return payload;
+      renderFromState();
     }
 
-    async function onSync() {
-      setBusy(true);
-      setStatus('Syncing markets...', '');
-      try {
-        const report = await api('/sync', { method: 'POST' });
-        renderReport(report);
-        setStatus('Sync completed.', 'ok');
-      } catch (err) {
-        setStatus(err.message, 'error');
-      } finally {
-        setBusy(false);
-      }
+    /* -- Status / Progress -- */
+    function setStatus(text, mode) {
+      els.status.textContent = text || '';
+      els.status.className = 'status ' + (mode || '');
     }
 
-    async function onRefresh() {
-      setBusy(true);
-      setStatus('Loading report...', '');
-      try {
-        const report = await api('/report');
-        renderReport(report);
-        setStatus('Report loaded.', 'ok');
-      } catch (err) {
-        setStatus(err.message, 'error');
-      } finally {
-        setBusy(false);
-      }
+    function showProgress(pct) {
+      els.progressBar.style.display = 'block';
+      els.progressFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
     }
 
-    async function onRecommend() {
-      setBusy(true);
-      setStatus('Computing recommendations...', '');
-      try {
-        const weights = {};
-        for (const trait of traits) {
-          weights[trait] = Number(document.getElementById(trait).value);
-        }
-
-        const threshold = Number(els.threshold.value || '0.05');
-
-        const result = await api('/recommend', {
-          method: 'POST',
-          body: JSON.stringify({ weights, threshold }),
-        });
-
-        renderRecommendations(result.recommendations || []);
-        setStatus('Recommendations updated.', 'ok');
-      } catch (err) {
-        setStatus(err.message, 'error');
-      } finally {
-        setBusy(false);
-      }
+    function hideProgress() {
+      els.progressBar.style.display = 'none';
+      els.progressFill.style.width = '0%';
     }
 
     function setBusy(flag) {
       els.syncBtn.disabled = flag;
-      els.refreshBtn.disabled = flag;
       els.recommendBtn.disabled = flag;
+      els.clearBtn.disabled = flag;
     }
 
-    function renderReport(report) {
-      const lastSync = report?.lastSyncTime;
-      els.lastSync.textContent = lastSync ? new Date(lastSync).toLocaleString() : 'Never';
+    /* -- Manifold API helpers -- */
+    var lastCallTime = 0;
 
-      renderSummaryList(els.newMarkets, report?.newMarkets24h || [], 'No new markets in last 24h.');
-      renderSummaryList(els.endedMarkets, report?.closedMarkets24h || [], 'No ended markets in last 24h.');
+    async function manifoldGet(path) {
+      var now = Date.now();
+      var wait = Math.max(0, RATE_MS - (now - lastCallTime));
+      if (wait > 0) await sleep(wait);
+      lastCallTime = Date.now();
 
-      const markets = report?.markets || [];
-      els.marketCount.textContent = `${markets.length} market(s)`;
+      var resp = await fetch(MANIFOLD_BASE + path);
+      if (!resp.ok) {
+        var txt = await resp.text().catch(function() { return ''; });
+        throw new Error('Manifold ' + resp.status + ': ' + txt.slice(0, 200));
+      }
+      return resp.json();
+    }
+
+    function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
+
+    /* -- Sync -- */
+    async function onSync() {
+      setBusy(true);
+      setStatus('Fetching Trump markets from Manifold...', '');
+      showProgress(0);
+
+      try {
+        var openMarkets = await fetchAllTrumpOpenMarkets();
+        var filtered = openMarkets.filter(function(m) { return getOptionCount(m) <= 5; });
+
+        setStatus('Processing ' + filtered.length + ' markets...', '');
+        var now = Date.now();
+
+        for (var i = 0; i < filtered.length; i++) {
+          showProgress((i / filtered.length) * 100);
+          var market = filtered[i];
+          var snapshot = buildSnapshot(market, now);
+          state.markets[String(snapshot.id)] = snapshot;
+        }
+
+        // Mark previously tracked markets that are no longer open
+        var openIds = new Set(filtered.map(function(m) { return String(m.id); }));
+        for (var id in state.markets) {
+          if (!openIds.has(id)) {
+            state.markets[id].isOpen = false;
+          }
+        }
+
+        state.lastSyncTime = now;
+        saveState();
+        showProgress(100);
+        renderFromState();
+        setStatus('Synced ' + filtered.length + ' open markets. ' + Object.keys(state.markets).length + ' total tracked.', 'ok');
+      } catch (err) {
+        setStatus('Sync error: ' + err.message, 'error');
+      } finally {
+        setBusy(false);
+        setTimeout(hideProgress, 800);
+      }
+    }
+
+    async function fetchAllTrumpOpenMarkets() {
+      var out = [];
+      var seen = new Set();
+      var beforeTime = null;
+      var MAX_PAGES = 40;
+
+      for (var page = 0; page < MAX_PAGES; page++) {
+        var params = new URLSearchParams({
+          term: 'Trump',
+          filter: 'open',
+          sort: 'newest',
+          limit: '100',
+        });
+        if (beforeTime) params.set('beforeTime', String(beforeTime));
+
+        setStatus('Fetching page ' + (page + 1) + '...', '');
+        var data = await manifoldGet('/v0/search-markets?' + params.toString());
+        if (!Array.isArray(data) || data.length === 0) break;
+
+        for (var j = 0; j < data.length; j++) {
+          var market = data[j];
+          if (!market || !market.id) continue;
+          var id = String(market.id);
+          if (seen.has(id)) continue;
+          seen.add(id);
+          if (!hasTrumpTitle(market)) continue;
+
+          // Hydrate multi-choice markets missing answers array
+          if (market.outcomeType === 'MULTIPLE_CHOICE' && !Array.isArray(market.answers)) {
+            try {
+              var full = await manifoldGet('/v0/market/' + encodeURIComponent(id));
+              out.push(full);
+            } catch (_) {
+              out.push(market);
+            }
+          } else {
+            out.push(market);
+          }
+        }
+
+        showProgress(Math.min(60, (page / 10) * 60));
+
+        var times = data.map(function(m) { return Number(m && m.createdTime); }).filter(function(n) { return Number.isFinite(n) && n > 0; });
+        if (data.length < 100 || times.length === 0) break;
+
+        var nextBefore = Math.min.apply(null, times) - 1;
+        if (!Number.isFinite(nextBefore) || nextBefore <= 0 || (beforeTime && nextBefore >= beforeTime)) break;
+        beforeTime = nextBefore;
+      }
+
+      return out;
+    }
+
+    /* -- Classification (rule-based, all client-side) -- */
+    function ruleScore(marketTitle, optionText) {
+      var text = (marketTitle + ' ' + optionText).toLowerCase();
+      var out = {};
+
+      for (var i = 0; i < TRAITS.length; i++) {
+        var trait = TRAITS[i];
+        var cfg = RULES[trait];
+        var score = 0.5;
+        for (var p = 0; p < cfg.positive.length; p++) {
+          if (text.indexOf(cfg.positive[p]) >= 0) score += 0.12;
+        }
+        for (var n = 0; n < cfg.negative.length; n++) {
+          if (text.indexOf(cfg.negative[n]) >= 0) score -= 0.1;
+        }
+        out[trait] = clamp(score, 0, 1);
+      }
+      return out;
+    }
+
+    /* -- Snapshot builder -- */
+    function buildSnapshot(market, now) {
+      var options = extractOptions(market);
+      var classified = options.map(function(opt) {
+        var traits = ruleScore(market.question || market.title || '', opt.text);
+        return {
+          id: String(opt.id),
+          text: String(opt.text),
+          probability: clamp(Number(opt.probability || 0), 0, 1),
+          traits: traits,
+        };
+      });
+
+      return {
+        id: String(market.id),
+        title: market.question || market.title || 'Untitled',
+        url: deriveUrl(market),
+        createdTime: toInt(market.createdTime),
+        closeTime: toInt(market.closeTime),
+        resolutionTime: toInt(market.resolutionTime),
+        isOpen: isOpen(market, now),
+        outcomeType: market.outcomeType || (classified.length === 2 ? 'BINARY' : 'MULTIPLE_CHOICE'),
+        optionCount: classified.length,
+        options: classified,
+        updatedAt: now,
+      };
+    }
+
+    function extractOptions(market) {
+      var answers = Array.isArray(market.answers) ? market.answers : [];
+      if (answers.length > 0) {
+        return answers.slice(0, 5).map(function(a, i) {
+          return {
+            id: String(a && a.id != null ? a.id : i),
+            text: String(a && (a.text || a.name) || ('Option ' + (i + 1))),
+            probability: clamp(Number(a && (a.probability != null ? a.probability : a.prob) || 0), 0, 1),
+          };
+        });
+      }
+      var p = clamp(Number(market.probability || 0), 0, 1);
+      return [
+        { id: 'YES', text: 'YES', probability: p },
+        { id: 'NO', text: 'NO', probability: round(1 - p, 6) },
+      ];
+    }
+
+    /* -- Recommendation engine -- */
+    function onRecommend() {
+      var weights = {};
+      for (var i = 0; i < TRAITS.length; i++) {
+        weights[TRAITS[i]] = Number($(TRAITS[i]).value);
+      }
+      var threshold = Number(els.threshold.value || '0.05');
+
+      var markets = Object.values(state.markets).filter(function(m) { return m.isOpen; });
+      var recs = [];
+
+      for (var j = 0; j < markets.length; j++) {
+        var market = markets[j];
+        if (!Array.isArray(market.options) || market.options.length === 0) continue;
+
+        if (market.options.length === 2) {
+          var yes = market.options.find(function(o) { return o.text.toUpperCase() === 'YES'; }) || market.options[0];
+          var edge = computeEdge(yes, weights);
+
+          if (edge.edge > threshold) {
+            recs.push(makeRec(market, 'YES', yes, edge, weights));
+          } else if (edge.edge < -threshold) {
+            recs.push(makeRec(market, 'NO', yes, { s: edge.s, pPref: edge.pPref, edge: Math.abs(edge.edge) }, weights));
+          }
+          continue;
+        }
+
+        for (var k = 0; k < market.options.length; k++) {
+          var opt = market.options[k];
+          var optEdge = computeEdge(opt, weights);
+          if (optEdge.edge > threshold) {
+            recs.push(makeRec(market, opt.text, opt, optEdge, weights));
+          }
+        }
+      }
+
+      recs.sort(function(a, b) { return b.edge - a.edge; });
+      renderRecommendations(recs);
+      setStatus(recs.length + ' recommendation(s) found across ' + markets.length + ' open markets.', recs.length > 0 ? 'ok' : '');
+    }
+
+    function computeEdge(option, weights) {
+      var t = option.traits || {};
+      var s = 0;
+      for (var i = 0; i < TRAITS.length; i++) {
+        s += weights[TRAITS[i]] * (t[TRAITS[i]] != null ? t[TRAITS[i]] : 0.5);
+      }
+      var pPref = 1 / (1 + Math.exp(-s));
+      var edge = pPref - clamp(Number(option.probability || 0), 0, 1);
+      return { s: s, pPref: pPref, edge: edge };
+    }
+
+    function makeRec(market, pick, option, edge, weights) {
+      return {
+        marketId: market.id,
+        marketTitle: market.title,
+        marketUrl: market.url,
+        pick: pick,
+        edge: round(edge.edge, 4),
+        marketProbability: round(option.probability, 4),
+        traitImpliedProbability: round(edge.pPref, 4),
+      };
+    }
+
+    /* -- Clear -- */
+    function onClear() {
+      if (!confirm('Clear all cached market data?')) return;
+      state = { markets: {}, lastSyncTime: null };
+      saveState();
+      renderFromState();
+      setStatus('Cache cleared.', 'ok');
+    }
+
+    /* -- Rendering -- */
+    function renderFromState() {
+      var markets = Object.values(state.markets).sort(function(a, b) { return (b.createdTime || 0) - (a.createdTime || 0); });
+      var now = Date.now();
+      var dayAgo = now - DAY_MS;
+
+      els.lastSync.textContent = state.lastSyncTime ? new Date(state.lastSyncTime).toLocaleString() : 'Never';
+      els.cachedCount.textContent = String(markets.length);
+      els.marketCount.textContent = markets.length + ' market(s)';
+
+      var newOnes = markets.filter(function(m) { return m.createdTime && m.createdTime >= dayAgo; });
+      var ended = markets.filter(function(m) { return !m.isOpen && closedTime(m, now) >= dayAgo; });
+
+      renderList(els.newMarkets, newOnes, 'No new markets in last 24h.');
+      renderList(els.endedMarkets, ended, 'No ended markets in last 24h.');
       renderAllMarkets(markets);
     }
 
-    function renderSummaryList(container, items, emptyText) {
+    function renderList(container, items, emptyText) {
       container.innerHTML = '';
       if (!items.length) {
-        const li = document.createElement('li');
-        li.className = 'small';
-        li.textContent = emptyText;
-        container.appendChild(li);
+        container.innerHTML = '<li class="small">' + esc(emptyText) + '</li>';
         return;
       }
-
-      for (const m of items) {
-        const li = document.createElement('li');
+      for (var i = 0; i < items.length; i++) {
+        var m = items[i];
+        var li = document.createElement('li');
         li.className = 'market-item';
-        li.innerHTML = `
-          <a href="${escapeAttr(m.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(m.title || m.id)}</a>
-          <div class="meta">Created: ${fmtTime(m.createdTime)} | Closed: ${fmtTime(m.closeTime || m.resolutionTime)} | ${m.isOpen ? 'Open' : 'Closed'}</div>
-        `;
+        li.innerHTML = '<a href="' + escA(m.url) + '" target="_blank" rel="noopener">' + esc(m.title) + '</a>' +
+          '<div class="meta">' + (m.isOpen ? 'Open' : 'Closed') + ' | Created: ' + fmtTime(m.createdTime) + '</div>';
         container.appendChild(li);
       }
     }
@@ -428,111 +728,96 @@
     function renderAllMarkets(markets) {
       els.allMarkets.innerHTML = '';
       if (!markets.length) {
-        const div = document.createElement('div');
-        div.className = 'small';
-        div.textContent = 'No tracked markets yet. Run Sync.';
-        els.allMarkets.appendChild(div);
+        els.allMarkets.innerHTML = '<div class="small">No tracked markets. Run Sync.</div>';
         return;
       }
 
-      for (const m of markets) {
-        const card = document.createElement('div');
+      for (var i = 0; i < markets.length; i++) {
+        var m = markets[i];
+        var card = document.createElement('div');
         card.className = 'market-item';
-
-        const rows = (m.options || []).map((o) => {
-          const t = o.traits || {};
-          return `
-            <tr>
-              <td>${escapeHtml(o.text)}</td>
-              <td>${fmtPct(o.probability)}</td>
-              <td>${fmtTrait(t.self_interested)}</td>
-              <td>${fmtTrait(t.loyalty_demand)}</td>
-              <td>${fmtTrait(t.exec_power)}</td>
-              <td>${fmtTrait(t.deal_making)}</td>
-            </tr>
-          `;
+        var rows = (m.options || []).map(function(o) {
+          var t = o.traits || {};
+          return '<tr>' +
+            '<td>' + esc(o.text) + '</td>' +
+            '<td>' + fmtPct(o.probability) + '</td>' +
+            '<td>' + traitCell(t.self_interested) + '</td>' +
+            '<td>' + traitCell(t.loyalty_demand) + '</td>' +
+            '<td>' + traitCell(t.exec_power) + '</td>' +
+            '<td>' + traitCell(t.deal_making) + '</td>' +
+            '</tr>';
         }).join('');
 
-        card.innerHTML = `
-          <a href="${escapeAttr(m.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(m.title || m.id)}</a>
-          <div class="meta">${m.isOpen ? 'Open' : 'Closed'} | Created: ${fmtTime(m.createdTime)} | Options: ${m.optionCount || (m.options || []).length}</div>
-          <table class="options-table">
-            <thead>
-              <tr>
-                <th>Option</th>
-                <th>Market P</th>
-                <th>Self</th>
-                <th>Loyalty</th>
-                <th>Exec</th>
-                <th>Deal</th>
-              </tr>
-            </thead>
-            <tbody>${rows}</tbody>
-          </table>
-        `;
-
+        card.innerHTML = '<a href="' + escA(m.url) + '" target="_blank" rel="noopener">' + esc(m.title) + '</a>' +
+          '<div class="meta">' + (m.isOpen ? 'Open' : 'Closed') + ' | Created: ' + fmtTime(m.createdTime) + ' | Options: ' + m.optionCount + '</div>' +
+          '<table class="options-table">' +
+          '<thead><tr><th>Option</th><th>Mkt P</th><th>Self</th><th>Loyal</th><th>Exec</th><th>Deal</th></tr></thead>' +
+          '<tbody>' + rows + '</tbody>' +
+          '</table>';
         els.allMarkets.appendChild(card);
       }
     }
 
-    function renderRecommendations(items) {
+    function renderRecommendations(recs) {
       els.recommendations.innerHTML = '';
-      if (!items.length) {
-        const div = document.createElement('div');
-        div.className = 'small';
-        div.textContent = 'No recommendations above threshold.';
-        els.recommendations.appendChild(div);
+      if (!recs.length) {
+        els.recommendations.innerHTML = '<div class="small">No recommendations above threshold.</div>';
         return;
       }
 
-      for (const r of items) {
-        const card = document.createElement('div');
+      for (var i = 0; i < recs.length; i++) {
+        var r = recs[i];
+        var card = document.createElement('div');
         card.className = 'recommend-item';
-        card.innerHTML = `
-          <div>
-            <a href="${escapeAttr(r.marketUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(r.marketTitle)}</a>
-            <span class="edge">Edge: ${fmtPct(r.edge)}</span>
-          </div>
-          <div class="meta">Pick: ${escapeHtml(r.pick)} | Market P: ${fmtPct(r.marketProbability)} | Trait P: ${fmtPct(r.traitImpliedProbability)}</div>
-          <div class="small">${escapeHtml(r.explanation || '')}</div>
-        `;
+        card.innerHTML = '<div>' +
+          '<a href="' + escA(r.marketUrl) + '" target="_blank" rel="noopener">' + esc(r.marketTitle) + '</a>' +
+          '<span class="edge">Edge: ' + fmtPct(r.edge) + '</span>' +
+          '</div>' +
+          '<div class="meta">' +
+          'Pick: <strong>' + esc(r.pick) + '</strong> | ' +
+          'Market: ' + fmtPct(r.marketProbability) + ' | ' +
+          'Your model: ' + fmtPct(r.traitImpliedProbability) +
+          '</div>';
         els.recommendations.appendChild(card);
       }
     }
 
-    function fmtTime(ms) {
-      if (!ms) return 'n/a';
-      const n = Number(ms);
-      if (!Number.isFinite(n)) return 'n/a';
-      return new Date(n).toLocaleString();
+    function traitCell(v) {
+      var n = clamp(Number(v != null ? v : 0.5), 0, 1);
+      var color = n > 0.6 ? '#145a86' : n < 0.4 ? '#9f1c1c' : '#999';
+      return '<span style="color:' + color + '; font-weight:' + (n > 0.6 || n < 0.4 ? '600' : '400') + '">' + n.toFixed(2) + '</span>';
     }
 
-    function fmtPct(v) {
-      const n = Number(v);
-      if (!Number.isFinite(n)) return '0.0%';
-      return `${(n * 100).toFixed(1)}%`;
+    /* -- Helpers -- */
+    function hasTrumpTitle(m) { return /trump/i.test((m && (m.question || m.title)) || ''); }
+    function getOptionCount(m) { return Array.isArray(m && m.answers) ? m.answers.length : 2; }
+    function isOpen(m, now) {
+      if (m && m.isResolved) return false;
+      var ct = toInt(m && m.closeTime);
+      if (ct && ct <= now) return false;
+      return true;
     }
-
-    function fmtTrait(v) {
-      const n = Number(v);
-      if (!Number.isFinite(n)) return '0.00';
-      return n.toFixed(2);
+    function closedTime(m, now) {
+      if (m.closeTime && m.closeTime <= now) return m.closeTime;
+      if (m.resolutionTime && m.resolutionTime <= now) return m.resolutionTime;
+      return m.updatedAt || 0;
     }
-
-    function escapeHtml(s) {
-      return String(s || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+    function deriveUrl(m) {
+      if (typeof (m && m.url) === 'string' && m.url.indexOf('http') === 0) return m.url;
+      var c = (m && m.creatorUsername) || 'market';
+      var s = (m && m.slug) || ((m && m.question) || 'market').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80);
+      return 'https://manifold.markets/' + c + '/' + s;
     }
-
-    function escapeAttr(s) {
-      return escapeHtml(s).replace(/`/g, '&#096;');
-    }
+    function clamp(v, lo, hi) { var n = Number(v); return Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : lo; }
+    function round(v, d) { var f = Math.pow(10, d); return Math.round(Number(v) * f) / f; }
+    function toInt(v) { var n = Number(v); return Number.isFinite(n) ? Math.trunc(n) : null; }
+    function fmtTime(ms) { return ms ? new Date(Number(ms)).toLocaleDateString() : 'n/a'; }
+    function fmtPct(v) { var n = Number(v); return Number.isFinite(n) ? (n * 100).toFixed(1) + '%' : '0.0%'; }
+    function esc(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function escA(s) { return esc(s).replace(/'/g, '&#039;'); }
 
     init();
+  })();
   </script>
 </body>
 </html>
