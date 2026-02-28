@@ -341,18 +341,18 @@ body {
 
   <div class="signals-grid" style="margin-bottom:20px;">
     <div class="signal-card">
-      <h4>FL Muni Bond Spread</h4>
-      <div class="signal-context">S&amp;P FL Muni Index vs. National Muni Index</div>
-      <div class="signal-value" style="color:var(--orange);">Widening</div>
-      <div class="signal-context">FL munis should underperform if market prices in $14.8B/yr revenue loss to localities. Watch for spread widening at key legislative milestones.</div>
-      <div class="signal-direction" style="background:rgba(255,173,31,0.15); color:var(--orange);">Bearish for FL munis = bullish for passage</div>
+      <h4>JOE vs. XHB Spread</h4>
+      <div class="signal-context">FL pure-play (JOE) vs. national homebuilders (XHB)</div>
+      <div class="signal-value" style="color:var(--green);">+30.4pp</div>
+      <div class="signal-context">JOE up 50.3% vs. XHB up 19.9% since Mar 2025. Spread widened sharply from Oct onward &mdash; coincides with legislative activity. Many confounders but directionally interesting.</div>
+      <div class="signal-direction" style="background:rgba(23,191,99,0.15); color:var(--green);">JOE outperformance = bullish signal (noisy)</div>
     </div>
     <div class="signal-card">
-      <h4>JOE (St. Joe Company)</h4>
-      <div class="signal-context">NYSE: JOE &mdash; Pure-play NW Florida real estate</div>
-      <div class="signal-value" style="color:var(--green);">Watch</div>
-      <div class="signal-context">Property tax elimination is a massive tailwind for FL home values. JOE vs. XHB (homebuilders ETF) spread captures FL-specific sentiment.</div>
-      <div class="signal-direction" style="background:rgba(23,191,99,0.15); color:var(--green);">JOE outperformance = bullish for passage</div>
+      <h4>MUB (National Munis)</h4>
+      <div class="signal-context">iShares National Muni Bond ETF &mdash; benchmark</div>
+      <div class="signal-value" style="color:var(--muted);">+6.4%</div>
+      <div class="signal-context">National munis up modestly. No FL-specific muni ETF available for direct comparison. FL muni spreads would widen if market prices in $14.8B/yr revenue loss, but this isn't directly trackable with available instruments.</div>
+      <div class="signal-direction" style="background:rgba(136,153,166,0.15); color:var(--muted);">No FL-specific muni ETF &mdash; national benchmark only</div>
     </div>
     <div class="signal-card">
       <h4>FL REIT Spread</h4>
@@ -372,13 +372,13 @@ body {
 
   <div class="chart-row">
     <div class="chart-section">
-      <h3>JOE vs. XHB (Indexed to 100)</h3>
-      <div class="chart-subtitle">Relative performance since DeSantis announcement (Mar 2025). JOE outperformance suggests FL-specific tailwind.</div>
+      <h3>JOE vs. XHB vs. MUB (Indexed to 100)</h3>
+      <div class="chart-subtitle">Yahoo Finance monthly adj. close, indexed to Mar 2025. JOE outperformance vs. national benchmarks = FL-specific tailwind.</div>
       <div class="chart-container"><canvas id="chart-joe-xhb"></canvas></div>
     </div>
     <div class="chart-section">
-      <h3>FL Muni Spread (Simulated)</h3>
-      <div class="chart-subtitle">Yield spread: FL muni index minus national muni index (bps). Widening = FL credit stress.</div>
+      <h3>JOE vs. XHB Relative Spread</h3>
+      <div class="chart-subtitle">JOE indexed performance minus XHB indexed (pp). Positive = FL real estate outperforming national homebuilders.</div>
       <div class="chart-container"><canvas id="chart-muni-spread"></canvas></div>
     </div>
   </div>
@@ -400,7 +400,7 @@ body {
     </div>
     <div class="chart-section">
       <h3>Google Trends: "Florida property tax"</h3>
-      <div class="chart-subtitle">Relative search interest (0-100 scale). Spikes correlate with legislative milestones.</div>
+      <div class="chart-subtitle">Monthly avg of weekly relative search interest (0-100). Source: Google Trends. Feb 2026 spike coincides with House vote.</div>
       <div class="chart-container"><canvas id="chart-gtrends"></canvas></div>
     </div>
   </div>
@@ -512,15 +512,16 @@ body {
   <ul>
     <li><strong>Base rate</strong>: Florida constitutional amendments proposed by the legislature that require 60% voter approval have a mixed track record. The 60% threshold is genuinely hard &mdash; Amendment 4 (abortion, 2024) got 57% and failed.</li>
     <li><strong>Decomposition</strong>: We break the chain into P(Senate passes) &times; P(on ballot | passes) &times; P(voters approve at 60%). Each conditional is estimated independently with Bayesian updating.</li>
-    <li><strong>Financial signals</strong>: FL muni bond spreads, JOE stock performance, and REIT spreads are <em>noisy</em> proxies. They capture market sentiment but are confounded by interest rates, migration, and macro conditions. Use as directional confirmation, not primary evidence.</li>
+    <li><strong>Financial signals</strong>: JOE stock performance vs. XHB (national homebuilders) and MUB (national munis) are <em>noisy</em> proxies. They capture market sentiment but are confounded by interest rates, migration, and macro conditions. Use as directional confirmation, not primary evidence. Data sourced from Yahoo Finance.</li>
     <li><strong>Polling</strong>: Three polls exist with varying methodology. The UNF PORL poll (49% support) is the most methodologically neutral. JMI (65%) uses favorable framing. The 60% threshold means even optimistic polls barely clear.</li>
+    <li><strong>Google Trends</strong>: Weekly search interest for "Florida property tax" averaged by month. Source: Google Trends. Spikes correlate with legislative milestones.</li>
     <li><strong>Key uncertainties</strong>: (1) Whether DeSantis calls a special session; (2) Senate willingness to negotiate; (3) Opposition campaign effectiveness on service cuts messaging.</li>
   </ul>
   <p style="margin-top: 12px;"><strong>To update this dashboard</strong>: Edit the data arrays in the JavaScript source. The <code>forecastLog</code>, <code>timelineEvents</code>, and chart data are all in plain JS objects &mdash; add new entries as events occur.</p>
 </div>
 
 <div class="footer">
-  <p>Built by <a href="https://adambraff.github.io/">Adam Braff</a> | Superforecasting methodology via Tetlock | Data from public sources</p>
+  <p>Built by <a href="https://adambraff.github.io/">Adam Braff</a> | Superforecasting methodology via Tetlock | Data from Yahoo Finance, Google Trends, public sources</p>
   <p style="margin-top:4px;">Last updated: <span id="last-updated"></span></p>
 </div>
 
@@ -545,44 +546,51 @@ const forecastLog = [
 ];
 
 const timelineEvents = [
-  { date: 'Mar 31, 2025', title: 'DeSantis announces property tax elimination push', desc: 'Asks legislators to redirect $5B in sales tax cuts to property tax relief. Proposes $1,000 rebate for homesteaded properties.', status: 'passed', signal: 'up', signalText: 'Catalyst — executive backing' },
-  { date: 'Apr–May 2025', title: 'WUSF/FL Survey: 46% support elimination', desc: '1,200 Floridians surveyed. 32% preferred sales tax cuts instead. 60% concerned about service impacts.', status: 'passed', signal: 'down', signalText: 'Below 60% threshold' },
-  { date: 'Jun 6, 2025', title: 'Extended session ends; HB 7031 signed', desc: 'DeSantis extended session to resolve tax plan. Signed tax bill but property tax elimination deferred to 2026.', status: 'passed', signal: 'neutral', signalText: 'Consolation prize — deferred' },
+  { date: 'Mar 31, 2025', title: 'DeSantis announces property tax elimination push', desc: 'Asks legislators to redirect $5B in sales tax cuts to property tax relief. Proposes $1,000 rebate for homesteaded properties.', status: 'passed', signal: 'up', signalText: 'Catalyst \u2014 executive backing' },
+  { date: 'Apr\u2013May 2025', title: 'WUSF/FL Survey: 46% support elimination', desc: '1,200 Floridians surveyed. 32% preferred sales tax cuts instead. 60% concerned about service impacts.', status: 'passed', signal: 'down', signalText: 'Below 60% threshold' },
+  { date: 'Jun 6, 2025', title: 'Extended session ends; HB 7031 signed', desc: 'DeSantis extended session to resolve tax plan. Signed tax bill but property tax elimination deferred to 2026.', status: 'passed', signal: 'neutral', signalText: 'Consolation prize \u2014 deferred' },
   { date: 'Sep 2025', title: 'House Select Committee on Property Taxes convenes', desc: '37-member bipartisan committee begins hearings. Gathers input from homeowners, local governments, businesses.', status: 'passed', signal: 'up', signalText: 'Legislative momentum building' },
   { date: 'Sep 29, 2025', title: 'JMI Poll: 65% would vote yes on ballot amendment', desc: '1,200 registered voters surveyed by James Madison Institute (conservative think tank). Favorable question framing.', status: 'passed', signal: 'up', signalText: 'Bullish but framing bias' },
   { date: 'Oct 2025', title: '7 Joint Resolutions filed (HJR 201-213)', desc: 'Slate of proposals ranging from $6.7B to $18.3B annual impact. HJR 203: 10-year phaseout of non-school homestead taxes.', status: 'passed', signal: 'up', signalText: 'Multiple legislative vehicles' },
-  { date: 'Oct 28, 2025', title: 'UNF Poll: 49% support, 43% oppose', desc: '728 likely voters. Most methodologically neutral poll. Margin of error ±4.25%. Below 60% threshold.', status: 'passed', signal: 'down', signalText: 'Tightest poll — below threshold' },
+  { date: 'Oct 28, 2025', title: 'UNF Poll: 49% support, 43% oppose', desc: '728 likely voters. Most methodologically neutral poll. Margin of error \u00b14.25%. Below 60% threshold.', status: 'passed', signal: 'down', signalText: 'Tightest poll \u2014 below threshold' },
   { date: 'Oct 29, 2025', title: 'DeSantis: wants "just one amendment" on property taxes', desc: 'Signals preference for consolidated approach rather than multiple ballot items.', status: 'passed', signal: 'neutral', signalText: 'Consolidation signal' },
   { date: 'Nov 2025', title: 'Bond Buyer: proposed cuts would affect FL localities', desc: 'Analysts warn of credit rating downgrades, higher borrowing costs for FL municipalities. $14.8B/yr revenue loss estimated.', status: 'passed', signal: 'down', signalText: 'Institutional opposition forming' },
   { date: 'Jan 13, 2026', title: '2026 Legislative Session opens', desc: 'Regular 60-day session begins. Multiple property tax proposals in committee.', status: 'passed', signal: 'neutral', signalText: 'Session begins' },
-  { date: 'Jan 2026', title: 'HJR 203 advances through House committees', desc: 'Ways & Means Committee passes 11-5. Amended to remove 10-year phase-in — now immediate full exemption.', status: 'passed', signal: 'up', signalText: 'Fast-tracked in House' },
-  { date: 'Feb 19, 2026', title: 'House passes HJR 203, 80-30', desc: 'Party-line vote. Speaker Perez calls it "historic." Amendment now eliminates non-school homestead taxes immediately if voters approve.', status: 'passed', signal: 'up', signalText: 'Major milestone — House passage' },
+  { date: 'Jan 2026', title: 'HJR 203 advances through House committees', desc: 'Ways & Means Committee passes 11-5. Amended to remove 10-year phase-in \u2014 now immediate full exemption.', status: 'passed', signal: 'up', signalText: 'Fast-tracked in House' },
+  { date: 'Feb 19, 2026', title: 'House passes HJR 203, 80-30', desc: 'Party-line vote. Speaker Perez calls it "historic." Amendment now eliminates non-school homestead taxes immediately if voters approve.', status: 'passed', signal: 'up', signalText: 'Major milestone \u2014 House passage' },
   { date: 'Feb 19, 2026', title: 'DeSantis sides with Senate\'s slow approach', desc: '"It\'s better to do it right than do it quick." Executive breaks with House Speaker.', status: 'passed', signal: 'down', signalText: 'Executive-legislative split' },
-  { date: 'Late Feb 2026', title: 'Senate: no hearing scheduled, no companion bill', desc: 'HJR 203 referred to Senate Appropriations Committee. President Albritton: "getting it right is more important than doing it quickly."', status: 'current', signal: 'down', signalText: 'Major bottleneck — Senate stalling' },
+  { date: 'Late Feb 2026', title: 'Senate: no hearing scheduled, no companion bill', desc: 'HJR 203 referred to Senate Appropriations Committee. President Albritton: "getting it right is more important than doing it quickly."', status: 'current', signal: 'down', signalText: 'Major bottleneck \u2014 Senate stalling' },
   { date: 'Mar 13, 2026', title: 'Regular session ends', desc: 'Hard deadline for regular session. HJR 203 must pass Senate with 3/5 supermajority (24 of 40) to reach ballot. Currently appears very unlikely in regular session.', status: 'future', signal: 'down', signalText: 'Clock running out' },
-  { date: 'Apr–Aug 2026', title: 'Possible special session', desc: 'DeSantis could call a special session specifically for property tax reform. This is the most likely path to ballot placement. Senate would need its own version.', status: 'future', signal: 'neutral', signalText: 'Main remaining path' },
+  { date: 'Apr\u2013Aug 2026', title: 'Possible special session', desc: 'DeSantis could call a special session specifically for property tax reform. This is the most likely path to ballot placement. Senate would need its own version.', status: 'future', signal: 'neutral', signalText: 'Main remaining path' },
   { date: 'Aug 2026', title: 'Ballot language deadline (approx)', desc: 'Constitutional amendments must be finalized for ballot language well before November. Exact deadline set by Division of Elections.', status: 'future', signal: 'neutral', signalText: 'Hard deadline for ballot placement' },
-  { date: 'Sep–Oct 2026', title: 'Campaign period', desc: 'If on ballot: expect heavy opposition from FL League of Cities, teachers unions, law enforcement groups citing service cuts. Proponents emphasize homeowner savings.', status: 'future', signal: 'neutral', signalText: 'Opposition campaigns matter' },
-  { date: 'Nov 3, 2026', title: 'General Election — 60% threshold vote', desc: 'Voters must approve with 60% supermajority. Midterm electorate typically more conservative, which could help. But 60% is genuinely hard.', status: 'future', signal: 'neutral', signalText: 'Final resolution' }
+  { date: 'Sep\u2013Oct 2026', title: 'Campaign period', desc: 'If on ballot: expect heavy opposition from FL League of Cities, teachers unions, law enforcement groups citing service cuts. Proponents emphasize homeowner savings.', status: 'future', signal: 'neutral', signalText: 'Opposition campaigns matter' },
+  { date: 'Nov 3, 2026', title: 'General Election \u2014 60% threshold vote', desc: 'Voters must approve with 60% supermajority. Midterm electorate typically more conservative, which could help. But 60% is genuinely hard.', status: 'future', signal: 'neutral', signalText: 'Final resolution' }
 ];
 
-// Chart data — mock/estimated for illustration. Replace with real data as available.
+// Chart data — Real data from Yahoo Finance and Google Trends (pulled Feb 28, 2026)
 // Monthly data points: Mar 2025 through Feb 2026
 const months = ['Mar 25','Apr 25','May 25','Jun 25','Jul 25','Aug 25','Sep 25','Oct 25','Nov 25','Dec 25','Jan 26','Feb 26'];
 
-// JOE vs XHB indexed to 100 at Mar 2025
-const joeIndexed =  [100, 103, 101, 105, 108, 106, 112, 115, 113, 118, 121, 125];
-const xhbIndexed =  [100, 102, 99, 101, 103, 100, 104, 106, 104, 107, 109, 111];
+// JOE vs XHB vs MUB indexed to 100 at Mar 2025
+// Source: Yahoo Finance monthly adjusted close prices
+// JOE raw: 46.41, 41.96, 44.33, 47.29, 50.22, 50.18, 49.35, 56.63, 60.17, 59.37, 66.19, 69.73
+const joeIndexed =  [100, 90.4, 95.5, 101.9, 108.2, 108.1, 106.3, 122.0, 129.6, 127.9, 142.6, 150.3];
+// XHB raw: 96.14, 94.26, 93.82, 98.11, 101.59, 113.65, 110.46, 104.85, 108.69, 102.78, 108.40, 115.31
+const xhbIndexed =  [100, 98.0, 97.6, 102.0, 105.7, 118.2, 114.9, 109.1, 113.1, 106.9, 112.8, 119.9];
+// MUB raw: 102.13, 101.71, 101.12, 102.01, 101.69, 102.54, 104.81, 106.07, 106.31, 106.26, 107.57, 108.64
+const mubIndexed = [100, 99.6, 99.0, 99.9, 99.6, 100.4, 102.6, 103.9, 104.1, 104.0, 105.3, 106.4];
 
-// FL muni spread (bps) — simulated directional move
-const muniSpread = [2, 3, 5, 4, 6, 8, 12, 15, 18, 16, 20, 24];
+// JOE vs XHB relative spread (JOE indexed - XHB indexed, percentage points)
+// Positive = JOE outperforming = FL-specific tailwind signal
+const joeXhbSpread = [0.0, -7.6, -2.1, -0.1, 2.5, -10.1, -8.6, 12.9, 16.5, 21.0, 29.8, 30.4];
 
 // Probability over time
 const probOverTime = [8, 8, 10, 9, 9, 10, 14, 16, 14, 13, 16, 15];
 const probLabels = months;
 
-// Google Trends (relative search interest 0-100)
-const gtrendsData = [25, 45, 38, 20, 15, 12, 35, 42, 30, 22, 48, 85];
+// Google Trends monthly averages (relative search interest 0-100)
+// Source: Google Trends weekly data for "Florida property tax", averaged by month
+const gtrendsData = [40, 30, 27, 25, 33, 35, 34, 43, 49, 38, 43, 69];
 
 // Poll support % over time
 const pollDates = ['May 25', 'Sep 25', 'Oct 25'];
@@ -606,7 +614,7 @@ timelineEvents.forEach(ev => {
     <div class="tl-date">${ev.date}</div>
     <div class="tl-title">${ev.title}</div>
     <div class="tl-desc">${ev.desc}</div>
-    <span class="tl-signal ${ev.signal}">${ev.signal === 'up' ? '↑' : ev.signal === 'down' ? '↓' : '→'} ${ev.signalText}</span>
+    <span class="tl-signal ${ev.signal}">${ev.signal === 'up' ? '\u2191' : ev.signal === 'down' ? '\u2193' : '\u2192'} ${ev.signalText}</span>
   `;
   tlContainer.appendChild(item);
 });
@@ -620,10 +628,10 @@ forecastLog.forEach(entry => {
     <div class="update-date">${entry.date}</div>
     <div class="update-text">${entry.event}</div>
     <div style="margin-top:6px;">
-      <span class="update-prob">P(ballot): ${entry.probBallot}%</span> &nbsp;&times;&nbsp;
+      <span class="update-prob">P(ballot): ${entry.probBallot}%</span> &nbsp;\u00d7&nbsp;
       <span class="update-prob">P(voter): ${entry.probVoter}%</span> &nbsp;=&nbsp;
       <span class="update-prob" style="color:var(--accent)">P(full): ${entry.probFull}%</span>
-      <span style="color:var(--muted); font-size:0.8rem;"> (CI: ${entry.ci[0]}–${entry.ci[1]}%)</span>
+      <span style="color:var(--muted); font-size:0.8rem;"> (CI: ${entry.ci[0]}\u2013${entry.ci[1]}%)</span>
     </div>
   `;
   logContainer.appendChild(div);
@@ -644,14 +652,15 @@ Chart.defaults.color = '#8899a6';
 Chart.defaults.borderColor = '#2d3e50';
 Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif';
 
-// JOE vs XHB
+// JOE vs XHB vs MUB
 new Chart(document.getElementById('chart-joe-xhb'), {
   type: 'line',
   data: {
     labels: months,
     datasets: [
-      { label: 'JOE', data: joeIndexed, borderColor: '#1da1f2', backgroundColor: 'rgba(29,161,242,0.1)', fill: true, tension: 0.3, pointRadius: 3 },
-      { label: 'XHB', data: xhbIndexed, borderColor: '#8899a6', backgroundColor: 'rgba(136,153,166,0.05)', fill: true, tension: 0.3, pointRadius: 3, borderDash: [5,5] }
+      { label: 'JOE', data: joeIndexed, borderColor: '#1da1f2', backgroundColor: 'rgba(29,161,242,0.1)', fill: false, tension: 0.3, pointRadius: 3, borderWidth: 2.5 },
+      { label: 'XHB', data: xhbIndexed, borderColor: '#8899a6', backgroundColor: 'rgba(136,153,166,0.05)', fill: false, tension: 0.3, pointRadius: 3, borderDash: [5,5], borderWidth: 2 },
+      { label: 'MUB', data: mubIndexed, borderColor: '#9b59b6', backgroundColor: 'rgba(155,89,182,0.05)', fill: false, tension: 0.3, pointRadius: 2, borderDash: [2,3], borderWidth: 1.5 }
     ]
   },
   options: {
@@ -664,15 +673,15 @@ new Chart(document.getElementById('chart-joe-xhb'), {
   }
 });
 
-// Muni Spread
+// JOE-XHB Relative Spread
 new Chart(document.getElementById('chart-muni-spread'), {
   type: 'bar',
   data: {
     labels: months,
     datasets: [{
-      label: 'FL–National Spread (bps)',
-      data: muniSpread,
-      backgroundColor: muniSpread.map(v => v > 15 ? 'rgba(224,36,94,0.6)' : v > 8 ? 'rgba(255,173,31,0.6)' : 'rgba(29,161,242,0.6)'),
+      label: 'JOE\u2013XHB Spread (pp)',
+      data: joeXhbSpread,
+      backgroundColor: joeXhbSpread.map(v => v > 10 ? 'rgba(23,191,99,0.7)' : v > 0 ? 'rgba(29,161,242,0.6)' : 'rgba(224,36,94,0.5)'),
       borderRadius: 4
     }]
   },
@@ -680,7 +689,7 @@ new Chart(document.getElementById('chart-muni-spread'), {
     responsive: true, maintainAspectRatio: false,
     plugins: { legend: { display: false } },
     scales: {
-      y: { title: { display: true, text: 'Spread (bps)' }, grid: { color: '#1a2332' }, beginAtZero: true },
+      y: { title: { display: true, text: 'Spread (percentage points)' }, grid: { color: '#1a2332' } },
       x: { grid: { display: false } }
     }
   }
