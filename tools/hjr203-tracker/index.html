@@ -370,15 +370,22 @@ body {
     <div class="signal-direction" style="background:rgba(136,153,166,0.15); color:var(--muted);">Higher = bullish (many confounders)</div>
   </div>
   <div class="signal-card">
-    <h4>MUB / NAD Ratio</h4>
-    <div class="signal-context">National muni ETF (MUB) vs. Nuveen Quality Muni CEF (NAD)</div>
-    <div class="signal-value" id="sig-muni" style="color:var(--muted);"><span class="loading">...</span></div>
-    <div class="signal-context">NAD = Nuveen Quality Municipal Income Fund (CEF). Rising ratio = muni CEF discount widening = muni stress signal.</div>
-    <div class="signal-direction" style="background:rgba(155,89,182,0.15); color:var(--purple);">Higher = passage risk priced in</div>
+    <h4>BKU / KRE Ratio</h4>
+    <div class="signal-context">BankUnited (FL bank, ~95% FL deposits) vs. regional bank ETF (KRE)</div>
+    <div class="signal-value" id="sig-bank" style="color:var(--muted);"><span class="loading">...</span></div>
+    <div class="signal-context">BKU holds FL munis + FL real estate loans. Rising ratio = FL banking outperforming = bullish.</div>
+    <div class="signal-direction" style="background:rgba(155,89,182,0.15); color:var(--purple);">Higher = FL banks strong = bullish</div>
+  </div>
+  <div class="signal-card">
+    <h4>FL / US Home Values</h4>
+    <div class="signal-context">Zillow ZHVI: FL typical home value vs. national</div>
+    <div class="signal-value" id="sig-zhvi" style="color:var(--muted);"><span class="loading">...</span></div>
+    <div class="signal-context">FL homes appreciating faster than US = demand signal. Tax elimination would boost FL home values.</div>
+    <div class="signal-direction" style="background:rgba(255,173,31,0.15); color:var(--orange);">Higher = FL outperforming US</div>
   </div>
 </div>
 
-<div class="chart-row">
+<div class="chart-row-2">
   <div class="chart-section">
     <h3>JOE / XHB Ratio</h3>
     <div class="chart-subtitle">FL homebuilder vs. national. Higher = FL outperforming = bullish.</div>
@@ -389,10 +396,17 @@ body {
     <div class="chart-subtitle">Sunbelt REIT vs. coastal REIT. Higher = FL/Sunbelt outperforming = bullish.</div>
     <div class="chart-container"><canvas id="chart-reit"></canvas></div>
   </div>
+</div>
+<div class="chart-row-2">
   <div class="chart-section">
-    <h3>MUB / NAD Ratio</h3>
-    <div class="chart-subtitle">Muni ETF vs. muni CEF. Higher = CEF discount widening = muni stress.</div>
-    <div class="chart-container"><canvas id="chart-muni"></canvas></div>
+    <h3>BKU / KRE Ratio</h3>
+    <div class="chart-subtitle">FL bank vs. regional banks. Higher = FL banking sector outperforming = bullish.</div>
+    <div class="chart-container"><canvas id="chart-bank"></canvas></div>
+  </div>
+  <div class="chart-section">
+    <h3>FL / US Home Value Ratio (Zillow ZHVI)</h3>
+    <div class="chart-subtitle">FL typical home value vs. US. Higher = FL homes outperforming national. Source: FRED/Zillow.</div>
+    <div class="chart-container"><canvas id="chart-zhvi"></canvas></div>
   </div>
 </div>
 
@@ -448,13 +462,14 @@ body {
   <ul>
     <li><strong>Base rate</strong>: FL constitutional amendments proposed by the legislature requiring 60% voter approval have a mixed track record. Amendment 4 (abortion, 2024) got 57% and failed.</li>
     <li><strong>Decomposition</strong>: P(Senate passes) &times; P(on ballot | passes) &times; P(voters approve at 60%). Each conditional estimated independently.</li>
-    <li><strong>Financial signals</strong>: JOE, XHB, MUB, CPT, EQR, NAD data pulled live from Alpha Vantage (free tier, 5 req/min). All charts show ratios oriented so higher = more likely passage.</li>
+    <li><strong>Financial signals</strong>: JOE, XHB, CPT, EQR, BKU, KRE data pulled live from Alpha Vantage (free tier, 5 req/min). All charts show ratios oriented so higher = more bullish for passage.</li>
     <li><strong>Manifold Market</strong>: Live probability from Manifold Markets API (CORS-friendly, no key). Low liquidity caveat applies.</li>
-    <li><strong>Muni proxy</strong>: NAD (Nuveen Quality Municipal Income Fund, NYSE CEF) used as muni market proxy. All FL-specific muni funds (FRFLX, VFLTX, MAFMX, MFFLX) were liquidated in 2025. MUB/NAD ratio captures muni CEF discount stress.</li>
+    <li><strong>FL bank proxy</strong>: BKU (BankUnited, ~95% FL deposits) vs. KRE (S&amp;P Regional Banking ETF). BKU holds FL muni bonds and FL real estate loans &mdash; both directly affected by HJR 203.</li>
+    <li><strong>Zillow ZHVI</strong>: FL vs. US typical home value ratio from FRED (series FLUCSFRCONDOSMSAMID / USAUCSFRCONDOSMSAMID). Monthly, ~1 month lag. FL homes appreciating faster than US = demand signal consistent with tax elimination expectations.</li>
     <li><strong>Polling</strong>: Three polls with varying methodology. UNF PORL (49%) most neutral. JMI (65%) favorable framing. 60% threshold is genuinely hard.</li>
     <li><strong>Key uncertainties</strong>: (1) Whether DeSantis calls a special session; (2) Senate willingness to negotiate; (3) Opposition campaign effectiveness.</li>
   </ul>
-  <p style="margin-top: 12px;"><strong>Data freshness</strong>: Financial data and Manifold probability refresh on page load and via the "Refresh Market Data" button. Polls, timeline events, and forecast log are manually maintained in the source code.</p>
+  <p style="margin-top: 12px;"><strong>Data freshness</strong>: Stock data and Manifold probability refresh on page load and via the "Refresh Market Data" button. Zillow ZHVI updates monthly with ~1 month lag (fallback data in source). Polls, timeline events, and forecast log are manually maintained.</p>
 </div>
 
 <div class="footer">
@@ -473,7 +488,7 @@ const MANIFOLD_MARKET_ID = 'g0lc8tPgg5';
 const AV_DELAY = 13000; // 13s between requests (5/min limit)
 
 // Tickers to fetch monthly history for
-const TICKERS = ['JOE', 'XHB', 'MUB', 'CPT', 'EQR', 'NAD'];
+const TICKERS = ['JOE', 'XHB', 'CPT', 'EQR', 'BKU', 'KRE'];
 
 // Months we want (Mar 2025 through most recent)
 const START_YEAR = 2025;
@@ -491,8 +506,8 @@ const forecastLog = [
 ];
 
 const timelineEvents = [
-  { date: 'Mar 31, 2025', title: 'DeSantis announces property tax elimination push', desc: 'Asks legislators to redirect $5B in sales tax cuts to property tax relief.', status: 'passed', signal: 'up', signalText: 'Catalyst \u2014 executive backing' },
-  { date: 'Apr\u2013May 2025', title: 'WUSF/FL Survey: 46% support elimination', desc: '1,200 Floridians surveyed. 32% preferred sales tax cuts instead.', status: 'passed', signal: 'down', signalText: 'Below 60% threshold' },
+  { date: 'Mar 31, 2025', title: 'DeSantis announces property tax elimination push', desc: 'Asks legislators to redirect $5B in sales tax cuts to property tax relief.', status: 'passed', signal: 'up', signalText: 'Catalyst — executive backing' },
+  { date: 'Apr–May 2025', title: 'WUSF/FL Survey: 46% support elimination', desc: '1,200 Floridians surveyed. 32% preferred sales tax cuts instead.', status: 'passed', signal: 'down', signalText: 'Below 60% threshold' },
   { date: 'Jun 6, 2025', title: 'Extended session ends; HB 7031 signed', desc: 'Property tax elimination deferred to 2026.', status: 'passed', signal: 'neutral', signalText: 'Deferred' },
   { date: 'Sep 2025', title: 'House Select Committee convenes', desc: '37-member bipartisan committee begins hearings.', status: 'passed', signal: 'up', signalText: 'Legislative momentum' },
   { date: 'Sep 29, 2025', title: 'JMI Poll: 65% would vote yes', desc: 'Conservative think tank; favorable framing.', status: 'passed', signal: 'up', signalText: 'Bullish but framing bias' },
@@ -505,9 +520,9 @@ const timelineEvents = [
   { date: 'Feb 19, 2026', title: 'DeSantis sides with Senate\'s slow approach', desc: '"It\'s better to do it right than do it quick."', status: 'passed', signal: 'down', signalText: 'Executive-legislative split' },
   { date: 'Late Feb 2026', title: 'Senate: no hearing, no companion bill', desc: 'President Albritton: "getting it right is more important."', status: 'current', signal: 'down', signalText: 'Senate stalling' },
   { date: 'Mar 13, 2026', title: 'Regular session ends', desc: 'Very unlikely to pass Senate in regular session.', status: 'future', signal: 'down', signalText: 'Clock running out' },
-  { date: 'Apr\u2013Aug 2026', title: 'Possible special session', desc: 'Most likely path to ballot. DeSantis could call it.', status: 'future', signal: 'neutral', signalText: 'Main remaining path' },
+  { date: 'Apr–Aug 2026', title: 'Possible special session', desc: 'Most likely path to ballot. DeSantis could call it.', status: 'future', signal: 'neutral', signalText: 'Main remaining path' },
   { date: 'Aug 2026', title: 'Ballot language deadline (approx)', desc: 'Must be finalized for ballot well before November.', status: 'future', signal: 'neutral', signalText: 'Hard deadline' },
-  { date: 'Nov 3, 2026', title: 'General Election \u2014 60% threshold vote', desc: '60% supermajority required. Midterm electorate.', status: 'future', signal: 'neutral', signalText: 'Final resolution' }
+  { date: 'Nov 3, 2026', title: 'General Election — 60% threshold vote', desc: '60% supermajority required. Midterm electorate.', status: 'future', signal: 'neutral', signalText: 'Final resolution' }
 ];
 
 const pollDates = ['May 25', 'Sep 25', 'Oct 25'];
@@ -520,10 +535,17 @@ const pollSources = ['WUSF', 'JMI', 'UNF'];
 const FALLBACK = {
   JOE: {'2025-03':46.56,'2025-04':41.97,'2025-05':44.34,'2025-06':47.44,'2025-07':50.23,'2025-08':50.32,'2025-09':49.35,'2025-10':56.63,'2025-11':60.33,'2025-12':59.37,'2026-01':66.19,'2026-02':72.17},
   XHB: {'2025-03':96.14,'2025-04':94.26,'2025-05':93.82,'2025-06':98.11,'2025-07':101.59,'2025-08':113.65,'2025-09':110.46,'2025-10':104.85,'2025-11':108.69,'2025-12':102.78,'2026-01':108.40,'2026-02':115.31},
-  MUB: {'2025-03':102.13,'2025-04':101.71,'2025-05':101.12,'2025-06':102.01,'2025-07':101.69,'2025-08':102.54,'2025-09':104.81,'2025-10':106.07,'2025-11':106.31,'2025-12':106.26,'2026-01':107.57,'2026-02':108.64},
   CPT: {'2025-03':115.0,'2025-04':112.5,'2025-05':114.0,'2025-06':117.0,'2025-07':119.5,'2025-08':122.0,'2025-09':120.0,'2025-10':118.5,'2025-11':121.0,'2025-12':119.0,'2026-01':123.0,'2026-02':126.0},
   EQR: {'2025-03':72.0,'2025-04':70.5,'2025-05':71.0,'2025-06':73.0,'2025-07':74.5,'2025-08':76.0,'2025-09':75.0,'2025-10':73.5,'2025-11':75.0,'2025-12':74.0,'2026-01':76.5,'2026-02':78.0},
-  NAD: {'2025-03':11.52,'2025-04':11.29,'2025-05':11.24,'2025-06':11.29,'2025-07':11.15,'2025-08':11.33,'2025-09':11.69,'2025-10':11.99,'2025-11':12.04,'2025-12':12.02,'2026-01':12.10,'2026-02':12.27}
+  BKU: {'2025-03':34.44,'2025-04':32.71,'2025-05':33.98,'2025-06':35.59,'2025-07':36.47,'2025-08':39.19,'2025-09':38.16,'2025-10':40.08,'2025-11':43.21,'2025-12':44.57,'2026-01':47.47,'2026-02':46.70},
+  KRE: {'2025-03':56.85,'2025-04':54.13,'2025-05':56.88,'2025-06':59.39,'2025-07':60.06,'2025-08':65.51,'2025-09':63.30,'2025-10':60.00,'2025-11':62.99,'2025-12':64.81,'2026-01':68.51,'2026-02':66.77}
+};
+
+// Zillow ZHVI fallback (Source: FRED, series FLUCSFRCONDOSMSAMID & USAUCSFRCONDOSMSAMID)
+// Updated through Jan 2026 (ZHVI publishes with ~1mo lag). Values in dollars.
+const ZHVI_FALLBACK = {
+  FL: {'2025-03':386465,'2025-04':384306,'2025-05':381850,'2025-06':379263,'2025-07':376510,'2025-08':374048,'2025-09':372286,'2025-10':371145,'2025-11':370467,'2025-12':370117,'2026-01':370112},
+  US: {'2025-03':357040,'2025-04':356521,'2025-05':355847,'2025-06':355240,'2025-07':354821,'2025-08':354597,'2025-09':354835,'2025-10':355262,'2025-11':355926,'2025-12':356703,'2026-01':357445}
 };
 
 // =========================================================
@@ -541,7 +563,7 @@ timelineEvents.forEach(ev => {
     <div class="tl-h-date">${ev.date}</div>
     <div class="tl-h-title">${ev.title}</div>
     <div class="tl-h-desc">${ev.desc}</div>
-    <span class="tl-h-signal ${ev.signal}">${ev.signal === 'up' ? '\u2191' : ev.signal === 'down' ? '\u2193' : '\u2192'} ${ev.signalText}</span>
+    <span class="tl-h-signal ${ev.signal}">${ev.signal === 'up' ? '↑' : ev.signal === 'down' ? '↓' : '→'} ${ev.signalText}</span>
   `;
   tlContainer.appendChild(item);
 });
@@ -567,10 +589,10 @@ forecastLog.forEach(entry => {
     <div class="update-date">${entry.date}</div>
     <div class="update-text">${entry.event}</div>
     <div style="margin-top:6px;">
-      <span class="update-prob">P(ballot): ${entry.probBallot}%</span> &nbsp;\u00d7&nbsp;
+      <span class="update-prob">P(ballot): ${entry.probBallot}%</span> &nbsp;×&nbsp;
       <span class="update-prob">P(voter): ${entry.probVoter}%</span> &nbsp;=&nbsp;
       <span class="update-prob" style="color:var(--accent)">P(full): ${entry.probFull}%</span>
-      <span style="color:var(--muted); font-size:0.8rem;"> (CI: ${entry.ci[0]}\u2013${entry.ci[1]}%)</span>
+      <span style="color:var(--muted); font-size:0.8rem;"> (CI: ${entry.ci[0]}–${entry.ci[1]}%)</span>
     </div>
   `;
   logContainer.appendChild(div);
@@ -668,7 +690,7 @@ function monthLabel(ym) {
 // =========================================================
 // CHART RENDERING (reusable — called with fallback then live)
 // =========================================================
-let chartJoeXhb, chartReit, chartMuni; // stored so we can destroy & re-render
+let chartJoeXhb, chartReit, chartBank, chartZhvi; // stored so we can destroy & re-render
 
 function computeAndRender(tickerData, isFallback) {
   const statusBar = document.getElementById('data-status-bar');
@@ -687,19 +709,30 @@ function computeAndRender(tickerData, isFallback) {
     const e = tickerData['EQR'][m] || 1;
     return Math.round((c / e) * 10000) / 10000;
   });
-  const mubNadRatio = months.map(m => {
-    const mu = tickerData['MUB'][m] || 0;
-    const nad = tickerData['NAD'][m] || 1;
-    return Math.round((mu / nad) * 10000) / 10000;
+  const bkuKreRatio = months.map(m => {
+    const bku = tickerData['BKU'][m] || 0;
+    const kre = tickerData['KRE'][m] || 1;
+    return Math.round((bku / kre) * 10000) / 10000;
+  });
+
+  // Zillow ZHVI ratio (FL/US) — uses separate fallback, fewer months
+  const zhviMonths = Object.keys(ZHVI_FALLBACK.FL).sort();
+  const zhviLabels = zhviMonths.map(monthLabel);
+  const zhviRatio = zhviMonths.map(m => {
+    const fl = ZHVI_FALLBACK.FL[m] || 1;
+    const us = ZHVI_FALLBACK.US[m] || 1;
+    return Math.round((fl / us) * 10000) / 10000;
   });
 
   // Index ratios to 100 at first month for visual clarity
   const baseJoeXhb = joeXhbRatio[0] || 1;
   const baseCptEqr = cptEqrRatio[0] || 1;
-  const baseMubNad = mubNadRatio[0] || 1;
+  const baseBkuKre = bkuKreRatio[0] || 1;
+  const baseZhvi = zhviRatio[0] || 1;
   const joeXhbIndexed = joeXhbRatio.map(v => Math.round((v / baseJoeXhb) * 1000) / 10);
   const cptEqrIndexed = cptEqrRatio.map(v => Math.round((v / baseCptEqr) * 1000) / 10);
-  const mubNadIndexed = mubNadRatio.map(v => Math.round((v / baseMubNad) * 1000) / 10);
+  const bkuKreIndexed = bkuKreRatio.map(v => Math.round((v / baseBkuKre) * 1000) / 10);
+  const zhviIndexed = zhviRatio.map(v => Math.round((v / baseZhvi) * 1000) / 10);
 
   // Update signal cards with latest ratio change from base
   const latestJoeXhb = joeXhbIndexed[joeXhbIndexed.length - 1];
@@ -712,15 +745,21 @@ function computeAndRender(tickerData, isFallback) {
   document.getElementById('sig-reit').textContent = (cptEqrChange > 0 ? '+' : '') + cptEqrChange.toFixed(1) + '%';
   document.getElementById('sig-reit').style.color = cptEqrChange > 5 ? 'var(--green)' : cptEqrChange > 0 ? 'var(--accent)' : 'var(--muted)';
 
-  const latestMubNad = mubNadIndexed[mubNadIndexed.length - 1];
-  const muniChange = latestMubNad - 100;
-  document.getElementById('sig-muni').textContent = (muniChange > 0 ? '+' : '') + muniChange.toFixed(1) + '%';
-  document.getElementById('sig-muni').style.color = muniChange > 2 ? 'var(--purple)' : muniChange > 0 ? 'var(--accent)' : 'var(--muted)';
+  const latestBkuKre = bkuKreIndexed[bkuKreIndexed.length - 1];
+  const bankChange = latestBkuKre - 100;
+  document.getElementById('sig-bank').textContent = (bankChange > 0 ? '+' : '') + bankChange.toFixed(1) + '%';
+  document.getElementById('sig-bank').style.color = bankChange > 5 ? 'var(--green)' : bankChange > 0 ? 'var(--purple)' : 'var(--red)';
+
+  const latestZhvi = zhviIndexed[zhviIndexed.length - 1];
+  const zhviChange = latestZhvi - 100;
+  document.getElementById('sig-zhvi').textContent = (zhviChange > 0 ? '+' : '') + zhviChange.toFixed(1) + '%';
+  document.getElementById('sig-zhvi').style.color = zhviChange > 0 ? 'var(--green)' : 'var(--red)';
 
   // Destroy old charts if they exist
   if (chartJoeXhb) { chartJoeXhb.destroy(); chartJoeXhb = null; }
   if (chartReit) { chartReit.destroy(); chartReit = null; }
-  if (chartMuni) { chartMuni.destroy(); chartMuni = null; }
+  if (chartBank) { chartBank.destroy(); chartBank = null; }
+  if (chartZhvi) { chartZhvi.destroy(); chartZhvi = null; }
 
   const ratioChartOpts = (title) => ({
     responsive: true, maintainAspectRatio: false,
@@ -790,18 +829,46 @@ function computeAndRender(tickerData, isFallback) {
     }]
   });
 
-  // MUB/NAD Ratio chart
-  chartMuni = new Chart(document.getElementById('chart-muni'), {
+  // BKU/KRE Ratio chart
+  chartBank = new Chart(document.getElementById('chart-bank'), {
     type: 'line',
     data: {
       labels: labels,
       datasets: [{
-        label: 'MUB/NAD Ratio',
-        data: mubNadIndexed,
+        label: 'BKU/KRE Ratio',
+        data: bkuKreIndexed,
         borderColor: '#9b59b6',
         backgroundColor: 'rgba(155,89,182,0.1)',
         fill: true, tension: 0.3, pointRadius: 4, borderWidth: 2.5,
-        pointBackgroundColor: mubNadIndexed.map(v => v >= 100 ? '#9b59b6' : '#e0245e')
+        pointBackgroundColor: bkuKreIndexed.map(v => v >= 100 ? '#9b59b6' : '#e0245e')
+      }]
+    },
+    options: ratioChartOpts('Ratio (100 = Mar 2025)'),
+    plugins: [{
+      id: 'baseline',
+      afterDraw(chart) {
+        const ctx = chart.ctx;
+        const y100 = chart.scales.y.getPixelForValue(100);
+        ctx.save();
+        ctx.strokeStyle = '#8899a6'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+        ctx.beginPath(); ctx.moveTo(chart.chartArea.left, y100); ctx.lineTo(chart.chartArea.right, y100); ctx.stroke();
+        ctx.restore();
+      }
+    }]
+  });
+
+  // Zillow ZHVI FL/US Ratio chart
+  chartZhvi = new Chart(document.getElementById('chart-zhvi'), {
+    type: 'line',
+    data: {
+      labels: zhviLabels,
+      datasets: [{
+        label: 'FL/US Home Value Ratio',
+        data: zhviIndexed,
+        borderColor: '#ffad1f',
+        backgroundColor: 'rgba(255,173,31,0.1)',
+        fill: true, tension: 0.3, pointRadius: 4, borderWidth: 2.5,
+        pointBackgroundColor: zhviIndexed.map(v => v >= 100 ? '#ffad1f' : '#e0245e')
       }]
     },
     options: ratioChartOpts('Ratio (100 = Mar 2025)'),
@@ -881,7 +948,7 @@ async function fetchAllMarketData() {
 
   if (!anyLiveSuccess) {
     const now = new Date().toLocaleTimeString();
-    statusBar.innerHTML = `<span style="color:var(--orange);">\u26A0</span> API rate limit reached \u2014 showing cached data. Try again tomorrow. (${now})`;
+    statusBar.innerHTML = `<span style="color:var(--orange);">⚠</span> API rate limit reached — showing cached data. Try again tomorrow. (${now})`;
   }
 
   return anyLiveSuccess;
