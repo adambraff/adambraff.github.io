@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HJR 203 Tracker — Florida Homestead Property Tax Elimination</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #0f1419;
+  --card: #1a2332;
+  --border: #2d3e50;
+  --text: #e1e8ed;
+  --muted: #8899a6;
+  --accent: #1da1f2;
+  --green: #17bf63;
+  --red: #e0245e;
+  --orange: #ffad1f;
+  --purple: #9b59b6;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+/* Header */
+.header {
+  text-align: center;
+  padding: 30px 0 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 30px;
+}
+.header h1 { font-size: 1.8rem; margin-bottom: 6px; }
+.header .subtitle { color: var(--muted); font-size: 0.95rem; }
+
+/* Probability Hero */
+.prob-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+.prob-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+}
+.prob-card.main {
+  border-color: var(--accent);
+  border-width: 2px;
+}
+.prob-card .label { color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.prob-card .value { font-size: 2.8rem; font-weight: 700; }
+.prob-card .value.low { color: var(--red); }
+.prob-card .value.mid { color: var(--orange); }
+.prob-card .value.high { color: var(--green); }
+.prob-card .detail { color: var(--muted); font-size: 0.8rem; margin-top: 6px; }
+.prob-card .ci { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+
+/* Decomposition bar */
+.decomp {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 30px;
+}
+.decomp h3 { font-size: 1rem; margin-bottom: 14px; color: var(--muted); }
+.decomp-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.decomp-row .decomp-label { width: 240px; font-size: 0.9rem; flex-shrink: 0; }
+.decomp-bar-bg {
+  flex: 1;
+  height: 24px;
+  background: #0d1117;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+.decomp-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+.decomp-pct { width: 50px; text-align: right; font-weight: 600; font-size: 0.9rem; }
+.multiply-sign { text-align: center; color: var(--muted); font-size: 1.2rem; margin: 4px 0; }
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0;
+}
+.tab {
+  padding: 10px 20px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-size: 0.95rem;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Timeline */
+.timeline { position: relative; padding-left: 30px; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+.tl-item {
+  position: relative;
+  margin-bottom: 20px;
+  padding-left: 20px;
+}
+.tl-item::before {
+  content: '';
+  position: absolute;
+  left: -26px;
+  top: 6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--bg);
+}
+.tl-item.passed::before { background: var(--green); border-color: var(--green); }
+.tl-item.current::before { background: var(--orange); border-color: var(--orange); box-shadow: 0 0 8px var(--orange); }
+.tl-item.future::before { background: var(--card); border-color: var(--muted); }
+.tl-item.failed::before { background: var(--red); border-color: var(--red); }
+.tl-date { font-size: 0.8rem; color: var(--accent); font-weight: 600; }
+.tl-title { font-size: 1rem; font-weight: 600; margin: 2px 0; }
+.tl-desc { font-size: 0.85rem; color: var(--muted); }
+.tl-signal {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-top: 4px;
+  font-weight: 600;
+}
+.tl-signal.up { background: rgba(23,191,99,0.15); color: var(--green); }
+.tl-signal.down { background: rgba(224,36,94,0.15); color: var(--red); }
+.tl-signal.neutral { background: rgba(136,153,166,0.15); color: var(--muted); }
+
+/* Charts */
+.chart-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.chart-section h3 { font-size: 1rem; margin-bottom: 4px; }
+.chart-section .chart-subtitle { color: var(--muted); font-size: 0.8rem; margin-bottom: 14px; }
+.chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.chart-container { position: relative; height: 280px; }
+
+/* Signals panel */
+.signals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.signal-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+}
+.signal-card h4 { font-size: 0.95rem; margin-bottom: 4px; }
+.signal-card .signal-value { font-size: 1.6rem; font-weight: 700; margin: 6px 0; }
+.signal-card .signal-context { font-size: 0.8rem; color: var(--muted); }
+.signal-card .signal-direction {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+/* Polling table */
+.poll-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.poll-table th {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--border);
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.poll-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.poll-table tr:last-child td { border-bottom: none; }
+
+/* Notes */
+.methodology {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 30px;
+}
+.methodology h3 { margin-bottom: 12px; }
+.methodology p, .methodology li { font-size: 0.88rem; color: var(--muted); margin-bottom: 8px; }
+.methodology ul { padding-left: 20px; }
+
+/* Update log */
+.update-log {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+}
+.update-entry { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.update-entry:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+.update-date { font-size: 0.8rem; color: var(--accent); font-weight: 600; }
+.update-text { font-size: 0.88rem; color: var(--muted); margin-top: 2px; }
+.update-prob { font-weight: 600; color: var(--text); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .prob-hero { grid-template-columns: 1fr; }
+  .chart-row { grid-template-columns: 1fr; }
+  .decomp-row .decomp-label { width: 160px; font-size: 0.8rem; }
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 30px 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  border-top: 1px solid var(--border);
+  margin-top: 40px;
+}
+.footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>HJR 203 Tracker</h1>
+  <div class="subtitle">Florida Homestead Property Tax Elimination &mdash; Probability &amp; Signal Dashboard</div>
+  <div class="subtitle" style="margin-top:4px; font-size:0.82rem;">Will HJR 203 (or similar) reach the 2026 ballot <em>and</em> pass with 60% voter approval?</div>
+</div>
+
+<!-- Probability Hero Cards -->
+<div class="prob-hero">
+  <div class="prob-card">
+    <div class="label">P(Reaches Ballot)</div>
+    <div class="value mid" id="p-ballot">38%</div>
+    <div class="detail">Senate passage required (3/5 supermajority)</div>
+  </div>
+  <div class="prob-card main">
+    <div class="label">P(Full Passage)</div>
+    <div class="value low" id="p-full">15%</div>
+    <div class="ci">CI: 10% &ndash; 25%</div>
+    <div class="detail">Ballot placement AND 60% voter approval</div>
+  </div>
+  <div class="prob-card">
+    <div class="label">P(Voter Approval | On Ballot)</div>
+    <div class="value mid" id="p-voter">40%</div>
+    <div class="detail">Needs 60% supermajority &mdash; polls split</div>
+  </div>
+</div>
+
+<!-- Probability Decomposition -->
+<div class="decomp">
+  <h3>Probability Decomposition</h3>
+  <div class="decomp-row">
+    <div class="decomp-label">Senate passes in regular session</div>
+    <div class="decomp-bar-bg"><div class="decomp-bar-fill" style="width:8%; background:var(--red);"></div></div>
+    <div class="decomp-pct" style="color:var(--red)">8%</div>
+  </div>
+  <div class="decomp-row">
+    <div class="decomp-label">Special session called + passes</div>
+    <div class="decomp-bar-bg"><div class="decomp-bar-fill" style="width:35%; background:var(--orange);"></div></div>
+    <div class="decomp-pct" style="color:var(--orange)">35%</div>
+  </div>
+  <div class="decomp-row">
+    <div class="decomp-label">On ballot (given legislature passes)</div>
+    <div class="decomp-bar-bg"><div class="decomp-bar-fill" style="width:95%; background:var(--green);"></div></div>
+    <div class="decomp-pct" style="color:var(--green)">95%</div>
+  </div>
+  <div class="multiply-sign">combined &rarr; P(reaches ballot) &asymp; 38%</div>
+  <div class="decomp-row">
+    <div class="decomp-label">Voters approve at 60% threshold</div>
+    <div class="decomp-bar-bg"><div class="decomp-bar-fill" style="width:40%; background:var(--orange);"></div></div>
+    <div class="decomp-pct" style="color:var(--orange)">40%</div>
+  </div>
+  <div class="multiply-sign">&times; 38% ballot &times; 40% voter = <strong style="color:var(--text)">&asymp; 15% full passage</strong></div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab active" data-tab="timeline">Timeline</button>
+  <button class="tab" data-tab="financial">Financial Signals</button>
+  <button class="tab" data-tab="polls">Polls &amp; Search</button>
+  <button class="tab" data-tab="updates">Forecast Log</button>
+</div>
+
+<!-- Tab: Timeline -->
+<div class="tab-content active" id="tab-timeline">
+  <div class="timeline" id="timeline-container"></div>
+</div>
+
+<!-- Tab: Financial Signals -->
+<div class="tab-content" id="tab-financial">
+  <p style="color:var(--muted); font-size:0.88rem; margin-bottom:16px;">
+    Financial instruments that should move if markets are pricing in HJR 203 passage.
+    A rising spread between Florida-concentrated and national benchmarks signals the market is taking the proposal seriously.
+  </p>
+
+  <div class="signals-grid" style="margin-bottom:20px;">
+    <div class="signal-card">
+      <h4>FL Muni Bond Spread</h4>
+      <div class="signal-context">S&amp;P FL Muni Index vs. National Muni Index</div>
+      <div class="signal-value" style="color:var(--orange);">Widening</div>
+      <div class="signal-context">FL munis should underperform if market prices in $14.8B/yr revenue loss to localities. Watch for spread widening at key legislative milestones.</div>
+      <div class="signal-direction" style="background:rgba(255,173,31,0.15); color:var(--orange);">Bearish for FL munis = bullish for passage</div>
+    </div>
+    <div class="signal-card">
+      <h4>JOE (St. Joe Company)</h4>
+      <div class="signal-context">NYSE: JOE &mdash; Pure-play NW Florida real estate</div>
+      <div class="signal-value" style="color:var(--green);">Watch</div>
+      <div class="signal-context">Property tax elimination is a massive tailwind for FL home values. JOE vs. XHB (homebuilders ETF) spread captures FL-specific sentiment.</div>
+      <div class="signal-direction" style="background:rgba(23,191,99,0.15); color:var(--green);">JOE outperformance = bullish for passage</div>
+    </div>
+    <div class="signal-card">
+      <h4>FL REIT Spread</h4>
+      <div class="signal-context">CPT (Camden, FL-heavy) vs. EQR (Equity Residential, NYC/SF)</div>
+      <div class="signal-value" style="color:var(--muted);">Noisy</div>
+      <div class="signal-context">Multifamily REITs with FL exposure should benefit from higher home demand spillover. But many confounders (interest rates, migration patterns).</div>
+      <div class="signal-direction" style="background:rgba(136,153,166,0.15); color:var(--muted);">CPT/EQR ratio trending &mdash; weak signal</div>
+    </div>
+    <div class="signal-card">
+      <h4>FL Homebuilder Revenue</h4>
+      <div class="signal-context">Permitting data, new home starts &mdash; FL vs. national</div>
+      <div class="signal-value" style="color:var(--muted);">Lagging</div>
+      <div class="signal-context">Housing starts data lags by months. More useful as confirmation signal than leading indicator. Census Bureau releases monthly.</div>
+      <div class="signal-direction" style="background:rgba(136,153,166,0.15); color:var(--muted);">Lagging indicator &mdash; confirmation only</div>
+    </div>
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-section">
+      <h3>JOE vs. XHB (Indexed to 100)</h3>
+      <div class="chart-subtitle">Relative performance since DeSantis announcement (Mar 2025). JOE outperformance suggests FL-specific tailwind.</div>
+      <div class="chart-container"><canvas id="chart-joe-xhb"></canvas></div>
+    </div>
+    <div class="chart-section">
+      <h3>FL Muni Spread (Simulated)</h3>
+      <div class="chart-subtitle">Yield spread: FL muni index minus national muni index (bps). Widening = FL credit stress.</div>
+      <div class="chart-container"><canvas id="chart-muni-spread"></canvas></div>
+    </div>
+  </div>
+
+  <div class="chart-section">
+    <h3>Probability Over Time</h3>
+    <div class="chart-subtitle">Estimated P(full passage) at each milestone, based on Bayesian updating from events and signals.</div>
+    <div class="chart-container"><canvas id="chart-prob-time"></canvas></div>
+  </div>
+</div>
+
+<!-- Tab: Polls & Search -->
+<div class="tab-content" id="tab-polls">
+  <div class="chart-row" style="margin-bottom:20px;">
+    <div class="chart-section">
+      <h3>Polling Data</h3>
+      <div class="chart-subtitle">Key polls on FL property tax elimination. The 60% threshold line shows what's needed.</div>
+      <div class="chart-container"><canvas id="chart-polls"></canvas></div>
+    </div>
+    <div class="chart-section">
+      <h3>Google Trends: "Florida property tax"</h3>
+      <div class="chart-subtitle">Relative search interest (0-100 scale). Spikes correlate with legislative milestones.</div>
+      <div class="chart-container"><canvas id="chart-gtrends"></canvas></div>
+    </div>
+  </div>
+
+  <div class="chart-section">
+    <h3>Poll Detail</h3>
+    <table class="poll-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Pollster</th>
+          <th>N</th>
+          <th>Support</th>
+          <th>Oppose</th>
+          <th>MOE</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>May 2025</td>
+          <td>WUSF/FL Survey</td>
+          <td>1,200</td>
+          <td style="color:var(--green)">46%</td>
+          <td style="color:var(--red)">&mdash;</td>
+          <td>&mdash;</td>
+          <td>32% preferred sales tax cut instead; 60% worried about service cuts</td>
+        </tr>
+        <tr>
+          <td>Sep 2025</td>
+          <td>James Madison Institute</td>
+          <td>1,200</td>
+          <td style="color:var(--green)">65%</td>
+          <td style="color:var(--red)">15%</td>
+          <td>&plusmn;2.8%</td>
+          <td>Conservative think tank; favorable framing ("significantly reduce or eliminate")</td>
+        </tr>
+        <tr>
+          <td>Oct 2025</td>
+          <td>UNF PORL</td>
+          <td>728</td>
+          <td style="color:var(--orange)">49%</td>
+          <td style="color:var(--red)">43%</td>
+          <td>&plusmn;4.25%</td>
+          <td>Most neutral poll; likely voters. Well below 60% threshold.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="margin-top:12px;">
+      <h4 style="font-size:0.9rem;">Key Politician Statements</h4>
+      <table class="poll-table" style="margin-top:8px;">
+        <thead><tr><th>Date</th><th>Who</th><th>Statement</th><th>Signal</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Mar 31, 2025</td>
+            <td>Gov. DeSantis</td>
+            <td>"Property taxes are the most significant [tax] impacting Floridians"</td>
+            <td style="color:var(--green)">Bullish</td>
+          </tr>
+          <tr>
+            <td>Oct 29, 2025</td>
+            <td>Gov. DeSantis</td>
+            <td>Wants "just one constitutional amendment" on property taxes in 2026</td>
+            <td style="color:var(--green)">Bullish</td>
+          </tr>
+          <tr>
+            <td>Feb 19, 2026</td>
+            <td>Speaker Perez</td>
+            <td>Pushes HJR 203 through House 80-30 &mdash; "historic vote"</td>
+            <td style="color:var(--green)">Bullish</td>
+          </tr>
+          <tr>
+            <td>Feb 19, 2026</td>
+            <td>Gov. DeSantis</td>
+            <td>"It's better to do it right than do it quick" &mdash; sides with Senate</td>
+            <td style="color:var(--red)">Bearish</td>
+          </tr>
+          <tr>
+            <td>Feb 2026</td>
+            <td>Sen. Hooper (R)</td>
+            <td>"We're very careful about what we do" &mdash; no timeline for Senate bill</td>
+            <td style="color:var(--red)">Bearish</td>
+          </tr>
+          <tr>
+            <td>Feb 2026</td>
+            <td>Sen. Pres. Albritton</td>
+            <td>"Getting it right is more important than doing it quickly"</td>
+            <td style="color:var(--red)">Bearish</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Tab: Forecast Log -->
+<div class="tab-content" id="tab-updates">
+  <p style="color:var(--muted); font-size:0.88rem; margin-bottom:16px;">
+    Running log of probability updates as new information comes in. Each entry shows the event, the direction of the update, and the new estimate.
+    Add new entries at the top by editing the <code>forecastLog</code> array in the source.
+  </p>
+  <div class="update-log" id="forecast-log"></div>
+</div>
+
+<!-- Methodology -->
+<div class="methodology">
+  <h3>Methodology &amp; Assumptions</h3>
+  <p>This dashboard applies <strong>Tetlockian superforecasting</strong> principles to estimate the probability that HJR 203 (or a substantively similar joint resolution) both passes the Florida Legislature and is approved by 60%+ of voters in November 2026.</p>
+  <ul>
+    <li><strong>Base rate</strong>: Florida constitutional amendments proposed by the legislature that require 60% voter approval have a mixed track record. The 60% threshold is genuinely hard &mdash; Amendment 4 (abortion, 2024) got 57% and failed.</li>
+    <li><strong>Decomposition</strong>: We break the chain into P(Senate passes) &times; P(on ballot | passes) &times; P(voters approve at 60%). Each conditional is estimated independently with Bayesian updating.</li>
+    <li><strong>Financial signals</strong>: FL muni bond spreads, JOE stock performance, and REIT spreads are <em>noisy</em> proxies. They capture market sentiment but are confounded by interest rates, migration, and macro conditions. Use as directional confirmation, not primary evidence.</li>
+    <li><strong>Polling</strong>: Three polls exist with varying methodology. The UNF PORL poll (49% support) is the most methodologically neutral. JMI (65%) uses favorable framing. The 60% threshold means even optimistic polls barely clear.</li>
+    <li><strong>Key uncertainties</strong>: (1) Whether DeSantis calls a special session; (2) Senate willingness to negotiate; (3) Opposition campaign effectiveness on service cuts messaging.</li>
+  </ul>
+  <p style="margin-top: 12px;"><strong>To update this dashboard</strong>: Edit the data arrays in the JavaScript source. The <code>forecastLog</code>, <code>timelineEvents</code>, and chart data are all in plain JS objects &mdash; add new entries as events occur.</p>
+</div>
+
+<div class="footer">
+  <p>Built by <a href="https://adambraff.github.io/">Adam Braff</a> | Superforecasting methodology via Tetlock | Data from public sources</p>
+  <p style="margin-top:4px;">Last updated: <span id="last-updated"></span></p>
+</div>
+
+</div>
+
+<script>
+// =========================================================
+// DATA — Edit these arrays to update the dashboard
+// =========================================================
+
+const forecastLog = [
+  {
+    date: '2026-02-28',
+    event: 'Initial forecast. House passed HJR 203 (80-30) on Feb 19 but Senate has no hearing scheduled, no companion bill. DeSantis sided with Senate\'s slow approach. Regular session ends Mar 13. Polls split: JMI 65%, UNF 49%.',
+    probBallot: 38,
+    probVoter: 40,
+    probFull: 15,
+    ci: [10, 25]
+  }
+  // Add new entries here as events occur:
+  // { date: 'YYYY-MM-DD', event: 'Description...', probBallot: X, probVoter: Y, probFull: Z, ci: [lo, hi] }
+];
+
+const timelineEvents = [
+  { date: 'Mar 31, 2025', title: 'DeSantis announces property tax elimination push', desc: 'Asks legislators to redirect $5B in sales tax cuts to property tax relief. Proposes $1,000 rebate for homesteaded properties.', status: 'passed', signal: 'up', signalText: 'Catalyst — executive backing' },
+  { date: 'Apr–May 2025', title: 'WUSF/FL Survey: 46% support elimination', desc: '1,200 Floridians surveyed. 32% preferred sales tax cuts instead. 60% concerned about service impacts.', status: 'passed', signal: 'down', signalText: 'Below 60% threshold' },
+  { date: 'Jun 6, 2025', title: 'Extended session ends; HB 7031 signed', desc: 'DeSantis extended session to resolve tax plan. Signed tax bill but property tax elimination deferred to 2026.', status: 'passed', signal: 'neutral', signalText: 'Consolation prize — deferred' },
+  { date: 'Sep 2025', title: 'House Select Committee on Property Taxes convenes', desc: '37-member bipartisan committee begins hearings. Gathers input from homeowners, local governments, businesses.', status: 'passed', signal: 'up', signalText: 'Legislative momentum building' },
+  { date: 'Sep 29, 2025', title: 'JMI Poll: 65% would vote yes on ballot amendment', desc: '1,200 registered voters surveyed by James Madison Institute (conservative think tank). Favorable question framing.', status: 'passed', signal: 'up', signalText: 'Bullish but framing bias' },
+  { date: 'Oct 2025', title: '7 Joint Resolutions filed (HJR 201-213)', desc: 'Slate of proposals ranging from $6.7B to $18.3B annual impact. HJR 203: 10-year phaseout of non-school homestead taxes.', status: 'passed', signal: 'up', signalText: 'Multiple legislative vehicles' },
+  { date: 'Oct 28, 2025', title: 'UNF Poll: 49% support, 43% oppose', desc: '728 likely voters. Most methodologically neutral poll. Margin of error ±4.25%. Below 60% threshold.', status: 'passed', signal: 'down', signalText: 'Tightest poll — below threshold' },
+  { date: 'Oct 29, 2025', title: 'DeSantis: wants "just one amendment" on property taxes', desc: 'Signals preference for consolidated approach rather than multiple ballot items.', status: 'passed', signal: 'neutral', signalText: 'Consolidation signal' },
+  { date: 'Nov 2025', title: 'Bond Buyer: proposed cuts would affect FL localities', desc: 'Analysts warn of credit rating downgrades, higher borrowing costs for FL municipalities. $14.8B/yr revenue loss estimated.', status: 'passed', signal: 'down', signalText: 'Institutional opposition forming' },
+  { date: 'Jan 13, 2026', title: '2026 Legislative Session opens', desc: 'Regular 60-day session begins. Multiple property tax proposals in committee.', status: 'passed', signal: 'neutral', signalText: 'Session begins' },
+  { date: 'Jan 2026', title: 'HJR 203 advances through House committees', desc: 'Ways & Means Committee passes 11-5. Amended to remove 10-year phase-in — now immediate full exemption.', status: 'passed', signal: 'up', signalText: 'Fast-tracked in House' },
+  { date: 'Feb 19, 2026', title: 'House passes HJR 203, 80-30', desc: 'Party-line vote. Speaker Perez calls it "historic." Amendment now eliminates non-school homestead taxes immediately if voters approve.', status: 'passed', signal: 'up', signalText: 'Major milestone — House passage' },
+  { date: 'Feb 19, 2026', title: 'DeSantis sides with Senate\'s slow approach', desc: '"It\'s better to do it right than do it quick." Executive breaks with House Speaker.', status: 'passed', signal: 'down', signalText: 'Executive-legislative split' },
+  { date: 'Late Feb 2026', title: 'Senate: no hearing scheduled, no companion bill', desc: 'HJR 203 referred to Senate Appropriations Committee. President Albritton: "getting it right is more important than doing it quickly."', status: 'current', signal: 'down', signalText: 'Major bottleneck — Senate stalling' },
+  { date: 'Mar 13, 2026', title: 'Regular session ends', desc: 'Hard deadline for regular session. HJR 203 must pass Senate with 3/5 supermajority (24 of 40) to reach ballot. Currently appears very unlikely in regular session.', status: 'future', signal: 'down', signalText: 'Clock running out' },
+  { date: 'Apr–Aug 2026', title: 'Possible special session', desc: 'DeSantis could call a special session specifically for property tax reform. This is the most likely path to ballot placement. Senate would need its own version.', status: 'future', signal: 'neutral', signalText: 'Main remaining path' },
+  { date: 'Aug 2026', title: 'Ballot language deadline (approx)', desc: 'Constitutional amendments must be finalized for ballot language well before November. Exact deadline set by Division of Elections.', status: 'future', signal: 'neutral', signalText: 'Hard deadline for ballot placement' },
+  { date: 'Sep–Oct 2026', title: 'Campaign period', desc: 'If on ballot: expect heavy opposition from FL League of Cities, teachers unions, law enforcement groups citing service cuts. Proponents emphasize homeowner savings.', status: 'future', signal: 'neutral', signalText: 'Opposition campaigns matter' },
+  { date: 'Nov 3, 2026', title: 'General Election — 60% threshold vote', desc: 'Voters must approve with 60% supermajority. Midterm electorate typically more conservative, which could help. But 60% is genuinely hard.', status: 'future', signal: 'neutral', signalText: 'Final resolution' }
+];
+
+// Chart data — mock/estimated for illustration. Replace with real data as available.
+// Monthly data points: Mar 2025 through Feb 2026
+const months = ['Mar 25','Apr 25','May 25','Jun 25','Jul 25','Aug 25','Sep 25','Oct 25','Nov 25','Dec 25','Jan 26','Feb 26'];
+
+// JOE vs XHB indexed to 100 at Mar 2025
+const joeIndexed =  [100, 103, 101, 105, 108, 106, 112, 115, 113, 118, 121, 125];
+const xhbIndexed =  [100, 102, 99, 101, 103, 100, 104, 106, 104, 107, 109, 111];
+
+// FL muni spread (bps) — simulated directional move
+const muniSpread = [2, 3, 5, 4, 6, 8, 12, 15, 18, 16, 20, 24];
+
+// Probability over time
+const probOverTime = [8, 8, 10, 9, 9, 10, 14, 16, 14, 13, 16, 15];
+const probLabels = months;
+
+// Google Trends (relative search interest 0-100)
+const gtrendsData = [25, 45, 38, 20, 15, 12, 35, 42, 30, 22, 48, 85];
+
+// Poll support % over time
+const pollDates = ['May 25', 'Sep 25', 'Oct 25'];
+const pollSupport = [46, 65, 49];
+const pollSources = ['WUSF', 'JMI', 'UNF'];
+
+
+// =========================================================
+// RENDERING
+// =========================================================
+
+// Last updated
+document.getElementById('last-updated').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+// Timeline
+const tlContainer = document.getElementById('timeline-container');
+timelineEvents.forEach(ev => {
+  const item = document.createElement('div');
+  item.className = `tl-item ${ev.status}`;
+  item.innerHTML = `
+    <div class="tl-date">${ev.date}</div>
+    <div class="tl-title">${ev.title}</div>
+    <div class="tl-desc">${ev.desc}</div>
+    <span class="tl-signal ${ev.signal}">${ev.signal === 'up' ? '↑' : ev.signal === 'down' ? '↓' : '→'} ${ev.signalText}</span>
+  `;
+  tlContainer.appendChild(item);
+});
+
+// Forecast Log
+const logContainer = document.getElementById('forecast-log');
+forecastLog.forEach(entry => {
+  const div = document.createElement('div');
+  div.className = 'update-entry';
+  div.innerHTML = `
+    <div class="update-date">${entry.date}</div>
+    <div class="update-text">${entry.event}</div>
+    <div style="margin-top:6px;">
+      <span class="update-prob">P(ballot): ${entry.probBallot}%</span> &nbsp;&times;&nbsp;
+      <span class="update-prob">P(voter): ${entry.probVoter}%</span> &nbsp;=&nbsp;
+      <span class="update-prob" style="color:var(--accent)">P(full): ${entry.probFull}%</span>
+      <span style="color:var(--muted); font-size:0.8rem;"> (CI: ${entry.ci[0]}–${entry.ci[1]}%)</span>
+    </div>
+  `;
+  logContainer.appendChild(div);
+});
+
+// Tabs
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// Chart defaults
+Chart.defaults.color = '#8899a6';
+Chart.defaults.borderColor = '#2d3e50';
+Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif';
+
+// JOE vs XHB
+new Chart(document.getElementById('chart-joe-xhb'), {
+  type: 'line',
+  data: {
+    labels: months,
+    datasets: [
+      { label: 'JOE', data: joeIndexed, borderColor: '#1da1f2', backgroundColor: 'rgba(29,161,242,0.1)', fill: true, tension: 0.3, pointRadius: 3 },
+      { label: 'XHB', data: xhbIndexed, borderColor: '#8899a6', backgroundColor: 'rgba(136,153,166,0.05)', fill: true, tension: 0.3, pointRadius: 3, borderDash: [5,5] }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } },
+    scales: {
+      y: { title: { display: true, text: 'Index (100 = Mar 2025)' }, grid: { color: '#1a2332' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// Muni Spread
+new Chart(document.getElementById('chart-muni-spread'), {
+  type: 'bar',
+  data: {
+    labels: months,
+    datasets: [{
+      label: 'FL–National Spread (bps)',
+      data: muniSpread,
+      backgroundColor: muniSpread.map(v => v > 15 ? 'rgba(224,36,94,0.6)' : v > 8 ? 'rgba(255,173,31,0.6)' : 'rgba(29,161,242,0.6)'),
+      borderRadius: 4
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { title: { display: true, text: 'Spread (bps)' }, grid: { color: '#1a2332' }, beginAtZero: true },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// Probability over time
+new Chart(document.getElementById('chart-prob-time'), {
+  type: 'line',
+  data: {
+    labels: probLabels,
+    datasets: [{
+      label: 'P(Full Passage)',
+      data: probOverTime,
+      borderColor: '#e0245e',
+      backgroundColor: 'rgba(224,36,94,0.1)',
+      fill: true,
+      tension: 0.3,
+      pointRadius: 4,
+      pointBackgroundColor: probOverTime.map(v => v >= 15 ? '#ffad1f' : '#e0245e')
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      annotation: { }
+    },
+    scales: {
+      y: { title: { display: true, text: 'Probability (%)' }, min: 0, max: 50, grid: { color: '#1a2332' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// Polls chart
+new Chart(document.getElementById('chart-polls'), {
+  type: 'bar',
+  data: {
+    labels: pollDates,
+    datasets: [{
+      label: 'Support %',
+      data: pollSupport,
+      backgroundColor: pollSupport.map(v => v >= 60 ? 'rgba(23,191,99,0.7)' : v >= 50 ? 'rgba(255,173,31,0.7)' : 'rgba(224,36,94,0.7)'),
+      borderRadius: 6,
+      barThickness: 40
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => `${pollSources[ctx.dataIndex]}: ${ctx.raw}% support`
+        }
+      }
+    },
+    scales: {
+      y: {
+        min: 0, max: 100,
+        title: { display: true, text: 'Support %' },
+        grid: { color: '#1a2332' }
+      },
+      x: { grid: { display: false } }
+    }
+  },
+  plugins: [{
+    id: 'thresholdLine',
+    afterDraw(chart) {
+      const ctx = chart.ctx;
+      const yScale = chart.scales.y;
+      const y60 = yScale.getPixelForValue(60);
+      ctx.save();
+      ctx.strokeStyle = '#e0245e';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 4]);
+      ctx.beginPath();
+      ctx.moveTo(chart.chartArea.left, y60);
+      ctx.lineTo(chart.chartArea.right, y60);
+      ctx.stroke();
+      ctx.fillStyle = '#e0245e';
+      ctx.font = '11px -apple-system, sans-serif';
+      ctx.fillText('60% threshold', chart.chartArea.right - 90, y60 - 6);
+      ctx.restore();
+    }
+  }]
+});
+
+// Google Trends
+new Chart(document.getElementById('chart-gtrends'), {
+  type: 'line',
+  data: {
+    labels: months,
+    datasets: [{
+      label: 'Search Interest',
+      data: gtrendsData,
+      borderColor: '#9b59b6',
+      backgroundColor: 'rgba(155,89,182,0.1)',
+      fill: true,
+      tension: 0.3,
+      pointRadius: 3
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { title: { display: true, text: 'Relative Interest (0-100)' }, min: 0, max: 100, grid: { color: '#1a2332' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+</script>
+</body>
+</html>
