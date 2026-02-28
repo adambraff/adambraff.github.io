@@ -115,21 +115,62 @@ body {
   vertical-align: middle;
 }
 
-/* Timeline */
-.timeline { position: relative; padding-left: 30px; }
-.timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: var(--border); }
-.tl-item { position: relative; margin-bottom: 20px; padding-left: 20px; }
-.tl-item::before { content: ''; position: absolute; left: -26px; top: 6px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg); }
-.tl-item.passed::before { background: var(--green); border-color: var(--green); }
-.tl-item.current::before { background: var(--orange); border-color: var(--orange); box-shadow: 0 0 8px var(--orange); }
-.tl-item.future::before { background: var(--card); border-color: var(--muted); }
-.tl-date { font-size: 0.8rem; color: var(--accent); font-weight: 600; }
-.tl-title { font-size: 1rem; font-weight: 600; margin: 2px 0; }
-.tl-desc { font-size: 0.85rem; color: var(--muted); }
-.tl-signal { display: inline-block; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; margin-top: 4px; font-weight: 600; }
-.tl-signal.up { background: rgba(23,191,99,0.15); color: var(--green); }
-.tl-signal.down { background: rgba(224,36,94,0.15); color: var(--red); }
-.tl-signal.neutral { background: rgba(136,153,166,0.15); color: var(--muted); }
+/* Horizontal Timeline */
+.timeline-wrapper {
+  overflow-x: auto;
+  padding-bottom: 12px;
+  margin-bottom: 24px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) var(--bg);
+}
+.timeline-wrapper::-webkit-scrollbar { height: 8px; }
+.timeline-wrapper::-webkit-scrollbar-track { background: var(--bg); border-radius: 4px; }
+.timeline-wrapper::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.timeline-wrapper::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+.timeline-h {
+  display: flex;
+  gap: 0;
+  position: relative;
+  padding: 20px 0 10px;
+  min-width: max-content;
+}
+.timeline-h::before {
+  content: '';
+  position: absolute;
+  top: 26px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--border);
+}
+.tl-h-item {
+  position: relative;
+  min-width: 180px;
+  max-width: 200px;
+  padding: 0 10px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.tl-h-dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  margin: 0 auto 10px;
+  position: relative;
+  z-index: 1;
+}
+.tl-h-item.passed .tl-h-dot { background: var(--green); border-color: var(--green); }
+.tl-h-item.current .tl-h-dot { background: var(--orange); border-color: var(--orange); box-shadow: 0 0 8px var(--orange); }
+.tl-h-item.future .tl-h-dot { background: var(--card); border-color: var(--muted); }
+.tl-h-date { font-size: 0.72rem; color: var(--accent); font-weight: 600; margin-bottom: 2px; }
+.tl-h-title { font-size: 0.82rem; font-weight: 600; line-height: 1.3; margin-bottom: 2px; }
+.tl-h-desc { font-size: 0.72rem; color: var(--muted); line-height: 1.3; }
+.tl-h-signal { display: inline-block; font-size: 0.68rem; padding: 1px 6px; border-radius: 3px; margin-top: 4px; font-weight: 600; }
+.tl-h-signal.up { background: rgba(23,191,99,0.15); color: var(--green); }
+.tl-h-signal.down { background: rgba(224,36,94,0.15); color: var(--red); }
+.tl-h-signal.neutral { background: rgba(136,153,166,0.15); color: var(--muted); }
 
 /* Charts */
 .chart-section {
@@ -141,7 +182,7 @@ body {
 }
 .chart-section h3 { font-size: 1rem; margin-bottom: 4px; }
 .chart-section .chart-subtitle { color: var(--muted); font-size: 0.8rem; margin-bottom: 14px; }
-.chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.chart-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
 .chart-container { position: relative; height: 280px; }
 
 /* Signals panel */
@@ -157,6 +198,35 @@ body {
 .live-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--green); margin-right: 6px; animation: pulse 2s infinite; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 .data-status { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
+
+/* Refresh button */
+.refresh-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+.refresh-btn:hover { background: #1a91da; }
+.refresh-btn:disabled { background: var(--border); cursor: not-allowed; color: var(--muted); }
+.refresh-btn .spinner {
+  display: none;
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+.refresh-btn.loading .spinner { display: inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.refresh-progress { font-size: 0.78rem; color: var(--muted); margin-left: 12px; vertical-align: middle; }
 
 /* Polling table */
 .poll-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
@@ -178,9 +248,13 @@ body {
 .update-text { font-size: 0.88rem; color: var(--muted); margin-top: 2px; }
 .update-prob { font-weight: 600; color: var(--text); }
 
+/* Two-col layout for polls section */
+.chart-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
 @media (max-width: 768px) {
   .prob-hero { grid-template-columns: 1fr; }
   .chart-row { grid-template-columns: 1fr; }
+  .chart-row-2 { grid-template-columns: 1fr; }
   .decomp-row .decomp-label { width: 160px; font-size: 0.8rem; }
   .manifold-card { flex-direction: column; text-align: center; }
 }
@@ -194,7 +268,7 @@ body {
 
 <div class="header">
   <h1>HJR 203 Tracker</h1>
-  <div class="subtitle">Florida Homestead Property Tax Elimination &mdash; Probability &amp; Signal Dashboard</div>
+  <div class="subtitle">Florida Homestead Property Tax Elimination — Probability & Signal Dashboard</div>
   <div class="subtitle" style="margin-top:4px; font-size:0.82rem;">Will HJR 203 (or similar) reach the 2026 ballot <em>and</em> pass with 60% voter approval?</div>
 </div>
 
@@ -207,16 +281,16 @@ body {
     <div class="value mid" id="p-ballot">38%</div>
     <div class="detail">Senate passage required (3/5 supermajority)</div>
   </div>
-  <div class="prob-card main">
-    <div class="label">P(Full Passage)</div>
-    <div class="value low" id="p-full">15%</div>
-    <div class="ci">CI: 10% &ndash; 25%</div>
-    <div class="detail">Ballot placement AND 60% voter approval</div>
-  </div>
   <div class="prob-card">
     <div class="label">P(Voter Approval | On Ballot)</div>
     <div class="value mid" id="p-voter">40%</div>
-    <div class="detail">Needs 60% supermajority &mdash; polls split</div>
+    <div class="detail">Needs 60% supermajority — polls split</div>
+  </div>
+  <div class="prob-card main">
+    <div class="label">P(Full Passage)</div>
+    <div class="value low" id="p-full">15%</div>
+    <div class="ci">CI: 10% – 25%</div>
+    <div class="detail">Ballot placement AND 60% voter approval</div>
   </div>
 </div>
 
@@ -237,13 +311,13 @@ body {
     <div class="decomp-bar-bg"><div class="decomp-bar-fill" style="width:95%; background:var(--green);"></div></div>
     <div class="decomp-pct" style="color:var(--green)">95%</div>
   </div>
-  <div class="multiply-sign">combined &rarr; P(reaches ballot) &asymp; 38%</div>
+  <div class="multiply-sign">combined → P(reaches ballot) ≈ 38%</div>
   <div class="decomp-row">
     <div class="decomp-label">Voters approve at 60% threshold</div>
     <div class="decomp-bar-bg"><div class="decomp-bar-fill" style="width:40%; background:var(--orange);"></div></div>
     <div class="decomp-pct" style="color:var(--orange)">40%</div>
   </div>
-  <div class="multiply-sign">&times; 38% ballot &times; 40% voter = <strong style="color:var(--text)">&asymp; 15% full passage</strong></div>
+  <div class="multiply-sign">× 38% ballot × 40% voter = <strong style="color:var(--text)">≈ 15% full passage</strong></div>
 </div>
 
 <!-- Manifold Market -->
@@ -253,84 +327,79 @@ body {
     <h4><span class="live-dot"></span>Manifold Market <span class="manifold-badge">LIVE</span></h4>
     <div>"Will Florida's elimination of Property Tax for Homesteaders pass in the Nov 2026 elections?"</div>
     <div class="manifold-meta" id="manifold-meta">Loading market data...</div>
-    <div class="manifold-meta"><a href="https://manifold.markets/Ram_N/will-floridas-elimination-of-proper" target="_blank">View on Manifold &rarr;</a></div>
+    <div class="manifold-meta"><a href="https://manifold.markets/Ram_N/will-floridas-elimination-of-proper" target="_blank">View on Manifold →</a></div>
   </div>
 </div>
 
 <!-- ===================== TIMELINE ===================== -->
-<h2 class="section-heading">Legislative Timeline</h2>
-<div class="timeline" id="timeline-container"></div>
+<h2 class="section-heading">Timeline</h2>
+<div class="timeline-wrapper" id="timeline-wrapper">
+  <div class="timeline-h" id="timeline-container"></div>
+</div>
 
 <!-- ===================== FINANCIAL SIGNALS ===================== -->
 <h2 class="section-heading">Financial Signals <span class="manifold-badge">LIVE DATA</span></h2>
 <p style="color:var(--muted); font-size:0.88rem; margin-bottom:16px;">
   Financial instruments that should move if markets are pricing in HJR 203 passage.
-  Data fetched live from Alpha Vantage on page load. Charts use historical monthly adjusted close prices.
+  All charts show <strong>ratios</strong> oriented so that <strong>higher = more likely passage</strong>.
 </p>
-<div id="data-status-bar" class="data-status" style="margin-bottom:12px;">
-  <span class="live-dot"></span> Fetching live market data...
+<div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+  <div id="data-status-bar" class="data-status">
+    <span class="live-dot"></span> Fetching live market data...
+  </div>
+  <button class="refresh-btn" id="refresh-btn" onclick="refreshMarketData()">
+    <span class="spinner"></span>
+    Refresh Market Data
+  </button>
+  <span class="refresh-progress" id="refresh-progress"></span>
 </div>
 
 <div class="signals-grid">
   <div class="signal-card">
-    <h4>JOE vs. XHB Spread</h4>
+    <h4>JOE / XHB Ratio</h4>
     <div class="signal-context">FL pure-play (JOE) vs. national homebuilders (XHB)</div>
     <div class="signal-value" id="sig-joe-xhb" style="color:var(--green);"><span class="loading">...</span></div>
-    <div class="signal-context">JOE outperformance vs XHB since Mar 2025. Spread widening from Oct onward coincides with legislative activity.</div>
-    <div class="signal-direction" style="background:rgba(23,191,99,0.15); color:var(--green);">JOE outperformance = bullish signal (noisy)</div>
+    <div class="signal-context">Ratio above 1.0 = JOE outperforming XHB. Rising ratio = FL real estate sentiment strengthening.</div>
+    <div class="signal-direction" style="background:rgba(23,191,99,0.15); color:var(--green);">Higher = bullish for passage</div>
   </div>
   <div class="signal-card">
-    <h4>CPT vs. EQR (REIT Spread)</h4>
-    <div class="signal-context">Camden (SE/FL exposure) vs. Equity Residential (NYC/SF)</div>
+    <h4>CPT / EQR Ratio</h4>
+    <div class="signal-context">Camden (SE/FL REIT) vs. Equity Residential (coastal REIT)</div>
     <div class="signal-value" id="sig-reit" style="color:var(--muted);"><span class="loading">...</span></div>
-    <div class="signal-context">CPT has meaningful Sunbelt/Florida exposure. EQR is coastal-heavy. Spread captures regional REIT sentiment.</div>
-    <div class="signal-direction" style="background:rgba(136,153,166,0.15); color:var(--muted);">CPT outperformance = mild bullish (many confounders)</div>
+    <div class="signal-context">CPT has meaningful Sunbelt/Florida exposure. Rising ratio = FL REIT market strengthening vs. coastal.</div>
+    <div class="signal-direction" style="background:rgba(136,153,166,0.15); color:var(--muted);">Higher = bullish (many confounders)</div>
   </div>
   <div class="signal-card">
-    <h4>MUB (National Munis)</h4>
-    <div class="signal-context">iShares National Muni Bond ETF &mdash; benchmark</div>
-    <div class="signal-value" id="sig-mub" style="color:var(--muted);"><span class="loading">...</span></div>
-    <div class="signal-context">No FL-specific muni ETF exists. National muni benchmark for context. FL muni spreads would widen on passage but aren't directly trackable.</div>
-    <div class="signal-direction" style="background:rgba(136,153,166,0.15); color:var(--muted);">National benchmark only</div>
-  </div>
-  <div class="signal-card">
-    <h4>Manifold Market</h4>
-    <div class="signal-context">Prediction market probability</div>
-    <div class="signal-value" id="sig-manifold" style="color:var(--accent);"><span class="loading">...</span></div>
-    <div class="signal-context">Crowd-sourced probability from Manifold Markets. Low liquidity/volume so far &mdash; treat as one signal among many.</div>
-    <div class="signal-direction" style="background:rgba(29,161,242,0.15); color:var(--accent);">Market-implied probability</div>
+    <h4>MUB / FRFLX Ratio</h4>
+    <div class="signal-context">National munis (MUB) vs. FL munis (FRFLX)</div>
+    <div class="signal-value" id="sig-muni" style="color:var(--muted);"><span class="loading">...</span></div>
+    <div class="signal-context">FRFLX = Franklin Florida Tax-Free Income Fund. Rising ratio = FL munis underperforming = passage risk being priced in.</div>
+    <div class="signal-direction" style="background:rgba(155,89,182,0.15); color:var(--purple);">Higher = passage risk priced in</div>
   </div>
 </div>
 
 <div class="chart-row">
   <div class="chart-section">
-    <h3>JOE vs. XHB vs. MUB (Indexed to 100)</h3>
-    <div class="chart-subtitle">Alpha Vantage monthly adj. close, indexed to Mar 2025 base. Updated on page load.</div>
+    <h3>JOE / XHB Ratio</h3>
+    <div class="chart-subtitle">FL homebuilder vs. national. Higher = FL outperforming = bullish.</div>
     <div class="chart-container"><canvas id="chart-joe-xhb"></canvas></div>
   </div>
   <div class="chart-section">
-    <h3>JOE vs. XHB Relative Spread</h3>
-    <div class="chart-subtitle">JOE indexed minus XHB indexed (pp). Positive = FL real estate outperforming.</div>
-    <div class="chart-container"><canvas id="chart-spread"></canvas></div>
-  </div>
-</div>
-<div class="chart-row">
-  <div class="chart-section">
-    <h3>CPT vs. EQR (REIT Indexed to 100)</h3>
-    <div class="chart-subtitle">Sunbelt REIT (CPT) vs. coastal REIT (EQR). Alpha Vantage monthly adj. close.</div>
+    <h3>CPT / EQR Ratio</h3>
+    <div class="chart-subtitle">Sunbelt REIT vs. coastal REIT. Higher = FL/Sunbelt outperforming = bullish.</div>
     <div class="chart-container"><canvas id="chart-reit"></canvas></div>
   </div>
   <div class="chart-section">
-    <h3>Probability Over Time</h3>
-    <div class="chart-subtitle">Estimated P(full passage) at each milestone, based on Bayesian updating.</div>
-    <div class="chart-container"><canvas id="chart-prob-time"></canvas></div>
+    <h3>MUB / FRFLX Ratio</h3>
+    <div class="chart-subtitle">National vs. FL munis. Higher = FL munis underperforming = passage risk.</div>
+    <div class="chart-container"><canvas id="chart-muni"></canvas></div>
   </div>
 </div>
 
 <!-- ===================== POLLS & STATEMENTS ===================== -->
 <h2 class="section-heading">Polls &amp; Political Signals</h2>
 
-<div class="chart-row" style="margin-bottom:20px;">
+<div class="chart-row-2" style="margin-bottom:20px;">
   <div class="chart-section">
     <h3>Polling Data</h3>
     <div class="chart-subtitle">Key polls on FL property tax elimination. The 60% threshold line shows what's needed.</div>
@@ -341,9 +410,9 @@ body {
     <table class="poll-table">
       <thead><tr><th>Date</th><th>Pollster</th><th>N</th><th>Support</th><th>Oppose</th><th>MOE</th></tr></thead>
       <tbody>
-        <tr><td>May 2025</td><td>WUSF/FL Survey</td><td>1,200</td><td style="color:var(--green)">46%</td><td style="color:var(--red)">&mdash;</td><td>&mdash;</td></tr>
-        <tr><td>Sep 2025</td><td>James Madison Institute</td><td>1,200</td><td style="color:var(--green)">65%</td><td style="color:var(--red)">15%</td><td>&plusmn;2.8%</td></tr>
-        <tr><td>Oct 2025</td><td>UNF PORL</td><td>728</td><td style="color:var(--orange)">49%</td><td style="color:var(--red)">43%</td><td>&plusmn;4.25%</td></tr>
+        <tr><td>May 2025</td><td>WUSF/FL Survey</td><td>1,200</td><td style="color:var(--green)">46%</td><td style="color:var(--red)">—</td><td>—</td></tr>
+        <tr><td>Sep 2025</td><td>James Madison Institute</td><td>1,200</td><td style="color:var(--green)">65%</td><td style="color:var(--red)">15%</td><td>±2.8%</td></tr>
+        <tr><td>Oct 2025</td><td>UNF PORL</td><td>728</td><td style="color:var(--orange)">49%</td><td style="color:var(--red)">43%</td><td>±4.25%</td></tr>
       </tbody>
     </table>
     <div style="font-size:0.8rem; color:var(--muted); margin-top:8px;">JMI poll uses favorable framing. UNF PORL is most methodologically neutral. Both below 60% needed.</div>
@@ -357,9 +426,9 @@ body {
     <tbody>
       <tr><td>Mar 31, 2025</td><td>Gov. DeSantis</td><td>"Property taxes are the most significant [tax] impacting Floridians"</td><td style="color:var(--green)">Bullish</td></tr>
       <tr><td>Oct 29, 2025</td><td>Gov. DeSantis</td><td>Wants "just one constitutional amendment" on property taxes in 2026</td><td style="color:var(--green)">Bullish</td></tr>
-      <tr><td>Feb 19, 2026</td><td>Speaker Perez</td><td>Pushes HJR 203 through House 80-30 &mdash; "historic vote"</td><td style="color:var(--green)">Bullish</td></tr>
-      <tr><td>Feb 19, 2026</td><td>Gov. DeSantis</td><td>"It's better to do it right than do it quick" &mdash; sides with Senate</td><td style="color:var(--red)">Bearish</td></tr>
-      <tr><td>Feb 2026</td><td>Sen. Hooper (R)</td><td>"We're very careful about what we do" &mdash; no timeline for Senate bill</td><td style="color:var(--red)">Bearish</td></tr>
+      <tr><td>Feb 19, 2026</td><td>Speaker Perez</td><td>Pushes HJR 203 through House 80-30 — "historic vote"</td><td style="color:var(--green)">Bullish</td></tr>
+      <tr><td>Feb 19, 2026</td><td>Gov. DeSantis</td><td>"It's better to do it right than do it quick" — sides with Senate</td><td style="color:var(--red)">Bearish</td></tr>
+      <tr><td>Feb 2026</td><td>Sen. Hooper (R)</td><td>"We're very careful about what we do" — no timeline for Senate bill</td><td style="color:var(--red)">Bearish</td></tr>
       <tr><td>Feb 2026</td><td>Sen. Pres. Albritton</td><td>"Getting it right is more important than doing it quickly"</td><td style="color:var(--red)">Bearish</td></tr>
     </tbody>
   </table>
@@ -378,13 +447,14 @@ body {
   <p>This dashboard applies <strong>Tetlockian superforecasting</strong> principles to estimate the probability that HJR 203 (or a substantively similar joint resolution) both passes the Florida Legislature and is approved by 60%+ of voters in November 2026.</p>
   <ul>
     <li><strong>Base rate</strong>: FL constitutional amendments proposed by the legislature requiring 60% voter approval have a mixed track record. Amendment 4 (abortion, 2024) got 57% and failed.</li>
-    <li><strong>Decomposition</strong>: P(Senate passes) &times; P(on ballot | passes) &times; P(voters approve at 60%). Each conditional estimated independently.</li>
-    <li><strong>Financial signals</strong>: JOE, XHB, MUB, CPT, EQR data pulled live from Alpha Vantage (free tier, 5 req/min). Requests staggered to respect rate limits. Charts show monthly adjusted close indexed to Mar 2025 = 100.</li>
+    <li><strong>Decomposition</strong>: P(Senate passes) × P(on ballot | passes) × P(voters approve at 60%). Each conditional estimated independently.</li>
+    <li><strong>Financial signals</strong>: JOE, XHB, MUB, CPT, EQR, FRFLX data pulled live from Alpha Vantage (free tier, 5 req/min). All charts show ratios oriented so higher = more likely passage.</li>
     <li><strong>Manifold Market</strong>: Live probability from Manifold Markets API (CORS-friendly, no key). Low liquidity caveat applies.</li>
+    <li><strong>FL Muni proxy</strong>: FRFLX (Franklin Florida Tax-Free Income Fund) used as FL-specific muni proxy. MUB/FRFLX ratio captures FL muni underperformance from passage risk.</li>
     <li><strong>Polling</strong>: Three polls with varying methodology. UNF PORL (49%) most neutral. JMI (65%) favorable framing. 60% threshold is genuinely hard.</li>
     <li><strong>Key uncertainties</strong>: (1) Whether DeSantis calls a special session; (2) Senate willingness to negotiate; (3) Opposition campaign effectiveness.</li>
   </ul>
-  <p style="margin-top: 12px;"><strong>Data freshness</strong>: Financial data and Manifold probability refresh every time you load the page. Polls, timeline events, and forecast log are manually maintained in the source code.</p>
+  <p style="margin-top: 12px;"><strong>Data freshness</strong>: Financial data and Manifold probability refresh on page load and via the "Refresh Market Data" button. Polls, timeline events, and forecast log are manually maintained in the source code.</p>
 </div>
 
 <div class="footer">
@@ -403,7 +473,7 @@ const MANIFOLD_MARKET_ID = 'g0lc8tPgg5';
 const AV_DELAY = 13000; // 13s between requests (5/min limit)
 
 // Tickers to fetch monthly history for
-const TICKERS = ['JOE', 'XHB', 'MUB', 'CPT', 'EQR'];
+const TICKERS = ['JOE', 'XHB', 'MUB', 'CPT', 'EQR', 'FRFLX'];
 
 // Months we want (Mar 2025 through most recent)
 const START_YEAR = 2025;
@@ -421,8 +491,8 @@ const forecastLog = [
 ];
 
 const timelineEvents = [
-  { date: 'Mar 31, 2025', title: 'DeSantis announces property tax elimination push', desc: 'Asks legislators to redirect $5B in sales tax cuts to property tax relief.', status: 'passed', signal: 'up', signalText: 'Catalyst \u2014 executive backing' },
-  { date: 'Apr\u2013May 2025', title: 'WUSF/FL Survey: 46% support elimination', desc: '1,200 Floridians surveyed. 32% preferred sales tax cuts instead.', status: 'passed', signal: 'down', signalText: 'Below 60% threshold' },
+  { date: 'Mar 31, 2025', title: 'DeSantis announces property tax elimination push', desc: 'Asks legislators to redirect $5B in sales tax cuts to property tax relief.', status: 'passed', signal: 'up', signalText: 'Catalyst — executive backing' },
+  { date: 'Apr–May 2025', title: 'WUSF/FL Survey: 46% support elimination', desc: '1,200 Floridians surveyed. 32% preferred sales tax cuts instead.', status: 'passed', signal: 'down', signalText: 'Below 60% threshold' },
   { date: 'Jun 6, 2025', title: 'Extended session ends; HB 7031 signed', desc: 'Property tax elimination deferred to 2026.', status: 'passed', signal: 'neutral', signalText: 'Deferred' },
   { date: 'Sep 2025', title: 'House Select Committee convenes', desc: '37-member bipartisan committee begins hearings.', status: 'passed', signal: 'up', signalText: 'Legislative momentum' },
   { date: 'Sep 29, 2025', title: 'JMI Poll: 65% would vote yes', desc: 'Conservative think tank; favorable framing.', status: 'passed', signal: 'up', signalText: 'Bullish but framing bias' },
@@ -435,12 +505,10 @@ const timelineEvents = [
   { date: 'Feb 19, 2026', title: 'DeSantis sides with Senate\'s slow approach', desc: '"It\'s better to do it right than do it quick."', status: 'passed', signal: 'down', signalText: 'Executive-legislative split' },
   { date: 'Late Feb 2026', title: 'Senate: no hearing, no companion bill', desc: 'President Albritton: "getting it right is more important."', status: 'current', signal: 'down', signalText: 'Senate stalling' },
   { date: 'Mar 13, 2026', title: 'Regular session ends', desc: 'Very unlikely to pass Senate in regular session.', status: 'future', signal: 'down', signalText: 'Clock running out' },
-  { date: 'Apr\u2013Aug 2026', title: 'Possible special session', desc: 'Most likely path to ballot. DeSantis could call it.', status: 'future', signal: 'neutral', signalText: 'Main remaining path' },
+  { date: 'Apr–Aug 2026', title: 'Possible special session', desc: 'Most likely path to ballot. DeSantis could call it.', status: 'future', signal: 'neutral', signalText: 'Main remaining path' },
   { date: 'Aug 2026', title: 'Ballot language deadline (approx)', desc: 'Must be finalized for ballot well before November.', status: 'future', signal: 'neutral', signalText: 'Hard deadline' },
-  { date: 'Nov 3, 2026', title: 'General Election \u2014 60% threshold vote', desc: '60% supermajority required. Midterm electorate.', status: 'future', signal: 'neutral', signalText: 'Final resolution' }
+  { date: 'Nov 3, 2026', title: 'General Election — 60% threshold vote', desc: '60% supermajority required. Midterm electorate.', status: 'future', signal: 'neutral', signalText: 'Final resolution' }
 ];
-
-const probOverTime = [8, 8, 10, 9, 9, 10, 14, 16, 14, 13, 16, 15];
 
 const pollDates = ['May 25', 'Sep 25', 'Oct 25'];
 const pollSupport = [46, 65, 49];
@@ -454,7 +522,8 @@ const FALLBACK = {
   XHB: {'2025-03':96.14,'2025-04':94.26,'2025-05':93.82,'2025-06':98.11,'2025-07':101.59,'2025-08':113.65,'2025-09':110.46,'2025-10':104.85,'2025-11':108.69,'2025-12':102.78,'2026-01':108.40,'2026-02':115.31},
   MUB: {'2025-03':102.13,'2025-04':101.71,'2025-05':101.12,'2025-06':102.01,'2025-07':101.69,'2025-08':102.54,'2025-09':104.81,'2025-10':106.07,'2025-11':106.31,'2025-12':106.26,'2026-01':107.57,'2026-02':108.64},
   CPT: {'2025-03':115.0,'2025-04':112.5,'2025-05':114.0,'2025-06':117.0,'2025-07':119.5,'2025-08':122.0,'2025-09':120.0,'2025-10':118.5,'2025-11':121.0,'2025-12':119.0,'2026-01':123.0,'2026-02':126.0},
-  EQR: {'2025-03':72.0,'2025-04':70.5,'2025-05':71.0,'2025-06':73.0,'2025-07':74.5,'2025-08':76.0,'2025-09':75.0,'2025-10':73.5,'2025-11':75.0,'2025-12':74.0,'2026-01':76.5,'2026-02':78.0}
+  EQR: {'2025-03':72.0,'2025-04':70.5,'2025-05':71.0,'2025-06':73.0,'2025-07':74.5,'2025-08':76.0,'2025-09':75.0,'2025-10':73.5,'2025-11':75.0,'2025-12':74.0,'2026-01':76.5,'2026-02':78.0},
+  FRFLX: {'2025-03':11.45,'2025-04':11.42,'2025-05':11.38,'2025-06':11.50,'2025-07':11.48,'2025-08':11.55,'2025-09':11.62,'2025-10':11.58,'2025-11':11.60,'2025-12':11.56,'2026-01':11.63,'2026-02':11.65}
 };
 
 // =========================================================
@@ -462,18 +531,31 @@ const FALLBACK = {
 // =========================================================
 document.getElementById('last-updated').textContent = new Date().toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-// Timeline
+// Horizontal Timeline
 const tlContainer = document.getElementById('timeline-container');
 timelineEvents.forEach(ev => {
   const item = document.createElement('div');
-  item.className = `tl-item ${ev.status}`;
+  item.className = `tl-h-item ${ev.status}`;
   item.innerHTML = `
-    <div class="tl-date">${ev.date}</div>
-    <div class="tl-title">${ev.title}</div>
-    <div class="tl-desc">${ev.desc}</div>
-    <span class="tl-signal ${ev.signal}">${ev.signal === 'up' ? '\u2191' : ev.signal === 'down' ? '\u2193' : '\u2192'} ${ev.signalText}</span>
+    <div class="tl-h-dot"></div>
+    <div class="tl-h-date">${ev.date}</div>
+    <div class="tl-h-title">${ev.title}</div>
+    <div class="tl-h-desc">${ev.desc}</div>
+    <span class="tl-h-signal ${ev.signal}">${ev.signal === 'up' ? '↑' : ev.signal === 'down' ? '↓' : '→'} ${ev.signalText}</span>
   `;
   tlContainer.appendChild(item);
+});
+
+// Scroll timeline to show current/recent events
+requestAnimationFrame(() => {
+  const wrapper = document.getElementById('timeline-wrapper');
+  const currentItem = document.querySelector('.tl-h-item.current');
+  if (currentItem && wrapper) {
+    const itemLeft = currentItem.offsetLeft;
+    const wrapperWidth = wrapper.clientWidth;
+    // Center the current item in view
+    wrapper.scrollLeft = itemLeft - (wrapperWidth / 2) + (currentItem.offsetWidth / 2);
+  }
 });
 
 // Forecast Log
@@ -485,10 +567,10 @@ forecastLog.forEach(entry => {
     <div class="update-date">${entry.date}</div>
     <div class="update-text">${entry.event}</div>
     <div style="margin-top:6px;">
-      <span class="update-prob">P(ballot): ${entry.probBallot}%</span> &nbsp;\u00d7&nbsp;
+      <span class="update-prob">P(ballot): ${entry.probBallot}%</span> &nbsp;×&nbsp;
       <span class="update-prob">P(voter): ${entry.probVoter}%</span> &nbsp;=&nbsp;
       <span class="update-prob" style="color:var(--accent)">P(full): ${entry.probFull}%</span>
-      <span style="color:var(--muted); font-size:0.8rem;"> (CI: ${entry.ci[0]}\u2013${entry.ci[1]}%)</span>
+      <span style="color:var(--muted); font-size:0.8rem;"> (CI: ${entry.ci[0]}–${entry.ci[1]}%)</span>
     </div>
   `;
   logContainer.appendChild(div);
@@ -498,32 +580,6 @@ forecastLog.forEach(entry => {
 Chart.defaults.color = '#8899a6';
 Chart.defaults.borderColor = '#2d3e50';
 Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif';
-
-// Static charts that don't need live data
-// Probability over time
-const probMonths = ['Mar 25','Apr 25','May 25','Jun 25','Jul 25','Aug 25','Sep 25','Oct 25','Nov 25','Dec 25','Jan 26','Feb 26'];
-new Chart(document.getElementById('chart-prob-time'), {
-  type: 'line',
-  data: {
-    labels: probMonths,
-    datasets: [{
-      label: 'P(Full Passage)',
-      data: probOverTime,
-      borderColor: '#e0245e',
-      backgroundColor: 'rgba(224,36,94,0.1)',
-      fill: true, tension: 0.3, pointRadius: 4,
-      pointBackgroundColor: probOverTime.map(v => v >= 15 ? '#ffad1f' : '#e0245e')
-    }]
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { display: false } },
-    scales: {
-      y: { title: { display: true, text: 'Probability (%)' }, min: 0, max: 50, grid: { color: '#1a2332' } },
-      x: { grid: { display: false } }
-    }
-  }
-});
 
 // Polls chart
 new Chart(document.getElementById('chart-polls'), {
@@ -590,21 +646,9 @@ function extractMonthlyPrices(avData) {
   for (const [dateStr, vals] of Object.entries(ts)) {
     const d = new Date(dateStr);
     const ym = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-    // Only include from Mar 2025 onward
     if (ym >= '2025-03') {
       result[ym] = parseFloat(vals['5. adjusted close']);
     }
-  }
-  return result;
-}
-
-// Helper: index prices to 100 at base month
-function indexPrices(priceMap, baseKey) {
-  const base = priceMap[baseKey];
-  if (!base) return priceMap;
-  const result = {};
-  for (const [k, v] of Object.entries(priceMap)) {
-    result[k] = Math.round((v / base) * 1000) / 10;
   }
   return result;
 }
@@ -624,98 +668,154 @@ function monthLabel(ym) {
 // =========================================================
 // CHART RENDERING (reusable — called with fallback then live)
 // =========================================================
-let chartJoeXhb, chartSpread, chartReit; // stored so we can destroy & re-render
+let chartJoeXhb, chartReit, chartMuni; // stored so we can destroy & re-render
 
 function computeAndRender(tickerData, isFallback) {
   const statusBar = document.getElementById('data-status-bar');
-  const baseKey = '2025-03';
-  const indexed = {};
-  for (const t of TICKERS) {
-    indexed[t] = indexPrices(tickerData[t], baseKey);
-  }
   const months = getMonthKeys(tickerData['JOE']);
   const labels = months.map(monthLabel);
-  const joeXhbSpread = months.map(m => Math.round(((indexed['JOE'][m] || 0) - (indexed['XHB'][m] || 0)) * 10) / 10);
   const latestMonth = months[months.length - 1];
 
-  // Update signal cards
-  const latestSpread = joeXhbSpread[joeXhbSpread.length - 1];
-  document.getElementById('sig-joe-xhb').textContent = (latestSpread > 0 ? '+' : '') + latestSpread.toFixed(1) + 'pp';
-  document.getElementById('sig-joe-xhb').style.color = latestSpread > 10 ? 'var(--green)' : latestSpread > 0 ? 'var(--accent)' : 'var(--red)';
+  // Compute RATIOS (not indexed, actual price ratios)
+  const joeXhbRatio = months.map(m => {
+    const j = tickerData['JOE'][m] || 0;
+    const x = tickerData['XHB'][m] || 1;
+    return Math.round((j / x) * 10000) / 10000;
+  });
+  const cptEqrRatio = months.map(m => {
+    const c = tickerData['CPT'][m] || 0;
+    const e = tickerData['EQR'][m] || 1;
+    return Math.round((c / e) * 10000) / 10000;
+  });
+  const mubFrflxRatio = months.map(m => {
+    const mu = tickerData['MUB'][m] || 0;
+    const fr = tickerData['FRFLX'][m] || 1;
+    return Math.round((mu / fr) * 10000) / 10000;
+  });
 
-  const reitSpread = Math.round(((indexed['CPT'][latestMonth] || 100) - (indexed['EQR'][latestMonth] || 100)) * 10) / 10;
-  document.getElementById('sig-reit').textContent = (reitSpread > 0 ? '+' : '') + reitSpread.toFixed(1) + 'pp';
-  document.getElementById('sig-reit').style.color = reitSpread > 5 ? 'var(--green)' : reitSpread > 0 ? 'var(--accent)' : 'var(--muted)';
+  // Index ratios to 100 at first month for visual clarity
+  const baseJoeXhb = joeXhbRatio[0] || 1;
+  const baseCptEqr = cptEqrRatio[0] || 1;
+  const baseMubFrflx = mubFrflxRatio[0] || 1;
+  const joeXhbIndexed = joeXhbRatio.map(v => Math.round((v / baseJoeXhb) * 1000) / 10);
+  const cptEqrIndexed = cptEqrRatio.map(v => Math.round((v / baseCptEqr) * 1000) / 10);
+  const mubFrflxIndexed = mubFrflxRatio.map(v => Math.round((v / baseMubFrflx) * 1000) / 10);
 
-  const mubReturn = Math.round(((indexed['MUB'][latestMonth] || 100) - 100) * 10) / 10;
-  document.getElementById('sig-mub').textContent = (mubReturn > 0 ? '+' : '') + mubReturn.toFixed(1) + '%';
+  // Update signal cards with latest ratio change from base
+  const latestJoeXhb = joeXhbIndexed[joeXhbIndexed.length - 1];
+  const joeXhbChange = latestJoeXhb - 100;
+  document.getElementById('sig-joe-xhb').textContent = (joeXhbChange > 0 ? '+' : '') + joeXhbChange.toFixed(1) + '%';
+  document.getElementById('sig-joe-xhb').style.color = joeXhbChange > 10 ? 'var(--green)' : joeXhbChange > 0 ? 'var(--accent)' : 'var(--red)';
+
+  const latestCptEqr = cptEqrIndexed[cptEqrIndexed.length - 1];
+  const cptEqrChange = latestCptEqr - 100;
+  document.getElementById('sig-reit').textContent = (cptEqrChange > 0 ? '+' : '') + cptEqrChange.toFixed(1) + '%';
+  document.getElementById('sig-reit').style.color = cptEqrChange > 5 ? 'var(--green)' : cptEqrChange > 0 ? 'var(--accent)' : 'var(--muted)';
+
+  const latestMubFrflx = mubFrflxIndexed[mubFrflxIndexed.length - 1];
+  const muniChange = latestMubFrflx - 100;
+  document.getElementById('sig-muni').textContent = (muniChange > 0 ? '+' : '') + muniChange.toFixed(1) + '%';
+  document.getElementById('sig-muni').style.color = muniChange > 2 ? 'var(--purple)' : muniChange > 0 ? 'var(--accent)' : 'var(--muted)';
 
   // Destroy old charts if they exist
   if (chartJoeXhb) { chartJoeXhb.destroy(); chartJoeXhb = null; }
-  if (chartSpread) { chartSpread.destroy(); chartSpread = null; }
   if (chartReit) { chartReit.destroy(); chartReit = null; }
+  if (chartMuni) { chartMuni.destroy(); chartMuni = null; }
 
-  // JOE vs XHB vs MUB
+  const ratioChartOpts = (title) => ({
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: {
+        title: { display: true, text: title },
+        grid: { color: '#1a2332' }
+      },
+      x: { grid: { display: false } }
+    }
+  });
+
+  // JOE/XHB Ratio chart
   chartJoeXhb = new Chart(document.getElementById('chart-joe-xhb'), {
     type: 'line',
     data: {
       labels: labels,
-      datasets: [
-        { label: 'JOE', data: months.map(m => indexed['JOE'][m]), borderColor: '#1da1f2', fill: false, tension: 0.3, pointRadius: 3, borderWidth: 2.5 },
-        { label: 'XHB', data: months.map(m => indexed['XHB'][m]), borderColor: '#8899a6', fill: false, tension: 0.3, pointRadius: 3, borderDash: [5,5], borderWidth: 2 },
-        { label: 'MUB', data: months.map(m => indexed['MUB'][m]), borderColor: '#9b59b6', fill: false, tension: 0.3, pointRadius: 2, borderDash: [2,3], borderWidth: 1.5 }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } },
-      scales: {
-        y: { title: { display: true, text: 'Index (100 = Mar 2025)' }, grid: { color: '#1a2332' } },
-        x: { grid: { display: false } }
-      }
-    }
-  });
-
-  // JOE-XHB Spread
-  chartSpread = new Chart(document.getElementById('chart-spread'), {
-    type: 'bar',
-    data: {
-      labels: labels,
       datasets: [{
-        label: 'JOE\u2013XHB Spread (pp)',
-        data: joeXhbSpread,
-        backgroundColor: joeXhbSpread.map(v => v > 10 ? 'rgba(23,191,99,0.7)' : v > 0 ? 'rgba(29,161,242,0.6)' : 'rgba(224,36,94,0.5)'),
-        borderRadius: 4
+        label: 'JOE/XHB Ratio',
+        data: joeXhbIndexed,
+        borderColor: '#1da1f2',
+        backgroundColor: 'rgba(29,161,242,0.1)',
+        fill: true, tension: 0.3, pointRadius: 4, borderWidth: 2.5,
+        pointBackgroundColor: joeXhbIndexed.map(v => v >= 100 ? '#17bf63' : '#e0245e')
       }]
     },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        y: { title: { display: true, text: 'Spread (pp)' }, grid: { color: '#1a2332' } },
-        x: { grid: { display: false } }
+    options: ratioChartOpts('Ratio (100 = Mar 2025)'),
+    plugins: [{
+      id: 'baseline',
+      afterDraw(chart) {
+        const ctx = chart.ctx;
+        const y100 = chart.scales.y.getPixelForValue(100);
+        ctx.save();
+        ctx.strokeStyle = '#8899a6'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+        ctx.beginPath(); ctx.moveTo(chart.chartArea.left, y100); ctx.lineTo(chart.chartArea.right, y100); ctx.stroke();
+        ctx.restore();
       }
-    }
+    }]
   });
 
-  // REIT chart: CPT vs EQR
+  // CPT/EQR Ratio chart
   chartReit = new Chart(document.getElementById('chart-reit'), {
     type: 'line',
     data: {
       labels: labels,
-      datasets: [
-        { label: 'CPT', data: months.map(m => indexed['CPT'][m]), borderColor: '#17bf63', fill: false, tension: 0.3, pointRadius: 3, borderWidth: 2.5 },
-        { label: 'EQR', data: months.map(m => indexed['EQR'][m]), borderColor: '#e0245e', fill: false, tension: 0.3, pointRadius: 3, borderDash: [5,5], borderWidth: 2 }
-      ]
+      datasets: [{
+        label: 'CPT/EQR Ratio',
+        data: cptEqrIndexed,
+        borderColor: '#17bf63',
+        backgroundColor: 'rgba(23,191,99,0.1)',
+        fill: true, tension: 0.3, pointRadius: 4, borderWidth: 2.5,
+        pointBackgroundColor: cptEqrIndexed.map(v => v >= 100 ? '#17bf63' : '#e0245e')
+      }]
     },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } },
-      scales: {
-        y: { title: { display: true, text: 'Index (100 = Mar 2025)' }, grid: { color: '#1a2332' } },
-        x: { grid: { display: false } }
+    options: ratioChartOpts('Ratio (100 = Mar 2025)'),
+    plugins: [{
+      id: 'baseline',
+      afterDraw(chart) {
+        const ctx = chart.ctx;
+        const y100 = chart.scales.y.getPixelForValue(100);
+        ctx.save();
+        ctx.strokeStyle = '#8899a6'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+        ctx.beginPath(); ctx.moveTo(chart.chartArea.left, y100); ctx.lineTo(chart.chartArea.right, y100); ctx.stroke();
+        ctx.restore();
       }
-    }
+    }]
+  });
+
+  // MUB/FRFLX Ratio chart
+  chartMuni = new Chart(document.getElementById('chart-muni'), {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'MUB/FRFLX Ratio',
+        data: mubFrflxIndexed,
+        borderColor: '#9b59b6',
+        backgroundColor: 'rgba(155,89,182,0.1)',
+        fill: true, tension: 0.3, pointRadius: 4, borderWidth: 2.5,
+        pointBackgroundColor: mubFrflxIndexed.map(v => v >= 100 ? '#9b59b6' : '#e0245e')
+      }]
+    },
+    options: ratioChartOpts('Ratio (100 = Mar 2025)'),
+    plugins: [{
+      id: 'baseline',
+      afterDraw(chart) {
+        const ctx = chart.ctx;
+        const y100 = chart.scales.y.getPixelForValue(100);
+        ctx.save();
+        ctx.strokeStyle = '#8899a6'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+        ctx.beginPath(); ctx.moveTo(chart.chartArea.left, y100); ctx.lineTo(chart.chartArea.right, y100); ctx.stroke();
+        ctx.restore();
+      }
+    }]
   });
 
   // Status
@@ -728,35 +828,34 @@ function computeAndRender(tickerData, isFallback) {
 }
 
 // =========================================================
-// MAIN: Render immediately, then try live data
+// FETCH LOGIC (shared between initial load and refresh)
 // =========================================================
-(async function main() {
+let isRefreshing = false;
+
+async function fetchAllMarketData() {
   const statusBar = document.getElementById('data-status-bar');
+  const progressEl = document.getElementById('refresh-progress');
 
-  // STEP 1: Render charts IMMEDIATELY with fallback data (no waiting)
-  computeAndRender(FALLBACK, true);
-
-  // STEP 2: Fetch Manifold (instant, no rate limit)
+  // Fetch Manifold
+  progressEl.textContent = 'Manifold...';
   try {
     const mkt = await fetchJSON(`https://api.manifold.markets/v0/market/${MANIFOLD_MARKET_ID}`);
     const prob = Math.round(mkt.probability * 100);
     document.getElementById('manifold-prob').textContent = prob + '%';
     document.getElementById('manifold-meta').innerHTML =
-      `${mkt.uniqueBettorCount} traders &middot; M$${Math.round(mkt.volume)} volume &middot; Created ${new Date(mkt.createdTime).toLocaleDateString()}`;
-    document.getElementById('sig-manifold').textContent = prob + '%';
-    document.getElementById('sig-manifold').style.color = prob > 30 ? 'var(--orange)' : prob > 15 ? 'var(--accent)' : 'var(--red)';
+      `${mkt.uniqueBettorCount} traders · M$${Math.round(mkt.volume)} volume · Created ${new Date(mkt.createdTime).toLocaleDateString()}`;
   } catch(e) {
     document.getElementById('manifold-prob').textContent = '?';
     document.getElementById('manifold-meta').textContent = 'Failed to load market data';
-    document.getElementById('sig-manifold').textContent = 'N/A';
   }
 
-  // STEP 3: Fetch live stock data with staggered requests
+  // Fetch stock data with staggered requests
   const liveData = {};
   let anyLiveSuccess = false;
   for (let i = 0; i < TICKERS.length; i++) {
     const ticker = TICKERS[i];
     statusBar.innerHTML = `<span class="live-dot"></span> Refreshing ${ticker} (${i+1}/${TICKERS.length})...`;
+    progressEl.textContent = `${ticker} (${i+1}/${TICKERS.length})`;
     try {
       const data = await fetchJSON(
         `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol=${ticker}&apikey=${AV_KEY}`
@@ -773,17 +872,46 @@ function computeAndRender(tickerData, isFallback) {
       console.warn(`Failed to fetch ${ticker}, keeping fallback:`, e.message);
       liveData[ticker] = FALLBACK[ticker];
     }
-    // Rate limit delay (skip after last)
     if (i < TICKERS.length - 1) await delay(AV_DELAY);
   }
 
-  // STEP 4: Re-render charts with whatever we got (live or fallback per ticker)
+  // Re-render charts
   computeAndRender(liveData, !anyLiveSuccess);
+  progressEl.textContent = '';
 
   if (!anyLiveSuccess) {
     const now = new Date().toLocaleTimeString();
-    statusBar.innerHTML = `<span style="color:var(--orange);">\u26A0</span> API rate limit reached — showing cached data. Try again tomorrow. (${now})`;
+    statusBar.innerHTML = `<span style="color:var(--orange);">⚠</span> API rate limit reached — showing cached data. Try again tomorrow. (${now})`;
   }
+
+  return anyLiveSuccess;
+}
+
+// Refresh button handler
+async function refreshMarketData() {
+  if (isRefreshing) return;
+  isRefreshing = true;
+  const btn = document.getElementById('refresh-btn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+  try {
+    await fetchAllMarketData();
+  } finally {
+    isRefreshing = false;
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
+
+// =========================================================
+// MAIN: Render immediately, then try live data
+// =========================================================
+(async function main() {
+  // STEP 1: Render charts IMMEDIATELY with fallback data
+  computeAndRender(FALLBACK, true);
+
+  // STEP 2: Fetch live data in background
+  await fetchAllMarketData();
 })();
 </script>
 </body>
