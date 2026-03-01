@@ -57,7 +57,8 @@
     .field label { font-size: 0.88rem; color: var(--muted); }
 
     input[type="text"],
-    input[type="number"] {
+    input[type="number"],
+    input[type="password"] {
       width: 100%;
       padding: 8px;
       border: 1px solid var(--border);
@@ -195,14 +196,19 @@
       margin-left: 8px;
     }
 
-    .small { font-size: 0.82rem; color: var(--muted); }
-
-    .trait-bar {
+    .recommend-item .source-tag {
       display: inline-block;
-      height: 8px;
+      font-size: 0.7rem;
+      padding: 1px 6px;
       border-radius: 4px;
+      margin-left: 6px;
       vertical-align: middle;
     }
+
+    .source-tag.gemini { background: #e8f0fe; color: #1a73e8; }
+    .source-tag.rules { background: #f0f0ee; color: #666; }
+
+    .small { font-size: 0.82rem; color: var(--muted); }
 
     .collapse-toggle {
       background: none;
@@ -218,9 +224,27 @@
 
     .hidden { display: none !important; }
 
+    .gemini-status {
+      font-size: 0.78rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .gemini-status.active { background: #e8f0fe; color: #1a73e8; }
+    .gemini-status.inactive { background: #f0f0ee; color: #999; }
+
+    .settings-row {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+    }
+
     @media (max-width: 700px) {
       .wrap { padding: 12px; }
       .panel { padding: 12px; }
+      .settings-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -256,6 +280,24 @@
       <div id="progressBar" class="progress-bar"><div class="fill" id="progressFill"></div></div>
     </section>
 
+    <!-- Settings: Gemini API Key -->
+    <section class="panel">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+        <h2 style="margin:0;">Settings</h2>
+        <span id="geminiStatus" class="gemini-status inactive">Gemini: off</span>
+      </div>
+      <div class="settings-row">
+        <div class="field">
+          <label for="geminiKey">Gemini API Key <span class="small">(optional &mdash; enriches trait classification via LLM; <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">get free key</a>)</span></label>
+          <input id="geminiKey" type="password" placeholder="AIza..." autocomplete="off" />
+        </div>
+        <div class="field">
+          <button id="saveKeyBtn" class="secondary">Save Key</button>
+        </div>
+      </div>
+      <p class="small" style="margin-top:6px;">Key is stored in your browser only. When set, Sync will call Gemini to classify each market option (cached per-option, so re-syncs are fast). Without it, classification uses keyword rules only.</p>
+    </section>
+
     <!-- Preference Sliders -->
     <section class="panel">
       <h2>Your Trump Model</h2>
@@ -289,7 +331,16 @@
           <label for="threshold">Edge Threshold</label>
           <input id="threshold" type="number" min="0" max="1" step="0.01" value="0.05" />
         </div>
+        <div class="field">
+          <label for="minProb">Min Market P</label>
+          <input id="minProb" type="number" min="0" max="1" step="0.01" value="0.10" />
+        </div>
+        <div class="field">
+          <label for="maxProb">Max Market P</label>
+          <input id="maxProb" type="number" min="0" max="1" step="0.01" value="0.90" />
+        </div>
       </div>
+      <p class="small" style="margin-top:4px;">Min/Max P filters out options with extreme market prices (essentially resolved). Default 10%-90% keeps the interesting stuff.</p>
     </section>
 
     <!-- New / Ended -->
@@ -326,14 +377,18 @@
   (function () {
     'use strict';
 
-    /* -- Constants -- */
-    const MANIFOLD_BASE = 'https://api.manifold.markets';
-    const TRAITS = ['self_interested', 'loyalty_demand', 'exec_power', 'deal_making'];
-    const DAY_MS = 24 * 60 * 60 * 1000;
-    const RATE_MS = 150; // ms between Manifold API calls
-    const LS_KEY = 'tmr_data';
+    /* ── Constants ── */
+    var MANIFOLD_BASE = 'https://api.manifold.markets';
+    var GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+    var TRAITS = ['self_interested', 'loyalty_demand', 'exec_power', 'deal_making'];
+    var DAY_MS = 24 * 60 * 60 * 1000;
+    var RATE_MS = 150;
+    var GEMINI_RATE_MS = 120;
+    var LS_KEY = 'tmr_data';
+    var LS_GEMINI_KEY = 'tmr_gemini_key';
+    var LS_GEMINI_CACHE = 'tmr_gemini_cache';
 
-    const RULES = {
+    var RULES = {
       self_interested: {
         positive: ['self', 'personal', 'profit', 'brand', 'image', 'ego', 'pardon', 'immunity', 'indictment', 'wealth', 'mar-a-lago', 'trump org', 'business', 'golf', 'hotel', 'property', 'net worth'],
         negative: ['country', 'nation', 'public', 'voters', 'citizens', 'community', 'patriot', 'sacrifice'],
@@ -352,14 +407,19 @@
       },
     };
 
-    /* -- DOM refs -- */
-    const $ = (id) => document.getElementById(id);
-    const els = {
+    /* ── DOM refs ── */
+    var $ = function(id) { return document.getElementById(id); };
+    var els = {
       syncBtn: $('syncBtn'),
       recommendBtn: $('recommendBtn'),
       clearBtn: $('clearBtn'),
       toggleMarkets: $('toggleMarkets'),
       threshold: $('threshold'),
+      minProb: $('minProb'),
+      maxProb: $('maxProb'),
+      geminiKey: $('geminiKey'),
+      saveKeyBtn: $('saveKeyBtn'),
+      geminiStatus: $('geminiStatus'),
       status: $('status'),
       progressBar: $('progressBar'),
       progressFill: $('progressFill'),
@@ -372,14 +432,15 @@
       recommendations: $('recommendations'),
     };
 
-    /* -- State (persisted in localStorage) -- */
-    let state = loadState();
+    /* ── State ── */
+    var state = loadState();
+    var geminiCache = loadGeminiCache();
 
     function loadState() {
       try {
-        const raw = localStorage.getItem(LS_KEY);
+        var raw = localStorage.getItem(LS_KEY);
         if (raw) {
-          const parsed = JSON.parse(raw);
+          var parsed = JSON.parse(raw);
           if (parsed && typeof parsed === 'object') return parsed;
         }
       } catch (_) {}
@@ -387,24 +448,75 @@
     }
 
     function saveState() {
-      try {
-        localStorage.setItem(LS_KEY, JSON.stringify(state));
-      } catch (_) {}
+      try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (_) {}
     }
 
-    /* -- Init -- */
+    function loadGeminiCache() {
+      try {
+        var raw = localStorage.getItem(LS_GEMINI_CACHE);
+        if (raw) {
+          var parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') return parsed;
+        }
+      } catch (_) {}
+      return {};
+    }
+
+    function saveGeminiCache() {
+      try { localStorage.setItem(LS_GEMINI_CACHE, JSON.stringify(geminiCache)); } catch (_) {}
+    }
+
+    function getGeminiKey() {
+      return (localStorage.getItem(LS_GEMINI_KEY) || '').trim();
+    }
+
+    /* ── Init ── */
     function init() {
-      for (const trait of TRAITS) {
-        const input = $(trait);
-        const label = $('v-' + trait);
-        const saved = localStorage.getItem('tmr_slider_' + trait);
-        if (saved !== null) { input.value = saved; }
+      // Load slider values
+      for (var i = 0; i < TRAITS.length; i++) {
+        var trait = TRAITS[i];
+        var input = $(trait);
+        var label = $('v-' + trait);
+        var saved = localStorage.getItem('tmr_slider_' + trait);
+        if (saved !== null) input.value = saved;
         label.textContent = Number(input.value).toFixed(2);
-        input.addEventListener('input', function() {
-          label.textContent = Number(input.value).toFixed(2);
-          localStorage.setItem('tmr_slider_' + trait, input.value);
-        });
+        (function(t, inp, lbl) {
+          inp.addEventListener('input', function() {
+            lbl.textContent = Number(inp.value).toFixed(2);
+            localStorage.setItem('tmr_slider_' + t, inp.value);
+          });
+        })(trait, input, label);
       }
+
+      // Load saved filter values
+      var savedMin = localStorage.getItem('tmr_minProb');
+      var savedMax = localStorage.getItem('tmr_maxProb');
+      var savedThreshold = localStorage.getItem('tmr_threshold');
+      if (savedMin !== null) els.minProb.value = savedMin;
+      if (savedMax !== null) els.maxProb.value = savedMax;
+      if (savedThreshold !== null) els.threshold.value = savedThreshold;
+
+      els.minProb.addEventListener('change', function() { localStorage.setItem('tmr_minProb', els.minProb.value); });
+      els.maxProb.addEventListener('change', function() { localStorage.setItem('tmr_maxProb', els.maxProb.value); });
+      els.threshold.addEventListener('change', function() { localStorage.setItem('tmr_threshold', els.threshold.value); });
+
+      // Gemini key
+      var storedKey = getGeminiKey();
+      if (storedKey) {
+        els.geminiKey.value = storedKey;
+      }
+      updateGeminiStatus();
+
+      els.saveKeyBtn.addEventListener('click', function() {
+        var key = els.geminiKey.value.trim();
+        if (key) {
+          localStorage.setItem(LS_GEMINI_KEY, key);
+        } else {
+          localStorage.removeItem(LS_GEMINI_KEY);
+        }
+        updateGeminiStatus();
+        setStatus(key ? 'Gemini API key saved.' : 'Gemini API key cleared.', 'ok');
+      });
 
       els.syncBtn.addEventListener('click', onSync);
       els.recommendBtn.addEventListener('click', onRecommend);
@@ -417,7 +529,13 @@
       renderFromState();
     }
 
-    /* -- Status / Progress -- */
+    function updateGeminiStatus() {
+      var hasKey = !!getGeminiKey();
+      els.geminiStatus.textContent = hasKey ? 'Gemini: on' : 'Gemini: off';
+      els.geminiStatus.className = 'gemini-status ' + (hasKey ? 'active' : 'inactive');
+    }
+
+    /* ── Status / Progress ── */
     function setStatus(text, mode) {
       els.status.textContent = text || '';
       els.status.className = 'status ' + (mode || '');
@@ -439,14 +557,14 @@
       els.clearBtn.disabled = flag;
     }
 
-    /* -- Manifold API helpers -- */
-    var lastCallTime = 0;
+    /* ── Manifold API helpers ── */
+    var lastManifoldCall = 0;
 
     async function manifoldGet(path) {
       var now = Date.now();
-      var wait = Math.max(0, RATE_MS - (now - lastCallTime));
+      var wait = Math.max(0, RATE_MS - (now - lastManifoldCall));
       if (wait > 0) await sleep(wait);
-      lastCallTime = Date.now();
+      lastManifoldCall = Date.now();
 
       var resp = await fetch(MANIFOLD_BASE + path);
       if (!resp.ok) {
@@ -458,24 +576,181 @@
 
     function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
 
-    /* -- Sync -- */
+    /* ── Gemini API ── */
+    var lastGeminiCall = 0;
+
+    async function geminiClassify(apiKey, marketTitle, optionText) {
+      // Check cache first
+      var cacheKey = makeCacheKey(marketTitle, optionText);
+      if (geminiCache[cacheKey]) return geminiCache[cacheKey];
+
+      // Rate limit
+      var now = Date.now();
+      var wait = Math.max(0, GEMINI_RATE_MS - (now - lastGeminiCall));
+      if (wait > 0) await sleep(wait);
+      lastGeminiCall = Date.now();
+
+      var prompt = 'Classify this prediction-market option on four Trump behavioral dimensions.\n' +
+        'Return STRICT JSON only: {"self_interested":0-1,"loyalty_demand":0-1,"exec_power":0-1,"deal_making":0-1,"rationale":"short"}\n' +
+        'self_interested: 1 = motivated by personal gain/ego/brand, 0 = motivated by public/national interest\n' +
+        'loyalty_demand: 1 = demands personal loyalty/punishes disloyalty, 0 = tolerates independence/dissent\n' +
+        'exec_power: 1 = expands executive authority/unilateral action, 0 = defers to courts/congress/states\n' +
+        'deal_making: 1 = seeks negotiation/compromise/deals, 0 = takes hardline/escalatory stance\n' +
+        'Market: ' + marketTitle + '\n' +
+        'Option: ' + optionText;
+
+      var body = {
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.1, responseMimeType: 'application/json' },
+      };
+
+      try {
+        var resp = await fetch(GEMINI_URL + '?key=' + encodeURIComponent(apiKey), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        if (!resp.ok) {
+          return null; // Fail silently, fall back to rules
+        }
+
+        var data = await resp.json();
+        var text = extractGeminiText(data);
+        var parsed = parseJsonObject(text);
+        if (!parsed) return null;
+
+        var result = {
+          self_interested: clamp(Number(parsed.self_interested), 0, 1),
+          loyalty_demand: clamp(Number(parsed.loyalty_demand), 0, 1),
+          exec_power: clamp(Number(parsed.exec_power), 0, 1),
+          deal_making: clamp(Number(parsed.deal_making), 0, 1),
+          rationale: String(parsed.rationale || ''),
+        };
+
+        if (TRAITS.some(function(k) { return isNaN(result[k]); })) return null;
+
+        // Cache it
+        geminiCache[cacheKey] = result;
+        return result;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function makeCacheKey(title, option) {
+      return (title + '||' + option).toLowerCase().replace(/\s+/g, ' ').trim().slice(0, 200);
+    }
+
+    function extractGeminiText(data) {
+      var parts = data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts;
+      if (!Array.isArray(parts)) return '';
+      return parts.map(function(p) { return typeof p.text === 'string' ? p.text : ''; }).join(' ').trim();
+    }
+
+    function parseJsonObject(text) {
+      if (!text || typeof text !== 'string') return null;
+      var trimmed = text.trim();
+      var candidates = [trimmed];
+      var fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
+      if (fenced && fenced[1]) candidates.unshift(fenced[1].trim());
+      var start = trimmed.indexOf('{');
+      var end = trimmed.lastIndexOf('}');
+      if (start >= 0 && end > start) candidates.push(trimmed.slice(start, end + 1));
+      for (var i = 0; i < candidates.length; i++) {
+        try {
+          var p = JSON.parse(candidates[i]);
+          if (p && typeof p === 'object' && !Array.isArray(p)) return p;
+        } catch (_) {}
+      }
+      return null;
+    }
+
+    /* ── Sync ── */
     async function onSync() {
       setBusy(true);
       setStatus('Fetching Trump markets from Manifold...', '');
       showProgress(0);
 
+      var apiKey = getGeminiKey();
+      var useGemini = !!apiKey;
+      var geminiErrors = 0;
+      var geminiCalls = 0;
+      var geminiCacheHits = 0;
+
       try {
         var openMarkets = await fetchAllTrumpOpenMarkets();
         var filtered = openMarkets.filter(function(m) { return getOptionCount(m) <= 5; });
 
-        setStatus('Processing ' + filtered.length + ' markets...', '');
+        var totalOptions = 0;
+        for (var c = 0; c < filtered.length; c++) {
+          totalOptions += getOptionCount(filtered[c]);
+        }
+
+        setStatus('Processing ' + filtered.length + ' markets (' + totalOptions + ' options)' + (useGemini ? ' with Gemini...' : '...'), '');
         var now = Date.now();
+        var processed = 0;
 
         for (var i = 0; i < filtered.length; i++) {
-          showProgress((i / filtered.length) * 100);
           var market = filtered[i];
-          var snapshot = buildSnapshot(market, now);
-          state.markets[String(snapshot.id)] = snapshot;
+          var options = extractOptions(market);
+          var classified = [];
+
+          for (var j = 0; j < options.length; j++) {
+            var opt = options[j];
+            var title = market.question || market.title || '';
+            var rule = ruleScore(title, opt.text);
+            var traits = rule;
+            var source = 'rules';
+
+            if (useGemini) {
+              var cached = geminiCache[makeCacheKey(title, opt.text)];
+              if (cached) {
+                geminiCacheHits++;
+                traits = blendScores(rule, cached);
+                source = 'gemini';
+              } else {
+                var llm = await geminiClassify(apiKey, title, opt.text);
+                if (llm) {
+                  geminiCalls++;
+                  traits = blendScores(rule, llm);
+                  source = 'gemini';
+                } else {
+                  geminiErrors++;
+                  if (geminiErrors > 5 && geminiCalls === 0) {
+                    // API key is probably bad, stop trying
+                    useGemini = false;
+                    setStatus('Gemini API errors, falling back to rules only...', 'error');
+                  }
+                }
+              }
+            }
+
+            classified.push({
+              id: String(opt.id),
+              text: String(opt.text),
+              probability: clamp(Number(opt.probability || 0), 0, 1),
+              traits: traits,
+              source: source,
+            });
+
+            processed++;
+            showProgress(60 + (processed / totalOptions) * 40);
+          }
+
+          state.markets[String(market.id)] = {
+            id: String(market.id),
+            title: market.question || market.title || 'Untitled',
+            url: deriveUrl(market),
+            createdTime: toInt(market.createdTime),
+            closeTime: toInt(market.closeTime),
+            resolutionTime: toInt(market.resolutionTime),
+            isOpen: isMarketOpen(market, now),
+            outcomeType: market.outcomeType || (classified.length === 2 ? 'BINARY' : 'MULTIPLE_CHOICE'),
+            optionCount: classified.length,
+            options: classified,
+            updatedAt: now,
+          };
         }
 
         // Mark previously tracked markets that are no longer open
@@ -488,15 +763,32 @@
 
         state.lastSyncTime = now;
         saveState();
+        saveGeminiCache();
         showProgress(100);
         renderFromState();
-        setStatus('Synced ' + filtered.length + ' open markets. ' + Object.keys(state.markets).length + ' total tracked.', 'ok');
+
+        var msg = 'Synced ' + filtered.length + ' open markets. ' + Object.keys(state.markets).length + ' total tracked.';
+        if (geminiCalls > 0 || geminiCacheHits > 0) {
+          msg += ' Gemini: ' + geminiCalls + ' new calls, ' + geminiCacheHits + ' cached';
+          if (geminiErrors > 0) msg += ', ' + geminiErrors + ' errors';
+          msg += '.';
+        }
+        setStatus(msg, 'ok');
       } catch (err) {
         setStatus('Sync error: ' + err.message, 'error');
       } finally {
         setBusy(false);
         setTimeout(hideProgress, 800);
       }
+    }
+
+    function blendScores(rule, llm) {
+      var out = {};
+      for (var i = 0; i < TRAITS.length; i++) {
+        var t = TRAITS[i];
+        out[t] = round(0.4 * rule[t] + 0.6 * llm[t], 6);
+      }
+      return out;
     }
 
     async function fetchAllTrumpOpenMarkets() {
@@ -526,7 +818,6 @@
           seen.add(id);
           if (!hasTrumpTitle(market)) continue;
 
-          // Hydrate multi-choice markets missing answers array
           if (market.outcomeType === 'MULTIPLE_CHOICE' && !Array.isArray(market.answers)) {
             try {
               var full = await manifoldGet('/v0/market/' + encodeURIComponent(id));
@@ -552,11 +843,10 @@
       return out;
     }
 
-    /* -- Classification (rule-based, all client-side) -- */
+    /* ── Classification (rule-based) ── */
     function ruleScore(marketTitle, optionText) {
       var text = (marketTitle + ' ' + optionText).toLowerCase();
       var out = {};
-
       for (var i = 0; i < TRAITS.length; i++) {
         var trait = TRAITS[i];
         var cfg = RULES[trait];
@@ -570,34 +860,6 @@
         out[trait] = clamp(score, 0, 1);
       }
       return out;
-    }
-
-    /* -- Snapshot builder -- */
-    function buildSnapshot(market, now) {
-      var options = extractOptions(market);
-      var classified = options.map(function(opt) {
-        var traits = ruleScore(market.question || market.title || '', opt.text);
-        return {
-          id: String(opt.id),
-          text: String(opt.text),
-          probability: clamp(Number(opt.probability || 0), 0, 1),
-          traits: traits,
-        };
-      });
-
-      return {
-        id: String(market.id),
-        title: market.question || market.title || 'Untitled',
-        url: deriveUrl(market),
-        createdTime: toInt(market.createdTime),
-        closeTime: toInt(market.closeTime),
-        resolutionTime: toInt(market.resolutionTime),
-        isOpen: isOpen(market, now),
-        outcomeType: market.outcomeType || (classified.length === 2 ? 'BINARY' : 'MULTIPLE_CHOICE'),
-        optionCount: classified.length,
-        options: classified,
-        updatedAt: now,
-      };
     }
 
     function extractOptions(market) {
@@ -618,16 +880,20 @@
       ];
     }
 
-    /* -- Recommendation engine -- */
+    /* ── Recommendation engine ── */
     function onRecommend() {
       var weights = {};
       for (var i = 0; i < TRAITS.length; i++) {
         weights[TRAITS[i]] = Number($(TRAITS[i]).value);
       }
       var threshold = Number(els.threshold.value || '0.05');
+      var minP = Number(els.minProb.value || '0');
+      var maxP = Number(els.maxProb.value || '1');
+      if (minP > maxP) { var tmp = minP; minP = maxP; maxP = tmp; }
 
       var markets = Object.values(state.markets).filter(function(m) { return m.isOpen; });
       var recs = [];
+      var skippedExtreme = 0;
 
       for (var j = 0; j < markets.length; j++) {
         var market = markets[j];
@@ -635,8 +901,14 @@
 
         if (market.options.length === 2) {
           var yes = market.options.find(function(o) { return o.text.toUpperCase() === 'YES'; }) || market.options[0];
-          var edge = computeEdge(yes, weights);
 
+          // Apply probability filter
+          if (yes.probability < minP || yes.probability > maxP) {
+            skippedExtreme++;
+            continue;
+          }
+
+          var edge = computeEdge(yes, weights);
           if (edge.edge > threshold) {
             recs.push(makeRec(market, 'YES', yes, edge, weights));
           } else if (edge.edge < -threshold) {
@@ -647,6 +919,10 @@
 
         for (var k = 0; k < market.options.length; k++) {
           var opt = market.options[k];
+          if (opt.probability < minP || opt.probability > maxP) {
+            skippedExtreme++;
+            continue;
+          }
           var optEdge = computeEdge(opt, weights);
           if (optEdge.edge > threshold) {
             recs.push(makeRec(market, opt.text, opt, optEdge, weights));
@@ -656,7 +932,9 @@
 
       recs.sort(function(a, b) { return b.edge - a.edge; });
       renderRecommendations(recs);
-      setStatus(recs.length + ' recommendation(s) found across ' + markets.length + ' open markets.', recs.length > 0 ? 'ok' : '');
+      var msg = recs.length + ' recommendation(s) across ' + markets.length + ' open markets.';
+      if (skippedExtreme > 0) msg += ' (' + skippedExtreme + ' options filtered by price range)';
+      setStatus(msg, recs.length > 0 ? 'ok' : '');
     }
 
     function computeEdge(option, weights) {
@@ -679,19 +957,22 @@
         edge: round(edge.edge, 4),
         marketProbability: round(option.probability, 4),
         traitImpliedProbability: round(edge.pPref, 4),
+        source: option.source || 'rules',
       };
     }
 
-    /* -- Clear -- */
+    /* ── Clear ── */
     function onClear() {
-      if (!confirm('Clear all cached market data?')) return;
+      if (!confirm('Clear all cached market data and Gemini classification cache?')) return;
       state = { markets: {}, lastSyncTime: null };
+      geminiCache = {};
       saveState();
+      saveGeminiCache();
       renderFromState();
-      setStatus('Cache cleared.', 'ok');
+      setStatus('All caches cleared.', 'ok');
     }
 
-    /* -- Rendering -- */
+    /* ── Rendering ── */
     function renderFromState() {
       var markets = Object.values(state.markets).sort(function(a, b) { return (b.createdTime || 0) - (a.createdTime || 0); });
       var now = Date.now();
@@ -738,8 +1019,9 @@
         card.className = 'market-item';
         var rows = (m.options || []).map(function(o) {
           var t = o.traits || {};
+          var tag = o.source === 'gemini' ? '<span class="source-tag gemini">G</span>' : '';
           return '<tr>' +
-            '<td>' + esc(o.text) + '</td>' +
+            '<td>' + esc(o.text) + tag + '</td>' +
             '<td>' + fmtPct(o.probability) + '</td>' +
             '<td>' + traitCell(t.self_interested) + '</td>' +
             '<td>' + traitCell(t.loyalty_demand) + '</td>' +
@@ -767,11 +1049,15 @@
 
       for (var i = 0; i < recs.length; i++) {
         var r = recs[i];
+        var tag = r.source === 'gemini'
+          ? '<span class="source-tag gemini">Gemini</span>'
+          : '<span class="source-tag rules">Rules</span>';
         var card = document.createElement('div');
         card.className = 'recommend-item';
         card.innerHTML = '<div>' +
           '<a href="' + escA(r.marketUrl) + '" target="_blank" rel="noopener">' + esc(r.marketTitle) + '</a>' +
           '<span class="edge">Edge: ' + fmtPct(r.edge) + '</span>' +
+          tag +
           '</div>' +
           '<div class="meta">' +
           'Pick: <strong>' + esc(r.pick) + '</strong> | ' +
@@ -788,10 +1074,10 @@
       return '<span style="color:' + color + '; font-weight:' + (n > 0.6 || n < 0.4 ? '600' : '400') + '">' + n.toFixed(2) + '</span>';
     }
 
-    /* -- Helpers -- */
+    /* ── Helpers ── */
     function hasTrumpTitle(m) { return /trump/i.test((m && (m.question || m.title)) || ''); }
     function getOptionCount(m) { return Array.isArray(m && m.answers) ? m.answers.length : 2; }
-    function isOpen(m, now) {
+    function isMarketOpen(m, now) {
       if (m && m.isResolved) return false;
       var ct = toInt(m && m.closeTime);
       if (ct && ct <= now) return false;
