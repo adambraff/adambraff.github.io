@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>March Madness 2026 Bracket Builder</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f8f8f8;color:#333;overflow:hidden;height:100vh}
+.top-bar{background:#1a1a2e;color:#fff;padding:6px 20px;display:flex;align-items:center;justify-content:space-between;height:42px}
+.top-bar h1{font-size:16px;font-weight:600;letter-spacing:.5px}
+.controls{display:flex;gap:12px;align-items:center;flex-wrap:nowrap}
+.ctrl{display:flex;align-items:center;gap:4px;font-size:11px}
+.ctrl label{color:#aaa;white-space:nowrap;cursor:help;border-bottom:1px dotted #666;position:relative}
+.ctrl label:hover .ltip{display:block}
+.ctrl label .ltip{display:none;position:absolute;top:100%;left:50%;transform:translateX(-50%);background:#222;color:#eee;padding:8px 10px;border-radius:4px;font-size:11px;line-height:1.4;white-space:normal;width:220px;z-index:200;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.5);margin-top:6px;font-weight:400;text-align:left}
+.ctrl label .ltip::after{content:'';position:absolute;bottom:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-bottom-color:#222}
+.ctrl input[type=range]{width:60px;height:4px;-webkit-appearance:none;background:#444;border-radius:2px;outline:none}
+.ctrl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#4fc3f7;cursor:pointer}
+.ctrl span{color:#4fc3f7;font-weight:600;min-width:22px;text-align:right}
+.ctrl select{background:#333;color:#fff;border:1px solid #555;border-radius:3px;padding:2px 4px;font-size:11px;font-family:inherit}
+.wsum{color:#f7dc6f;font-size:11px;font-weight:600}
+.wsum.warn{color:#e74c3c}
+button.reset{background:#444;color:#ccc;border:none;border-radius:3px;padding:3px 8px;font-size:10px;cursor:pointer}
+button.reset:hover{background:#666}
+
+.bracket-wrap{display:flex;height:calc(100vh - 42px);padding:4px}
+
+/* Each half: two regions stacked vertically, rounds flow inward */
+.half{flex:1;display:flex;flex-direction:column;overflow:hidden;gap:2px}
+.half .rounds{flex-direction:row}
+.half.right .region-block .rounds{flex-direction:row-reverse}
+.half.right .team{flex-direction:row-reverse}
+.half.right .team .sd{margin-right:0;margin-left:3px}
+.half.right .team .tip{left:auto;right:100%}
+
+.region-block{display:flex;flex-direction:column;position:relative;flex:1}
+.region-block .rlabel{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;color:#fff;border-radius:2px;text-align:center;flex-shrink:0}
+
+.rounds{display:flex;flex:1}
+.round{display:flex;flex-direction:column;justify-content:space-around;padding:0 1px}
+
+.game{display:flex;flex-direction:column;justify-content:center;margin:1px 0}
+.team{display:flex;align-items:center;padding:2px 4px;font-size:10px;line-height:1.2;min-width:110px;max-width:140px;background:#fff;border:1px solid #ddd;cursor:default;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative;height:18px}
+.team:first-child{border-bottom:none;border-radius:2px 2px 0 0}
+.team:last-child{border-radius:0 0 2px 2px}
+.team .sd{font-weight:700;margin-right:3px;min-width:14px;color:#666;font-size:9px}
+.team .nm{flex:1;overflow:hidden;text-overflow:ellipsis}
+.team .sc{font-size:8px;color:#999;margin-left:3px}
+.team.w{background:#e8f5e9;font-weight:600;border-color:#a5d6a7}
+.team.l{color:#bbb;background:#fafafa}
+.team.fav{border-left:3px solid #1565c0;background:#e3f2fd}
+.team.fav.w{background:#bbdefb;border-color:#1565c0}
+.team:hover{z-index:10}
+.team .tip{display:none;position:absolute;left:100%;top:-10px;background:#222;color:#fff;padding:8px;border-radius:4px;font-size:10px;line-height:1.5;white-space:pre;z-index:100;min-width:180px;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.team:hover .tip{display:block}
+
+/* Final Four center column */
+.ff-col{display:flex;flex-direction:column;justify-content:center;align-items:center;min-width:160px;gap:0;padding:0 6px}
+.ff-game{display:flex;flex-direction:column;margin:4px 0}
+.ff-team{padding:4px 8px;font-size:11px;min-width:140px;background:#fff;border:1px solid #ddd;display:flex;align-items:center;gap:4px;height:22px}
+.ff-team:first-child{border-bottom:none;border-radius:3px 3px 0 0}
+.ff-team:last-child{border-radius:0 0 3px 3px}
+.ff-team.w{background:#e8f5e9;font-weight:700;border-color:#66bb6a}
+.ff-team.l{color:#bbb}
+.ff-team.fav{border-left:3px solid #1565c0;background:#e3f2fd}
+.ff-team.fav.w{background:#bbdefb}
+.ff-team .sd{font-weight:700;min-width:16px;color:#555;font-size:10px}
+.champ-box{margin:8px 0;padding:8px 12px;background:linear-gradient(135deg,#ffd700,#ffb300);border-radius:6px;text-align:center;font-weight:700;font-size:14px;color:#1a1a2e;box-shadow:0 2px 8px rgba(255,179,0,.4);min-width:150px}
+.champ-box .champ-label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#5d4037;margin-bottom:2px}
+.champ-box .champ-score{font-size:11px;font-weight:400;color:#5d4037;margin-top:2px}
+.ff-label{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1px;margin:4px 0 2px}
+
+/* Region colors */
+.east .rlabel{background:#1565c0}
+.south .rlabel{background:#c62828}
+.west .rlabel{background:#2e7d32}
+.midwest .rlabel{background:#e65100}
+.east .team.w,.east .ff-team.w{border-color:#64b5f6}
+.south .team.w,.south .ff-team.w{border-color:#ef9a9a}
+.west .team.w,.west .ff-team.w{border-color:#81c784}
+.midwest .team.w,.midwest .ff-team.w{border-color:#ffb74d}
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <h1>March Madness 2026 Bracket Builder</h1>
+  <div class="controls">
+    <div class="ctrl"><label>Elo<span class="ltip"><b>COOPER Elo</b> (Nate Silver) &mdash; Power rating based on game results, margin of victory, and opponent strength. Updated after every game. Higher = stronger team overall. Scale: ~1300 (worst) to ~2300 (best).</span></label><input type="range" id="sElo" min="0" max="100" value="40"><span id="vElo">40</span></div>
+    <div class="ctrl"><label>SRS<span class="ltip"><b>Simple Rating System</b> (Sports Reference) &mdash; Average margin of victory adjusted for strength of schedule. Zero = average D-I team. +20 = elite. Combines offense and defense into one number.</span></label><input type="range" id="sSrs" min="0" max="100" value="25"><span id="vSrs">25</span></div>
+    <div class="ctrl"><label>NRtg<span class="ltip"><b>Net Rating</b> (Sports Reference) &mdash; Offensive efficiency minus defensive efficiency, per 100 possessions. Measures how much better a team scores than it allows, tempo-independent. +30 = elite.</span></label><input type="range" id="sNrtg" min="0" max="100" value="20"><span id="vNrtg">20</span></div>
+    <div class="ctrl"><label>Mom<span class="ltip"><b>Momentum</b> &mdash; Recent Elo change (current Elo minus prior). Positive = team is peaking. Negative = slumping. Only positive momentum counts here (slumps get zero weight, not penalty).</span></label><input type="range" id="sMom" min="0" max="100" value="10"><span id="vMom">10</span></div>
+    <div class="ctrl"><label>Peak<span class="ltip"><b>Peak Proximity</b> &mdash; Current Elo divided by season-max Elo. Measures how close the team is to its best form this season. 1.0 = at peak right now. 0.9 = 10% below their best.</span></label><input type="range" id="sPeak" min="0" max="100" value="5"><span id="vPeak">5</span></div>
+    <div class="wsum" id="wsum">=100%</div>
+    <div class="ctrl"><label>O/D<span class="ltip"><b>Offense vs Defense bias</b> &mdash; Center = balanced. Slide right to favor high-ORtg (scoring) teams. Slide left to favor low-DRtg (lockdown defense) teams. Adds up to &plusmn;15% composite bonus at the extremes.</span></label><input type="range" id="sOD" min="-100" max="100" value="0"><span id="vOD">0</span></div>
+    <div class="ctrl"><label>Chaos<span class="ltip"><b>Chaos / Upset factor</b> &mdash; Adds random noise to every team's score. Higher = more upsets. Click "Roll" to re-randomize. The bracket won't change until you click the button, so you can try different seeds.</span></label><input type="range" id="sChaos" min="0" max="100" value="0"><span id="vChaos">0</span><button class="reset" id="rollBtn" style="background:#e65100;color:#fff;margin-left:2px">Roll</button></div>
+    <div class="ctrl"><label>Fav<span class="ltip"><b>Favorite Team Bonus</b> &mdash; Adds a loyalty boost to your chosen team's composite score. The slider sets bonus magnitude. For when the heart overrules the spreadsheet.</span></label>
+      <select id="favTeam"><option value="">(None)</option></select>
+      <input type="range" id="sBonus" min="0" max="200" value="50"><span id="vBonus">50</span>
+    </div>
+    <button class="reset" id="resetBtn">Reset</button>
+  </div>
+</div>
+
+<div class="bracket-wrap" id="bracketWrap"></div>
+
+<script>
+const T={
+EAST:[
+{s:1,n:'Duke',c:'ACC',elo:2256.2,mom:-4.9,prior:2024.7,mx:2292.6,mn:2024.7,w:32,l:2,ppg:82.3,oppg:63.1,mov:19.15,sos:12.43,srs:31.57,ortg:129.4,drtg:84.9,nrtg:44.5},
+{s:16,n:'Siena',c:'MAAC',elo:1513.1,mom:22.4,prior:1352.9,mx:1519.3,mn:1352.9,w:22,l:10,ppg:78.6,oppg:73.1,mov:5.56,sos:-4.56,srs:0.99,ortg:106.9,drtg:103.4,nrtg:3.5},
+{s:8,n:'Ohio St.',c:'Big Ten',elo:1944.8,mom:10.7,prior:1832.0,mx:1944.8,mn:1809.8,w:20,l:14,ppg:73.1,oppg:67.1,mov:6.03,sos:10.34,srs:16.37,ortg:114.3,drtg:91.2,nrtg:23.2},
+{s:9,n:'TCU',c:'Big 12',elo:1876.7,mom:1.7,prior:1709.2,mx:1876.7,mn:1637.1,w:17,l:14,ppg:71.5,oppg:68.1,mov:3.35,sos:10.71,srs:14.06,ortg:112.3,drtg:92.8,nrtg:19.5},
+{s:5,n:"St. John's",c:'Big East',elo:2077.4,mom:33.1,prior:2030.0,mx:2077.4,mn:1956.6,w:28,l:6,ppg:78.5,oppg:66.9,mov:11.59,sos:10.84,srs:22.43,ortg:118.9,drtg:87.4,nrtg:31.5},
+{s:12,n:'N. Iowa',c:'MVC',elo:1771.2,mom:21.8,prior:1610.3,mx:1771.2,mn:1601.0,w:23,l:10,ppg:72.6,oppg:63.1,mov:9.48,sos:1.87,srs:7.80,ortg:101.9,drtg:87.0,nrtg:14.9},
+{s:4,n:'Kansas',c:'Big 12',elo:1941.0,mom:-27.7,prior:1887.4,mx:2041.0,mn:1880.5,w:22,l:10,ppg:77.1,oppg:71.5,mov:5.56,sos:12.98,srs:18.19,ortg:117.0,drtg:92.5,nrtg:24.5},
+{s:13,n:'Cal Baptist',c:'WAC',elo:1637.8,mom:16.0,prior:1459.8,mx:1637.8,mn:1459.8,w:24,l:8,ppg:73.3,oppg:67.8,mov:5.56,sos:-2.92,srs:2.54,ortg:101.2,drtg:98.0,nrtg:3.3},
+{s:6,n:'Louisville',c:'ACC',elo:2001.3,mom:-12.9,prior:1954.9,mx:2101.0,mn:1954.9,w:23,l:10,ppg:84.8,oppg:72.2,mov:12.58,sos:10.84,srs:23.42,ortg:125.7,drtg:94.1,nrtg:31.6},
+{s:11,n:'S. Florida',c:'AAC',elo:1853.4,mom:16.2,prior:1505.2,mx:1853.4,mn:1505.2,w:26,l:7,ppg:78.4,oppg:66.3,mov:12.06,sos:3.57,srs:15.63,ortg:110.7,drtg:87.2,nrtg:23.6},
+{s:3,n:'Michigan St.',c:'Big Ten',elo:2032.9,mom:-17.6,prior:1877.0,mx:2100.8,mn:1851.5,w:25,l:7,ppg:78.9,oppg:68.4,mov:10.53,sos:12.92,srs:23.46,ortg:123.9,drtg:90.5,nrtg:33.4},
+{s:14,n:'N. Dakota St.',c:'Summit',elo:1615.3,mom:-1.7,prior:1466.4,mx:1616.7,mn:1443.2,w:27,l:7,ppg:80.7,oppg:69.6,mov:11.15,sos:-5.78,srs:2.51,ortg:109.4,drtg:106.1,nrtg:3.3},
+{s:7,n:'UCLA',c:'Big Ten',elo:1963.3,mom:-4.8,prior:1948.1,mx:1967.3,mn:1866.0,w:20,l:13,ppg:76.9,oppg:72.6,mov:4.27,sos:11.83,srs:16.10,ortg:117.8,drtg:95.4,nrtg:22.3},
+{s:10,n:'UCF',c:'Big 12',elo:1783.6,mom:-1.9,prior:1727.0,mx:1831.3,mn:1679.3,w:18,l:14,ppg:72.0,oppg:68.3,mov:3.69,sos:8.23,srs:11.92,ortg:106.5,drtg:89.4,nrtg:17.1},
+{s:2,n:'UConn',c:'Big East',elo:2048.8,mom:-33.1,prior:2065.4,mx:2132.2,mn:2040.9,w:29,l:5,ppg:80.7,oppg:68.3,mov:12.38,sos:10.55,srs:22.93,ortg:119.0,drtg:87.5,nrtg:31.5},
+{s:15,n:'Furman',c:'Southern',elo:1504.0,mom:28.7,prior:1547.5,mx:1547.5,mn:1427.5,w:19,l:14,ppg:74.1,oppg:72.0,mov:2.06,sos:-1.57,srs:-1.51,ortg:103.9,drtg:101.3,nrtg:2.6}
+],
+SOUTH:[
+{s:1,n:'Florida',c:'SEC',elo:2173.1,mom:-37.6,prior:2083.5,mx:2210.1,mn:1997.2,w:26,l:7,ppg:86.8,oppg:72.0,mov:14.79,sos:13.14,srs:27.92,ortg:125.7,drtg:88.4,nrtg:37.3},
+{s:16,n:'Prairie View',c:'SWAC',elo:1267.0,mom:15.0,prior:1040.6,mx:1267.0,mn:1040.6,w:15,l:17,ppg:68.3,oppg:68.5,mov:-0.22,sos:-4.69,srs:-5.39,ortg:96.0,drtg:99.8,nrtg:-3.8},
+{s:8,n:'Clemson',c:'ACC',elo:1871.3,mom:1.3,prior:1752.8,mx:1932.3,mn:1752.8,w:21,l:11,ppg:80.1,oppg:71.3,mov:8.78,sos:7.38,srs:12.84,ortg:112.8,drtg:93.1,nrtg:19.7},
+{s:9,n:'Iowa',c:'Big Ten',elo:1909.7,mom:1.5,prior:1791.7,mx:1982.0,mn:1791.7,w:20,l:13,ppg:79.6,oppg:73.1,mov:6.45,sos:9.57,srs:16.00,ortg:119.1,drtg:95.9,nrtg:23.2},
+{s:5,n:'Vanderbilt',c:'SEC',elo:2001.4,mom:-22.7,prior:1811.9,mx:2032.6,mn:1811.9,w:26,l:7,ppg:86.7,oppg:74.9,mov:11.82,sos:11.36,srs:23.18,ortg:123.1,drtg:91.1,nrtg:32.0},
+{s:12,n:'McNeese',c:'Southland',elo:1738.4,mom:19.7,prior:1617.8,mx:1775.1,mn:1610.4,w:26,l:6,ppg:83.3,oppg:72.7,mov:10.59,sos:-3.84,srs:6.75,ortg:112.7,drtg:103.1,nrtg:9.6},
+{s:4,n:'Nebraska',c:'Big Ten',elo:1970.4,mom:-20.9,prior:1738.9,mx:2032.8,mn:1738.9,w:27,l:6,ppg:77.7,oppg:67.8,mov:9.88,sos:10.28,srs:19.87,ortg:118.7,drtg:89.9,nrtg:28.8},
+{s:13,n:'Troy',c:'Sun Belt',elo:1547.6,mom:20.0,prior:1573.2,mx:1641.4,mn:1511.8,w:19,l:14,ppg:76.1,oppg:73.3,mov:2.84,sos:-1.09,srs:1.76,ortg:104.5,drtg:103.6,nrtg:0.9},
+{s:6,n:'N. Carolina',c:'ACC',elo:1910.2,mom:-15.8,prior:1851.0,mx:1959.4,mn:1851.0,w:21,l:11,ppg:82.9,oppg:76.2,mov:6.75,sos:10.66,srs:16.41,ortg:119.8,drtg:96.1,nrtg:23.7},
+{s:11,n:'VCU',c:'A-10',elo:1833.9,mom:8.8,prior:1789.8,mx:1834.3,mn:1766.9,w:25,l:9,ppg:72.7,oppg:63.8,mov:8.85,sos:2.43,srs:11.28,ortg:105.3,drtg:86.8,nrtg:18.4},
+{s:3,n:'Illinois',c:'Big Ten',elo:2077.3,mom:-16.8,prior:1905.2,mx:2133.3,mn:1905.2,w:24,l:8,ppg:84.4,oppg:69.8,mov:14.56,sos:11.90,srs:26.46,ortg:132.2,drtg:94.3,nrtg:37.9},
+{s:14,n:'Penn',c:'Ivy',elo:1568.3,mom:19.6,prior:1368.7,mx:1568.3,mn:1340.5,w:22,l:7,ppg:69.9,oppg:62.2,mov:7.72,sos:-3.43,srs:0.02,ortg:99.7,drtg:93.1,nrtg:6.6},
+{s:7,n:"St. Mary's",c:'WCC',elo:1938.2,mom:-21.3,prior:1800.6,mx:1959.3,mn:1800.6,w:28,l:5,ppg:72.2,oppg:62.5,mov:9.70,sos:4.14,srs:13.84,ortg:109.4,drtg:86.6,nrtg:22.8},
+{s:10,n:'Texas A&M',c:'SEC',elo:1840.1,mom:-39.4,prior:1755.5,mx:1934.7,mn:1684.9,w:18,l:14,ppg:75.0,oppg:72.2,mov:2.84,sos:11.28,srs:14.12,ortg:113.4,drtg:96.6,nrtg:16.7},
+{s:2,n:'Houston',c:'Big 12',elo:2150.0,mom:-7.5,prior:2155.0,mx:2174.6,mn:2075.4,w:28,l:6,ppg:77.1,oppg:62.9,mov:14.29,sos:11.93,srs:26.23,ortg:124.2,drtg:86.6,nrtg:37.6},
+{s:15,n:'Idaho',c:'Big Sky',elo:1530.4,mom:12.3,prior:1343.8,mx:1530.4,mn:1343.8,w:24,l:10,ppg:74.2,oppg:64.2,mov:10.00,sos:-4.69,srs:5.31,ortg:100.8,drtg:89.9,nrtg:10.9}
+],
+WEST:[
+{s:1,n:'Arizona',c:'Big 12',elo:2210.7,mom:7.5,prior:1923.7,mx:2210.7,mn:1923.7,w:32,l:2,ppg:86.1,oppg:68.8,mov:17.35,sos:12.58,srs:29.93,ortg:126.7,drtg:85.9,nrtg:40.8},
+{s:16,n:'LIU',c:'NEC',elo:1424.1,mom:4.5,prior:1300.8,mx:1461.1,mn:1286.1,w:20,l:12,ppg:78.9,oppg:75.3,mov:3.59,sos:-6.45,srs:-2.86,ortg:105.1,drtg:109.4,nrtg:-4.4},
+{s:8,n:'Villanova',c:'Big East',elo:1847.3,mom:-39.5,prior:1777.0,mx:1916.3,mn:1777.0,w:20,l:14,ppg:78.3,oppg:74.3,mov:4.03,sos:7.85,srs:11.88,ortg:112.5,drtg:98.5,nrtg:14.0},
+{s:9,n:'Utah St.',c:'MWC',elo:1862.0,mom:17.2,prior:1703.9,mx:1918.9,mn:1703.9,w:27,l:7,ppg:79.9,oppg:68.1,mov:11.88,sos:1.93,srs:13.81,ortg:111.4,drtg:90.4,nrtg:21.0},
+{s:5,n:'Wisconsin',c:'Big Ten',elo:1972.8,mom:9.1,prior:1857.5,mx:1972.8,mn:1797.2,w:25,l:8,ppg:75.5,oppg:68.0,mov:7.55,sos:10.53,srs:17.42,ortg:118.3,drtg:93.1,nrtg:25.2},
+{s:12,n:'High Point',c:'Big South',elo:1710.2,mom:14.1,prior:1629.5,mx:1740.8,mn:1629.5,w:25,l:7,ppg:79.7,oppg:71.0,mov:8.72,sos:-3.78,srs:4.94,ortg:106.9,drtg:101.7,nrtg:5.3},
+{s:4,n:'Arkansas',c:'SEC',elo:2000.1,mom:22.7,prior:1917.1,mx:2000.1,mn:1860.3,w:25,l:8,ppg:85.1,oppg:75.3,mov:9.82,sos:12.28,srs:22.10,ortg:127.6,drtg:96.4,nrtg:31.2},
+{s:13,n:'Hawaii',c:'Big West',elo:1593.4,mom:20.1,prior:1409.4,mx:1631.3,mn:1409.4,w:20,l:12,ppg:69.2,oppg:67.2,mov:2.06,sos:-3.05,srs:-1.00,ortg:102.0,drtg:101.8,nrtg:0.2},
+{s:6,n:'BYU',c:'Big 12',elo:1936.5,mom:6.0,prior:1977.4,mx:2083.7,mn:1892.5,w:21,l:11,ppg:77.3,oppg:70.2,mov:7.09,sos:10.96,srs:18.05,ortg:113.9,drtg:89.5,nrtg:24.4},
+{s:11,n:'Texas',c:'SEC',elo:1835.1,mom:-27.9,prior:1819.4,mx:1916.1,mn:1788.2,w:15,l:17,ppg:77.3,oppg:75.3,mov:2.09,sos:11.65,srs:13.74,ortg:115.2,drtg:100.4,nrtg:14.8},
+{s:3,n:'Gonzaga',c:'WCC',elo:2031.2,mom:2.5,prior:1872.4,mx:2130.4,mn:1872.4,w:30,l:3,ppg:85.1,oppg:66.0,mov:19.12,sos:6.02,srs:25.14,ortg:123.0,drtg:88.5,nrtg:34.4},
+{s:14,n:'Kennesaw St.',c:'CUSA',elo:1542.6,mom:19.1,prior:1520.4,mx:1585.4,mn:1484.5,w:21,l:13,ppg:72.8,oppg:69.1,mov:3.68,sos:-3.46,srs:0.21,ortg:101.1,drtg:99.4,nrtg:1.6},
+{s:7,n:'Miami (FL)',c:'ACC',elo:1887.4,mom:-29.9,prior:1546.2,mx:1916.6,mn:1546.2,w:15,l:16,ppg:78.0,oppg:73.8,mov:4.19,sos:7.18,srs:11.37,ortg:114.0,drtg:100.6,nrtg:13.3},
+{s:10,n:'Missouri',c:'SEC',elo:1800.1,mom:-13.2,prior:1805.6,mx:1861.0,mn:1738.7,w:15,l:17,ppg:79.1,oppg:76.9,mov:2.22,sos:10.87,srs:13.09,ortg:117.8,drtg:103.5,nrtg:14.3},
+{s:2,n:'Purdue',c:'Big Ten',elo:2105.7,mom:25.3,prior:2229.8,mx:2229.8,mn:2053.5,w:26,l:8,ppg:81.7,oppg:70.1,mov:11.62,sos:13.60,srs:25.22,ortg:132.1,drtg:96.1,nrtg:36.0},
+{s:15,n:'Queens',c:'A-Sun',elo:1481.2,mom:13.9,prior:1409.2,mx:1481.2,mn:1351.5,w:23,l:9,ppg:74.2,oppg:66.3,mov:7.84,sos:-6.62,srs:1.23,ortg:99.9,drtg:90.8,nrtg:9.1}
+],
+MIDWEST:[
+{s:1,n:'Michigan',c:'Big Ten',elo:2231.3,mom:-25.3,prior:2000.4,mx:2306.1,mn:2000.4,w:31,l:2,ppg:87.3,oppg:68.9,mov:18.39,sos:14.54,srs:32.93,ortg:128.6,drtg:84.0,nrtg:44.6},
+{s:16,n:'UMBC',c:'AmEast',elo:1553.1,mom:15.4,prior:1326.6,mx:1553.1,mn:1291.1,w:21,l:12,ppg:72.9,oppg:66.8,mov:6.18,sos:-8.91,srs:-2.73,ortg:101.1,drtg:100.9,nrtg:0.2},
+{s:8,n:'Georgia',c:'SEC',elo:1874.6,mom:-27.3,prior:1751.7,mx:1935.3,mn:1751.7,w:20,l:13,ppg:78.3,oppg:73.8,mov:4.48,sos:11.54,srs:16.08,ortg:117.1,drtg:95.5,nrtg:21.6},
+{s:9,n:'Saint Louis',c:'A-10',elo:1824.2,mom:-13.0,prior:1607.2,mx:1953.4,mn:1607.2,w:23,l:10,ppg:77.3,oppg:67.3,mov:10.00,sos:3.00,srs:13.00,ortg:107.5,drtg:86.6,nrtg:20.9},
+{s:5,n:'Texas Tech',c:'Big 12',elo:1972.3,mom:-36.8,prior:1950.7,mx:2051.5,mn:1878.4,w:22,l:10,ppg:78.3,oppg:70.5,mov:7.78,sos:14.15,srs:21.94,ortg:123.2,drtg:94.6,nrtg:28.7},
+{s:12,n:'Akron',c:'MAC',elo:1736.1,mom:-4.3,prior:1521.2,mx:1751.2,mn:1521.2,w:24,l:8,ppg:76.1,oppg:69.5,mov:6.56,sos:-0.42,srs:6.98,ortg:109.0,drtg:100.7,nrtg:8.3},
+{s:4,n:'Alabama',c:'SEC',elo:1964.3,mom:-21.4,prior:1897.7,mx:2029.2,mn:1897.7,w:23,l:9,ppg:79.2,oppg:71.0,mov:8.25,sos:14.45,srs:22.70,ortg:122.9,drtg:92.7,nrtg:30.3},
+{s:13,n:'Hofstra',c:'CAA',elo:1703.6,mom:-1.7,prior:1441.5,mx:1705.6,mn:1423.5,w:25,l:8,ppg:75.1,oppg:67.1,mov:7.97,sos:-2.59,srs:5.38,ortg:104.3,drtg:95.4,nrtg:8.9},
+{s:6,n:'Tennessee',c:'SEC',elo:1970.4,mom:-11.6,prior:1903.2,mx:2008.4,mn:1885.7,w:22,l:11,ppg:77.9,oppg:67.8,mov:10.09,sos:12.02,srs:22.11,ortg:118.3,drtg:88.4,nrtg:30.0},
+{s:11,n:'SMU',c:'ACC',elo:1821.5,mom:3.3,prior:1731.9,mx:1880.0,mn:1730.4,w:18,l:15,ppg:79.2,oppg:73.4,mov:5.79,sos:7.73,srs:13.52,ortg:116.7,drtg:98.1,nrtg:18.6},
+{s:3,n:'Virginia',c:'ACC',elo:2019.2,mom:4.9,prior:1814.8,mx:2027.6,mn:1814.8,w:29,l:5,ppg:66.3,oppg:57.0,mov:9.29,sos:9.38,srs:21.58,ortg:114.5,drtg:83.2,nrtg:31.3},
+{s:14,n:'Wright St.',c:'Horizon',elo:1531.7,mom:-4.7,prior:1371.6,mx:1536.2,mn:1340.7,w:22,l:12,ppg:75.3,oppg:73.9,mov:1.44,sos:-2.91,srs:-1.47,ortg:102.9,drtg:104.0,nrtg:-1.1},
+{s:7,n:'Kentucky',c:'SEC',elo:1942.6,mom:0.8,prior:1963.5,mx:2031.7,mn:1914.5,w:22,l:10,ppg:76.8,oppg:71.5,mov:5.34,sos:11.87,srs:17.21,ortg:119.1,drtg:94.7,nrtg:24.4},
+{s:10,n:'Santa Clara',c:'WCC',elo:1867.2,mom:-2.5,prior:1716.8,mx:1869.1,mn:1687.8,w:26,l:7,ppg:77.5,oppg:67.6,mov:9.88,sos:3.23,srs:13.05,ortg:112.0,drtg:91.5,nrtg:20.5},
+{s:2,n:'Iowa State',c:'Big 12',elo:2157.9,mom:-5.2,prior:1900.2,mx:2164.9,mn:1900.2,w:27,l:7,ppg:81.8,oppg:65.1,mov:16.65,sos:10.50,srs:27.15,ortg:125.8,drtg:88.4,nrtg:37.3},
+{s:15,n:'Tennessee St.',c:'OVC',elo:1520.7,mom:30.2,prior:1350.4,mx:1520.7,mn:1318.2,w:22,l:12,ppg:77.2,oppg:73.2,mov:4.00,sos:-6.00,srs:-2.01,ortg:101.7,drtg:103.3,nrtg:-1.7}
+]
+};
+
+// Populate fav dropdown
+const favSel=document.getElementById('favTeam');
+const names=[];
+Object.values(T).forEach(r=>r.forEach(t=>names.push(t.n)));
+names.sort().forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;if(n==='UConn')o.selected=true;favSel.appendChild(o)});
+
+let W={elo:40,srs:25,nrtg:20,mom:10,peak:5,bonus:50,fav:'UConn',od:0,chaos:0};
+const sl={elo:document.getElementById('sElo'),srs:document.getElementById('sSrs'),nrtg:document.getElementById('sNrtg'),mom:document.getElementById('sMom'),peak:document.getElementById('sPeak'),bonus:document.getElementById('sBonus'),od:document.getElementById('sOD'),chaos:document.getElementById('sChaos')};
+const vd={elo:document.getElementById('vElo'),srs:document.getElementById('vSrs'),nrtg:document.getElementById('vNrtg'),mom:document.getElementById('vMom'),peak:document.getElementById('vPeak'),bonus:document.getElementById('vBonus'),od:document.getElementById('vOD'),chaos:document.getElementById('vChaos')};
+
+// Chaos noise map: team name -> random value (-1 to 1), only regenerated on Roll click
+let chaosMap={};
+function rollChaos(){
+  chaosMap={};
+  Object.values(T).forEach(r=>r.forEach(t=>{chaosMap[t.n]=(Math.random()*2-1)}));
+}
+rollChaos(); // initial roll
+
+function readW(){
+  W.elo=+sl.elo.value;W.srs=+sl.srs.value;W.nrtg=+sl.nrtg.value;W.mom=+sl.mom.value;W.peak=+sl.peak.value;W.bonus=+sl.bonus.value;W.fav=favSel.value;W.od=+sl.od.value;W.chaos=+sl.chaos.value;
+  vd.elo.textContent=W.elo;vd.srs.textContent=W.srs;vd.nrtg.textContent=W.nrtg;vd.mom.textContent=W.mom;vd.peak.textContent=W.peak;vd.bonus.textContent=W.bonus;
+  vd.od.textContent=(W.od>0?'+':'')+W.od;vd.chaos.textContent=W.chaos;
+  const s=W.elo+W.srs+W.nrtg+W.mom+W.peak;const ws=document.getElementById('wsum');ws.textContent='='+s+'%';ws.classList.toggle('warn',s!==100);
+}
+// Weight sliders and O/D slider update live
+['elo','srs','nrtg','mom','peak','bonus','od'].forEach(k=>sl[k].addEventListener('input',()=>{readW();render()}));
+// Chaos slider does NOT re-render (just updates display), only Roll button triggers render
+sl.chaos.addEventListener('input',()=>{readW()});
+favSel.addEventListener('change',()=>{readW();render()});
+document.getElementById('rollBtn').addEventListener('click',()=>{rollChaos();readW();render()});
+document.getElementById('resetBtn').addEventListener('click',()=>{sl.elo.value=40;sl.srs.value=25;sl.nrtg.value=20;sl.mom.value=10;sl.peak.value=5;sl.bonus.value=50;sl.od.value=0;sl.chaos.value=0;favSel.value='UConn';rollChaos();readW();render()});
+
+function comp(t){
+  let c=((t.elo/2300)*W.elo+(t.srs/35)*W.srs+(t.nrtg/45)*W.nrtg+(Math.max(t.mom,0)/50)*W.mom+(t.elo/t.mx)*W.peak)/100;
+  // Offense vs Defense bias: od ranges -100 to +100
+  // Positive = favor offense (high ORtg), Negative = favor defense (low DRtg = good)
+  if(W.od!==0){
+    const odFactor=W.od/100; // -1 to +1
+    // ORtg bonus: higher ORtg is better (scale ~95-135, center ~115)
+    // DRtg bonus: lower DRtg is better (scale ~80-110, center ~95), so invert
+    const offBonus=((t.ortg-115)/20)*0.15; // ~-0.15 to +0.15
+    const defBonus=((95-t.drtg)/15)*0.15;  // ~-0.15 to +0.15
+    if(odFactor>0) c+=offBonus*odFactor;
+    else c+=defBonus*(-odFactor);
+  }
+  // Favorite bonus
+  if(W.fav&&t.n===W.fav)c+=W.bonus/2300;
+  // Chaos noise (only applied if chaos > 0)
+  if(W.chaos>0&&chaosMap[t.n]!==undefined){
+    c+=chaosMap[t.n]*(W.chaos/100)*0.25; // max noise: \u00b10.25 at chaos=100
+  }
+  return c;
+}
+
+function tip(t){
+  const sc=comp(t);
+  return `${t.n} (${t.c})\nElo: ${t.elo.toFixed(1)}  Mom: ${t.mom>0?'+':''}${t.mom.toFixed(1)}\nSRS: ${t.srs.toFixed(1)}  NRtg: ${t.nrtg.toFixed(1)}\nRecord: ${t.w}-${t.l}\nPPG: ${t.ppg} / Opp: ${t.oppg}\nORtg: ${t.ortg}  DRtg: ${t.drtg}\nScore: ${(sc*100).toFixed(1)}`;
+}
+
+function teamEl(t,won,lost){
+  const isFav=W.fav&&t.n===W.fav;
+  const cls=['team'];
+  if(won)cls.push('w');if(lost)cls.push('l');if(isFav)cls.push('fav');
+  const sc=comp(t);
+  return `<div class="${cls.join(' ')}"><span class="sd">${t.s}</span><span class="nm">${t.n}</span><div class="tip">${tip(t)}</div></div>`;
+}
+
+function predictScore(a,b){
+  // Team PPG weighted by opponent's defensive strength (opp's oppg relative to avg)
+  const avgPPG=74;
+  const aOff=a.ppg*(b.oppg/avgPPG);
+  const bOff=b.ppg*(a.oppg/avgPPG);
+  // Adjust by composite advantage
+  const ca=comp(a),cb=comp(b);
+  const edge=(ca-cb)*15; // composite diff scaled to points
+  let sa=Math.round(aOff+edge/2), sb=Math.round(bOff-edge/2);
+  // No ties in basketball \u2014 winner (team a = champ) gets +1 if tied
+  if(sa===sb) sa+=1;
+  return {a:sa,b:sb};
+}
+
+function simRegion(teams){
+  let cur=[...teams];
+  const rounds=[cur];
+  while(cur.length>1){
+    const next=[];
+    for(let i=0;i<cur.length;i+=2){
+      const a=cur[i],b=cur[i+1];
+      next.push(comp(a)>=comp(b)?a:b);
+    }
+    rounds.push(next);
+    cur=next;
+  }
+  return rounds;
+}
+
+function makeRoundCol(teams,winners,regionCls,reverse){
+  const col=document.createElement('div');
+  col.className='round';
+  for(let i=0;i<teams.length;i+=2){
+    const a=teams[i],b=teams[i+1];
+    const aWon=winners?winners.includes(a):false;
+    const bWon=winners?winners.includes(b):false;
+    const g=document.createElement('div');
+    g.className='game';
+    g.innerHTML=teamEl(a,aWon,bWon)+teamEl(b,bWon,aWon);
+    col.appendChild(g);
+  }
+  return col;
+}
+
+function render(){
+  const wrap=document.getElementById('bracketWrap');
+  wrap.innerHTML='';
+
+  const regions={EAST:simRegion(T.EAST),SOUTH:simRegion(T.SOUTH),WEST:simRegion(T.WEST),MIDWEST:simRegion(T.MIDWEST)};
+
+  // LEFT HALF: East on far left, South inside
+  const leftHalf=document.createElement('div');leftHalf.className='half left';
+
+  // Build region columns function
+  function buildRegion(name,rounds,cls,reverse){
+    const block=document.createElement('div');block.className='region-block '+cls;
+    const label=document.createElement('div');label.className='rlabel';label.textContent=name;
+
+    const roundsDiv=document.createElement('div');roundsDiv.className='rounds';
+
+    for(let r=0;r<rounds.length-1;r++){
+      const col=makeRoundCol(rounds[r],rounds[r+1]?rounds[r+1]:null,cls,reverse);
+      roundsDiv.appendChild(col);
+    }
+
+    block.appendChild(label);
+    block.appendChild(roundsDiv);
+    return block;
+  }
+
+  leftHalf.appendChild(buildRegion('EAST',regions.EAST,'east',false));
+  leftHalf.appendChild(buildRegion('SOUTH',regions.SOUTH,'south',false));
+
+  // RIGHT HALF: Midwest far right, West inside
+  const rightHalf=document.createElement('div');rightHalf.className='half right';
+  rightHalf.appendChild(buildRegion('WEST',regions.WEST,'west',true));
+  rightHalf.appendChild(buildRegion('MIDWEST',regions.MIDWEST,'midwest',true));
+
+  // FINAL FOUR center
+  const eastChamp=regions.EAST[regions.EAST.length-1][0];
+  const southChamp=regions.SOUTH[regions.SOUTH.length-1][0];
+  const westChamp=regions.WEST[regions.WEST.length-1][0];
+  const midwestChamp=regions.MIDWEST[regions.MIDWEST.length-1][0];
+
+  const ff1W=comp(eastChamp)>=comp(southChamp)?eastChamp:southChamp;
+  const ff1L=ff1W===eastChamp?southChamp:eastChamp;
+  const ff2W=comp(westChamp)>=comp(midwestChamp)?westChamp:midwestChamp;
+  const ff2L=ff2W===westChamp?midwestChamp:westChamp;
+  const champ=comp(ff1W)>=comp(ff2W)?ff1W:ff2W;
+  const runner=champ===ff1W?ff2W:ff1W;
+
+  const finalScore=predictScore(champ,runner);
+
+  const ffCol=document.createElement('div');ffCol.className='ff-col';
+
+  function ffTeamEl(t,won){
+    const isFav=W.fav&&t.n===W.fav;
+    const cls=['ff-team'];if(won)cls.push('w');if(!won)cls.push('l');if(isFav)cls.push('fav');
+    return `<div class="${cls.join(' ')}"><span class="sd">${t.s}</span>${t.n}</div>`;
+  }
+
+  ffCol.innerHTML=`
+    <div class="ff-label">Final Four</div>
+    <div class="ff-game">${ffTeamEl(eastChamp,ff1W===eastChamp)}${ffTeamEl(southChamp,ff1W===southChamp)}</div>
+    <div class="champ-box">
+      <div class="champ-label">Champion</div>
+      ${champ.n}
+      <div class="champ-score">${finalScore.a} - ${finalScore.b}</div>
+    </div>
+    <div class="ff-game">${ffTeamEl(westChamp,ff2W===westChamp)}${ffTeamEl(midwestChamp,ff2W===midwestChamp)}</div>
+  `;
+
+  wrap.appendChild(leftHalf);
+  wrap.appendChild(ffCol);
+  wrap.appendChild(rightHalf);
+}
+
+readW();
+render();
+</script>
+</body>
+</html>
