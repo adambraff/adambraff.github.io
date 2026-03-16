@@ -268,7 +268,9 @@
         var upcoming = props.filter(function(p) {
             if (isResolved(p)) return false;
             var expected = new Date(p['Expected resolution date']);
-            return expected >= now && expected <= oneMonthFromNow;
+            // Show unresolved props resolving within the next month,
+            // OR past-due unresolved props (date typos, delayed resolution)
+            return expected <= oneMonthFromNow;
         });
 
         var unresolved = props.filter(function(p) { return !isResolved(p); });
