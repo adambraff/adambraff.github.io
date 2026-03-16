@@ -1,11 +1,12 @@
 # March Madness 2026 Bracket Builder
 
-Interactive bracket builder for the 2026 NCAA Tournament. Adjust weighted metrics to generate a custom bracket with predicted scores.
+Interactive bracket builder for the 2026 NCAA Tournament with all 68 teams including First Four play-in games.
 
 ## Features
 
+- **68-team bracket** with First Four play-in games (UMBC/Howard, Texas/NC State, Prairie View/Lehigh, Miami OH/SMU)
 - **Composite scoring** from COOPER Elo ratings (Nate Silver), SRS, Net Rating, Momentum, and Peak Proximity
-- **Adjustable weights** — sliders let you emphasize different metrics in real time
+- **Auto-balancing weight sliders** — weights always sum to 100%; adjusting one proportionally scales the others
 - **Offense vs Defense bias** — tilt the model toward high-scoring or lockdown-defense teams
 - **Chaos / Upset factor** — inject randomness to simulate bracket busting (button-triggered, not live)
 - **Favorite team bonus** — because the heart wants what it wants
@@ -17,6 +18,7 @@ Interactive bracket builder for the 2026 NCAA Tournament. Adjust weighted metric
 - **Elo ratings**: Nate Silver's COOPER model (Silver Bulletin)
 - **SRS, SOS, ORtg, DRtg, NRtg**: Sports Reference
 - **PPG, Record, MOV**: Sports Reference
+- **First Four team stats**: Sports Reference (Elo estimates for play-in teams)
 
 ## Usage
 

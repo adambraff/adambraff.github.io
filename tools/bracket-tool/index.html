@@ -26,7 +26,6 @@ button.reset:hover{background:#666}
 
 .bracket-wrap{display:flex;height:calc(100vh - 42px);padding:4px}
 
-/* Each half: two regions stacked vertically, rounds flow inward */
 .half{flex:1;display:flex;flex-direction:column;overflow:hidden;gap:2px}
 .half .rounds{flex-direction:row}
 .half.right .region-block .rounds{flex-direction:row-reverse}
@@ -41,10 +40,10 @@ button.reset:hover{background:#666}
 .round{display:flex;flex-direction:column;justify-content:space-around;padding:0 1px}
 
 .game{display:flex;flex-direction:column;justify-content:center;margin:1px 0}
-.team{display:flex;align-items:center;padding:2px 4px;font-size:10px;line-height:1.2;min-width:110px;max-width:140px;background:#fff;border:1px solid #ddd;cursor:default;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative;height:18px}
+.team{display:flex;align-items:center;padding:2px 4px;font-size:11px;line-height:1.2;min-width:110px;max-width:140px;background:#fff;border:1px solid #ddd;cursor:default;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative;height:20px}
 .team:first-child{border-bottom:none;border-radius:2px 2px 0 0}
 .team:last-child{border-radius:0 0 2px 2px}
-.team .sd{font-weight:700;margin-right:3px;min-width:14px;color:#666;font-size:9px}
+.team .sd{font-weight:700;margin-right:3px;min-width:14px;color:#666;font-size:10px}
 .team .nm{flex:1;overflow:hidden;text-overflow:ellipsis}
 .team .sc{font-size:8px;color:#999;margin-left:3px}
 .team.w{background:#e8f5e9;font-weight:600;border-color:#a5d6a7}
@@ -55,10 +54,9 @@ button.reset:hover{background:#666}
 .team .tip{display:none;position:absolute;left:100%;top:-10px;background:#222;color:#fff;padding:8px;border-radius:4px;font-size:10px;line-height:1.5;white-space:pre;z-index:100;min-width:180px;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.4)}
 .team:hover .tip{display:block}
 
-/* Final Four center column */
 .ff-col{display:flex;flex-direction:column;justify-content:center;align-items:center;min-width:160px;gap:0;padding:0 6px}
 .ff-game{display:flex;flex-direction:column;margin:4px 0}
-.ff-team{padding:4px 8px;font-size:11px;min-width:140px;background:#fff;border:1px solid #ddd;display:flex;align-items:center;gap:4px;height:22px}
+.ff-team{padding:4px 8px;font-size:12px;min-width:140px;background:#fff;border:1px solid #ddd;display:flex;align-items:center;gap:4px;height:24px}
 .ff-team:first-child{border-bottom:none;border-radius:3px 3px 0 0}
 .ff-team:last-child{border-radius:0 0 3px 3px}
 .ff-team.w{background:#e8f5e9;font-weight:700;border-color:#66bb6a}
@@ -70,6 +68,18 @@ button.reset:hover{background:#666}
 .champ-box .champ-label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#5d4037;margin-bottom:2px}
 .champ-box .champ-score{font-size:11px;font-weight:400;color:#5d4037;margin-top:2px}
 .ff-label{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1px;margin:4px 0 2px}
+
+/* First Four section */
+.f4-section{margin-top:8px;padding:6px 8px;background:#2a2a3e;border-radius:4px;min-width:150px}
+.f4-title{font-size:8px;color:#aaa;text-transform:uppercase;letter-spacing:1px;text-align:center;margin-bottom:4px}
+.f4-game{display:flex;flex-direction:column;margin:3px 0}
+.f4-team{padding:2px 6px;font-size:10px;background:#383850;color:#ddd;border:1px solid #555;display:flex;align-items:center;gap:3px;height:18px}
+.f4-team:first-child{border-bottom:none;border-radius:2px 2px 0 0}
+.f4-team:last-child{border-radius:0 0 2px 2px}
+.f4-team.w{background:#2e5030;color:#8f8;font-weight:600;border-color:#4a7a4e}
+.f4-team.l{color:#777;background:#2a2a35}
+.f4-team .sd{font-weight:700;min-width:14px;color:#999;font-size:9px}
+.f4-region{font-size:8px;color:#777;text-align:center;margin-top:1px}
 
 /* Region colors */
 .east .rlabel{background:#1565c0}
@@ -180,23 +190,56 @@ MIDWEST:[
 ]
 };
 
-// Populate fav dropdown
+const PLAYIN=[
+{regionKey:'MIDWEST',idx:1,label:'16 Midwest',
+ alt:{s:16,n:'Howard',c:'MEAC',elo:1250.0,mom:20.0,prior:1100.0,mx:1260.0,mn:1080.0,w:19,l:13,ppg:77.8,oppg:72.8,mov:5.0,sos:-6.55,srs:-1.55,ortg:108.2,drtg:101.2,nrtg:7.0}},
+{regionKey:'WEST',idx:9,label:'11 West',
+ alt:{s:11,n:'NC State',c:'ACC',elo:1870.0,mom:10.0,prior:1750.0,mx:1920.0,mn:1700.0,w:20,l:12,ppg:84.0,oppg:76.4,mov:7.6,sos:10.62,srs:18.25,ortg:119.4,drtg:108.5,nrtg:10.9}},
+{regionKey:'SOUTH',idx:1,label:'16 South',
+ alt:{s:16,n:'Lehigh',c:'Patriot',elo:1380.0,mom:25.0,prior:1250.0,mx:1400.0,mn:1200.0,w:18,l:16,ppg:73.2,oppg:74.0,mov:-0.8,sos:-7.03,srs:-9.31,ortg:105.7,drtg:106.8,nrtg:-1.1}},
+{regionKey:'MIDWEST',idx:9,label:'11 Midwest',
+ alt:{s:11,n:'Miami (OH)',c:'MAC',elo:1800.0,mom:5.0,prior:1650.0,mx:1810.0,mn:1500.0,w:31,l:1,ppg:90.7,oppg:75.3,mov:15.4,sos:-5.48,srs:5.38,ortg:123.9,drtg:102.8,nrtg:21.1}}
+];
+
 const favSel=document.getElementById('favTeam');
 const names=[];
 Object.values(T).forEach(r=>r.forEach(t=>names.push(t.n)));
+PLAYIN.forEach(p=>{ if(!names.includes(p.alt.n)) names.push(p.alt.n); });
 names.sort().forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;if(n==='UConn')o.selected=true;favSel.appendChild(o)});
 
 let W={elo:40,srs:25,nrtg:20,mom:10,peak:5,bonus:50,fav:'UConn',od:0,chaos:0};
 const sl={elo:document.getElementById('sElo'),srs:document.getElementById('sSrs'),nrtg:document.getElementById('sNrtg'),mom:document.getElementById('sMom'),peak:document.getElementById('sPeak'),bonus:document.getElementById('sBonus'),od:document.getElementById('sOD'),chaos:document.getElementById('sChaos')};
 const vd={elo:document.getElementById('vElo'),srs:document.getElementById('vSrs'),nrtg:document.getElementById('vNrtg'),mom:document.getElementById('vMom'),peak:document.getElementById('vPeak'),bonus:document.getElementById('vBonus'),od:document.getElementById('vOD'),chaos:document.getElementById('vChaos')};
 
-// Chaos noise map: team name -> random value (-1 to 1), only regenerated on Roll click
 let chaosMap={};
 function rollChaos(){
   chaosMap={};
   Object.values(T).forEach(r=>r.forEach(t=>{chaosMap[t.n]=(Math.random()*2-1)}));
+  PLAYIN.forEach(p=>{chaosMap[p.alt.n]=(Math.random()*2-1)});
 }
-rollChaos(); // initial roll
+rollChaos();
+
+function adjustSliders(changedKey){
+  const keys=['elo','srs','nrtg','mom','peak'];
+  const vals={};
+  keys.forEach(k=>vals[k]=+sl[k].value);
+  const others=keys.filter(k=>k!==changedKey);
+  const otherSum=others.reduce((s,k)=>s+vals[k],0);
+  const target=100-vals[changedKey];
+  if(target<0){sl[changedKey].value=100;others.forEach(k=>{sl[k].value=0});return;}
+  if(otherSum===0){
+    const each=Math.floor(target/others.length);
+    let rem=target-each*others.length;
+    others.forEach(k=>{sl[k].value=each+(rem>0?1:0);if(rem>0)rem--});
+  } else {
+    const scale=target/otherSum;
+    let distributed=0;
+    others.forEach((k,i)=>{
+      if(i===others.length-1){sl[k].value=Math.max(0,target-distributed)}
+      else{const nv=Math.max(0,Math.round(vals[k]*scale));sl[k].value=nv;distributed+=nv}
+    });
+  }
+}
 
 function readW(){
   W.elo=+sl.elo.value;W.srs=+sl.srs.value;W.nrtg=+sl.nrtg.value;W.mom=+sl.mom.value;W.peak=+sl.peak.value;W.bonus=+sl.bonus.value;W.fav=favSel.value;W.od=+sl.od.value;W.chaos=+sl.chaos.value;
@@ -204,9 +247,9 @@ function readW(){
   vd.od.textContent=(W.od>0?'+':'')+W.od;vd.chaos.textContent=W.chaos;
   const s=W.elo+W.srs+W.nrtg+W.mom+W.peak;const ws=document.getElementById('wsum');ws.textContent='='+s+'%';ws.classList.toggle('warn',s!==100);
 }
-// Weight sliders and O/D slider update live
-['elo','srs','nrtg','mom','peak','bonus','od'].forEach(k=>sl[k].addEventListener('input',()=>{readW();render()}));
-// Chaos slider does NOT re-render (just updates display), only Roll button triggers render
+
+['elo','srs','nrtg','mom','peak'].forEach(k=>sl[k].addEventListener('input',()=>{adjustSliders(k);readW();render()}));
+['bonus','od'].forEach(k=>sl[k].addEventListener('input',()=>{readW();render()}));
 sl.chaos.addEventListener('input',()=>{readW()});
 favSel.addEventListener('change',()=>{readW();render()});
 document.getElementById('rollBtn').addEventListener('click',()=>{rollChaos();readW();render()});
@@ -214,22 +257,16 @@ document.getElementById('resetBtn').addEventListener('click',()=>{sl.elo.value=4
 
 function comp(t){
   let c=((t.elo/2300)*W.elo+(t.srs/35)*W.srs+(t.nrtg/45)*W.nrtg+(Math.max(t.mom,0)/50)*W.mom+(t.elo/t.mx)*W.peak)/100;
-  // Offense vs Defense bias: od ranges -100 to +100
-  // Positive = favor offense (high ORtg), Negative = favor defense (low DRtg = good)
   if(W.od!==0){
-    const odFactor=W.od/100; // -1 to +1
-    // ORtg bonus: higher ORtg is better (scale ~95-135, center ~115)
-    // DRtg bonus: lower DRtg is better (scale ~80-110, center ~95), so invert
-    const offBonus=((t.ortg-115)/20)*0.15; // ~-0.15 to +0.15
-    const defBonus=((95-t.drtg)/15)*0.15;  // ~-0.15 to +0.15
+    const odFactor=W.od/100;
+    const offBonus=((t.ortg-115)/20)*0.15;
+    const defBonus=((95-t.drtg)/15)*0.15;
     if(odFactor>0) c+=offBonus*odFactor;
     else c+=defBonus*(-odFactor);
   }
-  // Favorite bonus
   if(W.fav&&t.n===W.fav)c+=W.bonus/2300;
-  // Chaos noise (only applied if chaos > 0)
   if(W.chaos>0&&chaosMap[t.n]!==undefined){
-    c+=chaosMap[t.n]*(W.chaos/100)*0.25; // max noise: \u00b10.25 at chaos=100
+    c+=chaosMap[t.n]*(W.chaos/100)*0.25;
   }
   return c;
 }
@@ -243,20 +280,16 @@ function teamEl(t,won,lost){
   const isFav=W.fav&&t.n===W.fav;
   const cls=['team'];
   if(won)cls.push('w');if(lost)cls.push('l');if(isFav)cls.push('fav');
-  const sc=comp(t);
   return `<div class="${cls.join(' ')}"><span class="sd">${t.s}</span><span class="nm">${t.n}</span><div class="tip">${tip(t)}</div></div>`;
 }
 
 function predictScore(a,b){
-  // Team PPG weighted by opponent's defensive strength (opp's oppg relative to avg)
   const avgPPG=74;
   const aOff=a.ppg*(b.oppg/avgPPG);
   const bOff=b.ppg*(a.oppg/avgPPG);
-  // Adjust by composite advantage
   const ca=comp(a),cb=comp(b);
-  const edge=(ca-cb)*15; // composite diff scaled to points
+  const edge=(ca-cb)*15;
   let sa=Math.round(aOff+edge/2), sb=Math.round(bOff-edge/2);
-  // No ties in basketball \u2014 winner (team a = champ) gets +1 if tied
   if(sa===sb) sa+=1;
   return {a:sa,b:sb};
 }
@@ -276,7 +309,7 @@ function simRegion(teams){
   return rounds;
 }
 
-function makeRoundCol(teams,winners,regionCls,reverse){
+function makeRoundCol(teams,winners){
   const col=document.createElement('div');
   col.className='round';
   for(let i=0;i<teams.length;i+=2){
@@ -295,49 +328,51 @@ function render(){
   const wrap=document.getElementById('bracketWrap');
   wrap.innerHTML='';
 
-  const regions={EAST:simRegion(T.EAST),SOUTH:simRegion(T.SOUTH),WEST:simRegion(T.WEST),MIDWEST:simRegion(T.MIDWEST)};
+  const R={};
+  for(let k in T) R[k]=[...T[k]];
+  const f4Results=PLAYIN.map(p=>{
+    const incumbent=R[p.regionKey][p.idx];
+    const challenger=p.alt;
+    const iWins=comp(incumbent)>=comp(challenger);
+    const winner=iWins?incumbent:challenger;
+    const loser=iWins?challenger:incumbent;
+    R[p.regionKey][p.idx]=winner;
+    return {a:incumbent,b:challenger,winner,loser,label:p.label};
+  });
 
-  // LEFT HALF: East on far left, South inside
+  const regions={EAST:simRegion(R.EAST),SOUTH:simRegion(R.SOUTH),WEST:simRegion(R.WEST),MIDWEST:simRegion(R.MIDWEST)};
+
   const leftHalf=document.createElement('div');leftHalf.className='half left';
 
-  // Build region columns function
-  function buildRegion(name,rounds,cls,reverse){
+  function buildRegion(name,rounds,cls){
     const block=document.createElement('div');block.className='region-block '+cls;
     const label=document.createElement('div');label.className='rlabel';label.textContent=name;
-
     const roundsDiv=document.createElement('div');roundsDiv.className='rounds';
-
     for(let r=0;r<rounds.length-1;r++){
-      const col=makeRoundCol(rounds[r],rounds[r+1]?rounds[r+1]:null,cls,reverse);
+      const col=makeRoundCol(rounds[r],rounds[r+1]?rounds[r+1]:null);
       roundsDiv.appendChild(col);
     }
-
     block.appendChild(label);
     block.appendChild(roundsDiv);
     return block;
   }
 
-  leftHalf.appendChild(buildRegion('EAST',regions.EAST,'east',false));
-  leftHalf.appendChild(buildRegion('SOUTH',regions.SOUTH,'south',false));
+  leftHalf.appendChild(buildRegion('EAST',regions.EAST,'east'));
+  leftHalf.appendChild(buildRegion('SOUTH',regions.SOUTH,'south'));
 
-  // RIGHT HALF: Midwest far right, West inside
   const rightHalf=document.createElement('div');rightHalf.className='half right';
-  rightHalf.appendChild(buildRegion('WEST',regions.WEST,'west',true));
-  rightHalf.appendChild(buildRegion('MIDWEST',regions.MIDWEST,'midwest',true));
+  rightHalf.appendChild(buildRegion('WEST',regions.WEST,'west'));
+  rightHalf.appendChild(buildRegion('MIDWEST',regions.MIDWEST,'midwest'));
 
-  // FINAL FOUR center
   const eastChamp=regions.EAST[regions.EAST.length-1][0];
   const southChamp=regions.SOUTH[regions.SOUTH.length-1][0];
   const westChamp=regions.WEST[regions.WEST.length-1][0];
   const midwestChamp=regions.MIDWEST[regions.MIDWEST.length-1][0];
 
   const ff1W=comp(eastChamp)>=comp(southChamp)?eastChamp:southChamp;
-  const ff1L=ff1W===eastChamp?southChamp:eastChamp;
   const ff2W=comp(westChamp)>=comp(midwestChamp)?westChamp:midwestChamp;
-  const ff2L=ff2W===westChamp?midwestChamp:westChamp;
   const champ=comp(ff1W)>=comp(ff2W)?ff1W:ff2W;
   const runner=champ===ff1W?ff2W:ff1W;
-
   const finalScore=predictScore(champ,runner);
 
   const ffCol=document.createElement('div');ffCol.className='ff-col';
@@ -348,6 +383,14 @@ function render(){
     return `<div class="${cls.join(' ')}"><span class="sd">${t.s}</span>${t.n}</div>`;
   }
 
+  let f4Html='<div class="f4-section"><div class="f4-title">First Four</div>';
+  f4Results.forEach(r=>{
+    const aW=r.winner===r.a;
+    const bW=r.winner===r.b;
+    f4Html+=`<div class="f4-game"><div class="f4-team${aW?' w':' l'}"><span class="sd">${r.a.s}</span>${r.a.n}</div><div class="f4-team${bW?' w':' l'}"><span class="sd">${r.b.s}</span>${r.b.n}</div></div><div class="f4-region">\u2192 ${r.label}</div>`;
+  });
+  f4Html+='</div>';
+
   ffCol.innerHTML=`
     <div class="ff-label">Final Four</div>
     <div class="ff-game">${ffTeamEl(eastChamp,ff1W===eastChamp)}${ffTeamEl(southChamp,ff1W===southChamp)}</div>
@@ -357,6 +400,7 @@ function render(){
       <div class="champ-score">${finalScore.a} - ${finalScore.b}</div>
     </div>
     <div class="ff-game">${ffTeamEl(westChamp,ff2W===westChamp)}${ffTeamEl(midwestChamp,ff2W===midwestChamp)}</div>
+    ${f4Html}
   `;
 
   wrap.appendChild(leftHalf);
