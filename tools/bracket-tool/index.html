@@ -115,6 +115,7 @@ button.reset:hover{background:#666}
 <div class="bracket-wrap" id="bracketWrap"></div>
 
 <script>
+// Main bracket teams (64 slots — play-in winners get swapped in during render)
 const T={
 EAST:[
 {s:1,n:'Duke',c:'ACC',elo:2256.2,mom:-4.9,prior:2024.7,mx:2292.6,mn:2024.7,w:32,l:2,ppg:82.3,oppg:63.1,mov:19.15,sos:12.43,srs:31.57,ortg:129.4,drtg:84.9,nrtg:44.5},
@@ -190,17 +191,20 @@ MIDWEST:[
 ]
 };
 
+// First Four play-in matchups: each has the "incumbent" team name (already in bracket)
+// and the "alt" challenger team data. Winner replaces the slot.
 const PLAYIN=[
 {regionKey:'MIDWEST',idx:1,label:'16 Midwest',
- alt:{s:16,n:'Howard',c:'MEAC',elo:1250.0,mom:20.0,prior:1100.0,mx:1260.0,mn:1080.0,w:19,l:13,ppg:77.8,oppg:72.8,mov:5.0,sos:-6.55,srs:-1.55,ortg:108.2,drtg:101.2,nrtg:7.0}},
+ alt:{s:16,n:'Howard',c:'MEAC',elo:1477.5,mom:-8.2,prior:1246.2,mx:1485.7,mn:1194.9,w:19,l:13,ppg:77.8,oppg:72.8,mov:5.0,sos:-6.55,srs:-1.55,ortg:108.2,drtg:101.2,nrtg:7.0}},
 {regionKey:'WEST',idx:9,label:'11 West',
- alt:{s:11,n:'NC State',c:'ACC',elo:1870.0,mom:10.0,prior:1750.0,mx:1920.0,mn:1700.0,w:20,l:12,ppg:84.0,oppg:76.4,mov:7.6,sos:10.62,srs:18.25,ortg:119.4,drtg:108.5,nrtg:10.9}},
+ alt:{s:11,n:'NC State',c:'ACC',elo:1835.8,mom:1.0,prior:1852.7,mx:1988.1,mn:1828.5,w:20,l:12,ppg:84.0,oppg:76.4,mov:7.6,sos:10.62,srs:18.25,ortg:119.4,drtg:108.5,nrtg:10.9}},
 {regionKey:'SOUTH',idx:1,label:'16 South',
- alt:{s:16,n:'Lehigh',c:'Patriot',elo:1380.0,mom:25.0,prior:1250.0,mx:1400.0,mn:1200.0,w:18,l:16,ppg:73.2,oppg:74.0,mov:-0.8,sos:-7.03,srs:-9.31,ortg:105.7,drtg:106.8,nrtg:-1.1}},
+ alt:{s:16,n:'Lehigh',c:'Patriot',elo:1339.4,mom:25.2,prior:1305.2,mx:1357.4,mn:1208.0,w:18,l:16,ppg:73.2,oppg:74.0,mov:-0.8,sos:-7.03,srs:-9.31,ortg:105.7,drtg:106.8,nrtg:-1.1}},
 {regionKey:'MIDWEST',idx:9,label:'11 Midwest',
- alt:{s:11,n:'Miami (OH)',c:'MAC',elo:1800.0,mom:5.0,prior:1650.0,mx:1810.0,mn:1500.0,w:31,l:1,ppg:90.7,oppg:75.3,mov:15.4,sos:-5.48,srs:5.38,ortg:123.9,drtg:102.8,nrtg:21.1}}
+ alt:{s:11,n:'Miami (OH)',c:'MAC',elo:1653.0,mom:-24.6,prior:1487.8,mx:1703.8,mn:1487.8,w:31,l:1,ppg:90.7,oppg:75.3,mov:15.4,sos:-5.48,srs:5.38,ortg:123.9,drtg:102.8,nrtg:21.1}}
 ];
 
+// Populate fav dropdown with all 68 teams
 const favSel=document.getElementById('favTeam');
 const names=[];
 Object.values(T).forEach(r=>r.forEach(t=>names.push(t.n)));
@@ -211,6 +215,7 @@ let W={elo:40,srs:25,nrtg:20,mom:10,peak:5,bonus:50,fav:'UConn',od:0,chaos:0};
 const sl={elo:document.getElementById('sElo'),srs:document.getElementById('sSrs'),nrtg:document.getElementById('sNrtg'),mom:document.getElementById('sMom'),peak:document.getElementById('sPeak'),bonus:document.getElementById('sBonus'),od:document.getElementById('sOD'),chaos:document.getElementById('sChaos')};
 const vd={elo:document.getElementById('vElo'),srs:document.getElementById('vSrs'),nrtg:document.getElementById('vNrtg'),mom:document.getElementById('vMom'),peak:document.getElementById('vPeak'),bonus:document.getElementById('vBonus'),od:document.getElementById('vOD'),chaos:document.getElementById('vChaos')};
 
+// Chaos noise map
 let chaosMap={};
 function rollChaos(){
   chaosMap={};
@@ -219,6 +224,7 @@ function rollChaos(){
 }
 rollChaos();
 
+// Auto-balance weight sliders to sum to 100
 function adjustSliders(changedKey){
   const keys=['elo','srs','nrtg','mom','peak'];
   const vals={};
@@ -248,8 +254,11 @@ function readW(){
   const s=W.elo+W.srs+W.nrtg+W.mom+W.peak;const ws=document.getElementById('wsum');ws.textContent='='+s+'%';ws.classList.toggle('warn',s!==100);
 }
 
+// Weight sliders auto-balance and re-render
 ['elo','srs','nrtg','mom','peak'].forEach(k=>sl[k].addEventListener('input',()=>{adjustSliders(k);readW();render()}));
+// Non-weight sliders just re-render
 ['bonus','od'].forEach(k=>sl[k].addEventListener('input',()=>{readW();render()}));
+// Chaos slider does NOT re-render
 sl.chaos.addEventListener('input',()=>{readW()});
 favSel.addEventListener('change',()=>{readW();render()});
 document.getElementById('rollBtn').addEventListener('click',()=>{rollChaos();readW();render()});
@@ -328,6 +337,7 @@ function render(){
   const wrap=document.getElementById('bracketWrap');
   wrap.innerHTML='';
 
+  // Resolve First Four play-in games
   const R={};
   for(let k in T) R[k]=[...T[k]];
   const f4Results=PLAYIN.map(p=>{
@@ -364,6 +374,7 @@ function render(){
   rightHalf.appendChild(buildRegion('WEST',regions.WEST,'west'));
   rightHalf.appendChild(buildRegion('MIDWEST',regions.MIDWEST,'midwest'));
 
+  // Final Four
   const eastChamp=regions.EAST[regions.EAST.length-1][0];
   const southChamp=regions.SOUTH[regions.SOUTH.length-1][0];
   const westChamp=regions.WEST[regions.WEST.length-1][0];
@@ -383,6 +394,7 @@ function render(){
     return `<div class="${cls.join(' ')}"><span class="sd">${t.s}</span>${t.n}</div>`;
   }
 
+  // First Four display
   let f4Html='<div class="f4-section"><div class="f4-title">First Four</div>';
   f4Results.forEach(r=>{
     const aW=r.winner===r.a;
