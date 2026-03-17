@@ -25,531 +25,1027 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .filter-section .fs-options label{font-size:12px;display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none;padding:2px 0}
 .filter-section .fs-options label:hover{color:var(--accent)}
 .filter-section .fs-options input[type="checkbox"]{accent-color:var(--accent);width:14px;height:14px}
+.filter-row{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}
+.filter-dates{display:flex;align-items:center;gap:10px;align-self:flex-start;margin-top:2px}
+.filter-dates label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.filter-dates select{padding:5px 8px;border:1px solid var(--border);border-radius:5px;font-size:12px;background:#fff}
+.filter-divider{width:1px;background:var(--border);align-self:stretch;min-height:40px;margin:0 4px}
 
-.content-area{flex:1;overflow-y:auto;padding:20px 24px}
-.dashboard-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(500px,1fr));gap:20px;margin-bottom:20px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+.tabs{display:flex;background:#fff;border-bottom:2px solid var(--border);padding:0 24px}
+.tab{padding:11px 18px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;color:var(--muted);transition:.2s}
+.tab:hover{color:var(--text)}.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
 
-.card h3{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text)}
-.card p{font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.5}
+.content{max-width:1440px;margin:0 auto;padding:20px 24px;flex:1;width:100%}
+.tab-content{display:none}.tab-content.active{display:block}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+.kpi{background:var(--card);border-radius:var(--radius);padding:16px;border:1px solid var(--border)}
+.kpi .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.kpi .v{font-size:26px;font-weight:700}.kpi .d{font-size:11px;color:var(--muted);margin-top:2px}
+.grid{display:grid;gap:18px;margin-bottom:20px}.g2{grid-template-columns:1fr 1fr}.g1{grid-template-columns:1fr}
+.box{background:var(--card);border-radius:var(--radius);padding:18px;border:1px solid var(--border)}
+.box h3{font-size:13px;font-weight:700;margin-bottom:2px}.box .bs{font-size:11px;color:var(--muted);margin-bottom:10px}
 
-.chart-container{position:relative;height:300px;margin-bottom:12px}
+table.dt{width:100%;border-collapse:collapse;font-size:12px}
+.dt th{text-align:left;padding:8px 10px;background:#f8fafc;border-bottom:2px solid var(--border);font-weight:700;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;user-select:none;white-space:nowrap}
+.dt th:hover{color:var(--accent)}
+.dt th .sort-arrow{font-size:9px;margin-left:3px;opacity:0.4}
+.dt th.sort-active .sort-arrow{opacity:1;color:var(--accent)}
+.dt td{padding:8px 10px;border-bottom:1px solid var(--border)}.dt tr:hover td{background:#f8fafc}
+.dt .n{text-align:right;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600}
+.hm-grid{display:grid;gap:2px}.hm-cell{padding:7px;text-align:center;font-size:11px;font-weight:600;border-radius:3px}
+.hm-h{background:#f1f5f9;color:#475569;font-size:10px;text-transform:uppercase}
+.loading{text-align:center;padding:60px;color:var(--muted)}
 
-.metric-row{display:flex;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
-.metric{flex:1;text-align:center}
-.metric-value{font-size:18px;font-weight:700;color:var(--accent)}
-.metric-label{font-size:11px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+.analysis-controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:18px}
+.ac-group{display:flex;flex-direction:column;gap:3px}
+.ac-group label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase}
+.ac-group select{padding:6px 10px;border:1px solid var(--border);border-radius:5px;font-size:13px;min-width:160px}
 
-.password-screen{position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);display:flex;align-items:center;justify-content:center;z-index:9999}
-.password-modal{background:#fff;padding:40px;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center;max-width:320px;width:100%}
-.password-modal h1{font-size:24px;font-weight:700;margin-bottom:8px;color:var(--text)}
-.password-modal p{font-size:13px;color:var(--muted);margin-bottom:20px}
-.password-modal input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:6px;font-size:14px;margin-bottom:16px;box-sizing:border-box}
-.password-modal button{width:100%;padding:10px 16px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.2s}
-.password-modal button:hover{background:#1d4ed8}
-.password-modal .error{color:#dc2626;font-size:12px;margin-top:8px;display:none}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;background:var(--accent);color:#fff;border:none;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;transition:.15s}
+.btn:hover{background:#1d4ed8}
+.btn-outline{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.btn-outline:hover{background:var(--accent);color:#fff}
+
+/* Chart containers: fixed heights to prevent squishing */
+.chart-h-sm{height:200px;position:relative}
+.chart-h-md{height:320px;position:relative}
+.chart-h-lg{height:400px;position:relative}
+.chart-h-auto{position:relative}
+
+.pd-controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:14px}
+.pd-controls input[type="text"]{padding:7px 12px;border:1px solid var(--border);border-radius:5px;font-size:13px;min-width:220px}
+.pd-controls select{padding:6px 10px;border:1px solid var(--border);border-radius:5px;font-size:12px}
+.pd-table-wrap{max-height:600px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius)}
+.pd-table-wrap table.dt th{position:sticky;top:0;z-index:1;background:#f8fafc}
+.pd-pager{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:12px;color:var(--muted)}
+.pd-pager button{padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;font-size:12px}
+.pd-pager button:disabled{opacity:0.4;cursor:default}
+.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+@media(max-width:960px){.g2{grid-template-columns:1fr}}
+#auth-gate{position:fixed;top:0;left:0;width:100%;height:100%;background:#1e293b;display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column}
+#auth-gate.hidden{display:none}
+#auth-gate h2{color:#fff;font-size:20px;margin-bottom:6px}
+#auth-gate .auth-sub{color:#94a3b8;font-size:13px;margin-bottom:20px}
+#auth-gate input{padding:10px 16px;border:2px solid #334155;border-radius:6px;font-size:15px;width:260px;background:#0f172a;color:#fff;text-align:center;letter-spacing:1px}
+#auth-gate input:focus{outline:none;border-color:#2563eb}
+#auth-gate button{margin-top:12px;padding:9px 32px;background:#2563eb;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer}
+#auth-gate button:hover{background:#1d4ed8}
+#auth-gate .auth-err{color:#f87171;font-size:12px;margin-top:10px;min-height:18px}
+.app-wrap.locked{visibility:hidden;height:0;overflow:hidden}
 </style>
 </head>
 <body>
 
-<div class="password-screen" id="passwordScreen">
-  <div class="password-modal">
-    <h1>Insights to Action</h1>
-    <p>Prototype Dashboard</p>
-    <input type="password" id="passwordInput" placeholder="Enter password" />
-    <button onclick="checkPassword()">Unlock</button>
-    <div class="error" id="errorMsg">Incorrect password</div>
+<div id="auth-gate">
+  <h2>Insights to Action</h2>
+  <div class="auth-sub">Braff &amp; Co · Prototype Dashboard</div>
+  <input type="password" id="auth-pw" placeholder="Enter password" autofocus>
+  <button onclick="checkAuth()">Continue</button>
+  <div class="auth-err" id="auth-err"></div>
+</div>
+<script>
+// Simple hash check — not cryptographic security, just a gate
+async function hashPw(pw){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pw));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+const HASH='af843cf3a8fdd2a27ccabcac5e4ef3a74926b3903a4a692ee6a2eefcb2ab7ae6';
+async function checkAuth(){
+  const pw=document.getElementById('auth-pw').value;
+  const h=await hashPw(pw);
+  if(h===HASH){
+    document.getElementById('auth-gate').classList.add('hidden');
+    document.querySelector('.app-wrap').classList.remove('locked');
+    sessionStorage.setItem('authed','1');
+  } else {
+    document.getElementById('auth-err').textContent='Incorrect password';
+    document.getElementById('auth-pw').value='';
+    document.getElementById('auth-pw').focus();
+  }
+}
+document.getElementById('auth-pw').addEventListener('keydown',e=>{if(e.key==='Enter')checkAuth();});
+// Auto-unlock if already authed this session
+if(sessionStorage.getItem('authed')==='1'){
+  document.getElementById('auth-gate').classList.add('hidden');
+}
+</script>
+
+<div class="app-wrap locked">
+<div class="header">
+  <div class="header-left">
+    <h1>Insights to Action — Prototype Dashboard</h1>
+    <div class="sub">Specialty Hub Services Patient Analytics</div>
+  </div>
+  <div class="header-right">Braff &amp; Co</div>
+</div>
+<div class="synth-banner">⚠ ALL DATA SHOWN IS ILLUSTRATIVE SYNTHETIC DATA — NOT REAL PATIENT, PROVIDER, OR MANUFACTURER DATA ⚠</div>
+
+<div class="sticky-top">
+  <div class="filter-bar" id="filter-bar"></div>
+  <div class="tabs" id="tabs-bar">
+    <div class="tab active" data-t="exec">Internal Cross-Program View</div>
+    <div class="tab" data-t="analysis">Analysis</div>
+    <div class="tab" data-t="ops">Operational Detail</div>
+    <div class="tab" data-t="patients">Patient Detail</div>
   </div>
 </div>
 
-<div id="dashboardContent" style="display:none">
-  <div class="header">
-    <div class="header-left">
-      <h1>Insights to Action</h1>
-      <div class="sub">Prototype Dashboard</div>
+<div class="content">
+  <div id="loading" class="loading"><h2>Loading…</h2><p>Place <code>dashboard_data.json</code> in the same folder, then serve via <code>python3 -m http.server 8000</code></p>
+  <input type="file" accept=".json" id="file-input" style="margin-top:12px"></div>
+
+  <div id="tab-exec" class="tab-content">
+    <div class="kpi-row" id="e-kpis"></div>
+    <div class="grid g1"><div class="box"><h3>Patient Funnel</h3><div class="bs">Patients entering each stage · stacked by outcome</div><div class="chart-h-lg"><canvas id="c-funnel"></canvas></div></div></div>
+    <div class="grid g2">
+      <div class="box"><h3>Monthly Enrollments</h3><div class="bs">By selected programs · toggle total line</div><div style="margin-bottom:8px"><label style="font-size:11px;cursor:pointer"><input type="checkbox" id="enroll-total" onchange="renderEnroll()"> Show total line</label></div><div class="chart-h-md"><canvas id="c-enroll"></canvas></div></div>
+      <div class="box"><h3>Average TAT by Stage</h3><div class="bs">Business days · pending → completed</div><div class="chart-h-lg"><canvas id="c-tat"></canvas></div></div>
     </div>
-    <div class="header-right" id="lastUpdated"></div>
+    <div class="grid g1"><div class="box"><h3>Program Comparison</h3><div class="bs">Key metrics for selected drug programs · click column headers to sort</div><div id="e-table"></div></div></div>
   </div>
 
-  <div class="synth-banner">
-    This dashboard uses <strong>synthetic data</strong> for demonstration purposes only
+  <div id="tab-analysis" class="tab-content">
+    <div class="analysis-controls" id="a-controls"></div>
+    <div class="grid g1"><div class="box"><div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;margin-bottom:4px"><div><h3 id="a-trend-title">Trend</h3><div class="bs" id="a-trend-sub"></div></div><button class="btn btn-outline" onclick="downloadTrendCSV()">⬇ Download CSV</button></div><div class="chart-h-md"><canvas id="c-trend"></canvas></div></div></div>
+    <div class="grid g1"><div class="box"><div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;margin-bottom:10px"><div><h3 id="a-bar-title">Ranking</h3><div class="bs" id="a-bar-sub"></div></div><button class="btn btn-outline" onclick="downloadAnalysisCSV()">⬇ Download CSV</button></div><div class="chart-h-auto" id="c-abar-wrap"><canvas id="c-abar"></canvas></div></div></div>
   </div>
 
-  <div class="sticky-top">
-    <div class="filter-bar">
-      <div class="filter-section">
-        <label class="fs-label">Months</label>
-        <div class="fs-options" id="monthFilters"></div>
-      </div>
-      <div class="filter-section">
-        <label class="fs-label">Agents</label>
-        <div class="fs-options" id="agentFilters"></div>
-      </div>
-      <div class="filter-section">
-        <label class="fs-label">Payors</label>
-        <div class="fs-options" id="payorFilters"></div>
-      </div>
-      <div class="filter-section">
-        <label class="fs-label">Providers</label>
-        <div class="fs-options" id="providerFilters"></div>
-      </div>
-      <div class="filter-section">
-        <label class="fs-label">Programs</label>
-        <div class="fs-options" id="programFilters"></div>
-      </div>
+  <div id="tab-ops" class="tab-content">
+    <div class="grid g2">
+      <div class="box"><h3>BI/BV Turnaround by Payor Type</h3><div class="bs">Average business days</div><div class="chart-h-sm"><canvas id="c-bvp"></canvas></div></div>
+      <div class="box"><h3>PA Denial Rate by Payor</h3><div class="bs">% of PA submissions denied</div><div class="chart-h-lg"><canvas id="c-pad"></canvas></div></div>
+    </div>
+    <div class="grid g1"><div class="box"><h3>Stage Aging — In-Flight Patients</h3><div class="bs">How long patients have been waiting at each stage (point-in-time snapshot)</div><div id="o-aging"></div></div></div>
+    <div class="grid g2">
+      <div class="box"><h3>Team Performance</h3><div class="bs">Avg TAT and event volume</div><div class="chart-h-sm"><canvas id="c-team"></canvas></div></div>
+      <div class="box"><h3>Top Abandonment Reasons</h3><div class="bs">Top 10 reasons for patient cancellation</div><div class="chart-h-md"><canvas id="c-abn"></canvas></div></div>
+    </div>
+    <div class="grid g2">
+      <div class="box"><h3>Appeal Success Rate by Payor</h3><div class="bs" id="o-appeal-sub">% of appeals that overturn denial</div><div class="chart-h-lg"><canvas id="c-appeal"></canvas></div></div>
+      <div class="box"><h3>Missing Information by Type</h3><div class="bs">Distribution of what's missing</div><div class="chart-h-md"><canvas id="c-mit"></canvas></div></div>
+    </div>
+    <div class="grid g2">
+      <div class="box"><h3>Missing Info — Top Providers</h3><div class="bs">% of stages with missing information</div><div class="chart-h-lg"><canvas id="c-mip"></canvas></div></div>
+      <div class="box"><h3>Referral Source Performance</h3><div class="bs">Conversion, abandonment, and time-to-therapy by referral channel</div><div id="o-refsrc"></div></div>
     </div>
   </div>
 
-  <div class="content-area">
-    <div class="dashboard-row">
-      <div class="card">
-        <h3>Patient Journey Overview</h3>
-        <p>Distribution of patients across the patient journey stages</p>
-        <div class="chart-container">
-          <canvas id="journeyChart"></canvas>
-        </div>
-      </div>
-      <div class="card">
-        <h3>Stage Conversion Funnel</h3>
-        <p>Conversion rates between consecutive journey stages</p>
-        <div class="chart-container">
-          <canvas id="conversionChart"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <div class="dashboard-row">
-      <div class="card">
-        <h3>Events by Month</h3>
-        <p>Temporal distribution of patient events</p>
-        <div class="chart-container">
-          <canvas id="timelineChart"></canvas>
-        </div>
-      </div>
-      <div class="card">
-        <h3>Program Enrollment</h3>
-        <p>Patient distribution across drug programs</p>
-        <div class="chart-container">
-          <canvas id="programChart"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <div class="dashboard-row">
-      <div class="card">
-        <h3>Top Agents</h3>
-        <p>Agents by number of patient interactions</p>
-        <div class="chart-container">
-          <canvas id="agentChart"></canvas>
-        </div>
-      </div>
-      <div class="card">
-        <h3>Top Providers</h3>
-        <p>Healthcare providers by referral volume</p>
-        <div class="chart-container">
-          <canvas id="providerChart"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <div class="dashboard-row">
-      <div class="card">
-        <h3>Payor Distribution</h3>
-        <p>Patient distribution across insurance payors</p>
-        <div class="chart-container">
-          <canvas id="payorChart"></canvas>
-        </div>
-      </div>
-      <div class="card">
-        <h3>Summary Metrics</h3>
-        <p>Key performance indicators</p>
-        <div class="metric-row">
-          <div class="metric">
-            <div class="metric-value" id="totalPatients">-</div>
-            <div class="metric-label">Total Patients</div>
-          </div>
-          <div class="metric">
-            <div class="metric-value" id="totalEvents">-</div>
-            <div class="metric-label">Total Events</div>
-          </div>
-          <div class="metric">
-            <div class="metric-value" id="avgStageTime">-</div>
-            <div class="metric-label">Avg Time in Stage</div>
-          </div>
-        </div>
-      </div>
+  <div id="tab-patients" class="tab-content">
+    <div id="pd-content">
+      <div class="pd-controls" id="pd-controls"></div>
+      <div class="pd-table-wrap"><table class="dt" id="pd-table"><thead></thead><tbody></tbody></table></div>
+      <div class="pd-pager" id="pd-pager"></div>
     </div>
   </div>
 </div>
 
 <script>
-const PASSWORD = 'AssistRx2025';
-let allData = null;
-let filteredData = null;
-let charts = {};
-const activeFilters = {
-  months: new Set(),
-  agents: new Set(),
-  payors: new Set(),
-  providers: new Set(),
-  programs: new Set()
-};
+// ── DATA & STATE ──
+let D = null;
+const S = { drugs: new Set(), sm: '', em: '', tab: 'exec', aDim: 'payor', aMeas: 'conversion', aFilt: {} };
+const charts = {};
+const STAGE_ORD = ['Enrollment','BI/BV','PA','Appeal','Financial Assistance','Triage to Pharmacy','Triage to SP','Pharmacy Verification','Scheduling','Dispensing'];
+const DRUG_C = {'Drug A1':'#2563eb','Drug A2':'#60a5fa','Drug B1':'#7c3aed','Drug B2':'#a78bfa','Drug C1':'#059669','Drug C2':'#34d399'};
+const MEASURES = {conversion:'Conversion Rate (%)',abandon:'Abandonment Rate (%)',pa_denial:'PA Denial Rate (%)',e2e_tat:'Avg E2E TAT (days)',mi_rate:'Missing Info Rate (%)',volume:'Patient Volume'};
 
-function checkPassword() {
-  const input = document.getElementById('passwordInput');
-  const error = document.getElementById('errorMsg');
-  
-  if (input.value === PASSWORD) {
-    document.getElementById('passwordScreen').style.display = 'none';
-    document.getElementById('dashboardContent').style.display = 'flex';
-    loadDashboard();
-  } else {
-    error.style.display = 'block';
-    input.value = '';
-  }
+let progSortCol = null, progSortAsc = true;
+const PD = { page: 0, perPage: 50, search: '', status: '', stage: '', stuck: '', sortCol: null, sortAsc: true };
+
+Chart.defaults.font.family = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif";
+Chart.defaults.font.size = 11; Chart.defaults.color = '#6b7280';
+Chart.register(ChartDataLabels);
+Chart.defaults.plugins.datalabels = { display: false };
+
+// ── HELPERS ──
+function rc(id){ if(charts[id]){charts[id].destroy();delete charts[id];} }
+function mk(id,cfg){ rc(id); charts[id]=new Chart(document.getElementById(id),cfg); return charts[id]; }
+function idx(schema,col){ return schema.indexOf(col); }
+function fStages(){ const si=idx(D.stages_s,'month'),di=idx(D.stages_s,'drug'); return D.stages.filter(r=>S.drugs.has(r[di])&&r[si]>=S.sm&&r[si]<=S.em); }
+function fPS(){ const si=idx(D.ps_s,'month'),di=idx(D.ps_s,'drug'); return D.ps.filter(r=>S.drugs.has(r[di])&&r[si]>=S.sm&&r[si]<=S.em); }
+function fTeams(){ const si=idx(D.teams_s,'month'),di=idx(D.teams_s,'drug'); return D.teams.filter(r=>S.drugs.has(r[di])&&r[si]>=S.sm&&r[si]<=S.em); }
+function fPcube(){ const si=idx(D.pcube_s,'month'),di=idx(D.pcube_s,'drug'); return D.pcube.filter(r=>S.drugs.has(r[di])&&r[si]>=S.sm&&r[si]<=S.em); }
+
+// ── COLOR: red-green gradient ──
+// inv=true → "high is bad" → high=red, low=green
+// inv=false → "high is good" → high=green, low=red
+function rgColor(val,min,max,inv){
+  const t = max===min ? 0 : (val-min)/(max-min);
+  const p = inv ? t : 1-t; // p=0 → green, p=1 → red
+  const r=Math.round(220*p+50*(1-p)), g=Math.round(50*p+180*(1-p)), b=Math.round(50*p+80*(1-p));
+  return `rgb(${r},${g},${b})`;
+}
+function rgColors(vals,inv){
+  const mn=Math.min(...vals),mx=Math.max(...vals);
+  return vals.map(v=>rgColor(v,mn,mx,inv));
+}
+// Neutral blue gradient for non-normative measures (e.g. volume)
+function blueColors(vals){
+  const mn=Math.min(...vals),mx=Math.max(...vals);
+  return vals.map(v=>{
+    const t = mx===mn ? 0.5 : (v-mn)/(mx-mn);
+    const r=Math.round(219-80*t), g=Math.round(234-100*t), b=Math.round(254-40*t);
+    return `rgb(${r},${g},${b})`;
+  });
 }
 
-document.getElementById('passwordInput').addEventListener('keypress', function(e) {
-  if (e.key === 'Enter') {
-    checkPassword();
+// ── Shared horizontal bar config (all labels visible, padding for data labels) ──
+function hbarOpts(extraOpts){
+  return Object.assign({
+    indexAxis:'y', responsive:true, maintainAspectRatio:false,
+    layout:{ padding:{ right:55 } },
+    plugins:{ legend:{display:false}, datalabels:{display:true, anchor:'end', align:'right', color:'#1e293b', font:{weight:'bold',size:11}, clip:false} },
+    scales:{ x:{beginAtZero:true}, y:{ticks:{autoSkip:false}} }
+  }, extraOpts);
+}
+
+// ── Build dimension cross-reference for proper filtering ──
+// Maps each (dim, val) → set of values in other dims, from patient_detail
+function buildDimXref(){
+  if(!D.patient_detail || D._dimXref) return;
+  const s = D.patient_detail_s;
+  const dimFields = {payor:s.indexOf('payor'), ptype:s.indexOf('ptype'), region:s.indexOf('region'), fin:s.indexOf('fin')};
+  const xref = {};
+  for(const dim of Object.keys(dimFields)) xref[dim] = {};
+  for(const r of D.patient_detail){
+    for(const [dim, ci] of Object.entries(dimFields)){
+      const val = r[ci];
+      if(!xref[dim][val]){
+        xref[dim][val] = {};
+        for(const od of Object.keys(dimFields)){
+          if(od !== dim) xref[dim][val][od] = new Set();
+        }
+      }
+      for(const [od, oci] of Object.entries(dimFields)){
+        if(od !== dim) xref[dim][val][od].add(r[oci]);
+      }
+    }
   }
+  D._dimXref = xref;
+}
+
+// ── FILTER BAR ──
+function buildFilters(){
+  const mfrs=[...new Set(D.programs.map(p=>p.manufacturer))];
+  const months=D.meta.months;
+  let h='<div class="filter-row">';
+  h+='<div class="filter-section"><div class="fs-label">Manufacturers</div><div class="fs-options" id="f-mfr">';
+  mfrs.forEach(m=>{h+=`<label><input type="checkbox" value="${m}" checked onchange="onMfr()"> ${m}</label>`;});
+  h+='</div></div>';
+  h+='<div class="filter-divider"></div>';
+  h+='<div class="filter-section"><div class="fs-label">Drugs</div><div class="fs-options" id="f-drug"></div></div>';
+  h+='<div class="filter-divider"></div>';
+  h+='<div class="filter-section"><div class="fs-label">Date range</div><div class="filter-dates">';
+  h+=`<select id="f-sm" onchange="onDate()">${months.map(m=>`<option>${m}</option>`).join('')}</select>`;
+  h+=`<span style="color:var(--muted);font-size:11px">to</span>`;
+  h+=`<select id="f-em" onchange="onDate()">${months.map(m=>`<option>${m}</option>`).join('')}</select>`;
+  h+='</div></div>';
+  h+='</div>';
+  document.getElementById('filter-bar').innerHTML=h;
+  const smEl=document.getElementById('f-sm'), emEl=document.getElementById('f-em');
+  smEl.value=months.includes('2024-07')?'2024-07':months[0];
+  emEl.value=months.includes('2025-09')?'2025-09':months[months.length-1];
+  S.sm=smEl.value; S.em=emEl.value;
+  onMfr();
+}
+function onMfr(){
+  const checked=new Set([...document.querySelectorAll('#f-mfr input:checked')].map(i=>i.value));
+  const drugs=D.programs.filter(p=>checked.has(p.manufacturer));
+  let h='';
+  drugs.forEach(p=>{h+=`<label><input type="checkbox" value="${p.drug_name}" checked onchange="onDrug()"> ${p.drug_name}</label>`;});
+  document.getElementById('f-drug').innerHTML=h;
+  onDrug();
+}
+function onDrug(){
+  S.drugs=new Set([...document.querySelectorAll('#f-drug input:checked')].map(i=>i.value));
+  S.sm=document.getElementById('f-sm').value;
+  S.em=document.getElementById('f-em').value;
+  renderTab();
+}
+function onDate(){ S.sm=document.getElementById('f-sm').value; S.em=document.getElementById('f-em').value; renderTab(); }
+
+// ── TABS ──
+document.getElementById('tabs-bar').addEventListener('click',e=>{
+  const t=e.target.closest('.tab'); if(!t)return;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  S.tab=t.dataset.t;
+  document.getElementById('tab-'+S.tab).classList.add('active');
+  renderTab();
 });
+function renderTab(){
+  if(S.tab==='exec') renderExec();
+  else if(S.tab==='ops') renderOps();
+  else if(S.tab==='analysis') renderAnalysis();
+  else if(S.tab==='patients') renderPatients();
+}
 
-async function loadDashboard() {
-  try {
-    const response = await fetch('dashboard_data.json');
-    allData = await response.json();
-    applyFilters();
-    initializeFilters();
-    renderDashboard();
-  } catch (error) {
-    console.error('Error loading data:', error);
+// ══════════════════════════════════════════════
+// TAB 1: EXECUTIVE SUMMARY
+// ══════════════════════════════════════════════
+function renderExec(){ renderEKPIs(); renderFunnel(); renderEnroll(); renderTAT(); renderProgTable(); }
+
+function renderEKPIs(){
+  const ss=D.stages_s, rows=fStages();
+  const iE=idx(ss,'entered'),iC=idx(ss,'completed'),iD=idx(ss,'denied'),iCa=idx(ss,'cancelled'),iIP=idx(ss,'in_progress');
+  let totE=0,totC=0,totD=0,totCa=0,totIP=0;
+  rows.forEach(r=>{totE+=r[iE];totC+=r[iC];totD+=r[iD];totCa+=r[iCa];totIP+=r[iIP];});
+  const pc=fPcube(), pcs=D.pcube_s;
+  const iDim=idx(pcs,'dim'),iNP=idx(pcs,'n_patients'),iNT=idx(pcs,'n_terminal'),iNC=idx(pcs,'n_cancelled'),iE2E=idx(pcs,'e2e_sum'),iE2EN=idx(pcs,'e2e_n');
+  let nP=0,nT=0,nC=0,e2eS=0,e2eN=0;
+  pc.filter(r=>r[iDim]==='region').forEach(r=>{nP+=r[iNP];nT+=r[iNT];nC+=r[iNC];e2eS+=r[iE2E];e2eN+=r[iE2EN];});
+  const conv=nP?((nT/nP)*100).toFixed(1):'—';
+  const abn=nP?((nC/nP)*100).toFixed(1):'—';
+  const e2e=e2eN?(e2eS/e2eN).toFixed(1):'—';
+
+  // Time-to-therapy from patient_detail
+  let tttSum=0, tttN=0, nDisp=0, nSPT=0;
+  if(D.patient_detail){
+    const s=D.patient_detail_s;
+    const iDrug=s.indexOf('drug'), iEnroll=s.indexOf('enroll_date'), iStatus=s.indexOf('overall_status');
+    const iTTT=s.indexOf('ttt_days'), iCStage=s.indexOf('current_stage');
+    for(const r of D.patient_detail){
+      if(!S.drugs.has(r[iDrug])) continue;
+      const em=r[iEnroll]?r[iEnroll].substring(0,7):'';
+      if(em<S.sm||em>S.em) continue;
+      if(r[iStatus]==='Completed'){
+        if(r[iCStage]==='Dispensing') nDisp++;
+        else if(r[iCStage]==='Triage to SP') nSPT++;
+        if(r[iTTT]!==null){ tttSum+=r[iTTT]; tttN++; }
+      }
+    }
   }
+  const ttt=tttN?(tttSum/tttN).toFixed(1):'—';
+  const dispPct=nT?(nDisp/nT*100).toFixed(0):'—';
+  const sptPct=nT?(nSPT/nT*100).toFixed(0):'—';
+
+  document.getElementById('e-kpis').innerHTML=`
+    <div class="kpi"><div class="l">Patients</div><div class="v" style="color:#2563eb">${nP.toLocaleString()}</div><div class="d">${S.drugs.size} drugs selected</div></div>
+    <div class="kpi"><div class="l">Conversion Rate</div><div class="v" style="color:#059669">${conv}%</div><div class="d">Dispensing ${dispPct}% · SP Triage ${sptPct}%</div></div>
+    <div class="kpi"><div class="l">Time to Therapy</div><div class="v">${ttt} days</div><div class="d">Enrollment → first dispense</div></div>
+    <div class="kpi"><div class="l">Avg E2E TAT</div><div class="v">${e2e} days</div><div class="d">Enrollment → final stage</div></div>
+    <div class="kpi"><div class="l">Abandonment Rate</div><div class="v" style="color:#d97706">${abn}%</div><div class="d">Cancelled patients / total patients</div></div>
+    <div class="kpi"><div class="l">In-Flight Events</div><div class="v" style="color:#dc2626">${totIP.toLocaleString()}</div><div class="d">Stages currently in progress</div></div>`;
 }
 
-function initializeFilters() {
-  const months = allData.meta.months;
-  const agents = allData.dimensions.agents;
-  const payors = allData.dimensions.payors;
-  const providers = allData.dimensions.providers;
-  const programs = allData.dimensions.programs;
-
-  renderFilterOptions('monthFilters', months, 'months');
-  renderFilterOptions('agentFilters', agents, 'agents');
-  renderFilterOptions('payorFilters', payors, 'payors');
-  renderFilterOptions('providerFilters', providers, 'providers');
-  renderFilterOptions('programFilters', programs, 'programs');
+function renderFunnel(){
+  const ss=D.stages_s, rows=fStages();
+  const iS=idx(ss,'stage'),iE=idx(ss,'entered'),iC=idx(ss,'completed'),iD=idx(ss,'denied'),iCa=idx(ss,'cancelled'),iIP=idx(ss,'in_progress');
+  const agg={};
+  rows.forEach(r=>{
+    const s=r[iS]; if(!agg[s]) agg[s]=[0,0,0,0,0];
+    agg[s][0]+=r[iE]; agg[s][1]+=r[iC]; agg[s][2]+=r[iD]; agg[s][3]+=r[iCa]; agg[s][4]+=r[iIP];
+  });
+  const stages=STAGE_ORD.filter(s=>agg[s]);
+  mk('c-funnel',{type:'bar',data:{labels:stages,datasets:[
+    {label:'Completed/Approved',data:stages.map(s=>agg[s][1]),backgroundColor:'#059669'},
+    {label:'In Progress',data:stages.map(s=>agg[s][4]),backgroundColor:'#f59e0b'},
+    {label:'Cancelled',data:stages.map(s=>agg[s][3]),backgroundColor:'#f87171'},
+    {label:'Denied',data:stages.map(s=>agg[s][2]),backgroundColor:'#dc2626'},
+  ]},options:{
+    indexAxis:'y', responsive:true, maintainAspectRatio:false,
+    layout:{ padding:{ right:10 } },
+    plugins:{
+      legend:{position:'top'},
+      datalabels:{
+        display:function(ctx){
+          // Hide label if bar segment is too narrow to avoid overlap
+          const meta=ctx.chart.getDatasetMeta(ctx.datasetIndex);
+          const bar=meta.data[ctx.dataIndex];
+          if(!bar) return false;
+          const w=Math.abs((bar.x||0)-(bar.base||0));
+          return ctx.dataset.data[ctx.dataIndex] > 0 && w > 18;
+        },
+        color:function(ctx){
+          const meta=ctx.chart.getDatasetMeta(ctx.datasetIndex);
+          const bar=meta.data[ctx.dataIndex];
+          if(!bar) return '#1e293b';
+          const w=Math.abs((bar.x||0)-(bar.base||0));
+          return w>40?'#fff':'#1e293b';
+        },
+        anchor:function(ctx){
+          const meta=ctx.chart.getDatasetMeta(ctx.datasetIndex);
+          const bar=meta.data[ctx.dataIndex];
+          if(!bar) return 'center';
+          const w=Math.abs((bar.x||0)-(bar.base||0));
+          return w>40?'center':'end';
+        },
+        align:function(ctx){
+          const meta=ctx.chart.getDatasetMeta(ctx.datasetIndex);
+          const bar=meta.data[ctx.dataIndex];
+          if(!bar) return 'center';
+          const w=Math.abs((bar.x||0)-(bar.base||0));
+          return w>40?'center':'right';
+        },
+        font:{weight:'bold',size:10},
+        formatter:(v)=>v>0?v.toLocaleString():''
+      }
+    },
+    scales:{x:{stacked:true,title:{display:true,text:'Stage Events'}},y:{stacked:true,ticks:{autoSkip:false}}}
+  }});
 }
 
-function renderFilterOptions(containerId, options, filterType) {
-  const container = document.getElementById(containerId);
-  container.innerHTML = '';
-  
-  options.forEach(option => {
-    const label = document.createElement('label');
-    label.innerHTML = `<input type="checkbox" value="${option}" onchange="toggleFilter('${filterType}', '${option}')"> ${option}`;
-    container.appendChild(label);
+function renderEnroll(){
+  const months=D.meta.months.filter(m=>m>=S.sm&&m<=S.em);
+  const drugs=[...S.drugs];
+  const showTotal=document.getElementById('enroll-total')&&document.getElementById('enroll-total').checked;
+  const datasets=drugs.map(d=>({
+    label:d,data:months.map(m=>(D.enrollment[m]||{})[d]||0),
+    borderColor:DRUG_C[d]||'#999',backgroundColor:(DRUG_C[d]||'#999')+'20',fill:true,tension:.3,pointRadius:2
+  }));
+  if(showTotal){
+    datasets.push({
+      label:'Total',
+      data:months.map(m=>{let t=0;drugs.forEach(d=>{t+=(D.enrollment[m]||{})[d]||0;});return t;}),
+      borderColor:'#1e293b',backgroundColor:'transparent',borderWidth:2.5,borderDash:[6,3],
+      fill:false,tension:.3,pointRadius:3,pointStyle:'rectRot',order:-1
+    });
+  }
+  mk('c-enroll',{type:'line',data:{labels:months,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},datalabels:{display:false}},scales:{x:{},y:{stacked:!showTotal,beginAtZero:true,title:{display:true,text:'Enrollments'}}}}});
+}
+
+function renderTAT(){
+  const ss=D.stages_s, rows=fStages();
+  const iS=idx(ss,'stage'),iTS=idx(ss,'tat_sum'),iTN=idx(ss,'tat_n');
+  const agg={};
+  rows.forEach(r=>{const s=r[iS];if(!agg[s])agg[s]=[0,0];agg[s][0]+=r[iTS];agg[s][1]+=r[iTN];});
+  const stages=STAGE_ORD.filter(s=>agg[s]&&agg[s][1]>0);
+  const avgs=stages.map(s=>+(agg[s][0]/agg[s][1]).toFixed(1));
+  mk('c-tat',{type:'bar',data:{labels:stages,datasets:[{label:'Avg TAT (days)',data:avgs,backgroundColor:rgColors(avgs,true)}]},
+    options:hbarOpts({
+      plugins:{legend:{display:false},datalabels:{display:true,anchor:'end',align:'right',color:'#1e293b',font:{weight:'bold',size:11},clip:false,formatter:v=>v.toFixed(1)+' d'}},
+      scales:{x:{beginAtZero:true,title:{display:true,text:'Business Days'}},y:{ticks:{autoSkip:false}}}
+    })
   });
 }
 
-function toggleFilter(filterType, value) {
-  if (activeFilters[filterType].has(value)) {
-    activeFilters[filterType].delete(value);
+// ── Sortable Program Comparison Table ──
+let progTableData = [];
+function renderProgTable(){
+  const drugs=[...S.drugs];
+  const ss=D.stages_s, rows=fStages();
+  const pcs=D.pcube_s, pc=fPcube();
+  const iE=idx(ss,'entered'),iCa=idx(ss,'cancelled'),iDrug=idx(ss,'drug');
+  const iDim=idx(pcs,'dim'),iDrugP=idx(pcs,'drug'),iNP=idx(pcs,'n_patients'),iNT=idx(pcs,'n_terminal'),iNC=idx(pcs,'n_cancelled'),iNPA=idx(pcs,'n_pa'),iNPD=idx(pcs,'n_pa_denied'),iE2E=idx(pcs,'e2e_sum'),iE2EN=idx(pcs,'e2e_n');
+  const progInfo={};
+  D.programs.forEach(p=>{progInfo[p.drug_name]=p;});
+  progTableData=[];
+  drugs.forEach(drug=>{
+    const info=progInfo[drug]||{};
+    let nP=0,nT=0,nC=0,nPA=0,nPD=0,e2eS=0,e2eN=0;
+    pc.filter(r=>r[iDrugP]===drug&&r[iDim]==='region').forEach(r=>{nP+=r[iNP];nT+=r[iNT];nC+=r[iNC];nPA+=r[iNPA];nPD+=r[iNPD];e2eS+=r[iE2E];e2eN+=r[iE2EN];});
+    let totE=0,totCa=0;
+    rows.filter(r=>r[iDrug]===drug).forEach(r=>{totE+=r[iE];totCa+=r[iCa];});
+    progTableData.push({drug,mfr:info.manufacturer||'',ta:info.therapeutic_area||'',nP,
+      conv:nP?(nT/nP*100):0, abn:totE?(totCa/totE*100):0, pad:nPA?(nPD/nPA*100):0, e2e:e2eN?(e2eS/e2eN):0});
+  });
+  renderProgTableHTML();
+}
+function renderProgTableHTML(){
+  const cols=[
+    {key:'drug',label:'Drug',num:false},{key:'mfr',label:'Manufacturer',num:false},{key:'ta',label:'Therapeutic Area',num:false},
+    {key:'nP',label:'Patients',num:true},{key:'conv',label:'Conversion',num:true},{key:'abn',label:'Abandon',num:true},
+    {key:'pad',label:'PA Denial',num:true},{key:'e2e',label:'Avg E2E TAT',num:true}
+  ];
+  let data=[...progTableData];
+  if(progSortCol!==null){
+    const col=cols[progSortCol];
+    data.sort((a,b)=>col.num?(progSortAsc?a[col.key]-b[col.key]:b[col.key]-a[col.key]):(progSortAsc?String(a[col.key]).localeCompare(String(b[col.key])):String(b[col.key]).localeCompare(String(a[col.key]))));
+  }
+  let html='<table class="dt"><thead><tr>';
+  cols.forEach((c,i)=>{
+    const active=progSortCol===i;
+    const arrow=active?(progSortAsc?'▲':'▼'):'⇅';
+    html+=`<th class="${c.num?'n':''} ${active?'sort-active':''}" onclick="sortProgTable(${i})">${c.label} <span class="sort-arrow">${arrow}</span></th>`;
+  });
+  html+='</tr></thead><tbody>';
+  data.forEach(d=>{
+    html+=`<tr><td><strong>${d.drug}</strong></td><td>${d.mfr}</td><td>${d.ta}</td>
+      <td class="n">${d.nP.toLocaleString()}</td><td class="n">${pillI(d.conv.toFixed(1),60,40)}</td>
+      <td class="n">${pill(d.abn.toFixed(1),3,5)}</td><td class="n">${pill(d.pad.toFixed(1),10,15)}</td>
+      <td class="n">${d.e2e.toFixed(1)} d</td></tr>`;
+  });
+  html+='</tbody></table>';
+  document.getElementById('e-table').innerHTML=html;
+}
+function sortProgTable(colIdx){
+  if(progSortCol===colIdx) progSortAsc=!progSortAsc;
+  else { progSortCol=colIdx; progSortAsc=true; }
+  renderProgTableHTML();
+}
+function pill(v,g,w){const n=parseFloat(v);if(isNaN(n))return v;const c=n<=g?'#d1fae5;color:#065f46':n<=w?'#fef3c7;color:#92400e':'#fee2e2;color:#991b1b';return `<span class="pill" style="background:${c}">${v}%</span>`;}
+function pillI(v,g,w){const n=parseFloat(v);if(isNaN(n))return v;const c=n>=g?'#d1fae5;color:#065f46':n>=w?'#fef3c7;color:#92400e':'#fee2e2;color:#991b1b';return `<span class="pill" style="background:${c}">${v}%</span>`;}
+
+// ══════════════════════════════════════════════
+// TAB 2: ANALYSIS
+// ══════════════════════════════════════════════
+function buildAnalysisControls(){
+  const dims=D.dim_labels;
+  let h='<div class="ac-group"><label>Dimension</label><select id="a-dim" onchange="onAChange()">';
+  Object.entries(dims).forEach(([k,v])=>{h+=`<option value="${k}">${v}</option>`;});
+  h+='</select></div><div class="ac-group"><label>Measure</label><select id="a-meas" onchange="onAChange()">';
+  Object.entries(MEASURES).forEach(([k,v])=>{h+=`<option value="${k}">${v}</option>`;});
+  h+='</select></div>';
+  h+='<div class="ac-group"><label>Payor Type</label><select id="af-ptype" onchange="onAChange()"><option value="">All</option>';
+  ['Commercial','Medicare','Medicaid','Uninsured'].forEach(v=>{h+=`<option>${v}</option>`;});
+  h+='</select></div>';
+  h+='<div class="ac-group"><label>Region</label><select id="af-region" onchange="onAChange()"><option value="">All</option>';
+  ['Northeast','Southeast','Midwest','West'].forEach(v=>{h+=`<option>${v}</option>`;});
+  h+='</select></div>';
+  h+='<div class="ac-group"><label>Financial Program</label><select id="af-fin" onchange="onAChange()"><option value="">All</option>';
+  ['Commercial Copay','PAP','Bridge','QuickStart','Cash'].forEach(v=>{h+=`<option>${v}</option>`;});
+  h+='</select></div>';
+  document.getElementById('a-controls').innerHTML=h;
+}
+function onAChange(){
+  S.aDim=document.getElementById('a-dim').value;
+  S.aMeas=document.getElementById('a-meas').value;
+  S.aFilt={ptype:document.getElementById('af-ptype').value,region:document.getElementById('af-region').value,fin:document.getElementById('af-fin').value};
+  renderAnalysis();
+}
+
+let lastAnalysisBarItems = [];
+
+function renderAnalysis(){
+  if(!document.getElementById('a-dim')) buildAnalysisControls();
+  buildDimXref();
+
+  const activeFilters = [];
+  if(S.aFilt.ptype) activeFilters.push({dim:'ptype', val:S.aFilt.ptype});
+  if(S.aFilt.region) activeFilters.push({dim:'region', val:S.aFilt.region});
+  if(S.aFilt.fin) activeFilters.push({dim:'fin', val:S.aFilt.fin});
+
+  // Map dimension keys to patient_detail schema fields
+  const DIM_TO_PD = {payor:'payor',ptype:'ptype',region:'region',state:'region',fin:'fin',ref:'region',hsys:'region'};
+  // Actually map properly using patient_detail_s
+  const pds = D.patient_detail_s;
+
+  function computeMeasure(acc){
+    const [np,nt,nc,npa,npd,e2es,e2en,nmi]=acc;
+    switch(S.aMeas){
+      case 'volume': return np;
+      case 'conversion': return np?+(nt/np*100).toFixed(1):0;
+      case 'abandon': return np?+(nc/np*100).toFixed(1):0;
+      case 'pa_denial': return npa?+(npd/npa*100).toFixed(1):0;
+      case 'e2e_tat': return e2en?+(e2es/e2en).toFixed(1):0;
+      case 'mi_rate': return np?+(nmi/np*100).toFixed(1):0;
+    }
+    return 0;
+  }
+
+  // When cross-dim filters are active, compute from patient_detail for accurate filtering
+  const usePD = activeFilters.length > 0;
+  let byVal={}, byMonth={}, byMonthVal={};
+
+  if(usePD && D.patient_detail){
+    // Build from patient_detail with proper cross-dim filtering
+    const s = pds;
+    const iDrug=s.indexOf('drug'), iEnroll=s.indexOf('enroll_date'), iStatus=s.indexOf('overall_status');
+    const iE2E=s.indexOf('e2e_days'), iNStages=s.indexOf('n_stages');
+    const iPayor=s.indexOf('payor'), iPtype=s.indexOf('ptype'), iRegion=s.indexOf('region'), iFin=s.indexOf('fin');
+    const iMfr=s.indexOf('mfr'), iCStage=s.indexOf('current_stage');
+
+    // Dimension field index in patient_detail for the selected analysis dimension
+    const dimFieldMap = {payor:iPayor, ptype:iPtype, region:iRegion, fin:iFin, drug:iDrug};
+    // For dimensions not directly in patient_detail, fall back to pcube
+    const dimIdx = dimFieldMap[S.aDim];
+    if(dimIdx === undefined){ /* fall through to pcube path below */ }
+
+    // Filter field indices for cross-dim filters
+    const filterFieldMap = {ptype:iPtype, region:iRegion, fin:iFin};
+
+    for(const r of D.patient_detail){
+      if(!S.drugs.has(r[iDrug])) continue;
+      const enrollMonth = r[iEnroll] ? r[iEnroll].substring(0,7) : '';
+      if(enrollMonth < S.sm || enrollMonth > S.em) continue;
+
+      // Apply cross-dim filters
+      let pass = true;
+      for(const f of activeFilters){
+        const fi = filterFieldMap[f.dim];
+        if(fi !== undefined && r[fi] !== f.val){ pass = false; break; }
+      }
+      if(!pass) continue;
+
+      const dimVal = dimIdx !== undefined ? r[dimIdx] : '';
+      if(!dimVal) continue;
+      const month = enrollMonth;
+      const status = r[iStatus];
+      const e2e = r[iE2E];
+
+      // Determine patient-level flags
+      const isTerminal = status === 'Completed';
+      const isCancelled = status === 'Cancelled';
+      const hadPA = r[iCStage] === 'PA' || r[iNStages] >= 3; // rough proxy
+      const paDenied = status === 'Denied';
+      // n_mi: check if patient had missing info (approximate — use current_stage presence as proxy)
+      // For accuracy, we'd need MI flag in patient_detail. Use a simple flag.
+
+      const acc = [1, isTerminal?1:0, isCancelled?1:0, hadPA?1:0, paDenied?1:0,
+                   (e2e!==null && isTerminal)?e2e:0, (e2e!==null && isTerminal)?1:0, 0];
+
+      // Accumulate
+      for(const [target, key] of [[byVal,dimVal],[byMonth,month],[byMonthVal,month+'|'+dimVal]]){
+        if(!target[key]) target[key]=[0,0,0,0,0,0,0,0];
+        const a=target[key];
+        for(let i=0;i<8;i++) a[i]+=acc[i];
+      }
+    }
   } else {
-    activeFilters[filterType].add(value);
+    // No cross-dim filters: use pcube (faster, pre-aggregated)
+    const pcs=D.pcube_s, pc=fPcube();
+    const iDim=idx(pcs,'dim'),iVal=idx(pcs,'val'),iM=idx(pcs,'month'),iDrug=idx(pcs,'drug');
+    const iNP=idx(pcs,'n_patients'),iNT=idx(pcs,'n_terminal'),iNC=idx(pcs,'n_cancelled'),iNPA=idx(pcs,'n_pa'),iNPD=idx(pcs,'n_pa_denied'),iE2E=idx(pcs,'e2e_sum'),iE2EN=idx(pcs,'e2e_n'),iNMI=idx(pcs,'n_mi');
+
+    let rows = pc.filter(r => r[iDim] === S.aDim);
+    rows.forEach(r => {
+      const val=r[iVal], month=r[iM];
+      [byVal, byMonth, byMonthVal].forEach((target, ti) => {
+        const key = ti===0?val:ti===1?month:month+'|'+val;
+        if(!target[key]) target[key]=[0,0,0,0,0,0,0,0];
+        const a=target[key];
+        a[0]+=r[iNP]; a[1]+=r[iNT]; a[2]+=r[iNC]; a[3]+=r[iNPA];
+        a[4]+=r[iNPD]; a[5]+=r[iE2E]; a[6]+=r[iE2EN]; a[7]+=r[iNMI];
+      });
+    });
   }
-  applyFilters();
-  renderDashboard();
+
+  const mLabel=MEASURES[S.aMeas], dLabel=D.dim_labels[S.aDim]||S.aDim;
+
+  // Bar chart: all values, sorted
+  let barItems=Object.entries(byVal).map(([val,acc])=>({l:val,v:computeMeasure(acc)}));
+  barItems.sort((a,b)=>b.v-a.v);
+  lastAnalysisBarItems=barItems;
+  const barVals=barItems.map(i=>i.v);
+  const invMeas=['abandon','pa_denial','e2e_tat','mi_rate'].includes(S.aMeas);
+  const isRateMeasure=['conversion','abandon','pa_denial','mi_rate'].includes(S.aMeas);
+
+  document.getElementById('a-bar-title').textContent=`${mLabel} by ${dLabel}`;
+  const filterDesc=activeFilters.length>0?' · filtered by '+activeFilters.map(f=>f.val).join(', '):'';
+  document.getElementById('a-bar-sub').textContent=`Sorted high to low · ${barItems.length} values${filterDesc}`;
+
+  // Dynamic height: 30px per bar, min 150, max 800
+  const barH=Math.max(150, Math.min(800, barItems.length*30));
+  document.getElementById('c-abar-wrap').style.height=barH+'px';
+
+  const barColors = S.aMeas==='volume' ? blueColors(barVals) : rgColors(barVals,invMeas);
+  mk('c-abar',{type:'bar',data:{labels:barItems.map(i=>i.l),datasets:[{data:barVals,backgroundColor:barColors}]},
+    options:hbarOpts({
+      plugins:{legend:{display:false},datalabels:{display:true,anchor:'end',align:'right',color:'#1e293b',font:{weight:'bold',size:11},clip:false,
+        formatter:v=>S.aMeas==='volume'?v.toLocaleString():v.toFixed(1)+(S.aMeas==='e2e_tat'?' d':'%')}},
+      scales:{x:{beginAtZero:true,title:{display:true,text:mLabel}},y:{ticks:{autoSkip:false}}}
+    })
+  });
+
+  // Trend: top 5
+  const top5=barItems.slice(0,5).map(i=>i.l);
+  const months=D.meta.months.filter(m=>m>=S.sm&&m<=S.em);
+  const lineColors=['#2563eb','#dc2626','#059669','#d97706','#7c3aed'];
+
+  document.getElementById('a-trend-title').textContent=`${mLabel} — Monthly Trend`;
+  document.getElementById('a-trend-sub').textContent=`Top 5 ${dLabel} values by ${mLabel}`;
+
+  const trendSeries=top5.map((val,vi)=>({
+    label:val,
+    data:months.map(m=>{const acc=byMonthVal[m+'|'+val]; return acc?computeMeasure(acc):null;}),
+  }));
+  lastTrendData={months, series:trendSeries};
+
+  mk('c-trend',{type:'line',data:{labels:months,datasets:top5.map((val,vi)=>({
+    label:val,
+    data:months.map(m=>{const acc=byMonthVal[m+'|'+val]; return acc?computeMeasure(acc):null;}),
+    borderColor:lineColors[vi],backgroundColor:lineColors[vi]+'20',
+    tension:0.3,pointRadius:3,spanGaps:true,
+  }))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},datalabels:{display:false}},
+    scales:{x:{},y:{beginAtZero:isRateMeasure,title:{display:true,text:mLabel}}}}});
 }
 
-function applyFilters() {
-  filteredData = {
-    meta: allData.meta,
-    dimensions: allData.dimensions,
-    metrics: {}
-  };
+function downloadAnalysisCSV(){
+  if(!lastAnalysisBarItems.length) return;
+  const mLabel=MEASURES[S.aMeas], dLabel=D.dim_labels[S.aDim]||S.aDim;
+  let csv=`${dLabel},${mLabel}\n`;
+  lastAnalysisBarItems.forEach(item=>{csv+=`"${item.l}",${item.v}\n`;});
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=`analysis_${S.aDim}_${S.aMeas}_${S.sm}_${S.em}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+}
 
-  for (const key in allData.metrics) {
-    const metric = allData.metrics[key];
-    if (matchesFilters(metric.filters)) {
-      if (!filteredData.metrics[key]) {
-        filteredData.metrics[key] = metric;
-      }
-    }
+let lastTrendData = {months:[], series:[]};
+
+function downloadTrendCSV(){
+  const t=lastTrendData;
+  if(!t.months.length) return;
+  const mLabel=MEASURES[S.aMeas], dLabel=D.dim_labels[S.aDim]||S.aDim;
+  let csv=`Month,${t.series.map(s=>'"'+s.label+'"').join(',')}\n`;
+  t.months.forEach((m,mi)=>{csv+=`${m},${t.series.map(s=>s.data[mi]!==null?s.data[mi]:'').join(',')}\n`;});
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=`trend_${S.aDim}_${S.aMeas}_${S.sm}_${S.em}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+// ══════════════════════════════════════════════
+// TAB 3: OPERATIONAL DETAIL
+// ══════════════════════════════════════════════
+function renderOps(){ renderBVP(); renderPAD(); renderAging(); renderTeam(); renderAbn(); renderAppeal(); renderMIP(); renderMIT(); renderRefSrc(); }
+
+function renderBVP(){
+  const ps=D.ps_s, rows=fPS().filter(r=>r[idx(ps,'stage')]==='BI/BV');
+  const iPT=idx(ps,'ptype'),iTS=idx(ps,'tat_sum'),iTN=idx(ps,'tat_n');
+  const agg={};
+  rows.forEach(r=>{const pt=r[iPT];if(!agg[pt])agg[pt]=[0,0];agg[pt][0]+=r[iTS];agg[pt][1]+=r[iTN];});
+  let items=Object.entries(agg).filter(([k,v])=>v[1]>0).map(([k,v])=>({l:k,v:+(v[0]/v[1]).toFixed(1)}));
+  items.sort((a,b)=>b.v-a.v);
+  mk('c-bvp',{type:'bar',data:{labels:items.map(i=>i.l),datasets:[{data:items.map(i=>i.v),backgroundColor:rgColors(items.map(i=>i.v),true)}]},
+    options:hbarOpts({
+      plugins:{legend:{display:false},datalabels:{display:true,anchor:'end',align:'right',color:'#1e293b',font:{weight:'bold',size:11},clip:false,formatter:v=>v.toFixed(1)+' d'}},
+      scales:{x:{beginAtZero:true,title:{display:true,text:'Business Days'}},y:{ticks:{autoSkip:false}}}
+    })
+  });
+}
+
+function renderPAD(){
+  const ps=D.ps_s, rows=fPS().filter(r=>r[idx(ps,'stage')]==='PA');
+  const iP=idx(ps,'payor'),iN=idx(ps,'n'),iDen=idx(ps,'denied');
+  const agg={};
+  rows.forEach(r=>{const p=r[iP];if(!agg[p])agg[p]={n:0,d:0};agg[p].n+=r[iN];agg[p].d+=r[iDen];});
+  let items=Object.entries(agg).filter(([k,v])=>v.n>=10).map(([k,v])=>({l:k,v:+(v.d/v.n*100).toFixed(1)}));
+  items.sort((a,b)=>b.v-a.v);
+  mk('c-pad',{type:'bar',data:{labels:items.map(i=>i.l),datasets:[{data:items.map(i=>i.v),backgroundColor:rgColors(items.map(i=>i.v),true)}]},
+    options:hbarOpts({
+      plugins:{legend:{display:false},datalabels:{display:true,anchor:'end',align:'right',color:'#1e293b',font:{weight:'bold',size:11},clip:false,formatter:v=>v.toFixed(1)+'%'}},
+      scales:{x:{beginAtZero:true,title:{display:true,text:'Denial Rate %'},max:Math.max(25,...items.map(i=>i.v+5))},y:{ticks:{autoSkip:false}}}
+    })
+  });
+}
+
+function renderAging(){
+  const aging=D.aging;
+  const stages=STAGE_ORD.filter(s=>aging[s]);
+  const bkts=['<2d','2-4d','5-7d','1-2wk','>2wk'];
+  const hmC=['#d1fae5','#bbf7d0','#fef9c3','#fed7aa','#fecaca'];
+  let h=`<div class="hm-grid" style="grid-template-columns:150px repeat(${bkts.length},1fr)"><div class="hm-cell hm-h">Stage</div>`;
+  bkts.forEach(b=>{h+=`<div class="hm-cell hm-h">${b}</div>`;});
+  stages.forEach(s=>{
+    const row=aging[s], tot=bkts.reduce((a,b)=>a+(row[b]||0),0);
+    h+=`<div class="hm-cell" style="text-align:left;background:#f1f5f9;color:#475569;font-size:11px;font-weight:600">${s}</div>`;
+    bkts.forEach((b,i)=>{const v=row[b]||0;const pct=tot?(v/tot*100).toFixed(0):0;h+=`<div class="hm-cell" style="background:${hmC[i]};color:#1e293b">${v} <span style="font-size:9px;opacity:.6">(${pct}%)</span></div>`;});
+  });
+  h+='</div>';
+  document.getElementById('o-aging').innerHTML=h;
+}
+
+function renderTeam(){
+  const ts=D.teams_s, rows=fTeams();
+  const iT=idx(ts,'team'),iN=idx(ts,'n_events'),iTS=idx(ts,'tat_sum'),iTN=idx(ts,'tat_n'),iC=idx(ts,'completed');
+  const agg={};
+  rows.forEach(r=>{const t=r[iT];if(!agg[t])agg[t]=[0,0,0,0];agg[t][0]+=r[iN];agg[t][1]+=r[iTS];agg[t][2]+=r[iTN];agg[t][3]+=r[iC];});
+  let items=Object.entries(agg).filter(([k,v])=>v[2]>0).map(([k,v])=>({l:k,tat:+(v[1]/v[2]).toFixed(1),n:v[0]}));
+  items.sort((a,b)=>b.tat-a.tat);
+  mk('c-team',{type:'bar',data:{labels:items.map(i=>i.l),datasets:[
+    {label:'Avg TAT (days)',data:items.map(i=>i.tat),backgroundColor:rgColors(items.map(i=>i.tat),true),yAxisID:'y'},
+    {label:'Events',data:items.map(i=>i.n),backgroundColor:'#e2e8f0',yAxisID:'y1'},
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},datalabels:{display:false}},scales:{
+    y:{position:'left',beginAtZero:true,title:{display:true,text:'Avg TAT (days)'}},
+    y1:{position:'right',grid:{drawOnChartArea:false},beginAtZero:true,title:{display:true,text:'Events'}}}}});
+}
+
+function renderAbn(){
+  const merged={};
+  [...S.drugs].forEach(d=>{const reasons=D.abandon[d]||{};Object.entries(reasons).forEach(([r,c])=>{merged[r]=(merged[r]||0)+c;});});
+  let items=Object.entries(merged).map(([r,c])=>({l:r,v:c}));
+  items.sort((a,b)=>b.v-a.v);
+  mk('c-abn',{type:'bar',data:{labels:items.map(i=>i.l),datasets:[{data:items.map(i=>i.v),backgroundColor:rgColors(items.map(i=>i.v),true)}]},
+    options:hbarOpts({
+      plugins:{legend:{display:false},datalabels:{display:true,anchor:'end',align:'right',color:'#1e293b',font:{weight:'bold',size:11},clip:false}},
+      scales:{x:{beginAtZero:true,title:{display:true,text:'Patients'}},y:{ticks:{autoSkip:false}}}
+    })
+  });
+}
+
+function renderAppeal(){
+  if(!D.appeals) return;
+  const ap=D.appeals;
+  document.getElementById('o-appeal-sub').textContent=`Overall: ${ap.won}/${ap.total} appeals won (${ap.rate}%)`;
+  const items=ap.by_payor;
+  if(!items.length) return;
+  const vals=items.map(i=>i.rate);
+  mk('c-appeal',{type:'bar',data:{labels:items.map(i=>i.payor),datasets:[{data:vals,backgroundColor:rgColors(vals,false)}]},
+    options:hbarOpts({
+      plugins:{legend:{display:false},datalabels:{display:true,anchor:'end',align:'right',color:'#1e293b',font:{weight:'bold',size:11},clip:false,
+        formatter:(v,ctx)=>{const it=items[ctx.dataIndex];return `${v.toFixed(1)}% (${it.won}/${it.total})`;}}},
+      scales:{x:{beginAtZero:true,max:100,title:{display:true,text:'Success Rate %'}},y:{ticks:{autoSkip:false}}}
+    })
+  });
+}
+
+function renderMIP(){
+  const provs=D.provider_mi;
+  const vals=provs.map(p=>p.r);
+  mk('c-mip',{type:'bar',data:{labels:provs.map(p=>p.p),datasets:[{data:vals,backgroundColor:rgColors(vals,true)}]},
+    options:hbarOpts({
+      plugins:{legend:{display:false},datalabels:{display:true,anchor:'end',align:'right',color:'#1e293b',font:{weight:'bold',size:11},clip:false,formatter:v=>v.toFixed(1)+'%'}},
+      scales:{x:{beginAtZero:true,title:{display:true,text:'% of Stages'},max:Math.max(50,...vals.map(v=>v+5))},y:{ticks:{autoSkip:false}}}
+    })
+  });
+}
+
+function renderMIT(){
+  const merged={};
+  [...S.drugs].forEach(d=>{const types=D.mi_types[d]||{};Object.entries(types).forEach(([t,c])=>{merged[t]=(merged[t]||0)+c;});});
+  let items=Object.entries(merged).map(([t,c])=>({l:t,v:c}));
+  items.sort((a,b)=>b.v-a.v);
+  const vals=items.map(i=>i.v);
+  mk('c-mit',{type:'bar',data:{labels:items.map(i=>i.l),datasets:[{data:vals,backgroundColor:rgColors(vals,true)}]},
+    options:hbarOpts({
+      plugins:{legend:{display:false},datalabels:{display:true,anchor:'end',align:'right',color:'#1e293b',font:{weight:'bold',size:11},clip:false}},
+      scales:{x:{beginAtZero:true,title:{display:true,text:'Count'}},y:{ticks:{autoSkip:false}}}
+    })
+  });
+}
+
+function renderRefSrc(){
+  if(!D.ref_summary || !D.ref_summary.length) return;
+  const items=D.ref_summary;
+  let h='<table class="dt"><thead><tr>';
+  h+='<th>Source</th><th class="n">Patients</th><th class="n">Conversion</th><th class="n">Abandonment</th><th class="n">Avg TTT</th>';
+  h+='</tr></thead><tbody>';
+  items.forEach(r=>{
+    h+=`<tr><td><strong>${r.source}</strong></td><td class="n">${r.patients.toLocaleString()}</td>`;
+    h+=`<td class="n">${pillI(r.conv_rate.toFixed(1),60,40)}</td>`;
+    h+=`<td class="n">${pill(r.abn_rate.toFixed(1),15,25)}</td>`;
+    h+=`<td class="n">${r.avg_ttt!==null?r.avg_ttt.toFixed(1)+' d':'—'}</td></tr>`;
+  });
+  h+='</tbody></table>';
+  document.getElementById('o-refsrc').innerHTML=h;
+}
+
+// ══════════════════════════════════════════════
+// TAB 4: PATIENT DETAIL
+// ══════════════════════════════════════════════
+function buildPDControls(){
+  let h=`<input type="text" placeholder="Search patient ID, payor, drug, provider…" id="pd-search" oninput="onPDChange()">`;
+  h+=`<select id="pd-status" onchange="onPDChange()"><option value="">All Statuses</option>`;
+  ['In Progress','Completed','Cancelled','Denied'].forEach(s=>{h+=`<option>${s}</option>`;});
+  h+=`</select>`;
+  h+=`<select id="pd-stage" onchange="onPDChange()"><option value="">All Stages</option>`;
+  STAGE_ORD.forEach(s=>{h+=`<option>${s}</option>`;});
+  h+=`</select>`;
+  h+=`<select id="pd-stuck" onchange="onPDChange()"><option value="">All Patients</option>`;
+  h+=`<option value="stuck14">Stuck >2 weeks</option>`;
+  h+=`<option value="stuck7">Stuck >1 week</option>`;
+  h+=`<option value="hightat">High E2E TAT (>40d)</option>`;
+  h+=`</select>`;
+  h+=`<span style="font-size:11px;color:var(--muted)" id="pd-count"></span>`;
+  document.getElementById('pd-controls').innerHTML=h;
+}
+function onPDChange(){
+  PD.search=(document.getElementById('pd-search')?.value||'').toLowerCase();
+  PD.status=document.getElementById('pd-status')?.value||'';
+  PD.stage=document.getElementById('pd-stage')?.value||'';
+  PD.stuck=document.getElementById('pd-stuck')?.value||'';
+  PD.page=0;
+  renderPDTable();
+}
+function getPatientRows(){
+  if(!D||!D.patient_detail) return [];
+  const s=D.patient_detail_s;
+  const iDrug=s.indexOf('drug'),iEnroll=s.indexOf('enroll_date'),iCStage=s.indexOf('current_stage'),iOStatus=s.indexOf('overall_status');
+  const iPayor=s.indexOf('payor'),iFin=s.indexOf('fin'),iRegion=s.indexOf('region'),iId=s.indexOf('id');
+  const iProv=s.indexOf('provider'),iHsys=s.indexOf('health_system'),iMfr=s.indexOf('mfr');
+  let data=D.patient_detail.filter(r=>S.drugs.has(r[iDrug])&&r[iEnroll]>=S.sm&&r[iEnroll]<=S.em+'-31');
+  if(PD.search){
+    const q=PD.search;
+    data=data.filter(r=>String(r[iId]).toLowerCase().includes(q)||String(r[iDrug]).toLowerCase().includes(q)||
+      String(r[iPayor]).toLowerCase().includes(q)||String(r[iFin]).toLowerCase().includes(q)||
+      String(r[iRegion]).toLowerCase().includes(q)||String(r[iProv]).toLowerCase().includes(q)||
+      String(r[iMfr]).toLowerCase().includes(q)||String(r[iHsys]).toLowerCase().includes(q));
   }
-}
-
-function matchesFilters(metricFilters) {
-  if (activeFilters.months.size > 0 && !activeFilters.months.has(metricFilters.month)) return false;
-  if (activeFilters.agents.size > 0 && !activeFilters.agents.has(metricFilters.agent)) return false;
-  if (activeFilters.payors.size > 0 && !activeFilters.payors.has(metricFilters.payor)) return false;
-  if (activeFilters.providers.size > 0 && !activeFilters.providers.has(metricFilters.provider)) return false;
-  if (activeFilters.programs.size > 0 && !activeFilters.programs.has(metricFilters.program)) return false;
-  return true;
-}
-
-function renderDashboard() {
-  updateMetrics();
-  renderJourneyChart();
-  renderConversionChart();
-  renderTimelineChart();
-  renderProgramChart();
-  renderAgentChart();
-  renderProviderChart();
-  renderPayorChart();
-}
-
-function updateMetrics() {
-  const metrics = calculateMetrics();
-  document.getElementById('totalPatients').textContent = metrics.totalPatients.toLocaleString();
-  document.getElementById('totalEvents').textContent = metrics.totalEvents.toLocaleString();
-  document.getElementById('avgStageTime').textContent = metrics.avgStageTime.toFixed(1) + ' d';
-  document.getElementById('lastUpdated').textContent = 'Updated: ' + new Date().toLocaleString();
-}
-
-function calculateMetrics() {
-  const journeyData = aggregateByDimension('journey_stage');
-  const totalPatients = allData.meta.n_patients;
-  const totalEvents = allData.meta.n_events;
-  const avgStageTime = 14; // placeholder
-  return { totalPatients, totalEvents, avgStageTime };
-}
-
-function renderJourneyChart() {
-  const ctx = document.getElementById('journeyChart').getContext('2d');
-  const data = aggregateByDimension('journey_stage');
-  const labels = Object.keys(data);
-  const values = Object.values(data);
-
-  if (charts.journey) charts.journey.destroy();
-  charts.journey = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: labels,
-      datasets: [{
-        data: values,
-        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'bottom', labels: { font: { size: 11 } } },
-        datalabels: { color: '#fff', font: { weight: 'bold', size: 11 } }
-      }
-    }
-  });
-}
-
-function renderConversionChart() {
-  const ctx = document.getElementById('conversionChart').getContext('2d');
-  const stages = ['Initial Outreach', 'Interested', 'Screening', 'Qualified', 'Enrolled'];
-  const conversions = [85, 72, 68, 61, 55];
-
-  if (charts.conversion) charts.conversion.destroy();
-  charts.conversion = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: stages,
-      datasets: [{
-        label: 'Conversion Rate',
-        data: conversions,
-        backgroundColor: '#3b82f6'
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        datalabels: { anchor: 'end', align: 'end', color: '#000', font: { weight: 'bold' }, formatter: (v) => v + '%' }
-      },
-      scales: {
-        x: { beginAtZero: true, max: 100 }
-      }
-    }
-  });
-}
-
-function renderTimelineChart() {
-  const ctx = document.getElementById('timelineChart').getContext('2d');
-  const months = allData.meta.months;
-  const eventsByMonth = aggregateByMonth();
-  const values = months.map(m => eventsByMonth[m] || 0);
-
-  if (charts.timeline) charts.timeline.destroy();
-  charts.timeline = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: months,
-      datasets: [{
-        label: 'Events',
-        data: values,
-        borderColor: '#3b82f6',
-        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-        tension: 0.4,
-        fill: true
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        datalabels: { display: false }
-      }
-    }
-  });
-}
-
-function renderProgramChart() {
-  const ctx = document.getElementById('programChart').getContext('2d');
-  const data = aggregateByDimension('program');
-  const labels = Object.keys(data);
-  const values = Object.values(data);
-
-  if (charts.program) charts.program.destroy();
-  charts.program = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: labels,
-      datasets: [{
-        data: values,
-        backgroundColor: ['#10b981', '#f59e0b', '#ef4444']
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'bottom', labels: { font: { size: 11 } } },
-        datalabels: { color: '#fff', font: { weight: 'bold', size: 11 } }
-      }
-    }
-  });
-}
-
-function renderAgentChart() {
-  const ctx = document.getElementById('agentChart').getContext('2d');
-  const data = aggregateByDimensionTopN('agent', 5);
-  const labels = Object.keys(data);
-  const values = Object.values(data);
-
-  if (charts.agent) charts.agent.destroy();
-  charts.agent = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Interactions',
-        data: values,
-        backgroundColor: '#3b82f6'
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        datalabels: { anchor: 'end', align: 'end', color: '#000', font: { weight: 'bold' } }
-      }
-    }
-  });
-}
-
-function renderProviderChart() {
-  const ctx = document.getElementById('providerChart').getContext('2d');
-  const data = aggregateByDimensionTopN('provider', 5);
-  const labels = Object.keys(data);
-  const values = Object.values(data);
-
-  if (charts.provider) charts.provider.destroy();
-  charts.provider = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Referrals',
-        data: values,
-        backgroundColor: '#10b981'
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        datalabels: { anchor: 'end', align: 'end', color: '#000', font: { weight: 'bold' } }
-      }
-    }
-  });
-}
-
-function renderPayorChart() {
-  const ctx = document.getElementById('payorChart').getContext('2d');
-  const data = aggregateByDimensionTopN('payor', 5);
-  const labels = Object.keys(data);
-  const values = Object.values(data);
-
-  if (charts.payor) charts.payor.destroy();
-  charts.payor = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Patients',
-        data: values,
-        backgroundColor: '#f59e0b'
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        datalabels: { anchor: 'end', align: 'end', color: '#000', font: { weight: 'bold' } }
-      }
-    }
-  });
-}
-
-function aggregateByDimension(dimension) {
-  const aggregated = {};
-  
-  for (const key in filteredData.metrics) {
-    const metric = filteredData.metrics[key];
-    const dimensionKey = metric.filters[dimension] || 'Unknown';
-    aggregated[dimensionKey] = (aggregated[dimensionKey] || 0) + metric.value;
+  if(PD.status) data=data.filter(r=>r[iOStatus]===PD.status);
+  if(PD.stage) data=data.filter(r=>r[iCStage]===PD.stage);
+  if(PD.stuck){
+    const iE2E=s.indexOf('e2e_days');
+    if(PD.stuck==='stuck14') data=data.filter(r=>r[iOStatus]==='In Progress'&&r[iE2E]!==null&&r[iE2E]>14);
+    else if(PD.stuck==='stuck7') data=data.filter(r=>r[iOStatus]==='In Progress'&&r[iE2E]!==null&&r[iE2E]>7);
+    else if(PD.stuck==='hightat') data=data.filter(r=>r[iE2E]!==null&&r[iE2E]>40);
   }
-  
-  return aggregated;
-}
-
-function aggregateByDimensionTopN(dimension, n) {
-  const aggregated = aggregateByDimension(dimension);
-  const sorted = Object.entries(aggregated)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, n);
-  
-  return Object.fromEntries(sorted);
-}
-
-function aggregateByMonth() {
-  const aggregated = {};
-  
-  for (const key in filteredData.metrics) {
-    const metric = filteredData.metrics[key];
-    const month = metric.filters.month;
-    aggregated[month] = (aggregated[month] || 0) + metric.value;
+  if(PD.sortCol!==null){
+    const colKeys=['id','drug','mfr','payor','ptype','fin','region','provider','health_system','enroll_date','current_stage','overall_status','e2e_days','ttt_days','n_stages'];
+    const ci=s.indexOf(colKeys[PD.sortCol]);
+    data.sort((a,b)=>{
+      let va=a[ci],vb=b[ci];
+      if(va===null) va=PD.sortAsc?Infinity:-Infinity;
+      if(vb===null) vb=PD.sortAsc?Infinity:-Infinity;
+      if(typeof va==='number'&&typeof vb==='number') return PD.sortAsc?va-vb:vb-va;
+      return PD.sortAsc?String(va).localeCompare(String(vb)):String(vb).localeCompare(String(va));
+    });
   }
-  
-  return aggregated;
+  return data;
 }
+function renderPDTable(){
+  const s=D.patient_detail_s;
+  const data=getPatientRows();
+  const total=data.length;
+  const start=PD.page*PD.perPage;
+  const page=data.slice(start,start+PD.perPage);
+  document.getElementById('pd-count').textContent=`${total.toLocaleString()} patients`;
+
+  const cols=[
+    {label:'Patient ID',key:'id'},{label:'Drug',key:'drug'},{label:'Mfr',key:'mfr'},{label:'Payor',key:'payor'},{label:'Type',key:'ptype'},
+    {label:'Financial Program',key:'fin'},{label:'Region',key:'region'},{label:'Provider',key:'provider'},{label:'Health System',key:'health_system'},
+    {label:'Enrolled',key:'enroll_date'},{label:'Current Stage',key:'current_stage'},{label:'Status',key:'overall_status'},
+    {label:'E2E TAT (d)',key:'e2e_days'},{label:'TTT (d)',key:'ttt_days'},{label:'Stages',key:'n_stages'}
+  ];
+  const colIdx=cols.map(c=>s.indexOf(c.key));
+
+  const thead=document.querySelector('#pd-table thead');
+  let hdr='<tr>';
+  cols.forEach((c,ci)=>{
+    const active=PD.sortCol===ci;
+    const arrow=active?(PD.sortAsc?'▲':'▼'):'⇅';
+    hdr+=`<th class="${active?'sort-active':''}" onclick="sortPD(${ci})">${c.label} <span class="sort-arrow">${arrow}</span></th>`;
+  });
+  thead.innerHTML=hdr+'</tr>';
+
+  const statusColors={Completed:'#059669','In Progress':'#f59e0b',Cancelled:'#dc2626',Denied:'#991b1b'};
+  let html='';
+  page.forEach(r=>{
+    const sc=statusColors[r[s.indexOf('overall_status')]]||'#6b7280';
+    html+=`<tr>`;
+    colIdx.forEach((ci,i)=>{
+      const val=r[ci];
+      if(cols[i].key==='id') html+=`<td><strong>${val}</strong></td>`;
+      else if(cols[i].key==='overall_status') html+=`<td><span class="status-dot" style="background:${sc}"></span>${val}</td>`;
+      else if(cols[i].key==='e2e_days'||cols[i].key==='ttt_days') html+=`<td class="n">${val!==null?val:'—'}</td>`;
+      else if(cols[i].key==='n_stages') html+=`<td class="n">${val}</td>`;
+      else html+=`<td>${val}</td>`;
+    });
+    html+=`</tr>`;
+  });
+  document.querySelector('#pd-table tbody').innerHTML=html;
+
+  const totalPages=Math.ceil(total/PD.perPage);
+  document.getElementById('pd-pager').innerHTML=`
+    <button ${PD.page<=0?'disabled':''} onclick="PD.page--;renderPDTable()">← Prev</button>
+    <span>Page ${totalPages>0?PD.page+1:0} of ${totalPages}</span>
+    <button ${PD.page>=totalPages-1?'disabled':''} onclick="PD.page++;renderPDTable()">Next →</button>
+    <button class="btn btn-outline" style="margin-left:auto" onclick="downloadPDCSV()">⬇ Download CSV</button>`;
+}
+function sortPD(colIdx){
+  if(PD.sortCol===colIdx) PD.sortAsc=!PD.sortAsc;
+  else { PD.sortCol=colIdx; PD.sortAsc=true; }
+  renderPDTable();
+}
+function downloadPDCSV(){
+  const s=D.patient_detail_s;
+  const data=getPatientRows();
+  let csv=s.join(',')+'\n';
+  data.forEach(r=>{csv+=r.map(v=>`"${v!==null?v:''}"`).join(',')+'\n';});
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=`patient_detail_${S.sm}_${S.em}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+}
+function renderPatients(){
+  if(!D||!D.patient_detail){
+    document.getElementById('pd-content').innerHTML='<div class="loading"><p style="color:#dc2626">Patient detail data not found. Re-run aggregate_data.py to regenerate dashboard_data.json.</p></div>';
+    return;
+  }
+  if(!document.getElementById('pd-search')) buildPDControls();
+  renderPDTable();
+}
+
+// ── INIT ──
+async function init(){
+  try{
+    const r=await fetch('dashboard_data.json');
+    if(!r.ok) throw new Error();
+    D=await r.json();
+  }catch(e){
+    document.getElementById('file-input').addEventListener('change',async ev=>{
+      const f=ev.target.files[0]; if(!f)return;
+      D=JSON.parse(await f.text());
+      boot();
+    });
+    return;
+  }
+  boot();
+}
+function boot(){
+  document.getElementById('loading').style.display='none';
+  document.getElementById('tab-exec').classList.add('active');
+  buildFilters();
+  buildAnalysisControls();
+  buildDimXref();
+  renderTab();
+}
+init();
 </script>
+</div><!-- /app-wrap -->
 </body>
 </html>
