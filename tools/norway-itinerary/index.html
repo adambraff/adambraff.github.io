@@ -61,10 +61,8 @@
   }
   .hero .route .arrow { opacity: 0.5; }
 
-  /* Container */
   .container { max-width: 860px; margin: 0 auto; padding: 0 20px; }
 
-  /* Quick Stats */
   .stats-bar {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 12px; padding: 24px 0; margin-top: -30px; position: relative; z-index: 1;
@@ -76,42 +74,31 @@
   .stat-card .num { font-size: 1.4em; font-weight: 700; color: var(--blue); }
   .stat-card .label { font-size: 0.8em; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; }
 
-  /* Map */
   .map-container {
     background: var(--card); border-radius: 16px; overflow: hidden;
     box-shadow: 0 4px 16px rgba(0,0,0,0.1); margin: 30px 0;
   }
-  .map-container h3 {
-    padding: 16px 20px 0; font-size: 1.1em; font-weight: 700; color: var(--navy);
-  }
+  .map-container h3 { padding: 16px 20px 0; font-size: 1.1em; font-weight: 700; color: var(--navy); }
   .map-wrapper { height: 420px; margin: 12px; border-radius: 10px; overflow: hidden; }
 
-  /* Section heading */
   .section-heading {
     font-size: 1.5em; font-weight: 800; color: var(--navy);
     margin: 40px 0 16px; padding-bottom: 8px;
-    border-bottom: 3px solid var(--blue);
-    display: inline-block;
+    border-bottom: 3px solid var(--blue); display: inline-block;
   }
 
-  /* Day Card */
   .day-card {
     background: var(--card); border-radius: 16px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    margin-bottom: 24px; overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 24px; overflow: hidden;
   }
   .day-header {
-    padding: 18px 24px;
-    display: flex; align-items: center; gap: 14px;
-    cursor: pointer; user-select: none;
-    transition: background 0.15s;
+    padding: 18px 24px; display: flex; align-items: center; gap: 14px;
+    cursor: pointer; user-select: none; transition: background 0.15s;
   }
   .day-header:hover { background: #f1f5f9; }
   .day-badge {
-    background: var(--blue); color: white;
-    border-radius: 10px; padding: 6px 14px;
-    font-weight: 700; font-size: 0.85em; white-space: nowrap;
-    min-width: 58px; text-align: center;
+    background: var(--blue); color: white; border-radius: 10px; padding: 6px 14px;
+    font-weight: 700; font-size: 0.85em; white-space: nowrap; min-width: 58px; text-align: center;
   }
   .day-badge.oslo { background: var(--red); }
   .day-badge.flam { background: var(--orange); }
@@ -121,21 +108,16 @@
   .day-title { font-weight: 700; font-size: 1.1em; flex: 1; }
   .day-toggle { font-size: 1.2em; color: var(--gray); transition: transform 0.2s; }
   .day-card.open .day-toggle { transform: rotate(180deg); }
-
   .day-body { padding: 0 24px 24px; display: none; }
   .day-card.open .day-body { display: block; }
 
-  /* Activity table */
   .activity-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
   .activity-table th {
     text-align: left; padding: 8px 12px; font-size: 0.75em;
     text-transform: uppercase; letter-spacing: 0.5px;
     color: var(--gray); border-bottom: 2px solid var(--border);
   }
-  .activity-table td {
-    padding: 10px 12px; border-bottom: 1px solid var(--border);
-    vertical-align: top; font-size: 0.92em;
-  }
+  .activity-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; font-size: 0.92em; }
   .activity-table tr:last-child td { border-bottom: none; }
   .activity-table .time { font-weight: 600; color: var(--blue); white-space: nowrap; width: 90px; }
   .activity-table .act { font-weight: 600; }
@@ -143,23 +125,16 @@
 
   .survey-note {
     background: #fffbeb; border-left: 4px solid var(--amber);
-    padding: 12px 16px; margin-top: 16px; border-radius: 0 8px 8px 0;
-    font-size: 0.88em; color: #92400e;
+    padding: 12px 16px; margin-top: 16px; border-radius: 0 8px 8px 0; font-size: 0.88em; color: #92400e;
   }
-
   .sports-note {
     background: #f0fdf4; border-left: 4px solid var(--green);
-    padding: 12px 16px; margin-top: 12px; border-radius: 0 8px 8px 0;
-    font-size: 0.88em; color: #166534;
+    padding: 12px 16px; margin-top: 12px; border-radius: 0 8px 8px 0; font-size: 0.88em; color: #166534;
   }
 
-  /* Survey section */
   .insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
   @media (max-width: 640px) { .insights-grid { grid-template-columns: 1fr; } }
-  .insight-card {
-    background: var(--card); border-radius: 12px; padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  }
+  .insight-card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
   .insight-card h4 { font-size: 0.9em; font-weight: 700; margin-bottom: 8px; }
   .insight-card.winners h4 { color: var(--green); }
   .insight-card.losers h4 { color: var(--red); }
@@ -167,48 +142,28 @@
   .insight-card li { padding: 4px 0; font-size: 0.88em; }
   .insight-card li::before { content: '→ '; color: var(--gray); }
 
-  /* Logistics */
   .logistics-section { margin-top: 40px; }
   .logistics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 16px; }
-  .logistics-card {
-    background: var(--card); border-radius: 12px; padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  }
+  .logistics-card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
   .logistics-card h4 { font-size: 0.95em; font-weight: 700; margin-bottom: 10px; color: var(--blue); }
   .logistics-card ul { list-style: none; padding: 0; }
   .logistics-card li { padding: 4px 0; font-size: 0.88em; border-bottom: 1px solid var(--border); }
   .logistics-card li:last-child { border-bottom: none; }
   .logistics-card li strong { color: var(--navy); }
 
-  /* Hotels table */
   .hotels-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-  .hotels-table th {
-    text-align: left; padding: 10px 14px; background: #f1f5f9;
-    font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray);
-  }
+  .hotels-table th { text-align: left; padding: 10px 14px; background: #f1f5f9; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray); }
   .hotels-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 0.92em; }
   .hotels-table tr:last-child td { border-bottom: none; }
 
-  /* Budget */
-  .budget-note {
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    border-radius: 12px; padding: 24px; margin-top: 24px;
-    font-size: 0.92em;
-  }
+  .budget-note { background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 12px; padding: 24px; margin-top: 24px; font-size: 0.92em; }
   .budget-note h4 { font-size: 1em; font-weight: 700; margin-bottom: 8px; }
 
-  /* Footer */
-  .footer {
-    text-align: center; padding: 40px 20px; margin-top: 40px;
-    color: var(--gray); font-size: 0.85em;
-    border-top: 1px solid var(--border);
-  }
+  .footer { text-align: center; padding: 40px 20px; margin-top: 40px; color: var(--gray); font-size: 0.85em; border-top: 1px solid var(--border); }
 
-  /* Leaflet popup style */
   .leaflet-popup-content-wrapper { border-radius: 10px; }
   .leaflet-popup-content { font-family: 'Inter', sans-serif; font-size: 13px; margin: 10px 14px; }
 
-  /* Mobile responsive */
   @media (max-width: 640px) {
     .hero h1 { font-size: 2em; }
     .hero .subtitle { font-size: 1em; }
@@ -220,29 +175,18 @@
     .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .stat-card { padding: 12px; }
     .stat-card .num { font-size: 1.2em; }
-
-    /* Stack activity tables on mobile */
     .activity-table thead { display: none; }
-    .activity-table, .activity-table tbody, .activity-table tr, .activity-table td {
-      display: block; width: 100%;
-    }
-    .activity-table tr {
-      padding: 12px 0; border-bottom: 1px solid var(--border);
-    }
+    .activity-table, .activity-table tbody, .activity-table tr, .activity-table td { display: block; width: 100%; }
+    .activity-table tr { padding: 12px 0; border-bottom: 1px solid var(--border); }
     .activity-table tr:last-child { border-bottom: none; }
     .activity-table td { padding: 2px 0; border-bottom: none; }
     .activity-table .time { width: auto; font-size: 0.8em; }
     .activity-table .act { font-size: 0.95em; }
     .activity-table .notes { font-size: 0.82em; }
-
-    /* Hotels table scroll on mobile */
     .hotels-table { font-size: 0.82em; }
     .hotels-table th, .hotels-table td { padding: 8px 8px; }
-
     .logistics-grid { grid-template-columns: 1fr; }
     .map-container { margin: 20px 0; }
-
-    /* Flam/London inner maps */
     .day-body .map-container { margin: 0 -12px 12px; }
     .day-body .map-wrapper { height: 260px; }
   }
@@ -266,7 +210,6 @@
 
 <div class="container">
 
-  <!-- Stats -->
   <div class="stats-bar">
     <div class="stat-card"><div class="num">10</div><div class="label">Days</div></div>
     <div class="stat-card"><div class="num">7+2</div><div class="label">Norway + London Nights</div></div>
@@ -274,7 +217,6 @@
     <div class="stat-card"><div class="num">4</div><div class="label">Hotels Total</div></div>
   </div>
 
-  <!-- Map 1: Norway Overview -->
   <div class="map-container">
     <h3>🇳🇴 Norway Route</h3>
     <div class="map-wrapper" id="map-norway"></div>
@@ -285,7 +227,6 @@
     </div>
   </div>
 
-  <!-- Survey insights -->
   <div class="section-heading">What We Know the Family Likes</div>
   <p style="margin-bottom:12px;color:var(--gray);font-size:0.92em;">Based on feedback from Japan 2025, Central Europe 2022, and Spain 2017:</p>
   <div class="insights-grid">
@@ -309,10 +250,8 @@
     </div>
   </div>
 
-  <!-- THE ITINERARY -->
   <div class="section-heading">The Itinerary</div>
 
-  <!-- Day 0 -->
   <div class="day-card open">
     <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
       <span class="day-badge travel">Day 0</span>
@@ -322,19 +261,17 @@
     <div class="day-body">
       <table class="activity-table">
         <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
-        <tr><td class="time">Evening</td><td class="act">Delta 264 JFK → CDG, connect Delta 8484 CDG → OSL</td><td class="notes">Business class. JFK 10:30pm → CDG 12:15pm (+1) → CDG 2:15pm → Oslo 4:40pm. 12h10m total.</td></tr>
+        <tr><td class="time">Evening</td><td class="act">FL 264 JFK → CDG, connect DL 8484 CDG → OSL ✅ BOOKED</td><td class="notes">Business class. JFK 10:30pm → CDG 12:50pm (+1) → CDG 2:15pm → Oslo 4:40pm.</td></tr>
       </table>
-      <div class="survey-note">Everyone connects to JFK from their home city. The CDG layover is 2 hours — tight but doable with business class priority.</div>
+      <div class="survey-note">Everyone connects to JFK from their home city. The CDG layover is ~1.5 hours — tight but doable with business class priority.</div>
     </div>
   </div>
 
-  <!-- Oslo map -->
   <div class="map-container">
     <h3>🏙️ Oslo Highlights (Days 1–3)</h3>
     <div class="map-wrapper" id="map-oslo"></div>
   </div>
 
-  <!-- Day 1 -->
   <div class="day-card">
     <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
       <span class="day-badge oslo">Day 1</span>
@@ -354,7 +291,6 @@
     </div>
   </div>
 
-  <!-- Day 2 -->
   <div class="day-card">
     <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
       <span class="day-badge oslo">Day 2</span>
@@ -376,7 +312,6 @@
     </div>
   </div>
 
-  <!-- Day 3 - OSLO FRIENDS DAY -->
   <div class="day-card">
     <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
       <span class="day-badge oslo">Day 3</span>
@@ -396,7 +331,6 @@
     </div>
   </div>
 
-  <!-- Day 4 - BIG TRAIN DAY -->
   <div class="day-card">
     <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
       <span class="day-badge flam">Day 4</span>
@@ -404,7 +338,6 @@
       <span class="day-toggle">▼</span>
     </div>
     <div class="day-body">
-      <!-- Flam detail map -->
       <div class="map-container" style="margin:0 -24px 16px;border-radius:0;box-shadow:none;">
         <h3>Flåm & Fjord Area Detail</h3>
         <div class="map-wrapper" id="map-flam" style="height:360px;"></div>
@@ -428,7 +361,6 @@
     </div>
   </div>
 
-  <!-- Day 5 -->
   <div class="day-card">
     <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
       <span class="day-badge flam">Day 5</span>
@@ -448,13 +380,11 @@
     </div>
   </div>
 
-  <!-- Bergen map -->
   <div class="map-container">
     <h3>⛰️ Bergen Highlights (Days 6–7)</h3>
     <div class="map-wrapper" id="map-bergen"></div>
   </div>
 
-  <!-- Day 6 -->
   <div class="day-card">
     <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
       <span class="day-badge bergen">Day 6</span>
@@ -474,7 +404,6 @@
     </div>
   </div>
 
-  <!-- Day 7 -->
   <div class="day-card">
     <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
       <span class="day-badge bergen">Day 7</span>
@@ -495,7 +424,6 @@
     </div>
   </div>
 
-  <!-- Day 8 -->
   <div class="day-card">
     <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
       <span class="day-badge london">Day 8</span>
@@ -503,7 +431,6 @@
       <span class="day-toggle">▼</span>
     </div>
     <div class="day-body">
-      <!-- London map -->
       <div class="map-container" style="margin:0 -24px 16px;border-radius:0;box-shadow:none;">
         <h3>🇬🇧 London: Key Locations</h3>
         <div class="map-wrapper" id="map-london" style="height:340px;"></div>
@@ -511,14 +438,13 @@
       <table class="activity-table">
         <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
         <tr><td class="time">Morning</td><td class="act">Last Bergen morning</td><td class="notes">Breakfast at hotel or harbor café. Last fjord views.</td></tr>
-        <tr><td class="time">Midday</td><td class="act">Flight Bergen → London</td><td class="notes">~2 hrs direct. Norwegian (BGO→LGW) or SAS/BA (BGO→LHR).</td></tr>
+        <tr><td class="time">Midday</td><td class="act">Flight Bergen → London (BGO→LGW or LHR)</td><td class="notes">~2 hrs direct. Norwegian or SAS. NOT YET BOOKED.</td></tr>
         <tr><td class="time">Afternoon</td><td class="act">Arrive London, check in</td><td class="notes">The Stafford (St. James's, quiet luxury) or Ham Yard Hotel (Soho, lively).</td></tr>
         <tr><td class="time">Dinner</td><td class="act">Bocca di Lupo or Ma La Sichuan</td><td class="notes">Bocca di Lupo = Italian small plates from all 20 regions. Ma La Sichuan = known winner (~8.8 avg in 2022).</td></tr>
       </table>
     </div>
   </div>
 
-  <!-- Day 9 -->
   <div class="day-card">
     <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
       <span class="day-badge london">Day 9</span>
@@ -540,7 +466,6 @@
     </div>
   </div>
 
-  <!-- Day 10 -->
   <div class="day-card">
     <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
       <span class="day-badge travel">Day 10</span>
@@ -550,22 +475,21 @@
     <div class="day-body">
       <table class="activity-table">
         <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
-        <tr><td class="time">Morning</td><td class="act">Pack up, breakfast</td><td class="notes">Maybe one last stroll depending on flight time.</td></tr>
-        <tr><td class="time">Midday+</td><td class="act">Flights London → home cities</td><td class="notes">LHR has direct flights to JFK, EWR, BOS, ORD. Everyone books direct to their home city.</td></tr>
+        <tr><td class="time">Morning</td><td class="act">Pack up, breakfast</td><td class="notes">3:50pm departure gives you a full morning. Last stroll, last coffee.</td></tr>
+        <tr><td class="time">3:50 PM</td><td class="act">DL 5922 (Virgin Atlantic) LHR → JFK ✅ BOOKED</td><td class="notes">Premium economy. Arrives JFK 6:35pm. Emma/Jeremy/Andrew book separate flights to BOS/ORD.</td></tr>
       </table>
     </div>
   </div>
 
-  <!-- LOGISTICS -->
   <div class="section-heading">Logistics</div>
 
   <div class="logistics-grid">
     <div class="logistics-card">
       <h4>✈️ Flights to Book</h4>
       <ul>
-        <li><strong>Aug 21:</strong> Delta JFK → CDG → OSL. Business class. Depart 10:30pm.</li>
-        <li><strong>Aug 29:</strong> Bergen → London — ~2 hrs direct. Norwegian or SAS. Cash.</li>
-        <li><strong>Aug 31:</strong> LHR → JFK nonstop. Business class, afternoon departure.</li>
+        <li><strong>Aug 21:</strong> FL 264 JFK → CDG, DL 8484 CDG → OSL. Business class. ✅ BOOKED</li>
+        <li><strong>Aug 29:</strong> Bergen → London (BGO→LGW or LHR) — ~2 hrs direct. Norwegian or SAS. NOT YET BOOKED.</li>
+        <li><strong>Aug 31:</strong> DL 5922 (Virgin Atlantic) LHR 3:50pm → JFK 6:35pm. Premium economy. ✅ BOOKED</li>
       </ul>
     </div>
     <div class="logistics-card">
@@ -588,7 +512,6 @@
     </div>
   </div>
 
-  <!-- Hotels -->
   <div class="map-container" style="margin-top:24px;">
     <h3 style="padding-bottom:12px;">🏨 Hotels</h3>
     <table class="hotels-table">
@@ -600,7 +523,6 @@
     </table>
   </div>
 
-
   <div class="footer">
     <p><em>This is a draft. All restaurants, hotels, and activities are suggestions to be discussed and confirmed.</em></p>
     <p style="margin-top:8px;">Built for the Braff family — March 2026</p>
@@ -609,7 +531,6 @@
 </div>
 
 <script>
-// ===== MAP UTILITIES =====
 function makeIcon(color, size) {
   size = size || 16;
   return L.divIcon({
@@ -635,7 +556,6 @@ function addLabel(map, lat, lng, text, opts) {
   }).addTo(map);
 }
 
-// ===== MAP 1: NORWAY OVERVIEW =====
 const tileUrl = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
 const tileOpts = { maxZoom: 20 };
 
@@ -658,7 +578,6 @@ addLabel(mapNorway, flam[0], flam[1], 'Flåm', {size:15,dx:16,dy:12});
 addLabel(mapNorway, myrdal[0], myrdal[1], 'Myrdal', {size:11,color:'#666',dx:12,dy:-6});
 addLabel(mapNorway, bergen[0], bergen[1], 'Bergen', {size:15,dx:16,dy:12});
 
-// ===== MAP 2: FLAM DETAIL =====
 const mapFlam = L.map('map-flam', { zoomControl: true, attributionControl: false, scrollWheelZoom: true }).setView([60.84, 6.95], 11);
 L.tileLayer(tileUrl, tileOpts).addTo(mapFlam);
 
@@ -679,7 +598,6 @@ addLabel(mapFlam, 60.87, 6.53, 'Gudvangen', {size:11,dx:14,dy:12});
 addLabel(mapFlam, 60.93, 6.93, 'Undredal', {size:11,dx:10,dy:12});
 addLabel(mapFlam, 60.90, 7.25, 'Stegastein', {size:11,dx:10,dy:12});
 
-// ===== MAP 3: LONDON =====
 const mapLondon = L.map('map-london', { zoomControl: true, attributionControl: false, scrollWheelZoom: true }).setView([51.508, -0.115], 14);
 L.tileLayer(tileUrl, tileOpts).addTo(mapLondon);
 
@@ -697,7 +615,6 @@ londonPlaces.forEach(p => {
   addLabel(mapLondon, p.ll[0], p.ll[1], p.name, {size:11,dx:12,dy:12});
 });
 
-// ===== MAP: OSLO =====
 const mapOslo = L.map('map-oslo', { zoomControl: true, attributionControl: false, scrollWheelZoom: true }).setView([59.915, 10.73], 13);
 L.tileLayer(tileUrl, tileOpts).addTo(mapOslo);
 
@@ -716,7 +633,6 @@ osloPlaces.forEach(p => {
   addLabel(mapOslo, p.ll[0], p.ll[1], p.name, {size:11,dx:12,dy:12});
 });
 
-// ===== MAP: BERGEN =====
 const mapBergen = L.map('map-bergen', { zoomControl: true, attributionControl: false, scrollWheelZoom: true }).setView([60.393, 5.33], 14);
 L.tileLayer(tileUrl, tileOpts).addTo(mapBergen);
 
@@ -733,20 +649,13 @@ bergenPlaces.forEach(p => {
   addLabel(mapBergen, p.ll[0], p.ll[1], p.name, {size:11,dx:12,dy:12});
 });
 
-// Fix maps inside collapsed day cards — Leaflet can't render in display:none containers
-// So we invalidateSize + re-center when a card opens
-const mapFixups = {
-  'map-flam': mapFlam,
-  'map-london': mapLondon
-};
+const mapFixups = { 'map-flam': mapFlam, 'map-london': mapLondon };
 document.querySelectorAll('.day-header').forEach(header => {
   header.addEventListener('click', function() {
     setTimeout(() => {
       Object.entries(mapFixups).forEach(([id, map]) => {
         const el = document.getElementById(id);
-        if (el && el.offsetParent !== null) {
-          map.invalidateSize();
-        }
+        if (el && el.offsetParent !== null) { map.invalidateSize(); }
       });
     }, 50);
   });
