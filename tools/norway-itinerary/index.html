@@ -251,3 +251,805 @@
   /* Mobile responsive */
   @media (max-width: 640px) {
     .hero h1 { font-size: 2em; }
+    .hero .subtitle { font-size: 1em; }
+    .hero .route { flex-direction: column; gap: 6px; }
+    .stats-bar { grid-template-columns: 1fr 1fr; }
+    .insights-grid { grid-template-columns: 1fr; }
+    .logistics-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Password gate overlay -->
+<div class="pw-overlay" id="pwOverlay">
+  <h2>📍 Trip Planner</h2>
+  <p style="font-size: 0.9em; opacity: 0.8; margin-bottom: 8px;">Enter password to view itinerary</p>
+  <input type="password" id="pwInput" placeholder="Password">
+  <button onclick="checkPw()">Unlock</button>
+  <div class="pw-error" id="pwError">Incorrect password</div>
+</div>
+
+<div id="mainContent" style="display: none;">
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <h1>🇳🇴 Norway & London</h1>
+    <p class="subtitle">August 2026 Adventure</p>
+    <p class="travelers">Adam, Blake & Cole</p>
+    <div class="route">
+      <span>Oslo</span>
+      <span class="arrow">→</span>
+      <span>Flåm</span>
+      <span class="arrow">→</span>
+      <span>Bergen</span>
+      <span class="arrow">→</span>
+      <span>London</span>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<section class="container">
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="num">14</div>
+      <div class="label">Days</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">4</div>
+      <div class="label">Cities</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">2</div>
+      <div class="label">Countries</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">🎯</div>
+      <div class="label">Goal</div>
+    </div>
+  </div>
+</section>
+
+<!-- Map -->
+<section class="container">
+  <div class="map-container">
+    <h3>Route Map</h3>
+    <div class="map-wrapper" id="map"></div>
+  </div>
+</section>
+
+<!-- Itinerary -->
+<section class="container">
+  <h2 class="section-heading">Day-by-Day Itinerary</h2>
+
+  <!-- Aug 3-4: Travel to Oslo -->
+  <div class="day-card open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <span class="day-badge travel">Travel</span>
+      <span class="day-title">Aug 3-4 — Flight to Oslo</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <table class="activity-table">
+        <thead>
+          <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="time">Depart home</td>
+            <td class="act">→ SFO</td>
+            <td class="notes">–</td>
+          </tr>
+          <tr>
+            <td class="time">Long flight</td>
+            <td class="act">→ Reykjavik hub</td>
+            <td class="notes">Icelandair or stopover option</td>
+          </tr>
+          <tr>
+            <td class="time">Afternoon</td>
+            <td class="act">→ Oslo arrival</td>
+            <td class="notes">Aug 4. Check into hotel, light walk around Bjørvika/harbor</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Aug 5: Explore Central Oslo -->
+  <div class="day-card open">
+    <div class="day-header" onclick="toggleDay(this)">
+      <span class="day-badge oslo">Oslo</span>
+      <span class="day-title">Aug 5 — Central Oslo</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <table class="activity-table">
+        <thead>
+          <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="time">Morning</td>
+            <td class="act">City walk: Stortorget → Karl Johans gate</td>
+            <td class="notes">Parliament square, main promenade</td>
+          </tr>
+          <tr>
+            <td class="time">Late morning</td>
+            <td class="act">Akershus Fortress &amp; park views</td>
+            <td class="notes">Free to enter grounds, stunning harbor photos</td>
+          </tr>
+          <tr>
+            <td class="time">Lunch</td>
+            <td class="act">Smelt at harbor (casual seafood)</td>
+            <td class="notes">Or: Colonihagen for outdoor seating</td>
+          </tr>
+          <tr>
+            <td class="time">Afternoon</td>
+            <td class="act">Opera House exterior &amp; surroundings</td>
+            <td class="notes">Walk the marble plaza, viewpoint from roof (free)</td>
+          </tr>
+          <tr>
+            <td class="time">Late afternoon</td>
+            <td class="act">Vigeland Sculpture Park (if time)</td>
+            <td class="notes">Largest sculpture park in world; 30 min by bus/tram</td>
+          </tr>
+          <tr>
+            <td class="time">Dinner</td>
+            <td class="act">Dinner &amp; evening stroll</td>
+            <td class="notes">Grünerløkka district for restaurants &amp; nightlife</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="alt-plan">
+        <strong>Rain fallback:</strong> Munch Museum or National Gallery; indoor food halls (Mathallen, Ferner Jacobsen).
+      </div>
+    </div>
+  </div>
+
+  <!-- Aug 6: Day Trip or Extended Oslo -->
+  <div class="day-card">
+    <div class="day-header" onclick="toggleDay(this)">
+      <span class="day-badge oslo">Oslo</span>
+      <span class="day-title">Aug 6 — Extended Oslo / Optional Lillehammer</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <table class="activity-table">
+        <thead>
+          <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="time">Option A: Stay in Oslo</td>
+            <td class="act">Museums, day passes, local neighborhoods</td>
+            <td class="notes">Folk Museum, Viking Ship Museum, Fram polar museum. Or: more cafes, local markets</td>
+          </tr>
+          <tr>
+            <td class="time">Option B: Lillehammer</td>
+            <td class="act">1 hour train north → Olympic town</td>
+            <td class="notes">Maihaugen Museum (open-air), skiing hills, scenic views. Return to Oslo by evening</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="alt-plan">
+        <strong>Recommendation:</strong> Mix both — morning in Oslo, 2-hour train ride to Lillehammer for lunch &amp; Maihaugen, return evening.
+      </div>
+    </div>
+  </div>
+
+  <!-- Aug 7: Train to Flåm -->
+  <div class="day-card">
+    <div class="day-header" onclick="toggleDay(this)">
+      <span class="day-badge travel">Travel</span>
+      <span class="day-title">Aug 7 — Train to Flåm (Flåm Railway)</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <table class="activity-table">
+        <thead>
+          <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="time">Morning</td>
+            <td class="act">Leave Oslo ~9:00 AM</td>
+            <td class="notes">Main train station (Oslo Sentralstasjon)</td>
+          </tr>
+          <tr>
+            <td class="time">~12:00</td>
+            <td class="act">Arrive Myrdal junction</td>
+            <td class="notes">Switch to Flåm Railway (20 min scenic descent)</td>
+          </tr>
+          <tr>
+            <td class="time">~13:30</td>
+            <td class="act">Arrive Flåm</td>
+            <td class="notes">Check into hotel. Light afternoon walk along the fjord</td>
+          </tr>
+          <tr>
+            <td class="time">Evening</td>
+            <td class="act">Dinner &amp; settle in</td>
+            <td class="notes">Flåm is tiny; most dining at hotels or small cafes</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="survey-note">
+        <strong>Booking note:</strong> Flåm Railway books out fast in summer. Pre-book online or contact hotel concierge. Alternatively, rent car from Oslo &amp; drive scenic route via Laerdal tunnel.
+      </div>
+    </div>
+  </div>
+
+  <!-- Aug 8: Flåm Day Activities -->
+  <div class="day-card">
+    <div class="day-header" onclick="toggleDay(this)">
+      <span class="day-badge flam">Flåm</span>
+      <span class="day-title">Aug 8 — Flåm &amp; Fjord Activities</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <table class="activity-table">
+        <thead>
+          <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="time">Morning</td>
+            <td class="act">Kayaking or fjord boat tour</td>
+            <td class="notes">Calm waters, short tours (2–3 hrs). Book at hotel or visitor center</td>
+          </tr>
+          <tr>
+            <td class="time">Late morning</td>
+            <td class="act">Short hike: Otternes or Flåmsdalen</td>
+            <td class="notes">1–2 hour walks; spectacular valley views</td>
+          </tr>
+          <tr>
+            <td class="time">Lunch</td>
+            <td class="act">Riverside picnic or hotel lunch</td>
+            <td class="notes">Pack food from nearby village shop</td>
+          </tr>
+          <tr>
+            <td class="time">Afternoon</td>
+            <td class="act">Explore Otternes (preserved farms)</td>
+            <td class="notes">Traditional Norwegian turf-roof buildings, short walk uphill</td>
+          </tr>
+          <tr>
+            <td class="time">Evening</td>
+            <td class="act">Relax &amp; dinner</td>
+            <td class="notes">Early rest for travel day tomorrow</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="alt-plan">
+        <strong>If bad weather:</strong> Flåm Railway scenic train (revisit in other direction), local shops, museum videos, or rest day at hotel.
+      </div>
+    </div>
+  </div>
+
+  <!-- Aug 9: Flåm to Bergen -->
+  <div class="day-card">
+    <div class="day-header" onclick="toggleDay(this)">
+      <span class="day-badge travel">Travel</span>
+      <span class="day-title">Aug 9 — Flåm to Bergen (Fjord Journey)</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <table class="activity-table">
+        <thead>
+          <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="time">Morning</td>
+            <td class="act">Board 08:30 or 10:30 ferry (check schedule)</td>
+            <td class="notes">Scenic fjord cruise (5–6 hours). Nærøy &amp; Geirangerfjords. Book ahead</td>
+          </tr>
+          <tr>
+            <td class="time">Afternoon</td>
+            <td class="act">Arrive Bergen ~15:30</td>
+            <td class="notes">Check into hotel, walk Bryggen waterfront district</td>
+          </tr>
+          <tr>
+            <td class="time">Evening</td>
+            <td class="act">Dinner near harbor</td>
+            <td class="notes">Fresh seafood; explore small streets behind Bryggen</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="survey-note">
+        <strong>Ferry timing:</strong> Sognefjord ferries are highly seasonal. Confirm operating days before booking. Slow train alternative: Flåm → Voss → Bergen (~4 hrs), less scenic but reliable.
+      </div>
+    </div>
+  </div>
+
+  <!-- Aug 10: Bergen Exploration -->
+  <div class="day-card">
+    <div class="day-header" onclick="toggleDay(this)">
+      <span class="day-badge bergen">Bergen</span>
+      <span class="day-title">Aug 10 — Bergen: Bryggen &amp; Surroundings</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <table class="activity-table">
+        <thead>
+          <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="time">Morning</td>
+            <td class="act">Explore Bryggen (UNESCO site)</td>
+            <td class="notes">Colorful Hanseatic buildings, galleries, shops, photos</td>
+          </tr>
+          <tr>
+            <td class="time">Late morning</td>
+            <td class="act">Fish Market (Fisketorget)</td>
+            <td class="notes">Fresh seafood, local treats. Grab lunch here or nearby</td>
+          </tr>
+          <tr>
+            <td class="time">Early afternoon</td>
+            <td class="act">Cable car up Floyen (Fløibanen)</td>
+            <td class="notes">Panoramic views, walking trails at top. 10 min ride up, 30–60 min walk optional</td>
+          </tr>
+          <tr>
+            <td class="time">Late afternoon</td>
+            <td class="act">Kunstmuseet or Bergenhus fortress</td>
+            <td class="notes">Art museum or medieval fortress; both walkable from harbor</td>
+          </tr>
+          <tr>
+            <td class="time">Evening</td>
+            <td class="act">Dinner &amp; rest</td>
+            <td class="notes">Try local restaurants (Bare Vestland, Bryggeloftet, or smaller bistros)</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="alt-plan">
+        <strong>Rainy alternative:</strong> KODE (art galleries, 4 museums), Aquarium, indoor shopping, or coffee-hopping in old town.
+      </div>
+    </div>
+  </div>
+
+  <!-- Aug 11: Bergen to London Travel -->
+  <div class="day-card">
+    <div class="day-header" onclick="toggleDay(this)">
+      <span class="day-badge travel">Travel</span>
+      <span class="day-title">Aug 11 — Depart Bergen → London</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <table class="activity-table">
+        <thead>
+          <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="time">Morning</td>
+            <td class="act">Flight from Bergen airport (BGO)</td>
+            <td class="notes">~08:30–09:30 departure. Direct to London (LHR, LGW, STN) or via Amsterdam/Dublin</td>
+          </tr>
+          <tr>
+            <td class="time">Afternoon</td>
+            <td class="act">Arrive London</td>
+            <td class="notes">Check into hotel, light walk around neighborhood</td>
+          </tr>
+          <tr>
+            <td class="time">Evening</td>
+            <td class="act">Settle in &amp; dinner</td>
+            <td class="notes">Relax after travel day. Early night recommended</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="survey-note">
+        <strong>Flight booking:</strong> Check Widerøe, SAS, Lufthansa for Bergen→London routes. Early morning flights keep afternoon free in London.
+      </div>
+    </div>
+  </div>
+
+  <!-- Aug 12: London — West End & South Bank -->
+  <div class="day-card">
+    <div class="day-header" onclick="toggleDay(this)">
+      <span class="day-badge london">London</span>
+      <span class="day-title">Aug 12 — West End &amp; South Bank</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <table class="activity-table">
+        <thead>
+          <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="time">Morning</td>
+            <td class="act">Stroll through Covent Garden</td>
+            <td class="notes">Street performers, shops, buzz. Coffee/pastry break</td>
+          </tr>
+          <tr>
+            <td class="time">Late morning</td>
+            <td class="act">Piccadilly Circus &amp; Leicester Square walk</td>
+            <td class="notes">Tourist heartland, but photogenic. 15–20 min walk</td>
+          </tr>
+          <tr>
+            <td class="time">Lunch</td>
+            <td class="act">West End district food options</td>
+            <td class="notes">Chains or local spots (Barrafina, Ottolenghi, Pho Cafe)</td>
+          </tr>
+          <tr>
+            <td class="time">Afternoon</td>
+            <td class="act">Cross Westminster Bridge → South Bank</td>
+            <td class="notes">Thames walk, London Eye (optional), Shakespeare's Globe, Tate Modern (free)</td>
+          </tr>
+          <tr>
+            <td class="time">Late afternoon</td>
+            <td class="act">Borough Market or Millennium Bridge stroll</td>
+            <td class="notes">Food stalls, river views, St. Paul's Cathedral views</td>
+          </tr>
+          <tr>
+            <td class="time">Evening</td>
+            <td class="act">Dinner on South Bank</td>
+            <td class="notes">Many options: casual to upscale along the Thames</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="alt-plan">
+        <strong>Rainy backup:</strong> British Museum (free), National Gallery (free), or indoor markets. West End theatre show if interested.
+      </div>
+    </div>
+  </div>
+
+  <!-- Aug 13: London — Royal London & East -->
+  <div class="day-card">
+    <div class="day-header" onclick="toggleDay(this)">
+      <span class="day-badge london">London</span>
+      <span class="day-title">Aug 13 — Royal London &amp; East End</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <table class="activity-table">
+        <thead>
+          <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="time">Morning</td>
+            <td class="act">Buckingham Palace &amp; St. James's Park</td>
+            <td class="notes">Changing of Guard (11:30 Mon/Wed/Fri/Sun). Pic and walk. Free</td>
+          </tr>
+          <tr>
+            <td class="time">Late morning</td>
+            <td class="act">Westminster Abbey</td>
+            <td class="notes">Gothic cathedral, royals, history. Entry fee. Book ahead for less crowded times</td>
+          </tr>
+          <tr>
+            <td class="time">Lunch</td>
+            <td class="act">Westminster / Pimlico area</td>
+            <td class="notes">Neighborhood walk, local pubs, casual dining</td>
+          </tr>
+          <tr>
+            <td class="time">Afternoon</td>
+            <td class="act">Tower of London &amp; Tower Bridge</td>
+            <td class="notes">Historic fortress, Crown Jewels (very crowded). Alternative: just walk bridge for free</td>
+          </tr>
+          <tr>
+            <td class="time">Late afternoon</td>
+            <td class="act">East London (Shoreditch, Bethnal Green)</td>
+            <td class="notes">Street art, vintage shops, trendy cafes. More authentic London vibe</td>
+          </tr>
+          <tr>
+            <td class="time">Evening</td>
+            <td class="act">Dinner in East London or back to West</td>
+            <td class="notes">Explore neighborhood restaurants</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="alt-plan">
+        <strong>Time-saving option:</strong> Skip Tower of London (long lines) and focus on Tower Bridge walk + East London street art + cafes for more authentic experience.
+      </div>
+    </div>
+  </div>
+
+  <!-- Aug 14: London — Parks, Museums & Neighborhoods -->
+  <div class="day-card">
+    <div class="day-header" onclick="toggleDay(this)">
+      <span class="day-badge london">London</span>
+      <span class="day-title">Aug 14 — Parks, Museums &amp; Local Neighborhoods</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <table class="activity-table">
+        <thead>
+          <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="time">Morning</td>
+            <td class="act">Hyde Park &amp; Kensington Gardens</td>
+            <td class="notes">Peaceful walk, Serpentine lake, Kensington Palace grounds. Coffee/brunch nearby</td>
+          </tr>
+          <tr>
+            <td class="time">Lunch</td>
+            <td class="act">Kensington High Street or park picnic</td>
+            <td class="notes">Local shops, cafes, or grab takeaway for park lunch</td>
+          </tr>
+          <tr>
+            <td class="time">Early afternoon</td>
+            <td class="act">V&amp;A Museum or Natural History Museum</td>
+            <td class="notes">Both free, world-class. Pick based on interests. 1–2 hours browsing</td>
+          </tr>
+          <tr>
+            <td class="time">Late afternoon</td>
+            <td class="act">NotthingHill or Portobello Road (if Sat/Sun for market)</td>
+            <td class="notes">Colorful neighborhood, eclectic shops, street cafes, vintage finds</td>
+          </tr>
+          <tr>
+            <td class="time">Evening</td>
+            <td class="act">Dinner &amp; nightlife planning</td>
+            <td class="notes">Rest before departure day tomorrow</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="alt-plan">
+        <strong>Alternative day structure:</strong> Regent's Park (Rose Garden), Camden Market (Sat/Sun), or Greenwich (historic ships, free museums).
+      </div>
+    </div>
+  </div>
+
+  <!-- Aug 15: Depart London -->
+  <div class="day-card">
+    <div class="day-header" onclick="toggleDay(this)">
+      <span class="day-badge travel">Travel</span>
+      <span class="day-title">Aug 15 — Depart London → Home</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <table class="activity-table">
+        <thead>
+          <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="time">Morning</td>
+            <td class="act">Final breakfast &amp; last-minute walk</td>
+            <td class="notes">Around hotel/neighborhood</td>
+          </tr>
+          <tr>
+            <td class="time">Late morning</td>
+            <td class="act">Travel to airport (LHR, LGW, STN)</td>
+            <td class="notes">Tube/train from central London. Allow 2+ hours for security</td>
+          </tr>
+          <tr>
+            <td class="time">Afternoon</td>
+            <td class="act">Flight departure</td>
+            <td class="notes">Transatlantic return (8–9 hours). Arrive home evening of Aug 15 (US time)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</section>
+
+<!-- Logistics -->
+<section class="container">
+  <h2 class="section-heading">Logistics & Planning</h2>
+
+  <div class="logistics-grid">
+    <div class="logistics-card">
+      <h4>Accommodation</h4>
+      <ul>
+        <li><strong>Oslo (Aug 4–7):</strong> 3 nights. Central location (Sentrum or Bjørvika). ~1100–1500 NOK/night</li>
+        <li><strong>Flåm (Aug 7–9):</strong> 2 nights. Riverside hotel. ~1200–1600 NOK/night</li>
+        <li><strong>Bergen (Aug 9–11):</strong> 2 nights. Bryggen or harbor area. ~1200–1600 NOK/night</li>
+        <li><strong>London (Aug 11–15):</strong> 4 nights. West End or South Bank. £100–150/night</li>
+      </ul>
+    </div>
+
+    <div class="logistics-card">
+      <h4>Transportation</h4>
+      <ul>
+        <li><strong>Flights:</strong> SFO → Oslo (Icelandair or direct); Bergen → London (SAS, Lufthansa); London → SFO (direct or hub)</li>
+        <li><strong>Trains:</strong> Oslo Central → Flåm Railway (via Myrdal). Flåm → Bergen ferry or train via Voss</li>
+        <li><strong>Local:</strong> Buses, trams in cities. London Oyster card recommended</li>
+        <li><strong>Car rental:</strong> Optional for flexibility in Norway; not needed in London (too congested)</li>
+      </ul>
+    </div>
+
+    <div class="logistics-card">
+      <h4>Booking Priority</h4>
+      <ul>
+        <li>Flights (Icelandair, SAS, Norwegian Air, Lufthansa)</li>
+        <li>Hotels (3–6 months ahead for summer)</li>
+        <li>Flåm Railway (seasonal, books out)</li>
+        <li>Ferry Flåm→Bergen (if available; confirm dates)</li>
+        <li>Attractions (Westminster Abbey, Tower pre-book if time-slot important)</li>
+      </ul>
+    </div>
+
+    <div class="logistics-card">
+      <h4>Budget (Estimate)</h4>
+      <ul>
+        <li><strong>Flights:</strong> $700–1000 per person (transatlantic + regional)</li>
+        <li><strong>Hotels:</strong> ~$4500 total (14 nights avg)</li>
+        <li><strong>Food:</strong> ~$1500 (mix casual &amp; nice dinners)</li>
+        <li><strong>Activities:</strong> ~$500 (museums, ferries, cable car)</li>
+        <li><strong>Misc:</strong> ~$300 (tips, transit, emergencies)</li>
+        <li style="border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px;"><strong>Total/person:</strong> ~$2300–2800</li>
+      </ul>
+    </div>
+
+    <div class="logistics-card">
+      <h4>Packing Tips</h4>
+      <ul>
+        <li><strong>Norway:</strong> Waterproof jacket, layers, comfortable walking shoes</li>
+        <li><strong>August weather:</strong> 12–18°C in Norway; 15–20°C in London. Rain likely</li>
+        <li><strong>Gear:</strong> Sunscreen, adapters (UK plugs), small backpack for day trips</li>
+        <li><strong>Docs:</strong> Passport, travel insurance, hotel confirmations on phone</li>
+      </ul>
+    </div>
+
+    <div class="logistics-card">
+      <h4>Practical Notes</h4>
+      <ul>
+        <li><strong>Currency:</strong> NOK (Norway), GBP (UK). Cards widely accepted everywhere</li>
+        <li><strong>Language:</strong> English widely spoken in both countries</li>
+        <li><strong>Phones:</strong> EU roaming works; consider local SIM for Norway/UK if heavy usage</li>
+        <li><strong>Visas:</strong> US citizens visa-free (90 days Schengen/UK)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Hotels Table -->
+  <h3 style="font-size: 1.2em; font-weight: 700; margin-top: 32px; margin-bottom: 12px;">Recommended Hotels (Sample Options)</h3>
+  <table class="hotels-table">
+    <thead>
+      <tr>
+        <th>City</th>
+        <th>Hotel Name</th>
+        <th>Neighborhood</th>
+        <th>Style</th>
+        <th>Approx. Cost</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Oslo</strong></td>
+        <td>The Thief</td>
+        <td>Bjørvika</td>
+        <td>Modern, design-forward luxury</td>
+        <td>1500+ NOK</td>
+      </tr>
+      <tr>
+        <td><strong>Oslo</strong></td>
+        <td>Radisson Blu</td>
+        <td>Sentrum</td>
+        <td>4-star business/leisure</td>
+        <td>1200–1400 NOK</td>
+      </tr>
+      <tr>
+        <td><strong>Flåm</strong></td>
+        <td>Flåm Camping (cabin) or Flåm Hotel</td>
+        <td>Riverside</td>
+        <td>Rustic charm or basic comfort</td>
+        <td>1200–1500 NOK</td>
+      </tr>
+      <tr>
+        <td><strong>Bergen</strong></td>
+        <td>Bryggen Boutique Hotel</td>
+        <td>Bryggen (UNESCO)</td>
+        <td>Charming, historic building</td>
+        <td>1300–1600 NOK</td>
+      </tr>
+      <tr>
+        <td><strong>Bergen</strong></td>
+        <td>Clarion Hotel Signal</td>
+        <td>Harbor/Nordnes</td>
+        <td>Modern 4-star, rooftop bar</td>
+        <td>1200–1400 NOK</td>
+      </tr>
+      <tr>
+        <td><strong>London</strong></td>
+        <td>Premier Inn (West End or South Bank)</td>
+        <td>Various central zones</td>
+        <td>Budget 3-star (reliable)</td>
+        <td>£80–120</td>
+      </tr>
+      <tr>
+        <td><strong>London</strong></td>
+        <td>Firmdale Hotels (Covent Garden)</td>
+        <td>Covent Garden</td>
+        <td>Boutique, quirky luxury</td>
+        <td>£200+</td>
+      </tr>
+      <tr>
+        <td><strong>London</strong></td>
+        <td>Premier Inn Southwark</td>
+        <td>South Bank</td>
+        <td>Budget 3-star, great location</td>
+        <td>£90–140</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Budget summary -->
+  <div class="budget-note">
+    <h4>Budget Breakdown & Notes</h4>
+    <p><strong>Total estimated cost for 3 people:</strong> ~£4000–7000 GBP / ~65,000 NOK (flights + hotels + food + activities)</p>
+    <p style="margin-top: 8px;"><strong>Rough per-person split:</strong> Flights £500–700 | Hotels £800–1000 | Food £500–600 | Activities £200–300 | Misc £200</p>
+    <p style="margin-top: 8px;"><strong>Ways to save:</strong> Book hotels 3+ months ahead; use budget airlines (but watch baggage); eat mix of restaurants & grocery stores; skip pricey attractions (focus on free museums, walks, nature).</p>
+    <p style="margin-top: 8px;"><strong>Splurge-worthy:</strong> Flåm train scenic route, fjord activities, one nice dinner in Bergen or London.</p>
+  </div>
+
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <p>Last updated: March 2026 | Trip departs August 3, 2026 | Questions? Check logistics section or contact trip planner.</p>
+</footer>
+
+</div>
+
+<!-- Leaflet Map -->
+<script>
+// Initialize map
+var map = L.map('map').setView([60.5, 7.5], 5);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+// Add markers and route
+var waypoints = [
+  { lat: 59.9139, lng: 10.7522, name: 'Oslo' },
+  { lat: 60.8832, lng: 7.1932, name: 'Flåm' },
+  { lat: 60.3894, lng: 5.3232, name: 'Bergen' },
+  { lat: 51.5074, lng: -0.1278, name: 'London' }
+];
+
+// Add markers
+waypoints.forEach(function(wp) {
+  L.circleMarker([wp.lat, wp.lng], {
+    radius: 6,
+    fillColor: '#2563eb',
+    color: '#fff',
+    weight: 2,
+    opacity: 1,
+    fillOpacity: 0.8
+  }).addTo(map).bindPopup(wp.name);
+});
+
+// Draw route line
+var route = waypoints.map(w => [w.lat, w.lng]);
+L.polyline(route, { color: '#2563eb', weight: 3, opacity: 0.7 }).addTo(map);
+</script>
+
+<!-- Day card toggle -->
+<script>
+function toggleDay(header) {
+  var card = header.closest('.day-card');
+  card.classList.toggle('open');
+}
+</script>
+
+<!-- Password gate -->
+<script>
+function checkPw() {
+  var pw = document.getElementById('pwInput').value;
+  // Simple hashing: base64 encode the password for comparison
+  var storedHash = 'c2NhbmRpbmF2aWE='; // base64 for 'scandinavia'
+  var inputHash = btoa(pw);
+  
+  if (inputHash === storedHash) {
+    document.getElementById('pwOverlay').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+  } else {
+    document.getElementById('pwError').style.display = 'block';
+    document.getElementById('pwInput').value = '';
+    setTimeout(() => {
+      document.getElementById('pwError').style.display = 'none';
+    }, 2000);
+  }
+}
+document.getElementById('pwInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') checkPw();
+});
+</script>
+</body>
+</html>
