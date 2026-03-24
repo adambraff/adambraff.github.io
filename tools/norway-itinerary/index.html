@@ -33,7 +33,6 @@
     font-size: 15px;
   }
 
-  /* Hero */
   .hero {
     background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 40%, #1a4a6e 100%);
     color: white;
@@ -42,6 +41,7 @@
     position: relative;
     overflow: hidden;
   }
+
   .hero::before {
     content: '';
     position: absolute;
@@ -50,6 +50,7 @@
     background-size: cover;
     opacity: 0.3;
   }
+
   .hero h1 { font-size: 2.8em; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; position: relative; }
   .hero .subtitle { font-size: 1.2em; font-weight: 300; opacity: 0.9; position: relative; }
   .hero .travelers { font-size: 1em; font-weight: 400; opacity: 0.75; margin-top: 12px; position: relative; }
@@ -61,10 +62,8 @@
   }
   .hero .route .arrow { opacity: 0.5; }
 
-  /* Container */
   .container { max-width: 860px; margin: 0 auto; padding: 0 20px; }
 
-  /* Quick Stats */
   .stats-bar {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 12px; padding: 24px 0; margin-top: -30px; position: relative; z-index: 1;
@@ -76,7 +75,6 @@
   .stat-card .num { font-size: 1.4em; font-weight: 700; color: var(--blue); }
   .stat-card .label { font-size: 0.8em; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; }
 
-  /* Map */
   .map-container {
     background: var(--card); border-radius: 16px; overflow: hidden;
     box-shadow: 0 4px 16px rgba(0,0,0,0.1); margin: 30px 0;
@@ -86,7 +84,6 @@
   }
   .map-wrapper { height: 420px; margin: 12px; border-radius: 10px; overflow: hidden; }
 
-  /* Section heading */
   .section-heading {
     font-size: 1.5em; font-weight: 800; color: var(--navy);
     margin: 40px 0 16px; padding-bottom: 8px;
@@ -94,7 +91,6 @@
     display: inline-block;
   }
 
-  /* Day Card */
   .day-card {
     background: var(--card); border-radius: 16px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.06);
@@ -125,7 +121,6 @@
   .day-body { padding: 0 24px 24px; display: none; }
   .day-card.open .day-body { display: block; }
 
-  /* Activity table */
   .activity-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
   .activity-table th {
     text-align: left; padding: 8px 12px; font-size: 0.75em;
@@ -153,7 +148,6 @@
     font-size: 0.88em; color: #166534;
   }
 
-  /* Survey section */
   .insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
   @media (max-width: 640px) { .insights-grid { grid-template-columns: 1fr; } }
   .insight-card {
@@ -167,7 +161,6 @@
   .insight-card li { padding: 4px 0; font-size: 0.88em; }
   .insight-card li::before { content: '→ '; color: var(--gray); }
 
-  /* Logistics */
   .logistics-section { margin-top: 40px; }
   .logistics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 16px; }
   .logistics-card {
@@ -180,7 +173,6 @@
   .logistics-card li:last-child { border-bottom: none; }
   .logistics-card li strong { color: var(--navy); }
 
-  /* Hotels table */
   .hotels-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
   .hotels-table th {
     text-align: left; padding: 10px 14px; background: #f1f5f9;
@@ -189,7 +181,6 @@
   .hotels-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 0.92em; }
   .hotels-table tr:last-child td { border-bottom: none; }
 
-  /* Budget */
   .budget-note {
     background: linear-gradient(135deg, #fef3c7, #fde68a);
     border-radius: 12px; padding: 24px; margin-top: 24px;
@@ -197,14 +188,12 @@
   }
   .budget-note h4 { font-size: 1em; font-weight: 700; margin-bottom: 8px; }
 
-  /* Footer */
   .footer {
     text-align: center; padding: 40px 20px; margin-top: 40px;
     color: var(--gray); font-size: 0.85em;
     border-top: 1px solid var(--border);
   }
 
-  /* Password gate */
   .pw-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 40%, #1a4a6e 100%);
@@ -229,7 +218,6 @@
   }
   .pw-overlay button:hover { background: #e2e8f0; }
 
-  /* Alt plan styling */
   .alt-plan {
     background: #f0f9ff; border-left: 4px solid var(--blue);
     padding: 12px 16px; margin-top: 16px; border-radius: 0 8px 8px 0;
@@ -237,18 +225,15 @@
   }
   .alt-plan strong { font-weight: 700; }
 
-  /* Rain fallback */
   .rain-fallback {
     background: #f0f4ff; border-left: 4px solid #6366f1;
     padding: 12px 16px; margin-top: 12px; border-radius: 0 8px 8px 0;
     font-size: 0.88em; color: #312e81;
   }
 
-  /* Leaflet popup style */
   .leaflet-popup-content-wrapper { border-radius: 10px; }
   .leaflet-popup-content { font-family: 'Inter', sans-serif; font-size: 13px; margin: 10px 14px; }
 
-  /* Mobile responsive */
   @media (max-width: 640px) {
     .hero h1 { font-size: 2em; }
     .hero .subtitle { font-size: 1em; }
@@ -377,7 +362,7 @@
           </tr>
           <tr>
             <td class="time">Late morning</td>
-            <td class="act">Akershus Fortress &amp; park views</td>
+            <td class="act">Akershus Fortress & park views</td>
             <td class="notes">Free to enter grounds, stunning harbor photos</td>
           </tr>
           <tr>
@@ -387,7 +372,7 @@
           </tr>
           <tr>
             <td class="time">Afternoon</td>
-            <td class="act">Opera House exterior &amp; surroundings</td>
+            <td class="act">Opera House exterior & surroundings</td>
             <td class="notes">Walk the marble plaza, viewpoint from roof (free)</td>
           </tr>
           <tr>
@@ -397,8 +382,8 @@
           </tr>
           <tr>
             <td class="time">Dinner</td>
-            <td class="act">Dinner &amp; evening stroll</td>
-            <td class="notes">Grünerløkka district for restaurants &amp; nightlife</td>
+            <td class="act">Dinner & evening stroll</td>
+            <td class="notes">Grünerløkka district for restaurants & nightlife</td>
           </tr>
         </tbody>
       </table>
@@ -434,7 +419,7 @@
         </tbody>
       </table>
       <div class="alt-plan">
-        <strong>Recommendation:</strong> Mix both — morning in Oslo, 2-hour train ride to Lillehammer for lunch &amp; Maihaugen, return evening.
+        <strong>Recommendation:</strong> Mix both — morning in Oslo, 2-hour train ride to Lillehammer for lunch & Maihaugen, return evening.
       </div>
     </div>
   </div>
@@ -469,13 +454,13 @@
           </tr>
           <tr>
             <td class="time">Evening</td>
-            <td class="act">Dinner &amp; settle in</td>
+            <td class="act">Dinner & settle in</td>
             <td class="notes">Flåm is tiny; most dining at hotels or small cafes</td>
           </tr>
         </tbody>
       </table>
       <div class="survey-note">
-        <strong>Booking note:</strong> Flåm Railway books out fast in summer. Pre-book online or contact hotel concierge. Alternatively, rent car from Oslo &amp; drive scenic route via Laerdal tunnel.
+        <strong>Booking note:</strong> Flåm Railway books out fast in summer. Pre-book online or contact hotel concierge. Alternatively, rent car from Oslo & drive scenic route via Laerdal tunnel.
       </div>
     </div>
   </div>
@@ -484,7 +469,7 @@
   <div class="day-card">
     <div class="day-header" onclick="toggleDay(this)">
       <span class="day-badge flam">Flåm</span>
-      <span class="day-title">Aug 8 — Flåm &amp; Fjord Activities</span>
+      <span class="day-title">Aug 8 — Flåm & Fjord Activities</span>
       <span class="day-toggle">▼</span>
     </div>
     <div class="day-body">
@@ -515,7 +500,7 @@
           </tr>
           <tr>
             <td class="time">Evening</td>
-            <td class="act">Relax &amp; dinner</td>
+            <td class="act">Relax & dinner</td>
             <td class="notes">Early rest for travel day tomorrow</td>
           </tr>
         </tbody>
@@ -542,7 +527,7 @@
           <tr>
             <td class="time">Morning</td>
             <td class="act">Board 08:30 or 10:30 ferry (check schedule)</td>
-            <td class="notes">Scenic fjord cruise (5–6 hours). Nærøy &amp; Geirangerfjords. Book ahead</td>
+            <td class="notes">Scenic fjord cruise (5–6 hours). Nærøy & Geirangerfjords. Book ahead</td>
           </tr>
           <tr>
             <td class="time">Afternoon</td>
@@ -566,7 +551,7 @@
   <div class="day-card">
     <div class="day-header" onclick="toggleDay(this)">
       <span class="day-badge bergen">Bergen</span>
-      <span class="day-title">Aug 10 — Bergen: Bryggen &amp; Surroundings</span>
+      <span class="day-title">Aug 10 — Bergen: Bryggen & Surroundings</span>
       <span class="day-toggle">▼</span>
     </div>
     <div class="day-body">
@@ -597,7 +582,7 @@
           </tr>
           <tr>
             <td class="time">Evening</td>
-            <td class="act">Dinner &amp; rest</td>
+            <td class="act">Dinner & rest</td>
             <td class="notes">Try local restaurants (Bare Vestland, Bryggeloftet, or smaller bistros)</td>
           </tr>
         </tbody>
@@ -633,7 +618,7 @@
           </tr>
           <tr>
             <td class="time">Evening</td>
-            <td class="act">Settle in &amp; dinner</td>
+            <td class="act">Settle in & dinner</td>
             <td class="notes">Relax after travel day. Early night recommended</td>
           </tr>
         </tbody>
@@ -648,7 +633,7 @@
   <div class="day-card">
     <div class="day-header" onclick="toggleDay(this)">
       <span class="day-badge london">London</span>
-      <span class="day-title">Aug 12 — West End &amp; South Bank</span>
+      <span class="day-title">Aug 12 — West End & South Bank</span>
       <span class="day-toggle">▼</span>
     </div>
     <div class="day-body">
@@ -664,7 +649,7 @@
           </tr>
           <tr>
             <td class="time">Late morning</td>
-            <td class="act">Piccadilly Circus &amp; Leicester Square walk</td>
+            <td class="act">Piccadilly Circus & Leicester Square walk</td>
             <td class="notes">Tourist heartland, but photogenic. 15–20 min walk</td>
           </tr>
           <tr>
@@ -699,7 +684,7 @@
   <div class="day-card">
     <div class="day-header" onclick="toggleDay(this)">
       <span class="day-badge london">London</span>
-      <span class="day-title">Aug 13 — Royal London &amp; East End</span>
+      <span class="day-title">Aug 13 — Royal London & East End</span>
       <span class="day-toggle">▼</span>
     </div>
     <div class="day-body">
@@ -710,7 +695,7 @@
         <tbody>
           <tr>
             <td class="time">Morning</td>
-            <td class="act">Buckingham Palace &amp; St. James's Park</td>
+            <td class="act">Buckingham Palace & St. James's Park</td>
             <td class="notes">Changing of Guard (11:30 Mon/Wed/Fri/Sun). Pic and walk. Free</td>
           </tr>
           <tr>
@@ -725,7 +710,7 @@
           </tr>
           <tr>
             <td class="time">Afternoon</td>
-            <td class="act">Tower of London &amp; Tower Bridge</td>
+            <td class="act">Tower of London & Tower Bridge</td>
             <td class="notes">Historic fortress, Crown Jewels (very crowded). Alternative: just walk bridge for free</td>
           </tr>
           <tr>
@@ -750,7 +735,7 @@
   <div class="day-card">
     <div class="day-header" onclick="toggleDay(this)">
       <span class="day-badge london">London</span>
-      <span class="day-title">Aug 14 — Parks, Museums &amp; Local Neighborhoods</span>
+      <span class="day-title">Aug 14 — Parks, Museums & Local Neighborhoods</span>
       <span class="day-toggle">▼</span>
     </div>
     <div class="day-body">
@@ -761,7 +746,7 @@
         <tbody>
           <tr>
             <td class="time">Morning</td>
-            <td class="act">Hyde Park &amp; Kensington Gardens</td>
+            <td class="act">Hyde Park & Kensington Gardens</td>
             <td class="notes">Peaceful walk, Serpentine lake, Kensington Palace grounds. Coffee/brunch nearby</td>
           </tr>
           <tr>
@@ -771,7 +756,7 @@
           </tr>
           <tr>
             <td class="time">Early afternoon</td>
-            <td class="act">V&amp;A Museum or Natural History Museum</td>
+            <td class="act">V&A Museum or Natural History Museum</td>
             <td class="notes">Both free, world-class. Pick based on interests. 1–2 hours browsing</td>
           </tr>
           <tr>
@@ -781,7 +766,7 @@
           </tr>
           <tr>
             <td class="time">Evening</td>
-            <td class="act">Dinner &amp; nightlife planning</td>
+            <td class="act">Dinner & nightlife planning</td>
             <td class="notes">Rest before departure day tomorrow</td>
           </tr>
         </tbody>
@@ -807,7 +792,7 @@
         <tbody>
           <tr>
             <td class="time">Morning</td>
-            <td class="act">Final breakfast &amp; last-minute walk</td>
+            <td class="act">Final breakfast & last-minute walk</td>
             <td class="notes">Around hotel/neighborhood</td>
           </tr>
           <tr>
@@ -868,7 +853,7 @@
       <ul>
         <li><strong>Flights:</strong> $700–1000 per person (transatlantic + regional)</li>
         <li><strong>Hotels:</strong> ~$4500 total (14 nights avg)</li>
-        <li><strong>Food:</strong> ~$1500 (mix casual &amp; nice dinners)</li>
+        <li><strong>Food:</strong> ~$1500 (mix casual & nice dinners)</li>
         <li><strong>Activities:</strong> ~$500 (museums, ferries, cable car)</li>
         <li><strong>Misc:</strong> ~$300 (tips, transit, emergencies)</li>
         <li style="border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px;"><strong>Total/person:</strong> ~$2300–2800</li>
@@ -988,14 +973,12 @@
 
 <!-- Leaflet Map -->
 <script>
-// Initialize map
 var map = L.map('map').setView([60.5, 7.5], 5);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
   attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
-// Add markers and route
 var waypoints = [
   { lat: 59.9139, lng: 10.7522, name: 'Oslo' },
   { lat: 60.8832, lng: 7.1932, name: 'Flåm' },
@@ -1003,7 +986,6 @@ var waypoints = [
   { lat: 51.5074, lng: -0.1278, name: 'London' }
 ];
 
-// Add markers
 waypoints.forEach(function(wp) {
   L.circleMarker([wp.lat, wp.lng], {
     radius: 6,
@@ -1015,7 +997,6 @@ waypoints.forEach(function(wp) {
   }).addTo(map).bindPopup(wp.name);
 });
 
-// Draw route line
 var route = waypoints.map(w => [w.lat, w.lng]);
 L.polyline(route, { color: '#2563eb', weight: 3, opacity: 0.7 }).addTo(map);
 </script>
@@ -1032,8 +1013,7 @@ function toggleDay(header) {
 <script>
 function checkPw() {
   var pw = document.getElementById('pwInput').value;
-  // Simple hashing: base64 encode the password for comparison
-  var storedHash = 'c2NhbmRpbmF2aWE='; // base64 for 'scandinavia'
+  var storedHash = 'c2NhbmRpbmF2aWE='; 
   var inputHash = btoa(pw);
   
   if (inputHash === storedHash) {
