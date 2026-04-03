@@ -9,31 +9,15 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-  :root {
-    --navy: #1a1a2e;
-    --blue: #2563eb;
-    --orange: #ea580c;
-    --green: #059669;
-    --purple: #7c3aed;
-    --red: #dc2626;
-    --amber: #f59e0b;
-    --gray: #64748b;
-    --light: #f8fafc;
-    --card: #ffffff;
-    --border: #e2e8f0;
-  }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    color: var(--navy);
-    background: var(--light);
+    color: #1a1a2e;
+    background: #f8fafc;
     line-height: 1.6;
-    font-size: 15px;
   }
 
-  /* Hero */
   .hero {
     background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 40%, #1a4a6e 100%);
     color: white;
@@ -42,52 +26,31 @@
     position: relative;
     overflow: hidden;
   }
-  .hero::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff10' d='M0,96L48,112C96,128,192,160,288,154.7C384,149,480,107,576,101.3C672,96,768,128,864,149.3C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'/%3E%3C/svg%3E") no-repeat bottom;
-    background-size: cover;
-    opacity: 0.3;
-  }
-  .hero h1 { font-size: 2.8em; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; position: relative; }
-  .hero .subtitle { font-size: 1.2em; font-weight: 300; opacity: 0.9; position: relative; }
 
-  /* Container */
   .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-  .content-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin: 40px 0; align-items: start; }
 
-  /* Sections */
   .section { margin: 60px 0; }
+
   .section-title {
     font-size: 2em;
     font-weight: 700;
     margin-bottom: 30px;
-    color: var(--navy);
-    border-bottom: 3px solid var(--blue);
+    color: #1a1a2e;
+    border-bottom: 3px solid #2563eb;
     padding-bottom: 15px;
   }
 
-  /* Cards */
   .card {
-    background: var(--card);
+    background: white;
     border-radius: 12px;
     padding: 25px;
     margin-bottom: 20px;
-    border-left: 4px solid var(--blue);
+    border-left: 4px solid #2563eb;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    transition: transform 0.3s, box-shadow 0.3s;
   }
-  .card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
-  .card h3 { margin: 0 0 10px 0; color: var(--navy); font-size: 1.3em; }
-  .card p { margin: 8px 0; color: var(--gray); font-size: 0.95em; line-height: 1.5; }
-  .card .date { font-weight: 600; color: var(--blue); font-size: 0.9em; }
-  .card .location { color: var(--orange); font-weight: 500; }
 
-  /* Day-specific styling */
-  .day-card {
-    border-left-color: var(--blue);
-  }
+  .card h3 { margin: 0 0 10px 0; color: #1a1a2e; font-size: 1.3em; }
+  .card p { margin: 8px 0; color: #64748b; }
 
   .highlights {
     display: grid;
@@ -97,7 +60,7 @@
   }
 
   .highlight-item {
-    background: linear-gradient(135deg, var(--blue) 0%, #1e40af 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
     color: white;
     padding: 15px;
     border-radius: 8px;
@@ -106,51 +69,47 @@
     font-weight: 500;
   }
 
-  /* Map container */
-  #map { height: 500px; border-radius: 12px; margin: 30px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  #map { height: 500px; border-radius: 12px; margin: 30px 0; }
 
-  /* Stats */
   .stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 20px;
     margin: 40px 0;
   }
+
   .stat-card {
-    background: linear-gradient(135deg, var(--blue) 0%, #1e40af 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
     color: white;
     padding: 25px;
     border-radius: 12px;
     text-align: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   }
-  .stat-card .number { font-size: 2.5em; font-weight: 800; line-height: 1; }
+
+  .stat-card .number { font-size: 2.5em; font-weight: 800; }
   .stat-card .label { font-size: 0.9em; opacity: 0.9; margin-top: 10px; }
 
-  /* Budget breakdown */
   .budget-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
     margin: 30px 0;
   }
+
   .budget-item {
-    background: var(--card);
+    background: white;
     padding: 20px;
     border-radius: 8px;
-    border-left: 4px solid var(--purple);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-left: 4px solid #7c3aed;
   }
-  .budget-item .category { font-weight: 700; color: var(--navy); margin-bottom: 8px; }
-  .budget-item .amount { font-size: 1.5em; font-weight: 800; color: var(--purple); }
 
-  /* Responsive */
+  .budget-item .category { font-weight: 700; color: #1a1a2e; }
+  .budget-item .amount { font-size: 1.5em; font-weight: 800; color: #7c3aed; }
+
   @media (max-width: 768px) {
-    .content-wrapper { grid-template-columns: 1fr; gap: 20px; }
     .hero h1 { font-size: 2em; }
     .section-title { font-size: 1.5em; }
     #map { height: 300px; }
-    .stats { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
 </head>
@@ -159,23 +118,22 @@
 <div class="hero">
   <div class="container">
     <h1>Norway & London</h1>
-    <p class="subtitle">August 2026 Adventure</p>
+    <p style="font-size: 1.2em; opacity: 0.9;">August 2026 Adventure</p>
   </div>
 </div>
 
 <div class="container">
-  <!-- Stats -->
   <div class="stats">
     <div class="stat-card">
       <div class="number">14</div>
       <div class="label">Days</div>
     </div>
     <div class="stat-card">
-      <div class="number">3</div>
+      <div class="number">4</div>
       <div class="label">Cities</div>
     </div>
     <div class="stat-card">
-      <div class="number">4</div>
+      <div class="number">2</div>
       <div class="label">Countries</div>
     </div>
     <div class="stat-card">
@@ -184,71 +142,56 @@
     </div>
   </div>
 
-  <!-- Map -->
   <div id="map"></div>
 
-  <!-- Itinerary -->
   <div class="section">
     <h2 class="section-title">Itinerary</h2>
     
-    <!-- Day 1-5: Oslo & Surroundings -->
-    <div class="card day-card">
-      <div class="date">August 1-5</div>
+    <div class="card">
+      <div style="font-weight: 600; color: #2563eb;">August 1-5</div>
       <h3>Oslo, Norway</h3>
-      <p class="location">Capital of Norway</p>
       <p>Arrive in Oslo and explore Norway's vibrant capital. Start with a visit to the iconic Opera House, then explore the Viking Ship Museum and modern Astrup Fearnley Museum of Modern Art. Enjoy traditional Norwegian cuisine at local restaurants.</p>
       <div class="highlights">
         <div class="highlight-item">Opera House</div>
         <div class="highlight-item">Viking Ships</div>
         <div class="highlight-item">Munch Museum</div>
-        <div class="highlight-item">Street Food Scene</div>
       </div>
     </div>
 
-    <!-- Day 6-7: Bergen --
-    <div class="card day-card">
-      <div class="date">August 6-7</div>
+    <div class="card">
+      <div style="font-weight: 600; color: #2563eb;">August 6-7</div>
       <h3>Bergen, Norway</h3>
-      <p class="location">Gateway to the Fjords</p>
-      <p>Fly to Bergen and immerse yourself in the charm of this historic harbor city. Visit Bryggen, a UNESCO World Heritage site with colorful wooden buildings. Take a scenic boat tour of the fjords and visit the famous Fish Market.</p>
+      <p>Fly to Bergen and explore this historic harbor city. Visit Bryggen, a UNESCO World Heritage site with colorful wooden buildings. Take a scenic boat tour of the fjords and visit the famous Fish Market.</p>
       <div class="highlights">
         <div class="highlight-item">Bryggen</div>
         <div class="highlight-item">Fish Market</div>
         <div class="highlight-item">Fjord Tour</div>
-        <div class="highlight-item">Local Seafood</div>
       </div>
     </div>
 
-    <!-- Day 8-10: Geirangerfjord & Trollstigen -->
-    <div class="card day-card">
-      <div class="date">August 8-10</div>
+    <div class="card">
+      <div style="font-weight: 600; color: #2563eb;">August 8-10</div>
       <h3>Geirangerfjord & Trollstigen</h3>
-      <p class="location">Norwegian Nature</p>
-      <p>Experience the stunning natural beauty of Norway's most famous fjord. Hike along scenic trails, visit spectacular waterfalls, and drive the famous Trollstigen serpentine mountain road with its 11 hairpin turns. Stay in a cozy mountain lodge.</p>
+      <p>Experience the stunning natural beauty of Norway's most famous fjord. Hike along scenic trails, visit spectacular waterfalls, and drive the famous Trollstigen serpentine mountain road with its 11 hairpin turns.</p>
       <div class="highlights">
         <div class="highlight-item">Geirangerfjord</div>
         <div class="highlight-item">Waterfall Hikes</div>
         <div class="highlight-item">Trollstigen Road</div>
-        <div class="highlight-item">Mountain Lodge</div>
       </div>
     </div>
 
-    <!-- Day 11-14: London -->
-    <div class="card day-card">
-      <div class="date">August 11-14</div>
+    <div class="card">
+      <div style="font-weight: 600; color: #2563eb;">August 11-14</div>
       <h3>London, England</h3>
-      <p class="location">The Great Metropolis</p>
-      <p>Fly to London and discover one of the world's greatest cities. Visit Big Ben, Tower of London, British Museum, and Westminster Abbey. Enjoy West End shows, British afternoon tea, and explore diverse neighborhoods from SoHo to Shoreditch.</p>
+      <p>Fly to London and discover one of the world's greatest cities. Visit Big Ben, Tower of London, British Museum, and Westminster Abbey. Enjoy West End shows, British afternoon tea, and explore diverse neighborhoods.</p>
       <div class="highlights">
         <div class="highlight-item">Big Ben & Parliament</div>
         <div class="highlight-item">Tower of London</div>
         <div class="highlight-item">British Museum</div>
-        <div class="highlight-item">West End Show</div>
       </div>
     </div>
   </div>
 
-  <!-- Budget -->
   <div class="section">
     <h2 class="section-title">Budget Breakdown</h2>
     <div class="budget-grid">
@@ -277,46 +220,24 @@
         <div class="amount">$200</div>
       </div>
     </div>
-    <div class="stat-card" style="grid-column: 1 / -1; margin-top: 20px;">
+    <div class="stat-card" style="margin-top: 20px;">
       <div class="label">Total Budget</div>
       <div class="number">$4,000</div>
     </div>
   </div>
 
-  <!-- Packing Tips -->
   <div class="section">
     <h2 class="section-title">Packing Essentials</h2>
-    <div class="content-wrapper">
-      <div>
-        <div class="card">
-          <h3>Weather & Clothing</h3>
-          <p>August in Norway and London can be cool and rainy. Pack:</p>
-          <ul style="margin-left: 20px; color: var(--gray);">
-            <li>Waterproof jacket and pants</li>
-            <li>Layers (sweaters, long-sleeved shirts)</li>
-            <li>Comfortable hiking boots</li>
-            <li>Hat and gloves</li>
-            <li>Umbrella</li>
-          </ul>
-        </div>
-      </div>
-      <div>
-        <div class="card">
-          <h3>Essentials</h3>
-          <p>Don't forget:</p>
-          <ul style="margin-left: 20px; color: var(--gray);">
-            <li>Passport & travel documents</li>
-            <li>Travel insurance</li>
-            <li>Power adapters (UK/EU)</li>
-            <li>Medications & first aid</li>
-            <li>Camera & memory cards</li>
-          </ul>
-        </div>
-      </div>
+    <div class="card">
+      <h3>Weather & Clothing</h3>
+      <p>August in Norway and London can be cool and rainy. Pack waterproof jackets, layers, comfortable hiking boots, hat, gloves, and an umbrella.</p>
+    </div>
+    <div class="card">
+      <h3>Essentials</h3>
+      <p>Don't forget: Passport & travel documents, travel insurance, power adapters (UK/EU), medications & first aid, and camera.</p>
     </div>
   </div>
 
-  <!-- Practical Info -->
   <div class="section">
     <h2 class="section-title">Practical Information</h2>
     <div class="card">
@@ -325,39 +246,37 @@
     </div>
     <div class="card">
       <h3>Currency & Money</h3>
-      <p>Norway uses Norwegian Krone (NOK) and the UK uses British Pounds (GBP). Notify your bank of travel dates. Both countries widely accept credit/debit cards.</p>
+      <p>Norway uses Norwegian Krone (NOK) and the UK uses British Pounds (GBP). Both countries widely accept credit/debit cards.</p>
     </div>
     <div class="card">
       <h3>Language</h3>
-      <p>English is widely spoken in both countries. In Norway and London, most people speak English fluently, making communication easy for travelers.</p>
+      <p>English is widely spoken in both countries. Communication is easy for travelers.</p>
     </div>
     <div class="card">
       <h3>Best Time to Visit</h3>
-      <p>August is an ideal time to visit Norway with long daylight hours and mild temperatures. London is pleasant in August with various festivals and outdoor events happening throughout the city.</p>
+      <p>August is ideal with long daylight hours and mild temperatures in Norway. London offers various festivals and outdoor events.</p>
     </div>
   </div>
 </div>
 
 <script>
-  // Initialize map
   const map = L.map('map').setView([60.5, 5], 3);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors',
     maxZoom: 19
   }).addTo(map);
 
-  // Add markers for cities
   const cities = [
-    { name: 'Oslo', lat: 59.9139, lng: 10.7522, color: 'blue' },
-    { name: 'Bergen', lat: 60.3913, lng: 5.3221, color: 'green' },
-    { name: 'Geirangerfjord', lat: 62.1017, lng: 7.2013, color: 'red' },
-    { name: 'London', lat: 51.5074, lng: -0.1278, color: 'purple' }
+    { name: 'Oslo', lat: 59.9139, lng: 10.7522 },
+    { name: 'Bergen', lat: 60.3913, lng: 5.3221 },
+    { name: 'Geirangerfjord', lat: 62.1017, lng: 7.2013 },
+    { name: 'London', lat: 51.5074, lng: -0.1278 }
   ];
 
   cities.forEach(city => {
     L.circleMarker([city.lat, city.lng], {
       radius: 8,
-      fillColor: city.color,
+      fillColor: '#2563eb',
       color: '#fff',
       weight: 2,
       opacity: 1,
