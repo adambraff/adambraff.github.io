@@ -35,291 +35,511 @@
   .slider-dash { color: rgba(255,255,255,0.4); font-size: 13px; }
 
   .panels { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; }
-  .panel { background: var(--card); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 24px; min-height: 240px; display: flex; flex-direction: column; }
-  .panel:nth-child(3n) { border-right: 0; }
-  .panel:nth-child(n+7) { border-bottom: 0; }
+  .panel { padding: 20px; border-right: 1px solid var(--border); }
+  .panel:last-child { border-right: none; }
+  .panel-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .panel-header .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .panel-header h2 { font-size: 15px; font-weight: 700; }
+  .panel-purpose { font-size: 11px; color: var(--muted); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+  .panel-question { font-size: 11px; font-style: italic; color: var(--muted); margin-bottom: 14px; }
 
-  .metric { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; }
-  .metric-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
-  .metric-value { font-size: 28px; font-weight: 700; color: var(--text); }
-  .metric-subtext { font-size: 10px; color: var(--muted); }
-  .metric-trend { display: flex; align-items: center; gap: 4px; margin-top: 4px; font-size: 11px; font-weight: 500; }
-  .metric-trend.up { color: var(--good); }
-  .metric-trend.down { color: var(--danger); }
-  .metric-trend.flat { color: var(--muted); }
-  .metric-trend-icon { font-size: 10px; }
+  .kpi-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .kpi { background: var(--bg); border-radius: 6px; padding: 10px; border: 1px solid var(--border); }
+  .kpi-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+  .kpi-value { font-size: 20px; font-weight: 700; }
+  .kpi-delta { font-size: 10px; margin-top: 2px; }
+  .kpi-delta.up { color: var(--good); }
+  .kpi-delta.down { color: var(--danger); }
+  .kpi-delta.flat { color: var(--muted); }
 
-  .chart-container { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; margin-top: 12px; }
-  .chart-note { font-size: 9px; color: var(--muted); margin-top: 8px; font-style: italic; }
+  .channel-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 14px; }
+  .channel-table th { text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); padding: 5px 6px; border-bottom: 2px solid var(--border); }
+  .channel-table th.num { text-align: right; }
+  .channel-table td { padding: 6px; border-bottom: 1px solid var(--border); }
+  .channel-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .channel-table tr.total-row td { font-weight: 700; border-bottom: 2px solid var(--border); }
 
-  .button { display: inline-block; background: var(--brand); color: white; padding: 8px 16px; border-radius: 4px; font-size: 11px; font-weight: 600; text-decoration: none; cursor: pointer; border: none; margin-top: auto; align-self: flex-start; }
-  .button:hover { background: #0d1f2d; }
+  .pill { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; font-weight: 600; }
+  .pill.good { background: #e8f5e9; color: var(--good); }
+  .pill.bad { background: #ffebee; color: var(--danger); }
+  .pill.warn { background: #fff8e1; color: #e65100; }
+  .pill.neutral { background: #f5f5f5; color: var(--muted); }
 
-  .footer { background: #f0f0f0; padding: 16px 32px; font-size: 10px; color: var(--muted); text-align: center; border-top: 1px solid var(--border); }
+  .chart-container { position: relative; width: 100%; height: 170px; margin-bottom: 14px; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 6px; margin-top: 6px; }
 
-  @media (max-width: 1024px) { .panels { grid-template-columns: 1fr 1fr; } .panel:nth-child(2n) { border-right: 0; } .panel:nth-child(n+5) { border-bottom: 0; } }
-  @media (max-width: 640px) { .panels { grid-template-columns: 1fr; } .panel { border-right: 0; border-bottom: 1px solid var(--border); } .panel:last-child { border-bottom: 0; } .header { padding: 12px 16px; } .header h1 { font-size: 16px; } }
+  .insight-bar { background: var(--card); border-top: 2px solid var(--border); padding: 14px 32px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .insight-bar .insight-title { font-weight: 700; font-size: 11px; margin-bottom: 3px; }
+  .insight-bar p { color: var(--muted); font-size: 11px; }
+
+  .panel-brand .dot { background: var(--brand); }
+  .panel-brand .kpi-value { color: var(--brand); }
+  .panel-brand .total-row td { color: var(--brand); }
+  .panel-perf .dot { background: var(--perf); }
+  .panel-perf .kpi-value { color: var(--perf); }
+  .panel-perf .total-row td { color: var(--perf); }
+  .panel-organic .dot { background: var(--organic); }
+  .panel-organic .kpi-value { color: var(--organic); }
+  .panel-organic .total-row td { color: var(--organic); }
+
+  .footnote { font-size: 9px; color: #999; font-style: italic; margin-top: 4px; }
+
+  @media (max-width: 1200px) {
+    .panels { grid-template-columns: 1fr; }
+    .panel { border-right: none; border-bottom: 1px solid var(--border); }
+    .insight-bar { grid-template-columns: 1fr; }
+    .header { flex-direction: column; align-items: flex-start; }
+  }
 </style>
 </head>
 <body>
+
 <div class="header">
   <div class="header-left">
-    <h1>Onelife Fitness</h1>
     <div>
-      <div style="font-weight: 600; font-size: 14px;">Marketing Performance Dashboard</div>
-      <div class="subtitle">Last 30 Days | All Channels</div>
+      <h1>Onelife Fitness — Marketing Performance</h1>
+      <div class="subtitle">Brand · Performance · Organic</div>
     </div>
-    <span class="illustrative-badge">Illustrative</span>
+    <div class="illustrative-badge">Illustrative Data</div>
   </div>
   <div class="filters">
     <div class="filter-group">
-      <label class="filter-label">Date Range</label>
-      <select id="dateRange">
-        <option>Last 7 Days</option>
-        <option selected>Last 30 Days</option>
-        <option>Last 90 Days</option>
-        <option>Last 12 Months</option>
+      <span class="filter-label">Period</span>
+      <div class="slider-container">
+        <select id="startMonth" onchange="render()"></select>
+        <span class="slider-dash">—</span>
+        <select id="endMonth" onchange="render()"></select>
+      </div>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Region</span>
+      <select id="regionSelect" onchange="updateClubs(); render();">
+        <option value="all">All Regions</option>
+        <option value="dmv">DMV</option>
+        <option value="atlanta">Atlanta</option>
+        <option value="coastal">Coastal</option>
+        <option value="sc">South Carolina</option>
       </select>
     </div>
     <div class="filter-group">
-      <label class="filter-label">Channel</label>
-      <select id="channel">
-        <option selected>All Channels</option>
-        <option>Organic Search</option>
-        <option>Paid Search</option>
-        <option>Social Media</option>
-        <option>Email</option>
-        <option>Affiliate</option>
-      </select>
-    </div>
-    <div class="filter-group">
-      <label class="filter-label">Goal</label>
-      <select id="goal">
-        <option selected>All Goals</option>
-        <option>Signups</option>
-        <option>Trial Starts</option>
-        <option>Conversions</option>
+      <span class="filter-label">Club</span>
+      <select id="clubSelect" onchange="render()">
+        <option value="all">All Clubs</option>
       </select>
     </div>
   </div>
 </div>
 
 <div class="panels">
-  <!-- Panel 1: Total Users -->
-  <div class="panel">
-    <div class="metric">
-      <span class="metric-label">Total Users</span>
-    </div>
-    <div class="metric-value">45,832</div>
-    <div class="metric-subtext">15.3% increase YoY</div>
-    <div class="metric-trend up">
-      <span class="metric-trend-icon">▲</span>
-      <span>+12.4% from last period</span>
-    </div>
-    <div class="chart-container">
-      <canvas id="chart1"></canvas>
-    </div>
-    <div class="chart-note">Data from Google Analytics</div>
+
+  <!-- PANEL 1: BRAND -->
+  <div class="panel panel-brand">
+    <div class="panel-header"><div class="dot"></div><h2>Brand Awareness</h2></div>
+    <div class="panel-purpose">Upper-funnel spend on channels where direct conversion cannot be measured. Evaluated on reach and cost efficiency — not joins.</div>
+    <div class="panel-question">Key question: "What are we spending on awareness, and what reach do the vendors claim?"</div>
+    <div id="brandKpis"></div>
+    <div class="section-label">Channels</div>
+    <div id="brandTable"></div>
+    <div class="section-label">Monthly Spend Trend</div>
+    <div class="chart-container"><canvas id="brandChart"></canvas></div>
+    <div class="section-label">Branded Search Interest vs. Competitors (Google Trends Index)</div>
+    <div class="chart-container"><canvas id="trendsChart"></canvas></div>
   </div>
 
-  <!-- Panel 2: Conversion Rate -->
-  <div class="panel">
-    <div class="metric">
-      <span class="metric-label">Conversion Rate</span>
-    </div>
-    <div class="metric-value">3.7%</div>
-    <div class="metric-subtext">From total users to trial signup</div>
-    <div class="metric-trend down">
-      <span class="metric-trend-icon">▼</span>
-      <span>-0.4% from last period</span>
-    </div>
-    <div class="chart-container">
-      <canvas id="chart2"></canvas>
-    </div>
-    <div class="chart-note">Tracked across all sources</div>
+  <!-- PANEL 2: PERFORMANCE -->
+  <div class="panel panel-perf">
+    <div class="panel-header"><div class="dot"></div><h2>Performance Marketing</h2></div>
+    <div class="panel-purpose">Lower-funnel spend designed to generate leads and convert them. Measured on cost-per-join and lead-to-join conversion.</div>
+    <div class="panel-question">Key question: "What does each incremental join cost us, and is it worth it?"</div>
+    <div id="perfKpis"></div>
+    <div class="section-label">Channel Breakdown</div>
+    <div id="perfTable"></div>
+    <div class="section-label">Cost per Join Trend</div>
+    <div class="chart-container"><canvas id="perfChart"></canvas></div>
   </div>
 
-  <!-- Panel 3: CAC (Cost per Acquisition) -->
-  <div class="panel">
-    <div class="metric">
-      <span class="metric-label">Avg CAC</span>
-    </div>
-    <div class="metric-value">$28.50</div>
-    <div class="metric-subtext">Cost per trial signup</div>
-    <div class="metric-trend flat">
-      <span class="metric-trend-icon">→</span>
-      <span>Unchanged from last period</span>
-    </div>
-    <div class="chart-container">
-      <canvas id="chart3"></canvas>
-    </div>
-    <div class="chart-note">From paid marketing spend</div>
+  <!-- PANEL 3: ORGANIC -->
+  <div class="panel panel-organic">
+    <div class="panel-header"><div class="dot"></div><h2>Organic &amp; Earned</h2></div>
+    <div class="panel-purpose">Joins without direct media spend. Goal: conversion rate optimization and retention.</div>
+    <div class="panel-question">Key question: "Are we converting and retaining the demand that comes to us for free?"</div>
+    <div id="organicKpis"></div>
+    <div class="section-label">Source Breakdown</div>
+    <div id="organicTable"></div>
+    <div class="section-label">Conversion Rate Trend</div>
+    <div class="chart-container"><canvas id="organicChart"></canvas></div>
   </div>
 
-  <!-- Panel 4: Organic Traffic -->
-  <div class="panel">
-    <div class="metric">
-      <span class="metric-label">Organic Sessions</span>
-    </div>
-    <div class="metric-value">18,940</div>
-    <div class="metric-subtext">41.4% of total users</div>
-    <div class="metric-trend up">
-      <span class="metric-trend-icon">▲</span>
-      <span>+8.1% from last period</span>
-    </div>
-    <div class="chart-container">
-      <canvas id="chart4"></canvas>
-    </div>
-    <div class="chart-note">Organic search, direct, referral</div>
-  </div>
-
-  <!-- Panel 5: Paid Traffic -->
-  <div class="panel">
-    <div class="metric">
-      <span class="metric-label">Paid Sessions</span>
-    </div>
-    <div class="metric-value">26,892</div>
-    <div class="metric-subtext">58.6% of total users</div>
-    <div class="metric-trend up">
-      <span class="metric-trend-icon">▲</span>
-      <span>+14.6% from last period</span>
-    </div>
-    <div class="chart-container">
-      <canvas id="chart5"></canvas>
-    </div>
-    <div class="chart-note">Google Ads, Facebook Ads, etc.</div>
-  </div>
-
-  <!-- Panel 6: ROAS (Return on Ad Spend) -->
-  <div class="panel">
-    <div class="metric">
-      <span class="metric-label">Avg ROAS</span>
-    </div>
-    <div class="metric-value">3.2x</div>
-    <div class="metric-subtext">Revenue per dollar spent</div>
-    <div class="metric-trend up">
-      <span class="metric-trend-icon">▲</span>
-      <span>+0.3x from last period</span>
-    </div>
-    <div class="chart-container">
-      <canvas id="chart6"></canvas>
-    </div>
-    <div class="chart-note">Based on attributed revenue</div>
-  </div>
-
-  <!-- Panel 7: Social Media Engagement -->
-  <div class="panel">
-    <div class="metric">
-      <span class="metric-label">Social Engagement</span>
-    </div>
-    <div class="metric-value">12,451</div>
-    <div class="metric-subtext">Total interactions (likes, comments, shares)</div>
-    <div class="metric-trend up">
-      <span class="metric-trend-icon">▲</span>
-      <span>+31.2% from last period</span>
-    </div>
-    <div class="chart-container">
-      <canvas id="chart7"></canvas>
-    </div>
-    <div class="chart-note">Instagram, TikTok, LinkedIn</div>
-  </div>
-
-  <!-- Panel 8: Email Performance -->
-  <div class="panel">
-    <div class="metric">
-      <span class="metric-label">Email Click Rate</span>
-    </div>
-    <div class="metric-value">4.8%</div>
-    <div class="metric-subtext">Of opens, leading to site visit</div>
-    <div class="metric-trend flat">
-      <span class="metric-trend-icon">→</span>
-      <span>Stable vs. last period</span>
-    </div>
-    <div class="chart-container">
-      <canvas id="chart8"></canvas>
-    </div>
-    <div class="chart-note">All email campaigns combined</div>
-  </div>
-
-  <!-- Panel 9: Subscriber Growth -->
-  <div class="panel">
-    <div class="metric">
-      <span class="metric-label">New Subscribers</span>
-    </div>
-    <div class="metric-value">3,245</div>
-    <div class="metric-subtext">Email list growth this period</div>
-    <div class="metric-trend up">
-      <span class="metric-trend-icon">▲</span>
-      <span>+18.7% from last period</span>
-    </div>
-    <div class="chart-container">
-      <canvas id="chart9"></canvas>
-    </div>
-    <div class="chart-note">From website and social channels</div>
-  </div>
 </div>
 
-<div class="footer">
-  <p>This dashboard is illustrative and displays sample data for demonstration purposes only. Actual data would be integrated from your analytics platforms (Google Analytics, Ads Manager, social platforms, email platforms, etc.).</p>
-</div>
+<div class="insight-bar" id="insightBar"></div>
 
 <script>
-  // Create demo charts for each panel
-  const chartConfigs = [
-    { id: 'chart1', label: 'Total Users', data: [32000, 35000, 38000, 41000, 43000, 44000, 45832], color: '#1a3a5c' },
-    { id: 'chart2', label: 'Conversion Rate', data: [3.2, 3.4, 3.5, 3.6, 3.8, 3.7, 3.7], color: '#c62828' },
-    { id: 'chart3', label: 'Avg CAC', data: [31.20, 29.80, 28.90, 28.60, 28.70, 28.60, 28.50], color: '#b35900' },
-    { id: 'chart4', label: 'Organic Sessions', data: [15200, 16100, 16800, 17400, 17900, 18200, 18940], color: '#2e7d32' },
-    { id: 'chart5', label: 'Paid Sessions', data: [19200, 20500, 21600, 22800, 24100, 25500, 26892], color: '#1565c0' },
-    { id: 'chart6', label: 'Avg ROAS', data: [2.8, 2.9, 3.0, 3.1, 3.1, 3.2, 3.2], color: '#00796b' },
-    { id: 'chart7', label: 'Social Engagement', data: [7200, 7800, 8400, 9200, 10100, 11000, 12451], color: '#e91e63' },
-    { id: 'chart8', label: 'Email Click Rate', data: [4.6, 4.7, 4.8, 4.7, 4.8, 4.8, 4.8], color: '#ff9800' },
-    { id: 'chart9', label: 'New Subscribers', data: [2100, 2300, 2450, 2600, 2850, 3050, 3245], color: '#7b1fa2' }
-  ];
+// ─── DATA MODEL ───
+// Monthly base data (all regions, all clubs). 18 months: Oct 2024 → Mar 2026, plus Apr 2026 partial
+const MONTHS = [
+  'Oct 2024','Nov 2024','Dec 2024','Jan 2025','Feb 2025','Mar 2025',
+  'Apr 2025','May 2025','Jun 2025','Jul 2025','Aug 2025','Sep 2025',
+  'Oct 2025','Nov 2025','Dec 2025','Jan 2026','Feb 2026','Mar 2026','Apr 2026'
+];
 
-  chartConfigs.forEach(config => {
-    const ctx = document.getElementById(config.id).getContext('2d');
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7'],
-        datasets: [{
-          label: config.label,
-          data: config.data,
-          borderColor: config.color,
-          backgroundColor: config.color + '15',
-          borderWidth: 2,
-          tension: 0.4,
-          fill: true,
-          pointRadius: 0,
-          pointHoverRadius: 5,
-          pointBackgroundColor: config.color
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false }
-        },
-        scales: {
-          y: { display: false, beginAtZero: false },
-          x: { display: false }
-        }
+// Brand channels: spend only (no leads/joins — that's the point)
+const brandData = {
+  'Billboards':           { spend: [44,46,48,45,44,46,48,47,46,45,48,47,46,48,50,48,48,48,48], impressions: [2.8,2.9,3.0,2.9,2.8,2.9,3.1,3.0,2.9,2.8,3.1,3.0,2.9,3.1,3.2,3.0,3.1,3.1,3.1], note:'DEC est.' },
+  'OTT / Radio / TV':    { spend: [30,32,35,33,31,32,34,33,32,31,34,33,32,34,36,34,34,34,34], impressions: [1.5,1.6,1.7,1.6,1.5,1.6,1.8,1.7,1.6,1.5,1.8,1.7,1.6,1.8,1.9,1.7,1.8,1.8,1.8], note:'media buy' },
+  'Programmatic Display': { spend: [18,19,20,19,18,19,22,21,20,19,22,21,20,22,23,21,22,22,22], impressions: [2.0,2.1,2.2,2.1,2.0,2.1,2.4,2.3,2.2,2.1,2.4,2.3,2.2,2.4,2.5,2.3,2.4,2.4,2.4], note:'ad server' },
+  'Meta (Awareness)':     { spend: [22,24,26,24,22,24,26,25,24,23,26,25,24,26,28,25,26,26,26], impressions: [0.6,0.6,0.7,0.6,0.6,0.6,0.7,0.7,0.6,0.6,0.7,0.7,0.6,0.7,0.8,0.7,0.7,0.7,0.7], note:'Meta' },
+  'Newspaper / Print':    { spend: [10,10,11,10,10,10,11,11,10,10,11,11,10,11,12,11,11,11,11], impressions: [0.1,0.1,0.1,0.1,0.1,0.1,0.2,0.1,0.1,0.1,0.2,0.1,0.1,0.2,0.2,0.1,0.2,0.2,0.2], note:'circ. est.' },
+};
+
+// Performance channels: spend + leads + joins
+const perfData = {
+  'Google (non-brand)':    { spend: [78,82,85,80,78,82,89,86,84,81,89,86,84,89,92,86,89,89,89], leads: [2400,2350,2200,2500,2450,2300,2140,2200,2250,2280,2140,2200,2250,2140,2050,2250,2200,2180,2140], joins: [288,270,242,300,280,253,214,231,236,239,214,231,236,214,195,236,220,218,214] },
+  'Google (brand search)': { spend: [16,16,17,16,16,16,18,17,17,16,18,17,17,18,19,17,18,18,18], leads: [1300,1280,1200,1350,1320,1260,1154,1200,1220,1240,1154,1200,1220,1154,1100,1220,1180,1170,1154], joins: [208,198,180,216,204,189,170,180,183,186,170,180,183,170,154,183,174,173,170] },
+  'Meta (DR/retarget)':    { spend: [52,56,58,54,52,56,62,59,57,55,62,59,57,62,65,59,62,62,62], leads: [750,730,680,780,760,720,672,700,710,720,672,700,710,672,640,710,690,685,672], joins: [98,92,82,102,95,86,78,84,85,86,78,84,85,78,70,85,80,79,78] },
+  'Direct Mail':           { spend: [34,35,37,35,34,35,38,37,36,35,38,37,36,38,40,37,38,38,38], leads: [120,118,105,125,122,115,108,112,114,116,108,112,114,108,98,114,110,109,108], joins: [25,24,21,26,25,23,21,22,23,24,21,22,23,21,18,23,22,21,21] },
+  'Local / Community':     { spend: [10,10,11,10,10,10,12,11,11,10,12,11,11,12,13,11,12,12,12], leads: [680,670,620,710,690,660,596,620,640,650,596,620,640,596,560,640,610,605,596], joins: [122,118,105,128,121,112,99,106,109,111,99,106,109,99,90,109,102,101,99] },
+};
+
+// Organic sources: leads + joins + retention (no spend)
+const organicData = {
+  'Website (organic)':  { leads: [4900,4800,4500,5000,4850,4650,4588,4700,4750,4800,4588,4700,4750,4588,4300,4750,4650,4620,4588], joins: [1800,1750,1620,1850,1780,1690,1444,1550,1570,1590,1444,1550,1570,1444,1340,1570,1480,1465,1444], retention: [80,79,78,79,78,77,76,77,77,77,76,77,77,76,75,77,76,76,76] },
+  'Member Referral':    { leads: [3600,3550,3300,3700,3600,3450,3396,3500,3540,3580,3396,3500,3540,3396,3200,3540,3440,3420,3396], joins: [610,595,545,630,605,570,511,540,550,555,511,540,550,511,470,550,520,516,511], retention: [85,84,84,84,83,83,82,83,83,83,82,83,83,82,81,83,82,82,82] },
+  'Previous Member':    { leads: [600,590,550,620,600,580,568,580,585,590,568,580,585,568,530,585,575,572,568], joins: [228,220,198,236,225,212,194,205,208,210,194,205,208,194,178,208,198,196,194], retention: [65,64,63,64,63,62,61,62,62,62,61,62,62,61,60,62,61,61,61] },
+  'Walk In':            { leads: [25,24,20,28,26,22,11,15,16,18,11,15,16,11,8,16,13,12,11], joins: [80,78,68,85,80,72,39,50,52,55,39,50,52,39,28,52,42,40,39], retention: [90,89,89,89,89,88,88,89,89,89,88,89,89,88,87,89,88,88,88] },
+  'Corporate':          { leads: [70,68,62,72,70,65,59,62,64,66,59,62,64,59,54,64,61,60,59], joins: [95,92,84,98,94,88,82,86,88,90,82,86,88,82,74,88,84,83,82], retention: [93,92,92,92,92,91,91,92,92,92,91,92,92,91,90,92,91,91,91] },
+  'Drive By':           { leads: [100,98,88,105,100,95,90,94,95,96,90,94,95,90,82,95,92,91,90], joins: [42,41,36,44,42,39,37,39,40,40,37,39,40,37,33,40,38,38,37], retention: [75,74,73,74,73,72,72,73,73,73,72,73,73,72,71,73,72,72,72] },
+};
+
+// Region weights (from board docs: DMV 50.9%, Atlanta 30.2%, Coastal 19.1%, SC ~5% — renorm to ~105% since SC is additive from acquisition)
+const regionWeights = { all: 1.0, dmv: 0.484, atlanta: 0.287, coastal: 0.182, sc: 0.047 };
+const clubCounts = { dmv: 28, atlanta: 9, coastal: 6, sc: 5 };
+const clubsByRegion = {
+  dmv: ['Alexandria','Arlington','Ballston','Bethesda','Capitol Hill','Clinton','Commerce','Crystal Park','Fairfax','Falls Church','Fort Totten','Germantown','Hunt Valley','Lexington','Manassas','Martinsburg','McLean','North Frederick','Old Town','Pike & Rose','South Frederick','Stafford','Sterling','Tech Center','Tenley','Upton','Valley Mall','Winchester'],
+  atlanta: ['Austell','Crabapple','Hamilton Mill','Lawrenceville','McCalla','Perimeter','Vickery','Windermere','Woodstock'],
+  coastal: ['Beach Boulevard','Brambleton','Chesapeake Square','Greenbrier','Newport News','Norfolk'],
+  sc: ['Forest Acres','SC Club 2','SC Club 3','SC Club 4','SC Club 5']
+};
+
+// ─── FILTER LOGIC ───
+function populateMonths() {
+  const s = document.getElementById('startMonth');
+  const e = document.getElementById('endMonth');
+  MONTHS.forEach((m, i) => {
+    s.innerHTML += `<option value="${i}" ${i===13?'selected':''}>${m}</option>`;
+    e.innerHTML += `<option value="${i}" ${i===18?'selected':''}>${m}</option>`;
+  });
+}
+
+function updateClubs() {
+  const region = document.getElementById('regionSelect').value;
+  const sel = document.getElementById('clubSelect');
+  sel.innerHTML = '<option value="all">All Clubs</option>';
+  let list = [];
+  if (region === 'all') { Object.values(clubsByRegion).forEach(a => list = list.concat(a)); }
+  else { list = clubsByRegion[region] || []; }
+  list.sort().forEach(c => { sel.innerHTML += `<option value="${c}">${c}</option>`; });
+}
+
+function getMultiplier() {
+  const region = document.getElementById('regionSelect').value;
+  const club = document.getElementById('clubSelect').value;
+  let m = regionWeights[region];
+  if (club !== 'all') {
+    const r = region === 'all' ? Object.keys(clubsByRegion).find(k => clubsByRegion[k].includes(club)) : region;
+    if (r) m = regionWeights[r] / clubCounts[r];
+  }
+  return m;
+}
+
+function getMonthRange() {
+  const s = parseInt(document.getElementById('startMonth').value);
+  const e = parseInt(document.getElementById('endMonth').value);
+  return [Math.min(s,e), Math.max(s,e)];
+}
+
+function sliceAndScale(arr, s, e, mult) {
+  return arr.slice(s, e+1).map(v => v * mult);
+}
+
+function sum(arr) { return arr.reduce((a,b) => a+b, 0); }
+function avg(arr) { return arr.length ? sum(arr)/arr.length : 0; }
+function fmt(n) { return n >= 1000 ? Math.round(n).toLocaleString() : n >= 100 ? Math.round(n).toString() : n >= 10 ? n.toFixed(0) : n.toFixed(1); }
+function fmtK(n) { return n >= 1000 ? '$' + Math.round(n/1000) + 'K' : '$' + Math.round(n); }
+function fmtM(n) { return n >= 1 ? n.toFixed(1) + 'M' : (n*1000).toFixed(0) + 'K'; }
+function pct(n) { return (n*100).toFixed(1) + '%'; }
+function delta(curr, prev, invert) {
+  if (!prev) return '<span class="kpi-delta flat">—</span>';
+  const d = (curr - prev) / prev * 100;
+  const dir = d > 1 ? 'up' : d < -1 ? 'down' : 'flat';
+  const cls = invert ? (dir === 'up' ? 'down' : dir === 'down' ? 'up' : 'flat') : dir;
+  return `<span class="kpi-delta ${cls}">${d>0?'▲':'▼'} ${Math.abs(d).toFixed(0)}% vs. prior period</span>`;
+}
+function pillColor(v, threshLow, threshHigh, invert) {
+  if (invert) { return v <= threshLow ? 'good' : v >= threshHigh ? 'bad' : 'warn'; }
+  return v >= threshHigh ? 'good' : v <= threshLow ? 'bad' : 'warn';
+}
+
+// ─── RENDER ───
+let brandChartInst, trendsChartInst, perfChartInst, organicChartInst;
+
+// Google Trends index (0-100 scale, monthly). Onelife vs 3 unnamed competitors.
+// Indexed so the highest point across all series = 100.
+const trendsData = {
+  'Onelife Fitness': [62,58,55,64,60,58,52,48,45,42,50,48,46,44,40,48,45,43,41],
+  'Competitor A':    [45,44,42,48,46,45,50,52,54,55,53,55,54,56,55,58,57,58,59],
+  'Competitor B':    [30,32,31,33,32,34,36,38,40,42,41,43,44,45,46,48,49,50,51],
+  'Competitor C':    [20,19,18,22,21,20,24,25,26,28,27,29,30,31,32,34,35,36,38],
+};
+
+function render() {
+  const [s, e] = getMonthRange();
+  const mult = getMultiplier();
+  const monthLabels = MONTHS.slice(s, e+1).map(m => m.replace(/\d{4}/, y => "'" + y.slice(2)));
+  const numMonths = e - s + 1;
+
+  // ── BRAND PANEL ──
+  let totalSpend = 0, totalImpr = 0;
+  const brandRows = [];
+  for (const [ch, d] of Object.entries(brandData)) {
+    const sp = sum(sliceAndScale(d.spend, s, e, mult));
+    const im = sum(sliceAndScale(d.impressions, s, e, mult));
+    const cpm = im > 0 ? (sp / im) : 0;
+    totalSpend += sp;
+    totalImpr += im;
+    brandRows.push({ ch, sp, im, cpm, note: d.note });
+  }
+  const blendedCPM = totalImpr > 0 ? totalSpend / totalImpr : 0;
+  const avgMonthSpend = totalSpend / numMonths;
+
+  // Prior period for comparison (same length, immediately before)
+  const priorLen = numMonths;
+  const ps = Math.max(0, s - priorLen);
+  const pe = s - 1;
+  let priorSpend = 0;
+  if (pe >= 0) { for (const d of Object.values(brandData)) priorSpend += sum(sliceAndScale(d.spend, ps, pe, mult)); }
+
+  document.getElementById('brandKpis').innerHTML = `
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-label">Total Spend (period)</div><div class="kpi-value">${fmtK(totalSpend*1000)}</div>${delta(totalSpend, priorSpend, true)}</div>
+      <div class="kpi"><div class="kpi-label">Avg Monthly Spend</div><div class="kpi-value">${fmtK(avgMonthSpend*1000)}</div><div class="kpi-delta flat">${numMonths} month${numMonths>1?'s':''} selected</div></div>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-label">Vendor-Reported Impr.</div><div class="kpi-value">${fmtM(totalImpr)}</div><div class="footnote">Vendor estimates, not verified</div></div>
+      <div class="kpi"><div class="kpi-label">Blended CPM</div><div class="kpi-value">$${blendedCPM.toFixed(1)}0</div><div class="footnote">Spend ÷ vendor impressions</div></div>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-label">Google Trends Index (latest)</div><div class="kpi-value">${trendsData['Onelife Fitness'][e]}</div><div class="footnote">vs. ${trendsData['Competitor A'][e]} / ${trendsData['Competitor B'][e]} / ${trendsData['Competitor C'][e]} competitors</div></div>
+      <div class="kpi"><div class="kpi-label">Trends Direction</div><div class="kpi-value">${trendsData['Onelife Fitness'][e] < trendsData['Onelife Fitness'][s] ? '↘ Declining' : trendsData['Onelife Fitness'][e] > trendsData['Onelife Fitness'][s] ? '↗ Rising' : '→ Flat'}</div>${delta(trendsData['Onelife Fitness'][e], trendsData['Onelife Fitness'][s])}</div>
+    </div>`;
+
+  let brandTableHTML = `<table class="channel-table"><tr><th>Channel</th><th class="num">Spend</th><th class="num">Impr.</th><th class="num">CPM</th><th class="num">Source</th></tr>`;
+  for (const r of brandRows) {
+    brandTableHTML += `<tr><td>${r.ch}</td><td class="num">${fmtK(r.sp*1000)}</td><td class="num">${fmtM(r.im)}</td><td class="num">$${r.cpm.toFixed(1)}0</td><td class="num"><span class="pill neutral">${r.note}</span></td></tr>`;
+  }
+  brandTableHTML += `<tr class="total-row"><td>Total Brand</td><td class="num">${fmtK(totalSpend*1000)}</td><td class="num">${fmtM(totalImpr)}</td><td class="num">$${blendedCPM.toFixed(1)}0</td><td class="num"></td></tr></table>`;
+  document.getElementById('brandTable').innerHTML = brandTableHTML;
+
+  // Brand chart: monthly spend stacked by channel
+  if (brandChartInst) brandChartInst.destroy();
+  const brandColors = ['#1a3a5c','#2d5f8a','#4a90c4','#7ab8e0','#b0d4f1'];
+  const brandDatasets = Object.entries(brandData).map(([ch, d], i) => ({
+    label: ch, data: sliceAndScale(d.spend, s, e, mult), backgroundColor: brandColors[i], borderRadius: 2,
+  }));
+  brandChartInst = new Chart(document.getElementById('brandChart'), {
+    type: 'bar',
+    data: { labels: monthLabels, datasets: brandDatasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: true, position: 'bottom', labels: { font: { size: 9 }, boxWidth: 10 } } },
+      scales: { x: { stacked: true, ticks: { font: { size: 9 } } }, y: { stacked: true, ticks: { font: { size: 9 }, callback: v => '$'+v+'K' } } }
+    }
+  });
+
+  // Google Trends chart
+  if (trendsChartInst) trendsChartInst.destroy();
+  const trendsColors = ['#1a3a5c', '#999', '#bbb', '#ddd'];
+  const trendsWidths = [2.5, 1.5, 1.5, 1.5];
+  const trendsDash = [[], [4,4], [4,4], [4,4]];
+  const trendsDS = Object.entries(trendsData).map(([name, vals], i) => ({
+    label: name,
+    data: vals.slice(s, e+1),
+    borderColor: trendsColors[i],
+    borderWidth: trendsWidths[i],
+    borderDash: trendsDash[i],
+    tension: 0.3,
+    pointRadius: i === 0 ? 3 : 2,
+    fill: i === 0,
+    backgroundColor: i === 0 ? 'rgba(26,58,92,0.06)' : 'transparent',
+  }));
+  trendsChartInst = new Chart(document.getElementById('trendsChart'), {
+    type: 'line',
+    data: { labels: monthLabels, datasets: trendsDS },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: true, position: 'bottom', labels: { font: { size: 9 }, boxWidth: 10 } } },
+      scales: {
+        y: { min: 0, max: 100, ticks: { font: { size: 9 } }, title: { display: true, text: 'Relative Interest', font: { size: 9 } } },
+        x: { ticks: { font: { size: 9 } } }
       }
-    });
+    }
   });
 
-  // Filter functionality (demo)
-  document.getElementById('dateRange').addEventListener('change', function() {
-    console.log('Date range changed to:', this.value);
+  // ── PERFORMANCE PANEL ──
+  let pTotalSpend = 0, pTotalLeads = 0, pTotalJoins = 0;
+  let pPriorSpend = 0, pPriorLeads = 0, pPriorJoins = 0;
+  const perfRows = [];
+  for (const [ch, d] of Object.entries(perfData)) {
+    const sp = sum(sliceAndScale(d.spend, s, e, mult));
+    const ld = sum(sliceAndScale(d.leads, s, e, mult));
+    const jn = sum(sliceAndScale(d.joins, s, e, mult));
+    const conv = ld > 0 ? jn/ld : 0;
+    const cpj = jn > 0 ? (sp*1000)/jn : 0;
+    pTotalSpend += sp; pTotalLeads += ld; pTotalJoins += jn;
+    if (pe >= 0) {
+      pPriorSpend += sum(sliceAndScale(d.spend, ps, pe, mult));
+      pPriorLeads += sum(sliceAndScale(d.leads, ps, pe, mult));
+      pPriorJoins += sum(sliceAndScale(d.joins, ps, pe, mult));
+    }
+    perfRows.push({ ch, sp, ld, jn, conv, cpj });
+  }
+  const pConv = pTotalLeads > 0 ? pTotalJoins/pTotalLeads : 0;
+  const pCPJ = pTotalJoins > 0 ? (pTotalSpend*1000)/pTotalJoins : 0;
+  const pPriorCPJ = pPriorJoins > 0 ? (pPriorSpend*1000)/pPriorJoins : 0;
+  const pPriorConv = pPriorLeads > 0 ? pPriorJoins/pPriorLeads : 0;
+
+  document.getElementById('perfKpis').innerHTML = `
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-label">Total Spend (period)</div><div class="kpi-value">${fmtK(pTotalSpend*1000)}</div>${delta(pTotalSpend, pPriorSpend, true)}</div>
+      <div class="kpi"><div class="kpi-label">Leads Generated</div><div class="kpi-value">${Math.round(pTotalLeads).toLocaleString()}</div>${delta(pTotalLeads, pPriorLeads)}</div>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-label">Joins</div><div class="kpi-value">${Math.round(pTotalJoins).toLocaleString()}</div>${delta(pTotalJoins, pPriorJoins)}</div>
+      <div class="kpi"><div class="kpi-label">Cost per Join</div><div class="kpi-value">$${Math.round(pCPJ)}</div>${delta(pCPJ, pPriorCPJ, true)}</div>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-label">Lead → Join Rate</div><div class="kpi-value">${(pConv*100).toFixed(1)}%</div>${delta(pConv, pPriorConv)}</div>
+      <div class="kpi"><div class="kpi-label">Avg Monthly Spend</div><div class="kpi-value">${fmtK(pTotalSpend/numMonths*1000)}</div><div class="kpi-delta flat">${numMonths} month${numMonths>1?'s':''}</div></div>
+    </div>`;
+
+  let perfTableHTML = `<table class="channel-table"><tr><th>Channel</th><th class="num">Spend</th><th class="num">Leads</th><th class="num">Joins</th><th class="num">Conv %</th><th class="num">Cost/Join</th></tr>`;
+  for (const r of perfRows) {
+    const cpjClass = pillColor(r.cpj, 200, 600, true);
+    perfTableHTML += `<tr><td>${r.ch}</td><td class="num">${fmtK(r.sp*1000)}</td><td class="num">${Math.round(r.ld).toLocaleString()}</td><td class="num">${Math.round(r.jn).toLocaleString()}</td><td class="num">${(r.conv*100).toFixed(1)}%</td><td class="num"><span class="pill ${cpjClass}">$${Math.round(r.cpj)}</span></td></tr>`;
+  }
+  perfTableHTML += `<tr class="total-row"><td>Total Performance</td><td class="num">${fmtK(pTotalSpend*1000)}</td><td class="num">${Math.round(pTotalLeads).toLocaleString()}</td><td class="num">${Math.round(pTotalJoins).toLocaleString()}</td><td class="num">${(pConv*100).toFixed(1)}%</td><td class="num">$${Math.round(pCPJ)}</td></tr></table>`;
+  document.getElementById('perfTable').innerHTML = perfTableHTML;
+
+  // Perf chart: CPJ over time
+  if (perfChartInst) perfChartInst.destroy();
+  const allPerfSpendByMonth = [], allPerfJoinsByMonth = [];
+  for (let i = s; i <= e; i++) {
+    let ms = 0, mj = 0;
+    for (const d of Object.values(perfData)) { ms += d.spend[i] * mult; mj += d.joins[i] * mult; }
+    allPerfSpendByMonth.push(ms);
+    allPerfJoinsByMonth.push(mj);
+  }
+  const cpjByMonth = allPerfSpendByMonth.map((sp, i) => allPerfJoinsByMonth[i] > 0 ? (sp*1000)/allPerfJoinsByMonth[i] : 0);
+  const convByMonth = allPerfSpendByMonth.map((_, i) => {
+    let ld = 0, jn = 0;
+    for (const d of Object.values(perfData)) { ld += d.leads[s+i]*mult; jn += d.joins[s+i]*mult; }
+    return ld > 0 ? (jn/ld)*100 : 0;
   });
-  document.getElementById('channel').addEventListener('change', function() {
-    console.log('Channel changed to:', this.value);
+
+  perfChartInst = new Chart(document.getElementById('perfChart'), {
+    type: 'bar',
+    data: {
+      labels: monthLabels,
+      datasets: [
+        { label: 'Cost/Join', data: cpjByMonth, backgroundColor: 'rgba(179,89,0,0.65)', borderRadius: 3, yAxisID: 'y' },
+        { label: 'Lead→Join %', data: convByMonth, type: 'line', borderColor: '#c62828', backgroundColor: 'transparent', tension: 0.3, pointRadius: 3, yAxisID: 'y1' }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: true, position: 'bottom', labels: { font: { size: 9 } } } },
+      scales: {
+        y: { beginAtZero: false, ticks: { font: { size: 9 }, callback: v => '$'+Math.round(v) } },
+        y1: { position: 'right', min: 8, max: 18, ticks: { font: { size: 9 }, callback: v => v+'%' }, grid: { display: false } },
+        x: { ticks: { font: { size: 9 } } }
+      }
+    }
   });
-  document.getElementById('goal').addEventListener('change', function() {
-    console.log('Goal changed to:', this.value);
+
+  // ── ORGANIC PANEL ──
+  let oTotalLeads = 0, oTotalJoins = 0, oPriorLeads = 0, oPriorJoins = 0;
+  const organicRows = [];
+  for (const [src, d] of Object.entries(organicData)) {
+    const ld = sum(sliceAndScale(d.leads, s, e, mult));
+    const jn = sum(sliceAndScale(d.joins, s, e, mult));
+    const conv = ld > 0 ? jn/ld : null;
+    const ret = avg(d.retention.slice(s, e+1));
+    const prLd = pe >= 0 ? sum(sliceAndScale(d.leads, ps, pe, mult)) : 0;
+    const prJn = pe >= 0 ? sum(sliceAndScale(d.joins, ps, pe, mult)) : 0;
+    const yoyJn = prJn > 0 ? ((jn - prJn)/prJn)*100 : null;
+    oTotalLeads += ld; oTotalJoins += jn;
+    oPriorLeads += prLd; oPriorJoins += prJn;
+    organicRows.push({ src, ld, jn, conv, ret, yoyJn });
+  }
+  const oConv = oTotalLeads > 0 ? oTotalJoins/oTotalLeads : 0;
+  const oPriorConv = oPriorLeads > 0 ? oPriorJoins/oPriorLeads : 0;
+  const oAvgRet = avg(organicRows.map(r => r.ret));
+
+  document.getElementById('organicKpis').innerHTML = `
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-label">Total Leads</div><div class="kpi-value">${Math.round(oTotalLeads).toLocaleString()}</div>${delta(oTotalLeads, oPriorLeads)}</div>
+      <div class="kpi"><div class="kpi-label">Total Joins</div><div class="kpi-value">${Math.round(oTotalJoins).toLocaleString()}</div>${delta(oTotalJoins, oPriorJoins)}</div>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-label">Conversion Rate</div><div class="kpi-value">${(oConv*100).toFixed(1)}%</div>${delta(oConv, oPriorConv)}</div>
+      <div class="kpi"><div class="kpi-label">Avg 90-Day Retention</div><div class="kpi-value">${oAvgRet.toFixed(0)}%</div><div class="kpi-delta flat">weighted avg across sources</div></div>
+    </div>`;
+
+  let oTableHTML = `<table class="channel-table"><tr><th>Source</th><th class="num">Leads</th><th class="num">Joins</th><th class="num">Conv %</th><th class="num">90d Retn</th><th class="num">Δ vs Prior</th></tr>`;
+  for (const r of organicRows) {
+    const yoyPill = r.yoyJn === null ? '<span class="pill neutral">—</span>' : r.yoyJn < -10 ? `<span class="pill bad">${r.yoyJn.toFixed(0)}%</span>` : r.yoyJn < 0 ? `<span class="pill warn">${r.yoyJn.toFixed(0)}%</span>` : `<span class="pill good">+${r.yoyJn.toFixed(0)}%</span>`;
+    oTableHTML += `<tr><td>${r.src}</td><td class="num">${Math.round(r.ld).toLocaleString()}</td><td class="num">${Math.round(r.jn).toLocaleString()}</td><td class="num">${r.conv !== null ? (r.conv*100).toFixed(1)+'%' : '—'}</td><td class="num">${r.ret.toFixed(0)}%</td><td class="num">${yoyPill}</td></tr>`;
+  }
+  oTableHTML += `<tr class="total-row"><td>Total Organic</td><td class="num">${Math.round(oTotalLeads).toLocaleString()}</td><td class="num">${Math.round(oTotalJoins).toLocaleString()}</td><td class="num">${(oConv*100).toFixed(1)}%</td><td class="num">${oAvgRet.toFixed(0)}%</td><td class="num">${oPriorJoins > 0 ? (((oTotalJoins-oPriorJoins)/oPriorJoins)*100).toFixed(0)+'%' : '—'}</td></tr></table>`;
+  document.getElementById('organicTable').innerHTML = oTableHTML;
+
+  // Organic chart: conversion by source
+  if (organicChartInst) organicChartInst.destroy();
+  const orgColors = ['#2e7d32','#66bb6a','#a5d6a7','#c8e6c9','#e8f5e9','#f1f8e9'];
+  const orgDatasets = Object.entries(organicData).map(([src, d], i) => {
+    const leads = d.leads.slice(s, e+1).map(v => v * mult);
+    const joins = d.joins.slice(s, e+1).map(v => v * mult);
+    const convs = leads.map((l, j) => l > 0 ? (joins[j]/l)*100 : null);
+    return { label: src, data: convs, borderColor: orgColors[i], tension: 0.3, pointRadius: 2, borderWidth: i === 0 ? 2.5 : 1.5 };
   });
+  organicChartInst = new Chart(document.getElementById('organicChart'), {
+    type: 'line',
+    data: { labels: monthLabels, datasets: orgDatasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: true, position: 'bottom', labels: { font: { size: 9 }, boxWidth: 10 } } },
+      scales: {
+        y: { beginAtZero: false, min: 0, max: 50, ticks: { font: { size: 9 }, callback: v => v+'%' } },
+        x: { ticks: { font: { size: 9 } } }
+      }
+    }
+  });
+
+  // ── INSIGHT BAR ──
+  // Find best and worst perf channel by CPJ
+  const sorted = [...perfRows].sort((a,b) => a.cpj - b.cpj);
+  const best = sorted[0], worst = sorted[sorted.length-1];
+  document.getElementById('insightBar').innerHTML = `
+    <div><div class="insight-title" style="color:var(--brand)">Brand</div><p>Spending ${fmtK(avgMonthSpend*1000)}/mo across ${Object.keys(brandData).length} channels. Vendors report ${fmtM(totalImpr/numMonths)} impressions/mo at $${blendedCPM.toFixed(1)}0 CPM. These are unverified vendor numbers — treat as directional.</p></div>
+    <div><div class="insight-title" style="color:var(--perf)">Performance</div><p>${best.ch} is the most efficient at $${Math.round(best.cpj)}/join. ${worst.ch} costs $${Math.round(worst.cpj)}/join. Blended conversion is ${(pConv*100).toFixed(1)}% — ${pPriorConv > 0 ? (pConv < pPriorConv ? 'down from ' + (pPriorConv*100).toFixed(1) + '% prior period' : 'stable vs. prior period') : 'no prior comparison'}.</p></div>
+    <div><div class="insight-title" style="color:var(--organic)">Organic</div><p>Leads: ${Math.round(oTotalLeads).toLocaleString()}, Joins: ${Math.round(oTotalJoins).toLocaleString()} (${(oConv*100).toFixed(1)}% conv). ${oTotalJoins < oPriorJoins ? 'Joins down ' + Math.abs(((oTotalJoins-oPriorJoins)/oPriorJoins)*100).toFixed(0) + '% vs. prior period despite stable lead volume — conversion problem.' : 'Tracking in line with prior period.'}</p></div>`;
+}
+
+// Init
+populateMonths();
+updateClubs();
+render();
 </script>
+
 </body>
 </html>
