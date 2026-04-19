@@ -103,10 +103,12 @@ function App() {
           <nav>
             <a href="#signals">Signals</a>
             <a href="#trend">Weight</a>
+            <a href="#events">Events</a>
             <a href="#decompose">Decompose</a>
+            <a href="#ageModel">Age model</a>
+            <a href="#forecast">Forecast</a>
             <a href="#seasonality">Seasonality</a>
             <a href="#sleep">Sleep</a>
-            <a href="#events">Events</a>
             <a href="#comparison">Compare</a>
             <a href="#explorer">Explorer</a>
             <a href="#spiral">Spiral</a>
@@ -200,6 +202,43 @@ function App() {
           </div>
         </section>
 
+        {/* EVENT DELTAS — placed right after the Weight trend chart so event colors are in context */}
+        <section className="block" id="events">
+          <h2>Event deltas</h2>
+          <div className="sect-sub">
+            For each annotated event, the change in 90-day average weight after vs. before. The colored dot matches the event
+            band or marker on the chart above. The event list is canonical — same on every device; edit DEFAULT_EVENTS in src/events.jsx to change it.
+          </div>
+          <div className="panel panel-pad">
+            {eventDeltas.length === 0 &&
+              <div style={{fontSize:'0.82rem', color:'var(--fg-muted)', fontStyle:'italic'}}>No events configured.</div>
+            }
+            {eventDeltas.map((ev) => {
+              const origIdx = events.findIndex(e => e.id === ev.id);
+              const color = EVENT_COLORS[origIdx % EVENT_COLORS.length];
+              return (
+                <div key={ev.id} style={{display:'flex', alignItems:'center', gap:10, padding:'8px 0',
+                  borderBottom:'1px solid var(--border-soft)', fontSize:'0.88rem'}}>
+                  <span style={{width:10, height:10, background:color, borderRadius:'50%', flexShrink:0, display:'inline-block'}} />
+                  <span style={{color:'var(--fg-muted)', fontSize:'0.78rem', fontVariantNumeric:'tabular-nums',
+                    minWidth:92, whiteSpace:'nowrap'}}>
+                    {ev.date}{ev.end ? ' → ' + ev.end : ''}
+                  </span>
+                  <span style={{color:'var(--fg-2)', flex:1, overflow:'hidden', textOverflow:'ellipsis',
+                    whiteSpace:'nowrap'}} title={ev.label}>{ev.label}</span>
+                  <span style={{fontVariantNumeric:'tabular-nums', fontWeight:600, whiteSpace:'nowrap',
+                    color: ev.delta === null ? 'var(--fg-muted)' : (ev.delta > 0 ? '#ff5555' : '#4ae04a')}}>
+                    {ev.delta === null ? 'n/a' : fmtDelta(ev.delta, 1) + ' lb'}
+                  </span>
+                </div>
+              );
+            })}
+            <div style={{fontSize:'0.74rem', color:'var(--fg-muted-2)', fontStyle:'italic', marginTop:14, lineHeight:1.5}}>
+              ⚠ Correlation, not causation. Many events coincide — e.g. a move and a diet change in the same week will both appear to own the delta.
+            </div>
+          </div>
+        </section>
+
         {/* DECOMPOSE — any signal */}
         <section className="block" id="decompose">
           <h2>Decomposition — trend, season, residual</h2>
@@ -212,6 +251,37 @@ function App() {
             ? <DecomposeAny signals={lifeSignals.signals} start={lifeSignals.start} count={lifeSignals.count} defaultKey="weight" />
             : <div style={{padding:'40px', textAlign:'center', color:'var(--fg-muted)'}}>Loading…</div>}
           <Findings daily={daily} events={events} />
+        </section>
+
+        {/* AGE-ADJUSTED WEIGHT MODEL */}
+        <section className="block" id="ageModel">
+          <h2>Age-adjusted decomposition — weight</h2>
+          <div className="sect-sub">
+            A mechanistic alternative to the smoothed trend above. Your weight is modeled as
+            <b> a + CDC_P50(age) + b<sub>drift</sub>·years + monthly + DOW + residual</b>. The aging shape comes from CDC/NHANES;
+            the personal drift and offset are fit from your data. Each component now has a meaning — you can extrapolate it,
+            question it, and project it forward.
+          </div>
+          <div className="chart-wrap">
+            <AgeDecomposition daily={daily} />
+          </div>
+        </section>
+
+        {/* FORECAST */}
+        <section className="block" id="forecast">
+          <h2>Forecast — where does this model send me?</h2>
+          <div className="sect-sub">
+            Projection from the age-adjusted model above. The age+drift baseline continues forward (CDC aging curve bends down
+            in your 60s — the model inherits that), plus the learned monthly seasonal. Bands are ±1.28σ (80%) and ±1.96σ (95%)
+            of historical residual, assuming residual volatility stays comparable to the last 15 years.
+            <br/><br/>
+            <b style={{color:'var(--fg)'}}>Read this as a structural projection, not a personal commitment.</b> It assumes your
+            personal drift continues at the historical rate — if you'd already planned to intervene, the forecast is invalid by
+            construction. That's the whole point of a mechanistic model: changing the inputs changes the output.
+          </div>
+          <div className="chart-wrap">
+            <WeightForecast daily={daily} />
+          </div>
         </section>
 
         {/* SEASONALITY */}
@@ -237,32 +307,6 @@ function App() {
           {lifeSignals
             ? <SleepArchitecture signals={lifeSignals.signals} start={lifeSignals.start} count={lifeSignals.count} />
             : <div style={{padding:'40px', textAlign:'center', color:'var(--fg-muted)'}}>Loading…</div>}
-        </section>
-
-        {/* EVENT DELTAS */}
-        <section className="block" id="events">
-          <h2>Event deltas</h2>
-          <div className="sect-sub">
-            For each annotated event, the change in 90-day average weight after vs. before. The event list is the canonical one
-            baked into the repo — same on every device. To add or change an event, edit DEFAULT_EVENTS in src/events.jsx.
-          </div>
-          <div className="panel panel-pad">
-            {eventDeltas.length === 0 &&
-              <div style={{fontSize:'0.82rem', color:'var(--fg-muted)', fontStyle:'italic'}}>Add events to see deltas.</div>
-            }
-            {eventDeltas.map(ev => (
-              <div key={ev.id} style={{display:'flex', justifyContent:'space-between', padding:'8px 0', borderBottom:'1px solid var(--border-soft)', fontSize:'0.88rem'}}>
-                <span style={{color:'var(--fg-2)', paddingRight:8, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}} title={ev.label}>{ev.label}</span>
-                <span style={{fontVariantNumeric:'tabular-nums', fontWeight:600,
-                  color: ev.delta === null ? 'var(--fg-muted)' : (ev.delta > 0 ? '#ff5555' : '#4ae04a')}}>
-                  {ev.delta === null ? 'n/a' : fmtDelta(ev.delta, 1) + ' lb'}
-                </span>
-              </div>
-            ))}
-            <div style={{fontSize:'0.74rem', color:'var(--fg-muted-2)', fontStyle:'italic', marginTop:14, lineHeight:1.5}}>
-              ⚠ Correlation, not causation. Many events coincide — e.g. a move and a diet change in the same week will both appear to own the delta.
-            </div>
-          </div>
         </section>
 
         {/* COMPARISON */}
