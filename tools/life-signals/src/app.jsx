@@ -104,12 +104,10 @@ function App() {
             <a href="#signals">Signals</a>
             <a href="#trend">Weight</a>
             <a href="#events">Events</a>
-            <a href="#decompose">Decompose</a>
             <a href="#ageModel">Age model</a>
             <a href="#forecast">Forecast</a>
-            <a href="#seasonality">Seasonality</a>
             <a href="#sleep">Sleep</a>
-            <a href="#comparison">Compare</a>
+            <a href="#comparison">vs. US pop.</a>
             <a href="#explorer">Explorer</a>
             <a href="#spiral">Spiral</a>
           </nav>
@@ -121,7 +119,7 @@ function App() {
         <header className="hero">
           <h1>Life Signals</h1>
           <div className="subtitle">
-            <b>{data.meta.weighInCount.toLocaleString()} weigh-ins</b>, {data.meta.firstDay} – {data.meta.lastDay}, plus iPhone/Watch signals.
+            <b>{data.meta.weighInCount.toLocaleString()} weigh-ins</b>, {data.meta.firstDay} → {data.meta.lastDay}, plus iPhone signals.
           </div>
           <div className="meta-row">
             <div className="meta-item"><span className="label">Weigh-ins</span><span className="val">{data.meta.weighInCount.toLocaleString()}</span></div>
@@ -225,17 +223,6 @@ function App() {
           </div>
         </section>
 
-        {/* DECOMPOSE — any signal */}
-        <section className="block" id="decompose">
-          <h2>Decomposition</h2>
-          <div className="sect-sub">
-            STL: trend (365-day centered mean) + monthly + DOW + residual.
-          </div>
-          {lifeSignals
-            ? <DecomposeAny signals={lifeSignals.signals} start={lifeSignals.start} count={lifeSignals.count} defaultKey="weight" />
-            : <div style={{padding:'40px', textAlign:'center', color:'var(--fg-muted)'}}>Loading…</div>}
-        </section>
-
         {/* AGE-ADJUSTED WEIGHT MODEL */}
         <section className="block" id="ageModel">
           <h2>Age-adjusted decomposition — weight</h2>
@@ -256,17 +243,6 @@ function App() {
           <div className="chart-wrap">
             <WeightForecast daily={daily} />
           </div>
-        </section>
-
-        {/* SEASONALITY */}
-        <section className="block" id="seasonality">
-          <h2>Seasonality</h2>
-          <div className="sect-sub">
-            Monthly and day-of-week deviation from the 1-year trend, plus annual polar view.
-          </div>
-          {lifeSignals
-            ? <SeasonalityAny signals={lifeSignals.signals} start={lifeSignals.start} count={lifeSignals.count} defaultKey="weight" />
-            : <div style={{padding:'40px', textAlign:'center', color:'var(--fg-muted)'}}>Loading…</div>}
         </section>
 
         {/* SLEEP ARCHITECTURE */}
