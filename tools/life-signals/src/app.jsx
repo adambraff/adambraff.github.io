@@ -16,6 +16,7 @@ function App() {
   React.useEffect(() => { try { localStorage.removeItem('we.events'); } catch (_) {} }, []);
   const [rangeKey, setRangeKey] = React.useState('all');
   const [tweaksOpen, setTweaksOpen] = React.useState(false);
+  const [cdcGroup, setCdcGroup] = React.useState('pooled'); // 'pooled' | 'white'
 
   React.useEffect(() => {
     fetch('data/weight.json').then(r => r.json()).then(setData);
@@ -42,7 +43,7 @@ function App() {
   };
 
   if (!data) {
-    return <div style={{padding:'120px 32px', textAlign:'center', color:'var(--fg-muted)'}}>Loading…</div>;
+    return <div style={{padding:'120px 32px', textAlign:'center', color:'var(--fg-muted)'}}>Loading 5,400 weigh-ins…</div>;
   }
 
   // Range presets
@@ -64,9 +65,9 @@ function App() {
   const rolledAll = rollingAvg(daily.map(d => d.w), 7);
   const currentAvg = rolledAll[rolledAll.length-1];
   const ageNow = ageAt(lastMs, BIRTH_YEAR);
-  const currentPct = cdcPercentile(ageNow, currentAvg);
+  const currentPct = cdcPercentile(ageNow, currentAvg, cdcGroup);
   const ageStart = ageAt(parseDay(daily[0].d), BIRTH_YEAR);
-  const startPct = cdcPercentile(ageStart, rolledAll.find(v => v !== null));
+  const startPct = cdcPercentile(ageStart, rolledAll.find(v => v !== null), cdcGroup);
 
   // Biggest moves (12-month): find largest net gain and loss over any rolling 12-month window
   const window365 = 365;
@@ -134,7 +135,7 @@ function App() {
         <section className="block" id="signals">
           <h2>At a glance</h2>
           <div className="sect-sub">
-            365-day centered trend per signal, shared timeline.
+            365-day centered trend per signal, shared timeline. Gaps are absent data, not zeros.
           </div>
           {lifeSignals
             ? <LifeSignals signals={lifeSignals.signals} start={lifeSignals.start} count={lifeSignals.count} />
@@ -145,7 +146,7 @@ function App() {
         <section className="block" id="trend">
           <h2>Weight — the long run</h2>
           <div className="sect-sub">
-            {smoothing}-day rolling average.
+            {smoothing}-day rolling average. Dots = single mornings. Colored bands = events.
           </div>
 
           <div style={{display:'flex', gap:10, marginBottom:16, alignItems:'center', flexWrap:'wrap'}}>
@@ -170,7 +171,7 @@ function App() {
               <div className="val" style={{color: totalChange > 0 ? '#ff5555' : '#4ae04a'}}>
                 {fmtDelta(totalChange, 1)}<span className="unit">lb</span>
               </div>
-              <div className="hint">{firstW.toFixed(1)} → {lastW.toFixed(1)} lb</div>
+              <div className="hint">{firstW.toFixed(1)} lb in Aug 2011 → {lastW.toFixed(1)} lb today</div>
             </div>
             <div className="stat-card">
               <div className="label">Biggest 12-mo Gain</div>
@@ -194,7 +195,7 @@ function App() {
         <section className="block" id="events">
           <h2>Event deltas</h2>
           <div className="sect-sub">
-            90-day weight Δ after vs. before each event.
+            90-day weight Δ after vs. before each event. Dot color matches the chart above.
           </div>
           <div className="panel panel-pad">
             {eventDeltas.length === 0 &&
@@ -238,7 +239,8 @@ function App() {
         <section className="block" id="forecast">
           <h2>Forecast</h2>
           <div className="sect-sub">
-            Projection from the age-adjusted model.
+            Projection from the age-adjusted model. Bands = ±1.28σ (80%), ±1.96σ (95%) of residual.
+            Assumes current drift continues; intervention invalidates.
           </div>
           <div className="chart-wrap">
             <WeightForecast daily={daily} />
@@ -258,15 +260,23 @@ function App() {
 
         {/* COMPARISON */}
         <section className="block" id="comparison">
-          <h2>vs. CDC distribution</h2>
+          <h2>Weight vs. US pop.</h2>
           <div className="sect-sub">
-            US adult males, age-adjusted, height 5'10". NHANES 2015–2018.
+            Age-adjusted. NHANES 2015–2018.
+          </div>
+          <div style={{display:'flex', gap:10, marginBottom:16}}>
+            <div className="btn-group">
+              <button className={clsx('btn small', cdcGroup === 'pooled' && 'active')}
+                onClick={() => setCdcGroup('pooled')}>All US men</button>
+              <button className={clsx('btn small', cdcGroup === 'white' && 'active')}
+                onClick={() => setCdcGroup('white')}>Non-Hispanic white</button>
+            </div>
           </div>
           <div className="chart-wrap" style={{marginBottom:20}}>
-            <PercentileTime daily={daily} smoothing={smoothing} birthYear={BIRTH_YEAR} />
+            <PercentileTime daily={daily} smoothing={smoothing} birthYear={BIRTH_YEAR} group={cdcGroup} />
           </div>
           <div className="chart-wrap">
-            <PercentileHistory daily={daily} smoothing={smoothing} birthYear={BIRTH_YEAR} />
+            <PercentileHistory daily={daily} smoothing={smoothing} birthYear={BIRTH_YEAR} group={cdcGroup} />
           </div>
         </section>
 
@@ -298,7 +308,7 @@ function App() {
           <p>
             {data.meta.weighInCount.toLocaleString()} weigh-ins, {data.meta.firstDay} – {data.meta.lastDay}.
             Weigh-ins cover {((data.meta.dayCount/data.meta.totalDays)*100).toFixed(0)}% of days; rest linearly interpolated.
-            CDC tables: NHANES 2015–2018, male, height 70".
+            CDC tables: NHANES 2015–2018.
           </p>
         </footer>
       </div>
