@@ -42,7 +42,7 @@ function App() {
   };
 
   if (!data) {
-    return <div style={{padding:'120px 32px', textAlign:'center', color:'var(--fg-muted)'}}>Loading 5,400 weigh-ins…</div>;
+    return <div style={{padding:'120px 32px', textAlign:'center', color:'var(--fg-muted)'}}>Loading…</div>;
   }
 
   // Range presets
@@ -121,9 +121,7 @@ function App() {
         <header className="hero">
           <h1>Life Signals</h1>
           <div className="subtitle">
-            Fifteen years of one body, instrumented. <b>5,400 weigh-ins</b> on a Withings scale since <b>August 2011</b>,
-            plus a decade of steps, sleep, gait, and other passive readings from iPhone and Apple Watch.
-            What moves together, what leads what, what explains what.
+            <b>{data.meta.weighInCount.toLocaleString()} weigh-ins</b>, {data.meta.firstDay} – {data.meta.lastDay}, plus iPhone/Watch signals.
           </div>
           <div className="meta-row">
             <div className="meta-item"><span className="label">Weigh-ins</span><span className="val">{data.meta.weighInCount.toLocaleString()}</span></div>
@@ -138,26 +136,18 @@ function App() {
         <section className="block" id="signals">
           <h2>At a glance</h2>
           <div className="sect-sub">
-            Weight plus six non-weight signals, each shown as a 365-day centered trend on a shared timeline.
-            The faint band behind each line is the weekly min–max of daily readings. Scan vertically: where does a signal inflect
-            the same way weight does, at roughly the same time? That's a candidate hypothesis — not a conclusion.
+            365-day centered trend per signal, shared timeline.
           </div>
           {lifeSignals
             ? <LifeSignals signals={lifeSignals.signals} start={lifeSignals.start} count={lifeSignals.count} />
             : <div style={{padding:'40px', textAlign:'center', color:'var(--fg-muted)'}}>Loading signals…</div>}
-          <div className="finding" style={{marginTop:16}}>
-            <b className="tag">Coverage note:</b>
-            Each series starts when its sensor did. Weight from 2011, steps from 2014, sleep from 2016, gait and active-energy
-            metrics from 2020. Visual dropouts are absent data, not zeros. Don't read a flat gap as "nothing was happening."
-          </div>
         </section>
 
         {/* TREND */}
         <section className="block" id="trend">
           <h2>Weight — the long run</h2>
           <div className="sect-sub">
-            Your full weigh-in history at the {smoothing}-day rolling average (blue line). Each small dot is a single morning on the scale —
-            the cloud around the line is the daily noise. Shaded bars overlay life events from the canonical list (see the Event deltas section below).
+            {smoothing}-day rolling average.
           </div>
 
           <div style={{display:'flex', gap:10, marginBottom:16, alignItems:'center', flexWrap:'wrap'}}>
@@ -182,7 +172,7 @@ function App() {
               <div className="val" style={{color: totalChange > 0 ? '#ff5555' : '#4ae04a'}}>
                 {fmtDelta(totalChange, 1)}<span className="unit">lb</span>
               </div>
-              <div className="hint">{firstW.toFixed(1)} lb in Aug 2011 → {lastW.toFixed(1)} lb today</div>
+              <div className="hint">{firstW.toFixed(1)} → {lastW.toFixed(1)} lb</div>
             </div>
             <div className="stat-card">
               <div className="label">Biggest 12-mo Gain</div>
@@ -206,8 +196,7 @@ function App() {
         <section className="block" id="events">
           <h2>Event deltas</h2>
           <div className="sect-sub">
-            For each annotated event, the change in 90-day average weight after vs. before. The colored dot matches the event
-            band or marker on the chart above. The event list is canonical — same on every device; edit DEFAULT_EVENTS in src/events.jsx to change it.
+            90-day weight Δ after vs. before each event.
           </div>
           <div className="panel panel-pad">
             {eventDeltas.length === 0 &&
@@ -233,34 +222,25 @@ function App() {
                 </div>
               );
             })}
-            <div style={{fontSize:'0.74rem', color:'var(--fg-muted-2)', fontStyle:'italic', marginTop:14, lineHeight:1.5}}>
-              ⚠ Correlation, not causation. Many events coincide — e.g. a move and a diet change in the same week will both appear to own the delta.
-            </div>
           </div>
         </section>
 
         {/* DECOMPOSE — any signal */}
         <section className="block" id="decompose">
-          <h2>Decomposition — trend, season, residual</h2>
+          <h2>Decomposition</h2>
           <div className="sect-sub">
-            A simplified STL for any signal. The trend is a 365-day centered mean; the monthly seasonal is each calendar month's average deviation from that trend;
-            the DOW seasonal is each day-of-week's average deviation; the residual is what's left — one-off moves that neither the long arc nor the calendar can explain.
-            Pick a signal to see its own decomposition.
+            STL: trend (365-day centered mean) + monthly + DOW + residual.
           </div>
           {lifeSignals
             ? <DecomposeAny signals={lifeSignals.signals} start={lifeSignals.start} count={lifeSignals.count} defaultKey="weight" />
             : <div style={{padding:'40px', textAlign:'center', color:'var(--fg-muted)'}}>Loading…</div>}
-          <Findings daily={daily} events={events} />
         </section>
 
         {/* AGE-ADJUSTED WEIGHT MODEL */}
         <section className="block" id="ageModel">
           <h2>Age-adjusted decomposition — weight</h2>
           <div className="sect-sub">
-            A mechanistic alternative to the smoothed trend above. Your weight is modeled as
-            <b> a + CDC_P50(age) + b<sub>drift</sub>·years + monthly + DOW + residual</b>. The aging shape comes from CDC/NHANES;
-            the personal drift and offset are fit from your data. Each component now has a meaning — you can extrapolate it,
-            question it, and project it forward.
+            weight = a + CDC_P50(age) + b<sub>drift</sub>·years + monthly + DOW + residual
           </div>
           <div className="chart-wrap">
             <AgeDecomposition daily={daily} />
@@ -269,15 +249,9 @@ function App() {
 
         {/* FORECAST */}
         <section className="block" id="forecast">
-          <h2>Forecast — where does this model send me?</h2>
+          <h2>Forecast</h2>
           <div className="sect-sub">
-            Projection from the age-adjusted model above. The age+drift baseline continues forward (CDC aging curve bends down
-            in your 60s — the model inherits that), plus the learned monthly seasonal. Bands are ±1.28σ (80%) and ±1.96σ (95%)
-            of historical residual, assuming residual volatility stays comparable to the last 15 years.
-            <br/><br/>
-            <b style={{color:'var(--fg)'}}>Read this as a structural projection, not a personal commitment.</b> It assumes your
-            personal drift continues at the historical rate — if you'd already planned to intervene, the forecast is invalid by
-            construction. That's the whole point of a mechanistic model: changing the inputs changes the output.
+            Projection from the age-adjusted model.
           </div>
           <div className="chart-wrap">
             <WeightForecast daily={daily} />
@@ -286,10 +260,9 @@ function App() {
 
         {/* SEASONALITY */}
         <section className="block" id="seasonality">
-          <h2>The calendar's pull</h2>
+          <h2>Seasonality</h2>
           <div className="sect-sub">
-            How much the selected signal tends to deviate from its 1-year trend, by month and by day of the week,
-            plus a polar view of the full annual cycle. Pick any signal to see its own seasonal pattern.
+            Monthly and day-of-week deviation from the 1-year trend, plus annual polar view.
           </div>
           {lifeSignals
             ? <SeasonalityAny signals={lifeSignals.signals} start={lifeSignals.start} count={lifeSignals.count} defaultKey="weight" />
@@ -300,9 +273,7 @@ function App() {
         <section className="block" id="sleep">
           <h2>Sleep architecture</h2>
           <div className="sect-sub">
-            Apple only started emitting stage-level breakdowns from your phone in early 2025 — before that, all sleep was lumped
-            into "asleep, unspecified." This section shows the stage composition (Awake / REM / Core / Deep) from the day stages
-            first appeared, stacked to total time in bed. The longer-run total-sleep trend lives in the Signals panel and Decompose section above.
+            Awake / REM / Core / Deep composition, stacked. Stage data begins Feb 2025.
           </div>
           {lifeSignals
             ? <SleepArchitecture signals={lifeSignals.signals} start={lifeSignals.start} count={lifeSignals.count} />
@@ -311,55 +282,34 @@ function App() {
 
         {/* COMPARISON */}
         <section className="block" id="comparison">
-          <h2>How you sit against the distribution</h2>
+          <h2>vs. CDC distribution</h2>
           <div className="sect-sub">
-            US adult males, age-adjusted, height 5'10". Bands are from the CDC NHANES anthropometric reference tables, interpolated
-            to your height. As you age, the median weight of your peers shifts — so your own percentile can drift even while you stand still.
+            US adult males, age-adjusted, height 5'10". NHANES 2015–2018.
           </div>
           <div className="chart-wrap" style={{marginBottom:20}}>
-            <div className="chart-title">Your weight vs. the age-adjusted distribution</div>
-            <div className="chart-sub">Orange bands = US male distribution at your age (shifts over time)</div>
             <PercentileTime daily={daily} smoothing={smoothing} birthYear={BIRTH_YEAR} />
           </div>
           <div className="chart-wrap">
-            <div className="chart-title">Your percentile over time</div>
-            <div className="chart-sub">Where you fall among US males at each point in your life (lower = lighter than median)</div>
             <PercentileHistory daily={daily} smoothing={smoothing} birthYear={BIRTH_YEAR} />
-          </div>
-          <div className="finding" style={{marginTop:20}}>
-            <b className="tag">Finding:</b>
-            You've held roughly the <b>P{currentPct.toFixed(0)}</b> slot among US males your age, meaning you are lighter than roughly
-            <b> {(100 - currentPct).toFixed(0)}%</b> of American men age {Math.round(ageNow)} at 5'10".
-            Because the median US male <i>gains</i> weight from age 40 to 55 before losing it, your percentile has drifted down even when your own weight hasn't moved much.
           </div>
         </section>
 
         {/* EXPLORER */}
         <section className="block" id="explorer">
-          <h2>Explorer — test your hypothesis</h2>
+          <h2>Explorer</h2>
           <div className="sect-sub">
-            Pick any two signals for X and Y. Optionally add a third as bubble size and a fourth as color.
-            Toggle each between raw daily values and day-over-day change. The lag slider shifts Y relative to X
-            — positive lag asks "does X today predict Y in <i>lag</i> days?" One point per day where all selected
-            variables have a reading.
+            Scatter any two signals. Optional size and color. Lag shifts Y relative to X.
           </div>
           {lifeSignals
             ? <Explorer signals={lifeSignals.signals} start={lifeSignals.start} count={lifeSignals.count} />
             : <div style={{padding:'40px', textAlign:'center', color:'var(--fg-muted)'}}>Loading signals…</div>}
-          <div className="finding" style={{marginTop:16}}>
-            <b className="tag">Warning:</b>
-            Pearson r is fragile. Day-over-day Δ amplifies noise; long lags reduce n; outliers distort slopes. Use n and r² together —
-            an r of 0.3 with n=50 is weaker than r=0.15 with n=2,000. And correlation is still not causation.
-          </div>
         </section>
 
         {/* SPIRAL */}
         <section className="block" id="spiral">
-          <h2>One signal, one glance</h2>
+          <h2>Spiral</h2>
           <div className="sect-sub">
-            A radial map: calendar angle, year radius, signal-value color. A single image of the entire record. If you see consistent warm arcs in
-            the same angular slices, that's seasonality made visible; if a ring is uniformly warmer than its neighbors, that's a year-long shift.
-            Pick any signal.
+            Angle = calendar position, radius = year, color = signal value.
           </div>
           <div className="chart-wrap">
             {lifeSignals
@@ -370,12 +320,10 @@ function App() {
 
         <footer>
           <p>
-            Data: <b>{data.meta.weighInCount.toLocaleString()}</b> weigh-ins from a Withings scale, {data.meta.firstDay} through {data.meta.lastDay}.
-            Daily series linearly interpolated where weigh-ins are missing (<b>{((1 - data.meta.dayCount/data.meta.totalDays)*100).toFixed(0)}%</b> of days).
-            Comparison tables derive from CDC NHANES 2015–2018 anthropometric reference data for US adult males, height-matched to 70".
+            {data.meta.weighInCount.toLocaleString()} weigh-ins, {data.meta.firstDay} – {data.meta.lastDay}.
+            Weigh-ins cover {((data.meta.dayCount/data.meta.totalDays)*100).toFixed(0)}% of days; rest linearly interpolated.
+            CDC tables: NHANES 2015–2018, male, height 70".
           </p>
-          <p><i>Methodology: trend = 365-day centered mean. Seasonal = mean detrended residual by day-of-year, smoothed with a 31-day circular window.
-          Percentile interpolation is linear within CDC bands; treat within ±3 percentile points as noise. This is a decomposition, not a forecast.</i></p>
         </footer>
       </div>
 
@@ -383,12 +331,9 @@ function App() {
       <div className={clsx('tweaks', tweaksOpen && 'show')}>
         <h4>Tweaks</h4>
         <div className="tweaks-row">
-          <div className="label">Smoothing window: <b style={{color:'var(--blue)'}}>{smoothing} days</b></div>
+          <div className="label">Smoothing: <b style={{color:'var(--blue)'}}>{smoothing}d</b></div>
           <input type="range" min="1" max="60" step="1" value={smoothing}
             onChange={e => setSmoothingAndPersist(+e.target.value)} />
-          <div style={{fontSize:'0.72rem', color:'var(--fg-muted)', marginTop:4}}>
-            Raw daily scale readings are noisy. A wider window calms the line but delays inflection points.
-          </div>
         </div>
         <div className="tweaks-row">
           <div className="label">Reset smoothing</div>
