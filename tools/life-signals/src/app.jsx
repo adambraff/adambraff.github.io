@@ -3,6 +3,15 @@
 const BIRTH_YEAR = 1970;
 const HEIGHT_IN = 70;
 
+// SES shift components. Each independently selectable; total shift = sum of active ones.
+// Magnitudes derive from NHANES-based BMI-by-education/income/region research
+// (Ogden et al.); at 5'10", 1 BMI point ≈ 5 lb.
+const SES_COMPONENTS = [
+  { key: 'college',  lbs: 5, label: 'College grad' },
+  { key: 'affluent', lbs: 4, label: 'Top income quintile' },
+  { key: 'urban',    lbs: 4, label: 'Northeast urban' },
+];
+
 function App() {
   const [data, setData] = React.useState(null);
   const [lifeSignals, setLifeSignals] = React.useState(null);
@@ -17,7 +26,15 @@ function App() {
   const [rangeKey, setRangeKey] = React.useState('all');
   const [tweaksOpen, setTweaksOpen] = React.useState(false);
   const [cdcGroup, setCdcGroup] = React.useState('pooled'); // 'pooled' | 'white'
-  const [cdcSes, setCdcSes] = React.useState('pooled');     // 'pooled' | 'college' | 'affluent' | 'ne_urban'
+  const [cdcSesKeys, setCdcSesKeys] = React.useState(() => new Set()); // independently-toggled SES components
+  const cdcSesShift = SES_COMPONENTS.reduce((s, c) => s + (cdcSesKeys.has(c.key) ? c.lbs : 0), 0);
+  const toggleSes = (key) => {
+    setCdcSesKeys(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  };
 
   React.useEffect(() => {
     fetch('data/weight.json').then(r => r.json()).then(setData);
@@ -66,9 +83,9 @@ function App() {
   const rolledAll = rollingAvg(daily.map(d => d.w), 7);
   const currentAvg = rolledAll[rolledAll.length-1];
   const ageNow = ageAt(lastMs, BIRTH_YEAR);
-  const currentPct = cdcPercentile(ageNow, currentAvg, cdcGroup, cdcSes);
+  const currentPct = cdcPercentile(ageNow, currentAvg, cdcGroup, cdcSesShift);
   const ageStart = ageAt(parseDay(daily[0].d), BIRTH_YEAR);
-  const startPct = cdcPercentile(ageStart, rolledAll.find(v => v !== null), cdcGroup, cdcSes);
+  const startPct = cdcPercentile(ageStart, rolledAll.find(v => v !== null), cdcGroup, cdcSesShift);
 
   // Biggest moves (12-month): find largest net gain and loss over any rolling 12-month window
   const window365 = 365;
@@ -275,30 +292,29 @@ function App() {
                   onClick={() => setCdcGroup('white')}>NH-white</button>
               </div>
             </div>
-            <div style={{display:'flex', alignItems:'center', gap:8}}>
-              <span className="label" style={{fontSize:'0.68rem', color:'var(--fg-muted)'}}>SES:</span>
+            <div style={{display:'flex', alignItems:'center', gap:8, flexWrap:'wrap'}}>
+              <span className="label" style={{fontSize:'0.68rem', color:'var(--fg-muted)'}}>SES (stack any):</span>
               <div className="btn-group">
-                <button className={clsx('btn small', cdcSes === 'pooled' && 'active')}
-                  onClick={() => setCdcSes('pooled')}>US avg</button>
-                <button className={clsx('btn small', cdcSes === 'college' && 'active')}
-                  onClick={() => setCdcSes('college')}>+ college grad</button>
-                <button className={clsx('btn small', cdcSes === 'affluent' && 'active')}
-                  onClick={() => setCdcSes('affluent')}>+ affluent</button>
-                <button className={clsx('btn small', cdcSes === 'ne_urban' && 'active')}
-                  onClick={() => setCdcSes('ne_urban')}>+ NE urban</button>
+                {SES_COMPONENTS.map(c => (
+                  <button key={c.key}
+                    className={clsx('btn small', cdcSesKeys.has(c.key) && 'active')}
+                    onClick={() => toggleSes(c.key)}>
+                    {c.label} (−{c.lbs})
+                  </button>
+                ))}
               </div>
-              {cdcSes !== 'pooled' && (
+              {cdcSesShift > 0 && (
                 <span style={{fontSize:'0.74rem', color:'var(--fg-muted-2)', fontStyle:'italic'}}>
-                  ref. −{CDC_SES_SHIFTS[cdcSes].lbs} lb (rough, literature-based)
+                  total ref. shift: −{cdcSesShift} lb (rough, literature-based)
                 </span>
               )}
             </div>
           </div>
           <div className="chart-wrap" style={{marginBottom:20}}>
-            <PercentileTime daily={daily} smoothing={smoothing} birthYear={BIRTH_YEAR} group={cdcGroup} ses={cdcSes} />
+            <PercentileTime daily={daily} smoothing={smoothing} birthYear={BIRTH_YEAR} group={cdcGroup} ses={cdcSesShift} />
           </div>
           <div className="chart-wrap">
-            <PercentileHistory daily={daily} smoothing={smoothing} birthYear={BIRTH_YEAR} group={cdcGroup} ses={cdcSes} />
+            <PercentileHistory daily={daily} smoothing={smoothing} birthYear={BIRTH_YEAR} group={cdcGroup} ses={cdcSesShift} />
           </div>
         </section>
 
