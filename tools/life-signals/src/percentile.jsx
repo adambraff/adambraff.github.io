@@ -2,7 +2,7 @@
 // 1) TIMESERIES: user's weight line over time, overlaid on P10/P25/P50/P75/P90 bands (which shift as age advances)
 // 2) PERCENTILE HISTORY: the user's own percentile at each point in time
 
-function PercentileTime({ daily, smoothing, birthYear, group, height=320 }) {
+function PercentileTime({ daily, smoothing, birthYear, group, ses, height=320 }) {
   const wrapRef = React.useRef(null);
   const w = useContainerWidth(wrapRef, 800);
   const margin = { top: 16, right: 16, bottom: 28, left: 44 };
@@ -16,7 +16,7 @@ function PercentileTime({ daily, smoothing, birthYear, group, height=320 }) {
   // Build bands at each day (bands shift slowly with age)
   const bands = daily.map(d => {
     const ms = parseDay(d.d);
-    return cdcBands(ageAt(ms, birthYear), group);
+    return cdcBands(ageAt(ms, birthYear), group, ses);
   });
 
   // y range: include user weight AND P25/P75 at least
@@ -85,7 +85,7 @@ function PercentileTime({ daily, smoothing, birthYear, group, height=320 }) {
   );
 }
 
-function PercentileHistory({ daily, smoothing, birthYear, group, height=240 }) {
+function PercentileHistory({ daily, smoothing, birthYear, group, ses, height=240 }) {
   const wrapRef = React.useRef(null);
   const w = useContainerWidth(wrapRef, 800);
   const margin = { top: 16, right: 56, bottom: 28, left: 48 };
@@ -102,7 +102,7 @@ function PercentileHistory({ daily, smoothing, birthYear, group, height=240 }) {
   const pctLine = daily.map((d, i) => {
     const wv = rolled[i];
     if (wv === null) return [sx(parseDay(d.d)), null];
-    const pct = cdcPercentile(ageAt(parseDay(d.d), birthYear), wv, group);
+    const pct = cdcPercentile(ageAt(parseDay(d.d), birthYear), wv, group, ses);
     return [sx(parseDay(d.d)), sy(pct)];
   });
 
