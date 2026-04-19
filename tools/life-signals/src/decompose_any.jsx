@@ -185,13 +185,13 @@
     for (let y = y0; y <= y1; y += step) yearTicks.push(Date.UTC(y, 0, 1));
 
     const panels = [
-      { title: 'Trend', sub: '365-day centered average — long-run direction',
+      { title: 'Trend', sub: '365-day centered mean',
         s: sTrend, ticks: niceTicks(tLo, tHi, 4), fmt: fmtTrend, color: '#6c8cff', draw: 'line' },
-      { title: 'Monthly seasonal', sub: `Average detrended deviation by calendar month (swing ≈ ${signedFmt(mAbs)(-mAbs)} to ${signedFmt(mAbs)(mAbs)})`,
+      { title: 'Monthly', sub: `${signedFmt(mAbs)(-mAbs)} to ${signedFmt(mAbs)(mAbs)}`,
         s: sM, ticks: [-mAbs, 0, mAbs], fmt: fmtM, color: '#ff9d4d', draw: 'area' },
-      { title: 'Day-of-week seasonal', sub: 'Average deviation by day of the week — constant across the series',
+      { title: 'Day-of-week', sub: 'detrended mean',
         s: sD, ticks: [-dAbs, 0, dAbs], fmt: fmtD, color: '#9d8fff', draw: 'dow' },
-      { title: 'Residual', sub: 'What trend + monthly + DOW do not explain — daily dots, 30-day average line',
+      { title: 'Residual', sub: 'remainder',
         s: sR, ticks: [-rLim, 0, rLim], fmt: fmtR, color: '#c9c2ff', draw: 'resid' },
     ];
 
