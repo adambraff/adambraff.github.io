@@ -72,18 +72,26 @@
     return denom > 0 ? sxy/denom : null;
   }
 
+  const DATE_KEY = '__date';
+
   function SigSelect({ label, sigs, value, onChange, allowNone, mode, onModeChange }) {
     const groups = {};
     Object.entries(sigs).forEach(([k, s]) => {
       if (!groups[s.group]) groups[s.group] = [];
       groups[s.group].push([k, s]);
     });
-    const groupOrder = ['Body', 'Activity', 'Sleep', 'Gait', 'Other'];
+    const groupOrder = ['Time', 'Body', 'Activity', 'Sleep', 'Gait', 'Other'];
+    const handleChange = (e) => {
+      const v = e.target.value;
+      onChange(v);
+      // Delta is meaningless for Date (always 1 day) — force raw.
+      if (v === DATE_KEY && mode !== 'raw') onModeChange('raw');
+    };
     return (
       <div style={{display:'flex', flexDirection:'column', gap:6, minWidth:180}}>
         <div className="label" style={{fontSize:'0.68rem', textTransform:'uppercase', letterSpacing:'0.05em',
           color:'var(--fg-muted)', fontWeight:600}}>{label}</div>
-        <select value={value} onChange={e => onChange(e.target.value)}
+        <select value={value} onChange={handleChange}
           style={{background:'#0f1117', border:'1px solid var(--border)', color:'var(--fg)',
             padding:'6px 8px', borderRadius:4, fontFamily:'var(--font-sans)', fontSize:'0.82rem'}}>
           {allowNone && <option value="none">— None —</option>}
@@ -95,7 +103,7 @@
             </optgroup>
           ))}
         </select>
-        {value !== 'none' && (
+        {value !== 'none' && value !== DATE_KEY && (
           <div className="btn-group" style={{alignSelf:'flex-start'}}>
             <button className={clsx('btn small', mode === 'raw' && 'active')}
               onClick={() => onModeChange('raw')}>Raw</button>
@@ -125,13 +133,27 @@
 
     const startMs = parseDay(start);
 
+    // Inject a virtual "Date" signal into the catalog. Values are per-day timestamps.
+    const sigsWithDate = React.useMemo(() => {
+      const dateVals = new Array(count);
+      for (let i = 0; i < count; i++) dateVals[i] = startMs + i * DAY_MS_EX;
+      return {
+        [DATE_KEY]: {
+          label: 'Date', unit: '', group: 'Time',
+          values: dateVals,
+          firstIdx: 0, lastIdx: count - 1, coverage: 1, n: count,
+        },
+        ...signals,
+      };
+    }, [signals, startMs, count]);
+
     // ---- Transform inputs ----
-    const xVals = React.useMemo(() => transform(signals[xKey].values, xMode), [signals, xKey, xMode]);
-    const yVals = React.useMemo(() => transform(signals[yKey].values, yMode), [signals, yKey, yMode]);
-    const sVals = React.useMemo(() => sKey === 'none' ? null : transform(signals[sKey].values, sMode),
-                                [signals, sKey, sMode]);
-    const cVals = React.useMemo(() => cKey === 'none' ? null : transform(signals[cKey].values, cMode),
-                                [signals, cKey, cMode]);
+    const xVals = React.useMemo(() => transform(sigsWithDate[xKey].values, xMode), [sigsWithDate, xKey, xMode]);
+    const yVals = React.useMemo(() => transform(sigsWithDate[yKey].values, yMode), [sigsWithDate, yKey, yMode]);
+    const sVals = React.useMemo(() => sKey === 'none' ? null : transform(sigsWithDate[sKey].values, sMode),
+                                [sigsWithDate, sKey, sMode]);
+    const cVals = React.useMemo(() => cKey === 'none' ? null : transform(sigsWithDate[cKey].values, cMode),
+                                [sigsWithDate, cKey, cMode]);
 
     // ---- Build points: X at day i, Y at day (i + lag) ----
     const points = React.useMemo(() => {
@@ -202,8 +224,8 @@
       return { slope, intercept };
     }, [points]);
 
-    const xTicks = niceTicks(xLo != null ? xLo : 0, xHi != null ? xHi : 1, 6);
-    const yTicks = niceTicks(yLo != null ? yLo : 0, yHi != null ? yHi : 1, 6);
+    const xIsDate = xKey === DATE_KEY;
+    const yIsDate = yKey === DATE_KEY;
     const fmtNum = v => {
       if (v == null) return '—';
       const a = Math.abs(v);
@@ -212,6 +234,27 @@
       if (a >= 1)    return v.toFixed(2);
       return v.toFixed(3);
     };
+    const fmtDateTick = t => new Date(t).getUTCFullYear();
+    // Year-start timestamps spanning the axis range
+    function yearTicks(lo, hi) {
+      if (lo == null || hi == null) return [];
+      const y0 = new Date(lo).getUTCFullYear();
+      const y1 = new Date(hi).getUTCFullYear();
+      const step = (y1 - y0) > 8 ? 2 : 1;
+      const out = [];
+      for (let y = y0; y <= y1; y += step) {
+        const ms = Date.UTC(y, 0, 1);
+        if (ms >= lo && ms <= hi) out.push(ms);
+      }
+      return out;
+    }
+    const xTicks = xIsDate ? yearTicks(xLo, xHi) : niceTicks(xLo != null ? xLo : 0, xHi != null ? xHi : 1, 6);
+    const yTicks = yIsDate ? yearTicks(yLo, yHi) : niceTicks(yLo != null ? yLo : 0, yHi != null ? yHi : 1, 6);
+    const xFmt = xIsDate ? fmtDateTick : fmtNum;
+    const yFmt = yIsDate ? fmtDateTick : fmtNum;
+    // For hover and stats output, format X/Y values appropriately
+    const fmtX = v => v == null ? '—' : (xIsDate ? fmtDayShort(v) : fmtNum(v));
+    const fmtY = v => v == null ? '—' : (yIsDate ? fmtDayShort(v) : fmtNum(v));
 
     const lagLabel = (l) => {
       if (l === 0) return 'same-day';
@@ -224,13 +267,13 @@
         {/* Controls */}
         <div className="panel panel-pad" style={{marginBottom:16}}>
           <div style={{display:'flex', gap:20, flexWrap:'wrap', alignItems:'flex-start'}}>
-            <SigSelect label="X axis"  sigs={signals} value={xKey} onChange={setXKey}
+            <SigSelect label="X axis"  sigs={sigsWithDate} value={xKey} onChange={setXKey}
               mode={xMode} onModeChange={setXMode} />
-            <SigSelect label="Y axis"  sigs={signals} value={yKey} onChange={setYKey}
+            <SigSelect label="Y axis"  sigs={sigsWithDate} value={yKey} onChange={setYKey}
               mode={yMode} onModeChange={setYMode} />
-            <SigSelect label="Bubble size (opt)" sigs={signals} value={sKey} onChange={setSKey}
+            <SigSelect label="Bubble size (opt)" sigs={sigsWithDate} value={sKey} onChange={setSKey}
               allowNone mode={sMode} onModeChange={setSMode} />
-            <SigSelect label="Color (opt)" sigs={signals} value={cKey} onChange={setCKey}
+            <SigSelect label="Color (opt)" sigs={sigsWithDate} value={cKey} onChange={setCKey}
               allowNone mode={cMode} onModeChange={setCMode} />
           </div>
 
@@ -269,29 +312,29 @@
         {/* Chart */}
         <div className="chart-wrap" ref={ref}>
           <div className="chart-title">
-            {signals[yKey].label}{yMode === 'delta' ? ' (Δ)' : ''} vs {signals[xKey].label}{xMode === 'delta' ? ' (Δ)' : ''}
+            {sigsWithDate[yKey].label}{yMode === 'delta' ? ' (Δ)' : ''} vs {sigsWithDate[xKey].label}{xMode === 'delta' ? ' (Δ)' : ''}
           </div>
           <div className="chart-sub">
             {points.length.toLocaleString()} overlapping days
-            {sKey !== 'none' && ` · size = ${signals[sKey].label}${sMode === 'delta' ? ' (Δ)' : ''}`}
-            {cKey !== 'none' && ` · color = ${signals[cKey].label}${cMode === 'delta' ? ' (Δ)' : ''}`}
+            {sKey !== 'none' && ` · size = ${sigsWithDate[sKey].label}${sMode === 'delta' ? ' (Δ)' : ''}`}
+            {cKey !== 'none' && ` · color = ${sigsWithDate[cKey].label}${cMode === 'delta' ? ' (Δ)' : ''}`}
           </div>
 
           <svg width={width} height={H} style={{display:'block'}}>
             {/* Axes */}
             <XAxisTime scaleX={sx} y={MARGIN.top + plotH}
-              ticks={xTicks} fmt={fmtNum} />
-            <YAxisLeft scaleY={sy} x={MARGIN.left} ticks={yTicks} fmt={fmtNum} />
+              ticks={xTicks} fmt={xFmt} />
+            <YAxisLeft scaleY={sy} x={MARGIN.left} ticks={yTicks} fmt={yFmt} />
 
             {/* Axis labels */}
             <text x={MARGIN.left + plotW/2} y={H - 6} textAnchor="middle"
               style={{fontSize:11, fill:'var(--fg-muted)'}}>
-              {signals[xKey].label}{signals[xKey].unit ? ` (${signals[xKey].unit})` : ''}
+              {sigsWithDate[xKey].label}{sigsWithDate[xKey].unit ? ` (${sigsWithDate[xKey].unit})` : ''}
               {xMode === 'delta' && ' — day-over-day Δ'}
             </text>
             <text transform={`translate(14,${MARGIN.top + plotH/2}) rotate(-90)`}
               textAnchor="middle" style={{fontSize:11, fill:'var(--fg-muted)'}}>
-              {signals[yKey].label}{signals[yKey].unit ? ` (${signals[yKey].unit})` : ''}
+              {sigsWithDate[yKey].label}{sigsWithDate[yKey].unit ? ` (${sigsWithDate[yKey].unit})` : ''}
               {yMode === 'delta' && ' — day-over-day Δ'}
             </text>
 
@@ -344,7 +387,7 @@
                 <text x="14" y={plotH - 2} style={{fontSize:10, fill:'var(--fg-muted)'}}>{fmtNum(colorLo)}</text>
                 <text transform={`translate(42, ${plotH/2}) rotate(-90)`} textAnchor="middle"
                   style={{fontSize:10, fill:'var(--fg-muted-2)'}}>
-                  {signals[cKey].label}{cMode === 'delta' ? ' Δ' : ''}
+                  {sigsWithDate[cKey].label}{cMode === 'delta' ? ' Δ' : ''}
                 </text>
               </g>
             )}
@@ -363,12 +406,12 @@
               {lag !== 0 && <span> → Y: {fmtDayShort(startMs + hoverPt.j * DAY_MS_EX)}</span>}
             </div>
             <div style={{fontVariantNumeric:'tabular-nums'}}>
-              <span style={{color:'var(--fg-muted)'}}>{signals[xKey].label}{xMode==='delta'?' Δ':''}:</span>{' '}
-              <b>{fmtNum(hoverPt.x)}</b>{'  '}
-              <span style={{color:'var(--fg-muted)'}}>→ {signals[yKey].label}{yMode==='delta'?' Δ':''}:</span>{' '}
-              <b>{fmtNum(hoverPt.y)}</b>
-              {sVals && <><span style={{color:'var(--fg-muted)'}}>  · size {signals[sKey].label}:</span>{' '}<b>{fmtNum(hoverPt.s)}</b></>}
-              {cVals && <><span style={{color:'var(--fg-muted)'}}>  · color {signals[cKey].label}:</span>{' '}<b>{fmtNum(hoverPt.c)}</b></>}
+              <span style={{color:'var(--fg-muted)'}}>{sigsWithDate[xKey].label}{xMode==='delta'?' Δ':''}:</span>{' '}
+              <b>{fmtX(hoverPt.x)}</b>{'  '}
+              <span style={{color:'var(--fg-muted)'}}>→ {sigsWithDate[yKey].label}{yMode==='delta'?' Δ':''}:</span>{' '}
+              <b>{fmtY(hoverPt.y)}</b>
+              {sVals && <><span style={{color:'var(--fg-muted)'}}>  · size {sigsWithDate[sKey].label}:</span>{' '}<b>{fmtNum(hoverPt.s)}</b></>}
+              {cVals && <><span style={{color:'var(--fg-muted)'}}>  · color {sigsWithDate[cKey].label}:</span>{' '}<b>{fmtNum(hoverPt.c)}</b></>}
             </div>
           </div>
         )}
