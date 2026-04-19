@@ -17,6 +17,7 @@ function App() {
   const [rangeKey, setRangeKey] = React.useState('all');
   const [tweaksOpen, setTweaksOpen] = React.useState(false);
   const [cdcGroup, setCdcGroup] = React.useState('pooled'); // 'pooled' | 'white'
+  const [cdcSes, setCdcSes] = React.useState('pooled');     // 'pooled' | 'college' | 'affluent' | 'ne_urban'
 
   React.useEffect(() => {
     fetch('data/weight.json').then(r => r.json()).then(setData);
@@ -65,9 +66,9 @@ function App() {
   const rolledAll = rollingAvg(daily.map(d => d.w), 7);
   const currentAvg = rolledAll[rolledAll.length-1];
   const ageNow = ageAt(lastMs, BIRTH_YEAR);
-  const currentPct = cdcPercentile(ageNow, currentAvg, cdcGroup);
+  const currentPct = cdcPercentile(ageNow, currentAvg, cdcGroup, cdcSes);
   const ageStart = ageAt(parseDay(daily[0].d), BIRTH_YEAR);
-  const startPct = cdcPercentile(ageStart, rolledAll.find(v => v !== null), cdcGroup);
+  const startPct = cdcPercentile(ageStart, rolledAll.find(v => v !== null), cdcGroup, cdcSes);
 
   // Biggest moves (12-month): find largest net gain and loss over any rolling 12-month window
   const window365 = 365;
@@ -264,19 +265,40 @@ function App() {
           <div className="sect-sub">
             Age-adjusted. NHANES 2015–2018.
           </div>
-          <div style={{display:'flex', gap:10, marginBottom:16}}>
-            <div className="btn-group">
-              <button className={clsx('btn small', cdcGroup === 'pooled' && 'active')}
-                onClick={() => setCdcGroup('pooled')}>All US men</button>
-              <button className={clsx('btn small', cdcGroup === 'white' && 'active')}
-                onClick={() => setCdcGroup('white')}>Non-Hispanic white</button>
+          <div style={{display:'flex', gap:16, marginBottom:16, flexWrap:'wrap', alignItems:'center'}}>
+            <div style={{display:'flex', alignItems:'center', gap:8}}>
+              <span className="label" style={{fontSize:'0.68rem', color:'var(--fg-muted)'}}>Race:</span>
+              <div className="btn-group">
+                <button className={clsx('btn small', cdcGroup === 'pooled' && 'active')}
+                  onClick={() => setCdcGroup('pooled')}>All US men</button>
+                <button className={clsx('btn small', cdcGroup === 'white' && 'active')}
+                  onClick={() => setCdcGroup('white')}>NH-white</button>
+              </div>
+            </div>
+            <div style={{display:'flex', alignItems:'center', gap:8}}>
+              <span className="label" style={{fontSize:'0.68rem', color:'var(--fg-muted)'}}>SES:</span>
+              <div className="btn-group">
+                <button className={clsx('btn small', cdcSes === 'pooled' && 'active')}
+                  onClick={() => setCdcSes('pooled')}>US avg</button>
+                <button className={clsx('btn small', cdcSes === 'college' && 'active')}
+                  onClick={() => setCdcSes('college')}>+ college grad</button>
+                <button className={clsx('btn small', cdcSes === 'affluent' && 'active')}
+                  onClick={() => setCdcSes('affluent')}>+ affluent</button>
+                <button className={clsx('btn small', cdcSes === 'ne_urban' && 'active')}
+                  onClick={() => setCdcSes('ne_urban')}>+ NE urban</button>
+              </div>
+              {cdcSes !== 'pooled' && (
+                <span style={{fontSize:'0.74rem', color:'var(--fg-muted-2)', fontStyle:'italic'}}>
+                  ref. −{CDC_SES_SHIFTS[cdcSes].lbs} lb (rough, literature-based)
+                </span>
+              )}
             </div>
           </div>
           <div className="chart-wrap" style={{marginBottom:20}}>
-            <PercentileTime daily={daily} smoothing={smoothing} birthYear={BIRTH_YEAR} group={cdcGroup} />
+            <PercentileTime daily={daily} smoothing={smoothing} birthYear={BIRTH_YEAR} group={cdcGroup} ses={cdcSes} />
           </div>
           <div className="chart-wrap">
-            <PercentileHistory daily={daily} smoothing={smoothing} birthYear={BIRTH_YEAR} group={cdcGroup} />
+            <PercentileHistory daily={daily} smoothing={smoothing} birthYear={BIRTH_YEAR} group={cdcGroup} ses={cdcSes} />
           </div>
         </section>
 
