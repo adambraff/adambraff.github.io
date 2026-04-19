@@ -59,31 +59,20 @@ window.cdcTable = function(group) {
   return (group === 'white') ? window.CDC_MALE_WHITE_70IN : window.CDC_MALE_70IN;
 };
 
-/* SES shift presets — lbs subtracted from the NHANES reference to approximate a
- * narrower peer group. Magnitudes derive from BMI × education/income/region
- * research (Ogden et al. NHANES studies): college-educated men run ~1-1.5 BMI
- * points below pooled; top income quintile adds another ~0.7-1; northeastern
- * urban adds another ~0.7-1. At 5'10", 1 BMI point ≈ 5 lb. These are composites,
- * not official NHANES tables — treat as rough directional adjustments.
- */
-window.CDC_SES_SHIFTS = {
-  'pooled':  { lbs: 0,  label: 'US avg' },
-  'college': { lbs: 5,  label: '+ college grad' },
-  'affluent':{ lbs: 9,  label: '+ affluent' },
-  'ne_urban':{ lbs: 13, label: '+ NE urban' },
-};
+// SES shift is a number of pounds to subtract from the reference distribution.
+// Caller computes total from independent components (college / affluent / urban);
+// see SES_COMPONENTS in app.jsx for the per-component magnitudes and sources.
 
-function _shift(ses) {
-  const s = window.CDC_SES_SHIFTS[ses];
-  return s ? s.lbs : 0;
+function _shift(sesShift) {
+  return (typeof sesShift === 'number' && !isNaN(sesShift)) ? sesShift : 0;
 }
 
 // Interpolate: given age (years), weight (lb), optional reference group
-// ('pooled'|'white'), optional SES key, return percentile (0-100).
-window.cdcPercentile = function(age, weight, group, ses) {
+// ('pooled'|'white'), optional SES shift in lbs, return percentile (0-100).
+window.cdcPercentile = function(age, weight, group, sesShift) {
   const table = window.cdcTable(group);
   const pcts = window.CDC_PCTS;
-  const shift = _shift(ses);
+  const shift = _shift(sesShift);
   let i = 0;
   while (i < table.length - 1 && table[i+1][0] <= age) i++;
   const a = table[i], b = table[Math.min(i+1, table.length-1)];
@@ -103,9 +92,9 @@ window.cdcPercentile = function(age, weight, group, ses) {
   return 50;
 };
 
-window.cdcBands = function(age, group, ses) {
+window.cdcBands = function(age, group, sesShift) {
   const table = window.cdcTable(group);
-  const shift = _shift(ses);
+  const shift = _shift(sesShift);
   let i = 0;
   while (i < table.length - 1 && table[i+1][0] <= age) i++;
   const a = table[i], b = table[Math.min(i+1, table.length-1)];
