@@ -12,7 +12,6 @@
     { key: 'steps',         color: '#6c8cff', accent: true,  fmt: v => Math.round(v).toLocaleString() },
     { key: 'sleep_total',   color: '#9d8fff', accent: true,  fmt: v => v.toFixed(2) + ' hr' },
     { key: 'walk_speed',    color: '#4ae04a', accent: true,  fmt: v => v.toFixed(2) + ' mph' },
-    { key: 'flights',       color: '#ff9d4d', accent: true,  fmt: v => v.toFixed(1) },
     { key: 'active_energy', color: '#ff5555', accent: true,  fmt: v => Math.round(v) + ' cal' },
     { key: 'double_support',color: '#00d9ff', accent: true,  fmt: v => (v*100).toFixed(2) + '%' },
   ];
