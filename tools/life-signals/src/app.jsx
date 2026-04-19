@@ -9,10 +9,13 @@ function App() {
   const [smoothing, setSmoothing] = React.useState(() => {
     return loadLS('we.smoothing', TWEAK_DEFAULTS.smoothingWindow || 7);
   });
-  const [events, setEvents] = React.useState(() => loadLS('we.events', DEFAULT_EVENTS));
+  // Events are the single source of truth from src/events.jsx — same list on every
+  // device, no localStorage. To change the list, edit DEFAULT_EVENTS in events.jsx.
+  const events = DEFAULT_EVENTS;
+  // One-time migration: clean up stale per-device events localStorage from prior versions.
+  React.useEffect(() => { try { localStorage.removeItem('we.events'); } catch (_) {} }, []);
   const [rangeKey, setRangeKey] = React.useState('all');
   const [tweaksOpen, setTweaksOpen] = React.useState(false);
-  const [addMode, setAddMode] = React.useState(false);
 
   React.useEffect(() => {
     fetch('data/weight.json').then(r => r.json()).then(setData);
@@ -20,7 +23,6 @@ function App() {
   }, []);
 
   React.useEffect(() => saveLS('we.smoothing', smoothing), [smoothing]);
-  React.useEffect(() => saveLS('we.events', events), [events]);
 
   // Edit-mode protocol
   React.useEffect(() => {
@@ -153,7 +155,7 @@ function App() {
           <h2>Weight — the long run</h2>
           <div className="sect-sub">
             Your full weigh-in history at the {smoothing}-day rolling average (blue line). Each small dot is a single morning on the scale —
-            the cloud around the line is the daily noise. Shaded bars overlay life events: click the chart to pin a date, or edit events on the right.
+            the cloud around the line is the daily noise. Shaded bars overlay life events from the canonical list (see the Event deltas section below).
           </div>
 
           <div style={{display:'flex', gap:10, marginBottom:16, alignItems:'center', flexWrap:'wrap'}}>
@@ -165,40 +167,11 @@ function App() {
                 </button>
               ))}
             </div>
-            <div style={{marginLeft:'auto'}}>
-              <button className={clsx('btn small', addMode && 'active')}
-                onClick={() => setAddMode(m => !m)}>
-                {addMode ? 'Click chart to add…' : '+ Add event by click'}
-              </button>
-            </div>
           </div>
 
-          <div className="grid-trend">
-            <div className="chart-wrap">
-              <TrendChart daily={daily} smoothing={smoothing} events={events}
-                range={currentRange}
-                onClickAdd={addMode ? (d) => {
-                  const label = prompt(`What happened around ${d}?`);
-                  if (label && label.trim()) {
-                    setEvents(evs => [...evs, {
-                      id: 'e' + Date.now(),
-                      date: d,
-                      label: label.trim()
-                    }]);
-                  }
-                } : null} />
-            </div>
-            <div className="panel panel-pad">
-              <div className="label" style={{marginBottom:10}}>Life events</div>
-              <div style={{fontSize:'0.76rem', color:'var(--fg-muted)', marginBottom:12, lineHeight:1.5}}>
-                Annotate your history. Use date ranges for jobs or phases, single dates for moments.
-                Click any row to edit. Stored locally.
-              </div>
-              <EventList events={events}
-                onAdd={(ev) => setEvents(e => [...e, ev])}
-                onDelete={(id) => setEvents(e => e.filter(x => x.id !== id))}
-                onUpdate={(ev) => setEvents(e => e.map(x => x.id === ev.id ? ev : x))} />
-            </div>
+          <div className="chart-wrap">
+            <TrendChart daily={daily} smoothing={smoothing} events={events}
+              range={currentRange} />
           </div>
 
           <div className="grid-4" style={{marginTop:20}}>
@@ -270,8 +243,8 @@ function App() {
         <section className="block" id="events">
           <h2>Event deltas</h2>
           <div className="sect-sub">
-            For each annotated event, the change in 90-day average weight after vs. before. Edit the event list in the
-            Weight section above, or click the trend chart with "Add event" on to pin one directly. Your annotations are saved locally.
+            For each annotated event, the change in 90-day average weight after vs. before. The event list is the canonical one
+            baked into the repo — same on every device. To add or change an event, edit DEFAULT_EVENTS in src/events.jsx.
           </div>
           <div className="panel panel-pad">
             {eventDeltas.length === 0 &&
