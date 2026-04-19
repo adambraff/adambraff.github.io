@@ -13,6 +13,7 @@ const DEFAULT_EVENTS = [
   { id: 'seed-covid',  date: '2020-03-15', end: '2020-06-30',        label: 'COVID lockdown in Pittsburgh' },
   { id: 'seed-prov',   date: '2021-07-01',                           label: 'Moved to Providence' },
   { id: 'seed-brvo',   date: '2022-12-01',                           label: 'BRVO diagnosis' },
+  { id: 'seed-brvo-res', date: '2023-09-12',                         label: 'BRVO resolved' },
 ];
 
 function EventRow({ ev, color, onDelete, onUpdate }) {
