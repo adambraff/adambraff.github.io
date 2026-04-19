@@ -55,6 +55,16 @@
       trend[i] = a + cdc50[i] + bDrift * years[i];
     }
 
+    // Standard error of bDrift slope (for long-horizon forecast uncertainty)
+    let sseFit = 0;
+    for (let i = 0; i < n; i++) {
+      if (isNaN(target[i])) continue;
+      const fit = a + bDrift * years[i];
+      sseFit += (target[i] - fit) ** 2;
+    }
+    const residVarFit = validN > 2 ? sseFit / (validN - 2) : 0;
+    const bDriftSE = den > 0 ? Math.sqrt(residVarFit / den) : 0;
+
     // R² — how much variance the (CDC_shape + linear drift) model explains
     let ssRes = 0, ssTot = 0;
     let wSum = 0;
@@ -117,7 +127,7 @@
     const residStd  = Math.sqrt(rSum2/rN - residMean*residMean);
 
     return {
-      a, bDrift, r2, validN,
+      a, bDrift, bDriftSE, r2, validN,
       age, cdc50, years, trend, resid0, resid,
       monthSeas, dowSeas, residStd,
       t0ms,
@@ -358,19 +368,40 @@
     const lastMs = parseDay(daily[n-1].d);
     const DAY = DAY_MS_AA;
 
-    // Build projection: one point per week (not per day, keeps chart readable)
+    // Start the forecast from the last known weight, not the fitted baseline — this keeps the
+    // visual line continuous at the join. Over time the "current offset" (how much you're
+    // above or below the model today) decays toward zero, and the uncertainty band grows.
+    const lastW = daily[n-1].w;
+    const lastMonthIdx = new Date(lastMs).getUTCMonth();
+    const lastMonthly = model.monthSeas[lastMonthIdx];
+    const lastBaseline = model.trend[n-1];
+    const offset0 = (lastW != null) ? (lastW - lastBaseline - lastMonthly) : 0;
+
+    // Offset-decay time constant (years). Residuals in this series have persisted for ~1 yr
+    // before reverting; this is the half-life-ish knob.
+    const TAU = 1.0;
+
+    // Build projection: one point per week (keeps chart readable)
     const futureDays = horizonYrs * 365;
     const stepDays = 7;
     const future = [];
+    // Anchor point at t=0 so the chart connects cleanly
+    future.push({ ms: lastMs, age: ageAt(lastMs, BIRTH_YEAR), center: lastW != null ? lastW : lastBaseline + lastMonthly, sigma: 0, baseline: lastBaseline });
     for (let off = stepDays; off <= futureDays; off += stepDays) {
       const ms = lastMs + off * DAY;
       const age = ageAt(ms, BIRTH_YEAR);
       const yearsFrom = (ms - t0ms) / (365.25 * DAY);
+      const yrsAhead = off / 365.25;
       const baseline = model.a + cdcBands(age)[3] + model.bDrift * yearsFrom;
       const mo = new Date(ms).getUTCMonth();
       const monthly = model.monthSeas[mo];
-      const center = baseline + monthly;
-      future.push({ ms, age, center, sigma: model.residStd, baseline });
+      const decayedOffset = offset0 * Math.exp(-yrsAhead / TAU);
+      const center = baseline + monthly + decayedOffset;
+      // Variance: residual mean-reverts (grows from 0 to residStd²); drift slope uncertainty grows linearly in t.
+      const resVar = model.residStd * model.residStd * (1 - Math.exp(-2 * yrsAhead / TAU));
+      const driftVar = (model.bDriftSE * yrsAhead) ** 2;
+      const sigma = Math.sqrt(resVar + driftVar);
+      future.push({ ms, age, center, sigma, baseline });
     }
 
     // Historical baseline trace for comparison
@@ -400,15 +431,15 @@
     // Fitted baseline (extended through history + future)
     const histBaselinePath = linePath(daily.map((d, i) => [sx(parseDay(d.d)), sy(model.trend[i])]));
 
-    // Forecast center
-    const fcCenter = linePath([[sx(lastMs), sy(model.trend[n-1])], ...future.map(p => [sx(p.ms), sy(p.center)])]);
+    // Forecast center — future[] already starts at (lastMs, lastW)
+    const fcCenter = linePath(future.map(p => [sx(p.ms), sy(p.center)]));
 
-    // Forecast baseline (without monthly) — for reference
-    const fcBaselinePath = linePath([[sx(lastMs), sy(model.trend[n-1])], ...future.map(p => [sx(p.ms), sy(p.baseline)])]);
+    // Forecast baseline (without monthly or offset-decay) — pure model expectation
+    const fcBaselinePath = linePath(future.map(p => [sx(p.ms), sy(p.baseline)]));
 
-    // Band paths (80% and 95%)
+    // Band paths — at t=0, sigma=0 so bands collapse to the anchor point for smooth opening
     const band = (mult) => {
-      const pts = [[sx(lastMs), sy(model.trend[n-1]), sy(model.trend[n-1])], ...future.map(p => [sx(p.ms), sy(p.center - mult * p.sigma), sy(p.center + mult * p.sigma)])];
+      const pts = future.map(p => [sx(p.ms), sy(p.center - mult * p.sigma), sy(p.center + mult * p.sigma)]);
       return areaPath(pts);
     };
     const band95 = band(1.96);
@@ -442,9 +473,13 @@
       const yearsFromStart = (ms - t0ms) / (365.25 * DAY);
       const base = model.a + cdcBands(age)[3] + model.bDrift * yearsFromStart;
       const mo = new Date(ms).getUTCMonth();
-      const mid = base + model.monthSeas[mo];
-      const lo95 = mid - 1.96 * model.residStd;
-      const hi95 = mid + 1.96 * model.residStd;
+      const decayedOffset = offset0 * Math.exp(-t.yrsFromNow / TAU);
+      const mid = base + model.monthSeas[mo] + decayedOffset;
+      const resVar = model.residStd * model.residStd * (1 - Math.exp(-2 * t.yrsFromNow / TAU));
+      const driftVar = (model.bDriftSE * t.yrsFromNow) ** 2;
+      const sigma = Math.sqrt(resVar + driftVar);
+      const lo95 = mid - 1.96 * sigma;
+      const hi95 = mid + 1.96 * sigma;
       return { label: t.label, age, mid, lo95, hi95 };
     });
 
