@@ -1,18 +1,18 @@
-// Events UI — editable list with add/delete/edit, supports date ranges. Default seed from user bio.
-
-// Seeded from public bio (braff.co, NYU SPS, podcasts). Dates are approximate —
-// click any row to edit, × to delete.
+// Events UI — editable list with add/delete/edit, supports date ranges.
+//
+// These defaults are the canonical seed. Edits the user makes in-app are stored
+// in localStorage['we.events'] on whichever origin the app is served from, and
+// persist there across reloads — these defaults only apply on first load (or
+// when localStorage is cleared or a new origin/browser is used).
 const DEFAULT_EVENTS = [
-  // Career arc — ranges
-  { id: 'seed-mck',    date: '2011-08-09', end: '2015-06-30', label: 'Partner, McKinsey & Company' },
-  { id: 'seed-jpmc',   date: '2015-07-01', end: '2017-12-31', label: 'JPMorgan Chase — analytics leadership' },
-  { id: 'seed-dtv',    date: '2018-01-01', end: '2019-06-30', label: 'DirecTV / AT&T — analytics leadership' },
-  { id: 'seed-zurich', date: '2019-07-01', end: '2020-12-31', label: 'Zurich Insurance — global analytics' },
-  { id: 'seed-p72',    date: '2021-01-01', end: '2022-06-30', label: 'Point72 — data & analytics' },
-  { id: 'seed-braff',  date: '2022-07-01', end: '2026-03-16', label: 'Braff & Co. — independent practice' },
-  // Life moments — points
-  { id: 'seed-covid', date: '2020-03-15', label: 'COVID lockdown begins' },
-  { id: 'seed-prov',  date: '2021-07-01', label: 'Relocated to Providence' },
+  { id: 'seed-jpmc',   date: '2011-08-09',                           label: 'JPMC' },
+  { id: 'seed-dtv',    date: '2013-09-01',                           label: 'DirecTV' },
+  { id: 'seed-zurich', date: '2015-09-01',                           label: 'Zurich' },
+  { id: 'seed-p72',    date: '2016-10-01',                           label: 'Point72' },
+  { id: 'seed-braff',  date: '2019-04-01',                           label: 'Launch Braff & Co.' },
+  { id: 'seed-covid',  date: '2020-03-15', end: '2020-06-30',        label: 'COVID lockdown in Pittsburgh' },
+  { id: 'seed-prov',   date: '2021-07-01',                           label: 'Moved to Providence' },
+  { id: 'seed-brvo',   date: '2022-12-01',                           label: 'BRVO diagnosis' },
 ];
 
 function EventRow({ ev, color, onDelete, onUpdate }) {
