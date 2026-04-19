@@ -212,16 +212,13 @@
 
     const panels = [
       { title: 'Age + drift baseline',
-        sub: `a = ${model.a >= 0 ? '+' : ''}${model.a.toFixed(1)} lb, b_drift = ${model.bDrift >= 0 ? '+' : ''}${model.bDrift.toFixed(2)} lb/yr, R² = ${model.r2.toFixed(3)}`,
+        sub: `a = ${model.a >= 0 ? '+' : ''}${model.a.toFixed(1)}, b = ${model.bDrift >= 0 ? '+' : ''}${model.bDrift.toFixed(2)}/yr`,
         s: sTrend, ticks: niceTicks(yLo, yHi, 4), fmt: fmtLb, color: '#6c8cff', draw: 'trend' },
-      { title: 'Monthly seasonal',
-        sub: 'Average deviation from baseline by calendar month',
+      { title: 'Monthly', sub: 'seasonal',
         s: sM, ticks: [-mAbs, 0, mAbs], fmt: fmtSignedLb, color: '#ff9d4d', draw: 'area' },
-      { title: 'Day-of-week seasonal',
-        sub: 'Detrended average by day of the week — your weekend legacy, visualized',
+      { title: 'Day-of-week', sub: 'detrended mean',
         s: sD, ticks: [-dAbs, 0, dAbs], fmt: fmtSignedLb, color: '#9d8fff', draw: 'dow' },
-      { title: 'Residual',
-        sub: 'What age, drift, month, and weekday do not explain — dieting attempts, interventions, exogenous shocks',
+      { title: 'Residual', sub: 'unexplained',
         s: sR, ticks: [-rLim, 0, rLim], fmt: fmtSignedLb, color: '#c9c2ff', draw: 'resid' },
     ];
 
@@ -321,31 +318,25 @@
         {/* Interpretation callouts */}
         <div className="grid-3" style={{marginTop:14}}>
           <div className="stat-card">
-            <div className="label">Personal offset (a)</div>
+            <div className="label">Offset (a)</div>
             <div className="val" style={{color: model.a > 0 ? '#ff9d4d' : '#4ae04a'}}>
               {model.a >= 0 ? '+' : ''}{model.a.toFixed(1)}<span className="unit">lb</span>
             </div>
-            <div className="hint">
-              Baseline distance from the median 5'10" American male at your age. Positive = chronically heavier than P50.
-            </div>
+            <div className="hint">vs. CDC P50.</div>
           </div>
           <div className="stat-card">
-            <div className="label">Personal drift (b_drift)</div>
+            <div className="label">Drift (b)</div>
             <div className="val" style={{color: model.bDrift > 0 ? '#ff5555' : '#4ae04a'}}>
               {model.bDrift >= 0 ? '+' : ''}{model.bDrift.toFixed(2)}<span className="unit">lb/yr</span>
             </div>
-            <div className="hint">
-              Gain/loss per year on top of aging. Positive = drifting upward faster than cohort; zero = aging like median.
-            </div>
+            <div className="hint">Non-aging change per year.</div>
           </div>
           <div className="stat-card">
             <div className="label">Residual σ</div>
             <div className="val">
               ±{model.residStd.toFixed(1)}<span className="unit">lb</span>
             </div>
-            <div className="hint">
-              Standard deviation of what the model can't explain. Your irreducible forecast uncertainty.
-            </div>
+            <div className="hint">Forecast uncertainty.</div>
           </div>
         </div>
       </div>
@@ -468,7 +459,7 @@
             style={{width:200, accentColor:'var(--blue)'}} />
           <div style={{fontSize:'0.88rem', fontWeight:600}}>
             {horizonYrs} year{horizonYrs === 1 ? '' : 's'}
-            <span style={{color:'var(--fg-muted)', fontWeight:400}}> — projecting to age {(lastAge + horizonYrs).toFixed(1)}</span>
+            <span style={{color:'var(--fg-muted)', fontWeight:400}}> — to age {(lastAge + horizonYrs).toFixed(1)}</span>
           </div>
         </div>
 
