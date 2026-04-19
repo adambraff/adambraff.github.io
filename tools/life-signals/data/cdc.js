@@ -59,16 +59,36 @@ window.cdcTable = function(group) {
   return (group === 'white') ? window.CDC_MALE_WHITE_70IN : window.CDC_MALE_70IN;
 };
 
-// Interpolate: given age (years), weight (lb), and optional reference group
-// ('pooled' default, or 'white'), return percentile (0-100)
-window.cdcPercentile = function(age, weight, group) {
+/* SES shift presets — lbs subtracted from the NHANES reference to approximate a
+ * narrower peer group. Magnitudes derive from BMI × education/income/region
+ * research (Ogden et al. NHANES studies): college-educated men run ~1-1.5 BMI
+ * points below pooled; top income quintile adds another ~0.7-1; northeastern
+ * urban adds another ~0.7-1. At 5'10", 1 BMI point ≈ 5 lb. These are composites,
+ * not official NHANES tables — treat as rough directional adjustments.
+ */
+window.CDC_SES_SHIFTS = {
+  'pooled':  { lbs: 0,  label: 'US avg' },
+  'college': { lbs: 5,  label: '+ college grad' },
+  'affluent':{ lbs: 9,  label: '+ affluent' },
+  'ne_urban':{ lbs: 13, label: '+ NE urban' },
+};
+
+function _shift(ses) {
+  const s = window.CDC_SES_SHIFTS[ses];
+  return s ? s.lbs : 0;
+}
+
+// Interpolate: given age (years), weight (lb), optional reference group
+// ('pooled'|'white'), optional SES key, return percentile (0-100).
+window.cdcPercentile = function(age, weight, group, ses) {
   const table = window.cdcTable(group);
   const pcts = window.CDC_PCTS;
+  const shift = _shift(ses);
   let i = 0;
   while (i < table.length - 1 && table[i+1][0] <= age) i++;
   const a = table[i], b = table[Math.min(i+1, table.length-1)];
   const t = b[0] === a[0] ? 0 : Math.max(0, Math.min(1, (age - a[0]) / (b[0] - a[0])));
-  const row = a.slice(1).map((v, j) => v + (b[j+1] - v) * t);
+  const row = a.slice(1).map((v, j) => (v + (b[j+1] - v) * t) - shift);
   if (weight <= row[0]) return pcts[0] * (weight / row[0]);
   if (weight >= row[row.length-1]) {
     const last = row.length-1;
@@ -83,11 +103,12 @@ window.cdcPercentile = function(age, weight, group) {
   return 50;
 };
 
-window.cdcBands = function(age, group) {
+window.cdcBands = function(age, group, ses) {
   const table = window.cdcTable(group);
+  const shift = _shift(ses);
   let i = 0;
   while (i < table.length - 1 && table[i+1][0] <= age) i++;
   const a = table[i], b = table[Math.min(i+1, table.length-1)];
   const t = b[0] === a[0] ? 0 : Math.max(0, Math.min(1, (age - a[0]) / (b[0] - a[0])));
-  return a.slice(1).map((v, j) => v + (b[j+1] - v) * t);
+  return a.slice(1).map((v, j) => (v + (b[j+1] - v) * t) - shift);
 };
