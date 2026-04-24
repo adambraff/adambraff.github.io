@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam Braff - Analytics & Forecasting Tools (Preview)</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --ink: #1f2430;
+            --ink-soft: #4a5160;
+            --paper: #faf7f0;
+            --paper-edge: #efe8d9;
+            --accent: #b85450;
+        }
+        html, body {
+            font-family: 'Georgia', 'Iowan Old Style', 'Palatino Linotype', serif;
+            background: var(--paper);
+            color: var(--ink);
+            min-height: 100vh;
+        }
+        body {
+            background-image:
+                radial-gradient(ellipse 800px 600px at 20% 0%, rgba(184,84,80,0.04), transparent 60%),
+                radial-gradient(ellipse 700px 500px at 80% 100%, rgba(50,80,120,0.04), transparent 60%);
+        }
+        header {
+            padding: 60px 40px 40px;
+            text-align: center;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: clamp(2.2rem, 5vw, 3.2rem);
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            margin-bottom: 0.4rem;
+        }
+        .tagline {
+            font-size: 1.05rem;
+            color: var(--ink-soft);
+            font-style: italic;
+        }
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px 24px 60px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 28px;
+        }
+        .tile {
+            display: block;
+            background: #fff;
+            border: 1px solid var(--paper-edge);
+            border-radius: 10px;
+            overflow: hidden;
+            text-decoration: none;
+            color: var(--ink);
+            box-shadow: 0 2px 6px rgba(40,30,20,0.04), 0 0 0 1px rgba(40,30,20,0.02);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .tile:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(40,30,20,0.1);
+        }
+        .tile-img {
+            display: block;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            background: var(--paper-edge);
+        }
+        .tile-body {
+            padding: 18px 20px 22px;
+        }
+        .tile-title {
+            font-size: 1.15rem;
+            font-weight: 400;
+            margin-bottom: 6px;
+            letter-spacing: 0.01em;
+        }
+        .tile-desc {
+            font-size: 0.9rem;
+            color: var(--ink-soft);
+            line-height: 1.5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .preview-banner {
+            background: #fef5e7;
+            border-bottom: 1px solid #e8d99e;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #8b6914;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        footer {
+            text-align: center;
+            padding: 30px 20px 50px;
+            font-size: 0.85rem;
+            color: var(--ink-soft);
+        }
+        footer a { color: var(--ink-soft); }
+    </style>
+</head>
+<body>
+    <div class="preview-banner">Preview of proposed redesign. Images go into /assets/tiles/ (filenames in DEPLOY-NOTES.md).</div>
+    <header>
+        <h1>Adam Braff</h1>
+        <p class="tagline">Analytics &amp; forecasting tools</p>
+    </header>
+    <main>
+        <div class="grid">
+            <a class="tile" href="/tools/contest-tracker/">
+                <img class="tile-img" src="/assets/tiles/01-forecasting-contest.png" alt="">
+                <div class="tile-body">
+                    <div class="tile-title">Narcissist Forecasting Contest</div>
+                    <div class="tile-desc">2026 forecasting competition tracker with leaderboards, prop analytics, and Monte Carlo simulations.</div>
+                </div>
+            </a>
+            <a class="tile" href="/forecasting_calibration/">
+                <img class="tile-img" src="/assets/tiles/02-calibration.png" alt="">
+                <div class="tile-body">
+                    <div class="tile-title">Forecasting Contest Calibration</div>
+                    <div class="tile-desc">Forecaster calibration across 10 years of Narcissist Forecasting Contest data (2016&ndash;2025).</div>
+                </div>
+            </a>
+            <a class="tile" href="/tools/tfr-explorer-v2/">
+                <img class="tile-img" src="/assets/tiles/03-fertility.png" alt="">
+                <div class="tile-body">
+                    <div class="tile-title">Fertility Rate Explorer</div>
+                    <div class="tile-desc">Why are birth rates falling? 265 countries and 75,000 US survey respondents &mdash; marriage, religion, economics, and projections.</div>
+                </div>
+            </a>
+            <a class="tile" href="/tools/ai-employment/">
+                <img class="tile-img" src="/assets/tiles/04-ai-employment.png" alt="">
+                <div class="tile-body">
+                    <div class="tile-title">AI Employment Futures</div>
+                    <div class="tile-desc">How will AI reshape US employment over the next decade? Prediction market anchors, industry breakdowns, probability bands.</div>
+                </div>
+            </a>
+            <a class="tile" href="/tools/nfl-valuations/">
+                <img class="tile-img" src="/assets/tiles/05-nfl-valuations.png" alt="">
+                <div class="tile-body">
+                    <div class="tile-title">NFL Valuation Explorer</div>
+                    <div class="tile-desc">What drives NFL franchise valuations &mdash; correlations, regression models, and team comparisons.</div>
+                </div>
+            </a>
+            <a class="tile" href="/tools/analytics-assessment/">
+                <img class="tile-img" src="/assets/tiles/06-birds-of-ai.png" alt="">
+                <div class="tile-body">
+                    <div class="tile-title">Birds of AI Assessment</div>
+                    <div class="tile-desc">Self-assess your business analytics skills across three dimensions: domain, statistics, coding.</div>
+                </div>
+            </a>
+            <a class="tile" href="/tools/hjr203-tracker/">
+                <img class="tile-img" src="/assets/tiles/07-hjr203.png" alt="">
+                <div class="tile-body">
+                    <div class="tile-title">HJR 203 Tracker</div>
+                    <div class="tile-desc">Florida Homestead Property Tax Elimination &mdash; probability dashboard with Manifold market data, FL-specific financial signals, and Zillow home value ratios.</div>
+                </div>
+            </a>
+            <a class="tile" href="/tools/mabels-providence-adventure/">
+                <img class="tile-img" src="/assets/tiles/08-mabel-adventure.png" alt="">
+                <div class="tile-body">
+                    <div class="tile-title">Mabel's Providence Adventure</div>
+                    <div class="tile-desc">Mobile runner game starring Mabel the Bernedoodle romping through Providence collecting treats. Best on phones.</div>
+                </div>
+            </a>
+        </div>
+    </main>
+    <footer>
+        <a href="https://github.com/adambraff">github.com/adambraff</a>
+    </footer>
+</body>
+</html>
