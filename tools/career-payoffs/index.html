@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career Payoff Explorer · Braff &amp; Co.</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface-2: #1a1d28;
+  --surface-3: #232735;
+  --border: #2e3345;
+  --border-soft: #2a2d3a;
+  --fg: #e4e6ef;
+  --fg-2: #e0e0e0;
+  --fg-muted: #8b8fa3;
+  --fg-muted-2: #888;
+  --blue: #6c8cff;
+  --blue-deep: #4a90d9;
+  --orange: #ff9d4d;
+  --green: #4ae04a;
+  --red: #ff5555;
+  --yellow: #f0c040;
+  --purple: #9d8fff;
+  --rust: #e67e22;
+  --nav-bg: rgba(15,17,23,0.95);
+  --hero-card-bg: linear-gradient(135deg, #1a2a4a 0%, #16213e 100%);
+  --hero-card-border: #2a3a5a;
+  --row-hover: rgba(108,140,255,0.03);
+  --finding-bg: rgba(108,140,255,0.05);
+  --tooltip-bg: #1a1d27;
+  --tooltip-border: #2e3345;
+  --grid-line: rgba(46,51,69,0.5);
+  --zero-line: rgba(139,143,163,0.4);
+  --tick-color: #888;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", Monaco, Menlo, Consolas, monospace;
+}
+[data-theme="light"] {
+  --bg: #f8f9fa;
+  --surface: #ffffff;
+  --surface-2: #f8f9fa;
+  --surface-3: #f0f1f3;
+  --border: #e0e0e0;
+  --border-soft: #d4d4d8;
+  --fg: #1a1a2e;
+  --fg-2: #333333;
+  --fg-muted: #666666;
+  --fg-muted-2: #888888;
+  --blue: #4a90d9;
+  --blue-deep: #357abd;
+  --nav-bg: rgba(255,255,255,0.95);
+  --hero-card-bg: linear-gradient(135deg, #eaf3fb 0%, #ffffff 100%);
+  --hero-card-border: #c5d9ec;
+  --row-hover: rgba(74,144,217,0.05);
+  --finding-bg: rgba(74,144,217,0.05);
+  --tooltip-bg: #ffffff;
+  --tooltip-border: #e0e0e0;
+  --grid-line: rgba(0,0,0,0.06);
+  --zero-line: rgba(0,0,0,0.25);
+  --tick-color: #666;
+}
+* { box-sizing: border-box; }
+html { font-family: var(--font-sans); }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 16px;
+  line-height: 1.6;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.nav {
+  position: sticky; top: 0; z-index: 20;
+  background: var(--nav-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 32px;
+  display: flex; align-items: center; gap: 16px;
+}
+.nav .brand { font-weight: 700; font-size: 0.95rem; color: var(--fg); text-decoration: none; letter-spacing: -0.01em; }
+.nav .nav-right { margin-left: auto; }
+.theme-toggle { display: inline-flex; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+.theme-toggle button { background: transparent; border: 0; padding: 5px 12px; color: var(--fg-muted); font-family: inherit; font-size: 0.78rem; cursor: pointer; transition: all 0.15s ease; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+.theme-toggle button:hover { color: var(--fg); }
+.theme-toggle button.active { background: var(--blue); color: #fff; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 28px 32px 60px; }
+.hero { margin-bottom: 28px; }
+.hero h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 6px 0; line-height: 1.25; color: var(--fg); }
+.hero .subtitle { color: var(--fg-muted); font-size: 0.95rem; margin: 0; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 18px 22px; margin-bottom: 16px; }
+.micro-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); font-weight: 600; display: block; margin-bottom: 10px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 4px; cursor: pointer; font-size: 0.82rem; user-select: none; transition: all 0.15s ease; }
+.chip:hover { border-color: var(--border-soft); }
+.chip.active { border-left-width: 3px; padding-left: 10px; }
+.chip input { display: none; }
+.chip .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.chip .chip-label { transition: color 0.15s ease; }
+.controls-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px; }
+@media (max-width: 800px) { .controls-grid { grid-template-columns: 1fr; gap: 20px; } }
+.control input[type=range] { width: 100%; accent-color: var(--blue); margin-top: 6px; }
+.control .row { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.82rem; color: var(--fg-muted); margin-bottom: 2px; }
+.control .val { color: var(--fg); font-weight: 600; font-variant-numeric: tabular-nums; }
+.view-row { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.view-row .micro-label { margin: 0; }
+.toggle-group { display: inline-flex; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+.toggle-group button { background: transparent; border: 0; padding: 7px 14px; color: var(--fg-muted); font-family: inherit; font-size: 0.82rem; cursor: pointer; transition: all 0.15s ease; }
+.toggle-group button:hover { color: var(--fg); }
+.toggle-group button.active { background: var(--blue); color: #fff; }
+.main-grid { display: grid; grid-template-columns: 1fr 320px; gap: 16px; }
+@media (max-width: 960px) { .main-grid { grid-template-columns: 1fr; } }
+.chart-card { padding: 18px 22px; }
+.chart-container { position: relative; height: 480px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; margin-bottom: 8px; border-left: 3px solid var(--border-soft); }
+.stat-card.is-hero { background: var(--hero-card-bg); border: 1px solid var(--hero-card-border); border-left: 3px solid var(--blue); }
+.stat-card .head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+.stat-card .career-name { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: var(--fg); font-weight: 600; }
+.stat-card .dot-color { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.stat-card .rank { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); font-weight: 600; }
+.stat-card .median { font-size: 1.5rem; font-weight: 700; color: var(--blue); line-height: 1.1; margin: 4px 0 2px 0; font-variant-numeric: tabular-nums; }
+.stat-card .median-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); font-weight: 600; margin-bottom: 4px; }
+.stat-card .hint { font-size: 0.78rem; color: var(--fg-muted); margin-top: 6px; font-variant-numeric: tabular-nums; }
+.table-card { padding: 18px 22px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+th, td { padding: 10px 12px; text-align: right; border-bottom: 1px solid var(--border); }
+th:first-child, td:first-child { text-align: left; }
+th { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-muted); font-weight: 600; background: transparent; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover td { background: var(--row-hover); }
+td.rank-cell { font-weight: 700; color: var(--fg); }
+.career-name { display: flex; align-items: center; gap: 10px; color: var(--fg); }
+.dot-color { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+details { margin-top: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 0; }
+details summary { color: var(--blue); cursor: pointer; padding: 14px 22px; font-size: 0.85rem; font-weight: 600; list-style: none; }
+details summary::-webkit-details-marker { display: none; }
+details summary::before { content: "▸ "; color: var(--fg-muted); margin-right: 6px; }
+details[open] summary::before { content: "▾ "; }
+details[open] summary { border-bottom: 1px solid var(--border); }
+details .body { padding: 14px 22px 18px; }
+details p { color: var(--fg-muted); line-height: 1.7; margin: 8px 0; font-size: 0.88rem; }
+details code { background: var(--surface-3); padding: 1px 6px; border-radius: 3px; font-size: 0.85em; color: var(--fg-2); font-family: var(--font-mono); }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a class="brand" href="https://adambraff.github.io/">Braff &amp; Co.</a>
+  <div class="nav-right">
+    <div class="theme-toggle">
+      <button class="active" id="darkBtn">Dark</button>
+      <button id="lightBtn">Light</button>
+    </div>
+  </div>
+</nav>
+<main class="wrap">
+  <header class="hero">
+    <h1>Career Payoff Explorer</h1>
+    <p class="subtitle">Lifetime earnings distributions across six career archetypes</p>
+  </header>
+  <section class="card">
+    <span class="micro-label">Careers</span>
+    <div class="chips" id="chips"></div>
+  </section>
+  <section class="card">
+    <div class="controls-grid">
+      <div class="control">
+        <span class="micro-label">Time horizon</span>
+        <div class="row"><span>Working years</span><span class="val"><span id="yearsValue">30</span> yrs</span></div>
+        <input type="range" id="years" min="10" max="45" value="30">
+      </div>
+      <div class="control">
+        <span class="micro-label">Economy</span>
+        <div class="row"><span id="economyLabel">Neutral</span><span class="val" id="economyValue">+0.0</span></div>
+        <input type="range" id="economy" min="-2" max="2" step="0.1" value="0">
+      </div>
+      <div class="control">
+        <span class="micro-label">AI scenario</span>
+        <div class="row"><span id="aiLabel">Status quo</span><span class="val" id="aiValue">+0.0</span></div>
+        <input type="range" id="ai" min="-2" max="2" step="0.1" value="0">
+      </div>
+    </div>
+  </section>
+  <div class="view-row">
+    <span class="micro-label">View</span>
+    <div class="toggle-group">
+      <button class="active" id="fullViewBtn">Full distribution</button>
+      <button id="tailsBtn">Right-tail focus</button>
+    </div>
+  </div>
+  <section class="main-grid">
+    <div class="card chart-card"><div class="chart-container"><canvas id="chart"></canvas></div></div>
+    <aside id="statSidebar"></aside>
+  </section>
+  <section class="card table-card">
+    <span class="micro-label">Detail by career — current settings</span>
+    <table id="summaryTable">
+      <thead><tr><th>Career</th><th>p10</th><th>Median</th><th>p90</th><th>p99</th><th>Rank</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+  <details>
+    <summary>About the model</summary>
+    <div class="body">
+      <p>Each career has a hand-calibrated quantile distribution representing lifetime <strong>earnings</strong> (salary + bonus + equity monetization, pre-tax, $M) across an idealized 30-year career in a neutral economy under status-quo AI progress. Anchor points span p0.5 to p99.9. Values between anchors are interpolated log-linearly when both endpoints are positive, linearly when one is non-positive.</p>
+      <p>Time scaling: <code>(years/30)^0.85</code>. Sublinear because peak earning years cluster mid-career and very long horizons hit retirement saturation.</p>
+      <p>Economy multiplier varies by career — investing and tournament are highly economy-sensitive (β ~0.7–0.8); risk mgmt is barely affected (β ~0.15). Bad economies shrink upside AND deepen the left tail.</p>
+      <p>AI scenario applies a percentile-dependent multiplier. AGI compresses functional consulting and BigLaw, expands the right tail of tournament careers (AI-native unicorns) and risk management (more breaches, more demand, but bigger left-tail catastrophes).</p>
+      <p>Rank column orders selected careers by median earnings under current settings.</p>
+      <p style="font-style:italic;color:var(--fg-muted-2)">⚠ Anchor values are approximations. Tournament careers probably have fatter tails beyond p99.9 than the model captures.</p>
+    </div>
+  </details>
+</main>
+<script>
+const careers = {
+  biglaw: { name: "BigLaw (litigator)", shortName: "BigLaw", color: "#6c8cff", quantiles: [[0.5,-8],[1,-3],[2,-1],[5,0.5],[10,1.5],[25,3],[50,5],[75,10],[90,17],[95,25],[99,45],[99.9,100]], economyEffect: 0.20, aiEffect: { left: 0.20, mid: -0.25, right: -0.10 } },
+  consulting: { name: "Consulting (functional specialist)", shortName: "Consulting", color: "#ff9d4d", quantiles: [[0.5,0.8],[1,1.5],[2,2],[5,2.5],[10,3.5],[25,5],[50,9],[75,16],[90,28],[95,40],[99,80],[99.9,200]], economyEffect: 0.40, aiEffect: { left: 0.25, mid: -0.30, right: -0.30 } },
+  exec: { name: "Corp exec (general manager)", shortName: "Corp exec", color: "#9d8fff", quantiles: [[0.5,1.5],[1,2],[2,2.5],[5,3],[10,4],[25,6],[50,11],[75,20],[90,35],[95,50],[99,100],[99.9,300]], economyEffect: 0.35, aiEffect: { left: 0.15, mid: -0.10, right: 0.00 } },
+  investing: { name: "Investing (hedge fund PM)", shortName: "Investing", color: "#4ae04a", quantiles: [[0.5,-5],[1,-2],[2,0],[5,1],[10,2],[25,5],[50,12],[75,30],[90,80],[95,150],[99,500],[99.9,3000]], economyEffect: 0.80, aiEffect: { left: 0.20, mid: -0.20, right: 0.20 } },
+  tournament: { name: "Tournament (startup founder, athlete)", shortName: "Tournament", color: "#8c564b", quantiles: [[0.5,-3],[1,-2],[2,-1],[5,-0.5],[10,0],[25,0.5],[50,2],[75,8],[90,25],[95,60],[99,250],[99.9,5000]], economyEffect: 0.70, aiEffect: { left: 0.00, mid: 0.10, right: 0.70 } },
+  riskmgmt: { name: "Risk management (CISO)", shortName: "Risk mgmt", color: "#ff5555", quantiles: [[0.5,-10],[1,-5],[2,-2],[5,0],[10,2],[25,4],[50,7],[75,11],[90,14],[95,17],[99,22],[99.9,35]], economyEffect: 0.15, aiEffect: { left: 0.40, mid: 0.20, right: 0.25 } }
+};
+function interpolateQuantile(career, p) { const q = career.quantiles; if (p <= q[0][0]) return q[0][1]; if (p >= q[q.length-1][0]) return q[q.length-1][1]; for (let i = 0; i < q.length-1; i++) { if (p >= q[i][0] && p <= q[i+1][0]) { const [p1, v1] = q[i]; const [p2, v2] = q[i+1]; const t = (p - p1) / (p2 - p1); if (v1 > 0.05 && v2 > 0.05) return Math.exp(Math.log(v1) + t * (Math.log(v2) - Math.log(v1))); return v1 + t * (v2 - v1); } } }
+function aiMultiplier(p, effect, ai) { let coef; if (p < 50) { const t = (50 - p) / 50; coef = effect.mid + (effect.left - effect.mid) * t; } else { const t = (p - 50) / 50; coef = effect.mid + (effect.right - effect.mid) * t; } return Math.max(0.05, 1 + ai * coef); }
+function getValue(career, p, years, economy, ai) { let val = interpolateQuantile(career, p); val *= aiMultiplier(p, career.aiEffect, ai); val *= Math.pow(years / 30, 0.85); let econMult; if (val > 0) econMult = 1 + economy * career.economyEffect; else econMult = 1 - economy * career.economyEffect; econMult = Math.max(0.05, econMult); return val * econMult; }
+function symlog(v) { if (Math.abs(v) <= 1) return v; return Math.sign(v) * (1 + Math.log10(Math.abs(v))); }
+function invsymlog(y) { if (Math.abs(y) <= 1) return y; return Math.sign(y) * Math.pow(10, Math.abs(y) - 1); }
+function fmtMoney(v) { if (v === 0 || Math.abs(v) < 0.001) return '$0'; const minus = v < 0 ? '−' : ''; const abs = Math.abs(v); if (abs >= 100) return minus + '$' + Math.round(abs).toLocaleString() + 'M'; if (abs >= 10) return minus + '$' + Math.round(abs) + 'M'; if (abs >= 1) return minus + '$' + (Math.round(abs * 10) / 10) + 'M'; return minus + '$' + Math.round(abs * 1000) + 'K'; }
+function ordinal(n) { const s = ['th','st','nd','rd']; const v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
+function getThemeTokens() { const cs = getComputedStyle(document.documentElement); return { text: cs.getPropertyValue('--fg').trim(), muted: cs.getPropertyValue('--tick-color').trim(), fgMuted: cs.getPropertyValue('--fg-muted').trim(), grid: cs.getPropertyValue('--grid-line').trim(), zeroLine: cs.getPropertyValue('--zero-line').trim(), tooltipBg: cs.getPropertyValue('--tooltip-bg').trim(), tooltipBorder: cs.getPropertyValue('--tooltip-border').trim(), fg: cs.getPropertyValue('--fg').trim() }; }
+let selectedCareers = new Set(['biglaw','consulting','investing','tournament']);
+let years = 30, economy = 0, ai = 0, showTails = false;
+const chipsEl = document.getElementById('chips');
+function renderChip(id, c) { const label = document.createElement('label'); label.className = 'chip' + (selectedCareers.has(id) ? ' active' : ''); label.style.color = c.color; label.style.borderLeftColor = c.color; label.innerHTML = `<input type="checkbox" ${selectedCareers.has(id) ? 'checked' : ''} data-id="${id}"><span class="dot"></span><span class="chip-label">${c.shortName}</span>`; const lbl = label.querySelector('.chip-label'); lbl.style.color = selectedCareers.has(id) ? 'var(--fg)' : 'var(--fg-muted)'; const input = label.querySelector('input'); input.addEventListener('change', e => { if (e.target.checked) selectedCareers.add(id); else selectedCareers.delete(id); label.classList.toggle('active', e.target.checked); lbl.style.color = e.target.checked ? 'var(--fg)' : 'var(--fg-muted)'; update(); }); chipsEl.appendChild(label); }
+Object.entries(careers).forEach(([id, c]) => renderChip(id, c));
+document.getElementById('years').addEventListener('input', e => { years = +e.target.value; document.getElementById('yearsValue').textContent = years; update(); });
+const economyLabels = ['Severe recession','Recession','Sluggish','Neutral','Solid growth','Boom','Roaring'];
+document.getElementById('economy').addEventListener('input', e => { economy = +e.target.value; document.getElementById('economyValue').textContent = (economy >= 0 ? '+' : '−') + Math.abs(economy).toFixed(1); const idx = Math.round((economy + 2) * 6 / 4); document.getElementById('economyLabel').textContent = economyLabels[Math.min(6, Math.max(0, idx))]; update(); });
+const aiLabels = ['AI bust','Stagnation','Slow progress','Status quo','Strong progress','Near-AGI','AGI'];
+document.getElementById('ai').addEventListener('input', e => { ai = +e.target.value; document.getElementById('aiValue').textContent = (ai >= 0 ? '+' : '−') + Math.abs(ai).toFixed(1); const idx = Math.round((ai + 2) * 6 / 4); document.getElementById('aiLabel').textContent = aiLabels[Math.min(6, Math.max(0, idx))]; update(); });
+document.getElementById('tailsBtn').addEventListener('click', () => { showTails = true; document.getElementById('tailsBtn').classList.add('active'); document.getElementById('fullViewBtn').classList.remove('active'); update(); });
+document.getElementById('fullViewBtn').addEventListener('click', () => { showTails = false; document.getElementById('fullViewBtn').classList.add('active'); document.getElementById('tailsBtn').classList.remove('active'); update(); });
+document.getElementById('darkBtn').addEventListener('click', () => { document.documentElement.setAttribute('data-theme', 'dark'); document.getElementById('darkBtn').classList.add('active'); document.getElementById('lightBtn').classList.remove('active'); update(); });
+document.getElementById('lightBtn').addEventListener('click', () => { document.documentElement.setAttribute('data-theme', 'light'); document.getElementById('lightBtn').classList.add('active'); document.getElementById('darkBtn').classList.remove('active'); update(); });
+function getPercentiles() { if (showTails) return [70,72,75,78,80,82,85,88,90,92,94,95,96,97,98,98.5,99,99.3,99.5,99.7,99.9]; return [0.5,1,2,3,5,7,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,93,95,97,98,99,99.5,99.9]; }
+const ctx = document.getElementById('chart').getContext('2d');
+let chart;
+function update() {
+  const t = getThemeTokens();
+  const ps = getPercentiles();
+  const datasets = [];
+  for (const id of selectedCareers) {
+    const c = careers[id];
+    const data = ps.map(p => ({ x: p, y: symlog(getValue(c, p, years, economy, ai)) }));
+    datasets.push({ label: c.shortName, data, borderColor: c.color, backgroundColor: c.color + '20', borderWidth: 2, pointRadius: 1.5, pointHoverRadius: 5, tension: 0.25, fill: false });
+  }
+  if (chart) chart.destroy();
+  chart = new Chart(ctx, {
+    type: 'line', data: { datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'nearest', axis: 'x', intersect: false },
+      animation: { duration: 220 },
+      scales: {
+        x: { type: 'linear', title: { display: true, text: 'OUTCOME PERCENTILE', color: t.fgMuted, font: { size: 11, weight: 600 } }, min: showTails ? 70 : 0, max: showTails ? 99.9 : 100, ticks: { callback: v => v + 'th', color: t.muted, font: { size: 11 } }, grid: { color: t.grid, drawTicks: false } },
+        y: { title: { display: true, text: 'LIFETIME EARNINGS', color: t.fgMuted, font: { size: 11, weight: 600 } }, ticks: { stepSize: 1, callback: y => fmtMoney(invsymlog(y)), color: t.muted, font: { size: 11 } }, grid: { color: c => c.tick.value === 0 ? t.zeroLine : t.grid, lineWidth: c => c.tick.value === 0 ? 1.5 : 1 } }
+      },
+      plugins: {
+        legend: { display: true, position: 'top', align: 'start', labels: { boxWidth: 10, boxHeight: 10, padding: 14, color: t.fg, font: { size: 12, weight: 500 } } },
+        tooltip: { backgroundColor: t.tooltipBg, titleColor: t.fg, bodyColor: t.fg, borderColor: t.tooltipBorder, borderWidth: 1, padding: 10, itemSort: (a, b) => b.parsed.y - a.parsed.y, callbacks: { title: items => 'p' + items[0].parsed.x.toFixed(items[0].parsed.x < 10 || items[0].parsed.x > 99 ? 1 : 0), label: item => item.dataset.label + ': ' + fmtMoney(invsymlog(item.parsed.y)) } }
+      }
+    }
+  });
+  const medianValues = [];
+  for (const id of selectedCareers) medianValues.push({ id, value: getValue(careers[id], 50, years, economy, ai) });
+  medianValues.sort((a, b) => b.value - a.value);
+  const rankMap = new Map();
+  medianValues.forEach((m, i) => rankMap.set(m.id, i + 1));
+  const sidebar = document.getElementById('statSidebar');
+  sidebar.innerHTML = '';
+  medianValues.forEach((m, i) => {
+    const c = careers[m.id];
+    const card = document.createElement('div');
+    card.className = 'stat-card' + (i === 0 ? ' is-hero' : '');
+    if (i !== 0) card.style.borderLeftColor = c.color;
+    const p90 = getValue(c, 90, years, economy, ai);
+    const p99 = getValue(c, 99, years, economy, ai);
+    card.innerHTML = `<div class="head"><span class="career-name"><span class="dot-color" style="background:${c.color}"></span>${c.shortName}</span><span class="rank">${ordinal(i + 1)}</span></div><div class="median-label">Median</div><div class="median">${fmtMoney(m.value)}</div><div class="hint">p90 ${fmtMoney(p90)} · p99 ${fmtMoney(p99)}</div>`;
+    sidebar.appendChild(card);
+  });
+  const tbody = document.querySelector('#summaryTable tbody');
+  tbody.innerHTML = '';
+  for (const { id } of medianValues) {
+    const c = careers[id];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><span class="career-name"><span class="dot-color" style="background:${c.color}"></span>${c.name}</span></td><td>${fmtMoney(getValue(c, 10, years, economy, ai))}</td><td>${fmtMoney(getValue(c, 50, years, economy, ai))}</td><td>${fmtMoney(getValue(c, 90, years, economy, ai))}</td><td>${fmtMoney(getValue(c, 99, years, economy, ai))}</td><td class="rank-cell">${ordinal(rankMap.get(id))}</td>`;
+    tbody.appendChild(tr);
+  }
+}
+update();
+</script>
+</body>
+</html>
