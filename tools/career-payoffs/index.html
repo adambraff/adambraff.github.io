@@ -158,7 +158,7 @@ details code { background: var(--surface-3); padding: 1px 6px; border-radius: 3p
 <main class="wrap">
   <header class="hero">
     <h1>Career Payoff Explorer</h1>
-    <p class="subtitle">Lifetime earnings distributions across six career archetypes</p>
+    <p class="subtitle">Toy model using illustrative data to get people thinking along the risk dimension</p>
   </header>
   <section class="card">
     <span class="micro-label">Careers</span>
@@ -204,12 +204,13 @@ details code { background: var(--surface-3); padding: 1px 6px; border-radius: 3p
   <details>
     <summary>About the model</summary>
     <div class="body">
-      <p>Each career has a hand-calibrated quantile distribution representing lifetime <strong>earnings</strong> (salary + bonus + equity monetization, pre-tax, $M) across an idealized 30-year career in a neutral economy under status-quo AI progress. Anchor points span p0.5 to p99.9. Values between anchors are interpolated log-linearly when both endpoints are positive, linearly when one is non-positive.</p>
+      <p>This is a <strong>toy model with illustrative numbers</strong>, not a calibrated empirical study. The point is to make the risk shape of different career paths legible at a glance — fat right tails for tournaments, fat left tails for risk roles, narrow capped distributions for ladder careers — not to claim that the dollar amounts are right.</p>
+      <p>Each career has a hand-picked quantile distribution representing lifetime earnings (salary + bonus + equity monetization, pre-tax, $M) across an idealized 30-year career in a neutral economy under status-quo AI. Anchor points span p0.5 to p99.9. Values between anchors are interpolated log-linearly when both endpoints are positive, linearly otherwise.</p>
       <p>Time scaling: <code>(years/30)^0.85</code>. Sublinear because peak earning years cluster mid-career and very long horizons hit retirement saturation.</p>
       <p>Economy multiplier varies by career — investing and tournament are highly economy-sensitive (β ~0.7–0.8); risk mgmt is barely affected (β ~0.15). Bad economies shrink upside AND deepen the left tail.</p>
       <p>AI scenario applies a percentile-dependent multiplier. AGI compresses functional consulting and BigLaw, expands the right tail of tournament careers (AI-native unicorns) and risk management (more breaches, more demand, but bigger left-tail catastrophes).</p>
       <p>Rank column orders selected careers by median earnings under current settings.</p>
-      <p style="font-style:italic;color:var(--fg-muted-2)">⚠ Anchor values are approximations. Tournament careers probably have fatter tails beyond p99.9 than the model captures.</p>
+      <p style="font-style:italic;color:var(--fg-muted-2)">⚠ Anchor values are eyeballed approximations. The shape of each curve is the load-bearing claim; the dollar values are not.</p>
     </div>
   </details>
 </main>
