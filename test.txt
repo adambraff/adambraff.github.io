@@ -1,1 +1,2 @@
 test content
+verified 2026-05-09: claude-cowork token still works after Cowork deploy deletion
