@@ -22,16 +22,15 @@
         }
         .nav-link {
             padding: 0.5rem 0.75rem; background: none; border: none; color: var(--text-secondary);
-            cursor: pointer; font-size: 0.8rem; white-space: nowrap; transition: all 0.3s;
-            border-bottom: 2px solid transparent; font-family: inherit;
+            cursor: pointer; font-size: 0.8rem; white-space: nowrap; transition: all 0.15s;
+            border-bottom: 2px solid transparent; font-family: inherit; font-weight: 500;
         }
         .nav-link:hover { color: var(--text); }
         .nav-link.active { color: var(--blue); border-bottom-color: var(--blue); }
         .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-        .hero { text-align: center; padding: 4rem 1rem 2rem; }
-        .hero h1 { font-size: 2.8rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .hero .subtitle { color: var(--text-secondary); font-size: 1.1rem; }
-        section { padding: 3rem 0; border-bottom: 1px solid var(--border); }
+        .hero { text-align: center; padding: 2rem 1rem 1rem; }
+        .hero h1 { font-size: 2.8rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.01em; }
+        section { padding: 2rem 0; border-bottom: 1px solid var(--border); }
         section:last-child { border-bottom: none; }
         h2 { font-size: 1.8rem; font-weight: 700; margin-bottom: 1rem; }
         .narrative { max-width: 800px; margin: 0 auto 2rem; color: var(--text-secondary); font-size: 1.05rem; line-height: 1.8; }
@@ -83,7 +82,6 @@
 
 <div class="hero">
     <h1>Fertility Rate Explorer</h1>
-    <p class="subtitle">Understanding why birth rates are falling — 265 countries + 75,699 US survey respondents</p>
 </div>
 
 <nav class="sticky-nav">
@@ -105,7 +103,7 @@
 <section id="collapse">
     <h2>The Collapse</h2>
     <div class="narrative">
-        <p>Global fertility has collapsed. In the 1960s, the world average was 5 children per woman. By 2023, it had fallen to 2.3 — below the long-term replacement rate of 2.1. More than half of all countries now sit below replacement. This is unprecedented in human history.</p>
+        <p>Global fertility has collapsed. In the 1960s, the world average was 5 children per woman. By 2023, it had fallen to 2.4 — and the median country is already below the 2.1 replacement rate. More than half of all countries now sit below replacement. This is unprecedented in human history.</p>
         <p>This is not a developed-world story. Bangladesh, Vietnam, Brazil, and Iran have all undergone demographic transitions in a single generation. What took Sweden 150 years has happened in parts of Asia and Latin America in 30.</p>
     </div>
     <div class="metric-row">
@@ -137,7 +135,7 @@
 <section id="marriage">
     <h2>Marriage — The Biggest Driver</h2>
     <div class="narrative">
-        <p>Never-married status is the single strongest predictor of lower fertility in the US (standardized coefficient: −0.293). Married women average about 2.2 children; never-married women average 0.7. And the share of never-married adults has tripled since 1970.</p>
+        <p>Never-married status is the single strongest predictor of lower fertility in the US (standardized β = −0.293). Married women average about 2.1 children; never-married women average 0.8. And the share of never-married adults has more than doubled since 1972 — from 13% to 32%.</p>
         <p>On the left: how the composition of marital status has shifted over time. On the right: how many children each group averages.</p>
     </div>
     <div class="chart-row">
@@ -151,7 +149,7 @@
 <section id="culture">
     <h2>Culture &amp; Secularization</h2>
     <div class="narrative">
-        <p>Secularization removes pro-natalist norms. The share of Americans identifying as "None" (no religion) has risen from 5% in 1972 to over 25% today. Protestants — once the majority — have fallen below 40%. And the non-religious have fewer children: 1.5 vs 2.1 for Protestants.</p>
+        <p>Secularization removes pro-natalist norms. The share of Americans identifying as "None" (no religion) has risen from 5% in 1972 to 26% today. Protestants — once the majority — have fallen toward 40%. And the non-religious have fewer children: 1.3 vs 2.0 for Protestants.</p>
     </div>
     <div class="chart-row">
         <div class="chart-wrap"><canvas id="religion-area-chart"></canvas></div>
@@ -162,14 +160,14 @@
         <select id="rel-region-filter"><option value="All">All Regions</option></select>
     </div>
     <div class="chart-wrap"><canvas id="religiosity-scatter"></canvas></div>
-    <div class="finding"><strong>Finding:</strong> Internationally, more religious countries have higher TFR, but the effect is largely mediated through development and education. Within the US, religion's direct effect on fertility (beta = −0.041 for non-religious) is modest compared to marriage.</div>
+    <div class="finding"><strong>Finding:</strong> Internationally, more religious countries have higher TFR, but the effect is largely mediated through development and education. Within the US, religion's direct effect on fertility (β = −0.041 for non-religious) is modest compared to marriage (β = −0.293).</div>
 </section>
 
 <!-- SECTION 5: Economics -->
 <section id="economics">
     <h2>Economics &amp; Opportunity Cost</h2>
     <div class="narrative">
-        <p>As women gain education and career opportunities, the opportunity cost of having children rises. Female education is the strongest international predictor of lower fertility — explaining 80% of the variance in a random forest model. Within the US, College+ women average 1.6 children vs 2.3 for those without a high school diploma.</p>
+        <p>As women gain education and career opportunities, the opportunity cost of having children rises. Female secondary education enrollment is the strongest international predictor of lower fertility in a random forest model (R² ≈ 0.80). Within the US, College+ women average 1.5 children vs 2.4 for those without a high school diploma.</p>
     </div>
     <div style="margin-bottom:1rem">
         <label for="econ-region-filter" style="font-size:0.9rem;color:var(--text-secondary)">Filter by region: </label>
@@ -180,7 +178,7 @@
         <div class="chart-wrap"><canvas id="edu-era-chart"></canvas></div>
     </div>
     <div class="chart-wrap"><canvas id="income-era-chart"></canvas></div>
-    <div class="finding"><strong>Finding:</strong> Female education and labor force participation are the 3rd strongest predictors of lower fertility (standardized coefficient: −0.187). However, within the US, education effects are much more modest once marital status is accounted for.</div>
+    <div class="finding"><strong>Finding:</strong> Female education is the top predictor internationally (permutation importance: 1.01), followed by log GDP (0.35) and female LFP (0.09). Within the US, education years is the 3rd strongest predictor (β = −0.187), but effects are more modest once marital status is accounted for.</div>
 </section>
 
 <!-- SECTION 6: Development -->
@@ -204,7 +202,7 @@
 <section id="trap">
     <h2>The Fertility Trap</h2>
     <div class="narrative">
-        <p>Once a country drops below 1.5 TFR, approximately 95% never recover. The fertility trap is self-reinforcing: smaller cohorts produce fewer absolute births, which shifts cultural norms toward smaller families, which keeps fertility low. Early intervention (before crossing 1.5) is far more cost-effective than attempting recovery.</p>
+        <p>Once a country drops below 1.5 TFR, approximately 86% never recover. Of the 79 countries that have entered the trap, only 11 have climbed back above 1.5. The fertility trap is self-reinforcing: smaller cohorts produce fewer absolute births, which shifts cultural norms toward smaller families, which keeps fertility low.</p>
     </div>
     <div class="metric-row">
         <div class="metric-card"><div class="label">Countries Entered Trap</div><div class="value" id="kpi-trap-entered">--</div></div>
@@ -219,21 +217,21 @@
 <section id="cohorts">
     <h2>Cohort Analysis — Delay or Decline?</h2>
     <div class="narrative">
-        <p>Is the fertility decline just women having children later — or actually having fewer? Cohort analysis settles it: this is primarily a reduction in completed fertility, not merely a delay. Women born in the 1960s had ~2.0 children by age 45; women born in the 1950s had ~1.9. And childlessness rates have risen from 7% (1930s cohort) to 18% (1960s cohort).</p>
+        <p>Is the fertility decline just women having children later — or actually having fewer? Cohort analysis settles it: this is primarily a reduction in completed fertility, not merely a delay. Women born in the 1940s averaged 2.3 children by age 40+; those born in the 1950s averaged 1.9. And childlessness rose from 7% (1930s cohort) to 19% (1950s cohort).</p>
     </div>
     <div class="chart-wrap"><canvas id="cohort-curves-chart"></canvas></div>
     <div class="chart-row">
         <div class="chart-wrap"><canvas id="completed-fertility-chart"></canvas></div>
         <div class="chart-wrap"><canvas id="childlessness-chart"></canvas></div>
     </div>
-    <div class="finding"><strong>Finding:</strong> Cohort curves flatten earlier for recent generations. Women born in the 1980s are on track for completed fertility of ~2.0, but with higher childlessness offset by larger families among those who do have children.</div>
+    <div class="finding"><strong>Finding:</strong> The 1970s and 1980s cohorts show a slight rebound (2.2 and 2.0), but with higher childlessness (~16%) — suggesting larger families among those who do have children, offset by more women choosing to remain childless.</div>
 </section>
 
 <!-- SECTION 9: Predictors -->
 <section id="predictors">
     <h2>What Predicts Fertility?</h2>
     <div class="narrative">
-        <p>Two complementary models: an OLS regression on 74,045 US GSS respondents identifies individual-level predictors, while a random forest on 265 countries identifies international-level drivers.</p>
+        <p>Two complementary models: an OLS regression on 74,045 US GSS respondents identifies individual-level predictors (R² = 0.255), while a random forest on 265 countries identifies international-level drivers (cross-validated R² ≈ 0.80).</p>
     </div>
     <h3 class="section-title">US Individual-Level (GSS OLS Regression)</h3>
     <div style="margin-bottom:1rem">
@@ -840,9 +838,10 @@ function renderTrap() {
 // 8. COHORT ANALYSIS
 // ============================================================
 function renderCohorts() {
-    const ageBins = ['18-24','25-29','30-34','35-39','40-44','45-49','50-54','55-59','60-64','65-69','70-74'];
+    const ageBins = ['40-44','45-49','50-54','55-59','60-64','65-69','70-74'];
     const cohorts = G.gss.cohort_curves || [];
 
+    // Top: cohort curves (cumulative children by age bin)
     destroy('cohort-curves-chart');
     G.charts['cohort-curves-chart'] = new Chart(document.getElementById('cohort-curves-chart'), {
         type: 'line',
@@ -852,7 +851,7 @@ function renderCohorts() {
                 const binMap = {};
                 (c.points || []).forEach(p => { binMap[p.age_bin] = p.avg_children; });
                 return {
-                    label: c.cohort || c.cohort_decade,
+                    label: c.cohort || c.cohort_decade + 's',
                     data: ageBins.map(b => binMap[b] ?? null),
                     borderColor: demoColors[i % demoColors.length],
                     tension: 0.3, spanGaps: true, pointRadius: 3
@@ -861,21 +860,21 @@ function renderCohorts() {
         },
         options: {
             responsive: true, maintainAspectRatio: false,
-            plugins: { title: { display: true, text: 'Cumulative Children by Age — Birth Cohort Curves (GSS)', color: '#e4e6ef' } },
+            plugins: { title: { display: true, text: 'Avg Children by Age — Birth Cohort Curves (GSS, women 40+)', color: '#e4e6ef' } },
             scales: { y: { title: { display: true, text: 'Avg Children' } } }
         }
     });
 
-    // Completed fertility
+    // Bottom-left: completed fertility by cohort
     const cf = G.gss.completed_fertility || [];
     destroy('completed-fertility-chart');
     G.charts['completed-fertility-chart'] = new Chart(document.getElementById('completed-fertility-chart'), {
         type: 'bar',
         data: { labels: cf.map(d => d.cohort), datasets: [{ label: 'Avg Children', data: cf.map(d => d.avg_children), backgroundColor: '#6c8cff' }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Completed Fertility by Birth Cohort (GSS, women 40–50)', color: '#e4e6ef' }, legend: { display: false } }, scales: { y: { title: { display: true, text: 'Avg Children' } } } }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Completed Fertility by Birth Cohort (GSS, women 40–50)', color: '#e4e6ef' }, legend: { display: false } }, scales: { y: { title: { display: true, text: 'Avg Children' }, min: 1.0 } } }
     });
 
-    // Childlessness
+    // Bottom-right: childlessness by cohort
     const cl = G.gss.childlessness_by_cohort || [];
     destroy('childlessness-chart');
     G.charts['childlessness-chart'] = new Chart(document.getElementById('childlessness-chart'), {
@@ -891,13 +890,14 @@ function renderCohorts() {
 function renderPredictors() {
     const reg = G.gss.regression;
     const overall = reg?.overall;
+    const coefs = overall?.coefs || [];
+
     if (overall) {
         document.getElementById('pred-n').textContent = overall.n?.toLocaleString() || '--';
         document.getElementById('pred-r2').textContent = overall.r2?.toFixed(3) || '--';
     }
 
     // OLS coefficients
-    const coefs = overall?.coefs || [];
     const sorted = [...coefs].sort((a, b) => Math.abs(b.beta) - Math.abs(a.beta)).slice(0, 15);
     destroy('coef-chart');
     G.charts['coef-chart'] = new Chart(document.getElementById('coef-chart'), {
@@ -906,15 +906,15 @@ function renderPredictors() {
             labels: sorted.map(c => c.label || c.name),
             datasets: [{ label: 'Standardized Beta', data: sorted.map(c => c.beta), backgroundColor: sorted.map(c => c.beta >= 0 ? '#4ae04a' : '#ff5555') }]
         },
-        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'GSS OLS Standardized Coefficients', color: '#e4e6ef' }, legend: { display: false } } }
+        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'GSS OLS Standardized Coefficients (n = 74,045)', color: '#e4e6ef' }, legend: { display: false } } }
     });
 
     // Decade trends
     const byDecade = reg?.by_decade || {};
     const decades = Object.keys(byDecade).sort();
+    destroy('decade-trends-chart');
     if (coefs.length > 0 && decades.length > 0) {
         const topVars = [...coefs].sort((a, b) => Math.abs(b.beta) - Math.abs(a.beta)).slice(0, 5);
-        destroy('decade-trends-chart');
         G.charts['decade-trends-chart'] = new Chart(document.getElementById('decade-trends-chart'), {
             type: 'line',
             data: {
