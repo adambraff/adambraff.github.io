@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deliberate Practice Calculator — Braff & Co.</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --border: #2e3345;
+  --border-soft: #2a2d3a;
+  --text: #e4e6ef;
+  --text-2: #e0e0e0;
+  --muted: #8b8fa3;
+  --muted-2: #888;
+  --accent: #6c8cff;
+  --green: #4ae04a;
+  --red: #ff5555;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", Monaco, Menlo, Consolas, monospace;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.6;
+  padding: 0;
+  font-size: 0.9rem;
+}
+
+/* Sticky Nav */
+.sticky-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(15,17,23,0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+}
+
+.sticky-nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  transition: color 0.15s;
+}
+
+.sticky-nav a:hover { color: var(--text); }
+
+.sticky-nav .brand { font-weight: 600; color: var(--text-2); }
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 32px 64px;
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.intro {
+  color: var(--muted);
+  font-size: 0.9rem;
+  max-width: 800px;
+  margin-bottom: 32px;
+  line-height: 1.7;
+}
+
+h2 {
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Activity Table */
+.activity-section { margin-bottom: 32px; }
+
+.activity-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+table.activity-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  min-width: 700px;
+  font-variant-numeric: tabular-nums;
+}
+
+table.activity-table th {
+  background: var(--surface);
+  padding: 10px 8px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.7rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+table.activity-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border-soft);
+  vertical-align: middle;
+}
+
+table.activity-table tr:last-child td { border-bottom: none; }
+table.activity-table tr:hover td { background: rgba(108,140,255,0.04); }
+
+table.activity-table input[type="text"] { width: 100%; min-width: 100px; }
+table.activity-table input[type="number"] { width: 70px; }
+table.activity-table input[type="range"] { width: 80px; }
+table.activity-table select { width: 55px; }
+
+input, select {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(108,140,255,0.2);
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  background: var(--border);
+  height: 4px;
+  border-radius: 2px;
+  border: none;
+  padding: 0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+.dp-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dp-val {
+  font-weight: 600;
+  min-width: 1.2em;
+  text-align: right;
+  font-size: 0.85rem;
+  font-family: var(--font-mono);
+  color: var(--accent);
+}
+
+.btn-remove {
+  background: none;
+  border: none;
+  color: var(--red);
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+.btn-remove:hover { opacity: 1; background: rgba(255,85,85,0.1); }
+
+.controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 0.85rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.btn:hover { background: var(--surface); border-color: var(--muted); }
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.btn-primary:hover { background: #5a7ae6; }
+
+.halflife-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.halflife-control label { text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.7rem; font-weight: 600; }
+
+.halflife-control input[type="range"] { width: 140px; }
+
+.halflife-val {
+  font-weight: 600;
+  min-width: 2.5em;
+  font-family: var(--font-mono);
+  color: var(--accent);
+}
+
+.tooltip-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--muted);
+  font-size: 0.65rem;
+  font-weight: 700;
+  cursor: help;
+  position: relative;
+}
+
+.tooltip-trigger:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text);
+  color: var(--bg);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 400;
+  white-space: normal;
+  width: 240px;
+  z-index: 200;
+  line-height: 1.4;
+  pointer-events: none;
+}
+
+/* Summary Stats */
+.summary-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  font-family: var(--font-mono);
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.interpretation {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-style: italic;
+  margin-bottom: 32px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+/* Charts */
+.chart-row {
+  display: grid;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.chart-row-3 { grid-template-columns: repeat(3, 1fr); }
+.chart-row-2 { grid-template-columns: repeat(2, 1fr); }
+
+.chart-card {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px;
+  background: var(--surface);
+}
+
+.chart-card h3 {
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.chart-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.chart-wrap canvas {
+  width: 100% !important;
+}
+
+.regression-info {
+  font-size: 0.75rem;
+  color: var(--muted-2);
+  margin-top: 8px;
+  font-family: var(--font-mono);
+}
+
+/* Share */
+.share-section {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.copy-feedback {
+  font-size: 0.85rem;
+  color: var(--green);
+  margin-left: 8px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.copy-feedback.show { opacity: 1; }
+
+/* Expand overlay */
+.chart-card { cursor: pointer; transition: border-color 0.15s; }
+.chart-card:hover { border-color: var(--accent); }
+.chart-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15,17,23,0.92);
+  z-index: 200;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.chart-overlay.active { display: flex; }
+.chart-overlay-inner {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 24px;
+  width: 90vw;
+  max-width: 900px;
+  max-height: 80vh;
+}
+.chart-overlay-inner canvas { width: 100% !important; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .chart-row-3, .chart-row-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .container { padding: 16px; }
+  .sticky-nav { padding: 0 16px; }
+  h1 { font-size: 1.25rem; }
+  .summary-stats { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav class="sticky-nav">
+  <a href="https://braff.co" class="brand">Braff & Co.</a>
+  <a href="https://braff.co">← All tools</a>
+</nav>
+
+<div class="container">
+  <h1>Deliberate Practice Calculator</h1>
+  <p class="intro">
+    Anders Ericsson's research on deliberate practice showed that structured, feedback-rich practice matters more than raw hours. Malcolm Gladwell simplified this to "10,000 hours makes you an expert," which Ericsson spent years correcting. This tool lets you inventory your own lifetime hours, apply time decay, score your activities on deliberate practice quality, and see how much of your current skill level is explained by practice and how much isn't.
+  </p>
+  <p class="intro">
+    Add and remove activities where you believe you have spent significant time and where you want to assess how that time has resulted in skill. Time should be mutually exclusive and deliberate. For example, think of parenting as time spent doing things with your kids with some or all of the focus on them, exclusive of other activities on this list.
+  </p>
+
+  <div class="activity-section">
+    <h2>Your Activities</h2>
+    <div class="activity-table-wrap">
+      <table class="activity-table" id="activityTable">
+        <thead>
+          <tr>
+            <th>Activity</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Hrs/wk</th>
+            <th>Deliberate Practice <span class="tooltip-trigger" style="text-transform:none;letter-spacing:0;font-size:0.78rem" data-tip="How much structured feedback do you get? 10 = constant expert feedback, 1 = no idea how well you're doing">?</span></th>
+            <th>Skill Rank <span class="tooltip-trigger" style="text-transform:none;letter-spacing:0;font-size:0.78rem" data-tip="Force-rank how skillful you are at these activities, 1 = best. A good test: could you get paid to do it?">?</span></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="activityBody"></tbody>
+      </table>
+    </div>
+
+    <div class="controls-row">
+      <button class="btn btn-primary" onclick="addActivity()">+ Add activity</button>
+      <div class="halflife-control">
+        <label for="halflife">Half-life:</label>
+        <input type="range" id="halflife" min="5" max="30" value="15" oninput="onHalflifeChange()">
+        <span class="halflife-val" id="halflifeVal">15</span> years
+        <span class="tooltip-trigger" data-tip="How many years before old practice is worth half as much. Lower = recent practice matters more.">?</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="summary-stats" id="summaryStats"></div>
+  <div class="interpretation" id="interpretation" style="display:none"></div>
+
+  <div class="chart-row chart-row-3">
+    <div class="chart-card" onclick="expandChart('hoursPerYear')">
+      <h3>How you spend your time</h3>
+      <div class="chart-wrap"><canvas id="chartHoursPerYear"></canvas></div>
+    </div>
+    <div class="chart-card" onclick="expandChart('cumulative')">
+      <h3>Total hours invested</h3>
+      <div class="chart-wrap"><canvas id="chartCumulative"></canvas></div>
+    </div>
+    <div class="chart-card" onclick="expandChart('decay')">
+      <h3>What sticks (decay-adjusted)</h3>
+      <div class="chart-wrap"><canvas id="chartDecay"></canvas></div>
+    </div>
+  </div>
+  <div class="chart-overlay" id="chartOverlay" onclick="closeExpanded()">
+    <div class="chart-overlay-inner" onclick="event.stopPropagation()">
+      <canvas id="chartExpanded"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-row chart-row-2">
+    <div class="chart-card" onclick="expandChart('bubble')">
+      <h3>Experience vs. feedback quality <span style="font-weight:400;text-transform:none;letter-spacing:0">(bubble size = skill rank, #1 = largest)</span></h3>
+      <div class="chart-wrap"><canvas id="chartBubble"></canvas></div>
+    </div>
+    <div class="chart-card" onclick="expandChart('residual')">
+      <h3>The unexplained</h3>
+      <div class="chart-wrap"><canvas id="chartResidual"></canvas></div>
+      <div class="regression-info" id="regressionInfo"></div>
+    </div>
+  </div>
+
+  <div class="share-section">
+    <button class="btn" onclick="copyShareLink()">Copy shareable link</button>
+    <span class="copy-feedback" id="copyFeedback">Copied!</span>
+  </div>
+</div>
+
+<script>
+const CURRENT_YEAR = 2026;
+const WAKING_HOURS_PER_YEAR = 5840;
+
+const COLORS = [
+  '#6c8cff', '#ff9d4d', '#4ae04a', '#9d8fff', '#ff5555',
+  '#00d9ff', '#f0c040', '#e67e22', '#1abc9c', '#f472b6'
+];
+
+const COLORS_ALPHA = COLORS.map(c => c + '1a');
+
+const DEFAULT_ACTIVITIES = [
+  { name: 'Professional work', start: 1999, end: 2026, hpw: 40, dp: 8, rank: 1 },
+  { name: 'Writing',           start: 1988, end: 2026, hpw: 2,  dp: 5, rank: 2 },
+  { name: 'Parenting',         start: 2001, end: 2025, hpw: 14, dp: 3, rank: 3 },
+  { name: 'Teaching',          start: 2019, end: 2026, hpw: 2,  dp: 4, rank: 4 },
+  { name: 'Cooking',           start: 1995, end: 2026, hpw: 7,  dp: 7, rank: 5 },
+  { name: 'Being a student',   start: 1975, end: 1991, hpw: 5,  dp: 7, rank: 6 },
+  { name: 'Coding',            start: 1978, end: 1987, hpw: 10, dp: 7, rank: 7 },
+  { name: 'Law',               start: 1993, end: 1998, hpw: 40, dp: 6, rank: 8 },
+  { name: 'Exercise',          start: 1990, end: 2026, hpw: 3,  dp: 2, rank: 9 }
+];
+
+let activities = [];
+let charts = {};
+
+function getActivities() {
+  const rows = document.querySelectorAll('#activityBody tr');
+  const acts = [];
+  rows.forEach((row, i) => {
+    acts.push({
+      name:  row.querySelector('.act-name').value || `Activity ${i+1}`,
+      start: parseInt(row.querySelector('.act-start').value) || 2000,
+      end:   parseInt(row.querySelector('.act-end').value) || CURRENT_YEAR,
+      hpw:   parseFloat(row.querySelector('.act-hpw').value) || 0,
+      dp:    parseInt(row.querySelector('.act-dp').value) || 5,
+      rank:  parseInt(row.querySelector('.act-rank').value) || (i + 1)
+    });
+  });
+  return acts;
+}
+
+function renderTable(acts) {
+  const tbody = document.getElementById('activityBody');
+  tbody.innerHTML = '';
+  acts.forEach((a, i) => {
+    const tr = document.createElement('tr');
+    const rankOpts = acts.map((_, j) => `<option value="${j+1}" ${a.rank === j+1 ? 'selected' : ''}>${j+1}</option>`).join('');
+    tr.innerHTML = `
+      <td><input type="text" class="act-name" value="${escHtml(a.name)}" oninput="onInputChange()"></td>
+      <td><input type="number" class="act-start" value="${a.start}" min="1900" max="${CURRENT_YEAR}" oninput="onInputChange()"></td>
+      <td><input type="number" class="act-end" value="${a.end}" min="1900" max="${CURRENT_YEAR}" oninput="onInputChange()"></td>
+      <td><input type="number" class="act-hpw" value="${a.hpw}" min="0" max="168" step="0.5" oninput="onInputChange()"></td>
+      <td><div class="dp-cell"><input type="range" class="act-dp" min="1" max="10" value="${a.dp}" oninput="this.parentNode.querySelector('.dp-val').textContent=this.value; onInputChange()"><span class="dp-val">${a.dp}</span></div></td>
+      <td><select class="act-rank" onchange="onRankChange(${i}, this.value)">${rankOpts}</select></td>
+      <td><button class="btn-remove" onclick="removeActivity(${i})" title="Remove">&times;</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+  snapshotRanks();
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function addActivity() {
+  const acts = getActivities();
+  acts.push({ name: '', start: 2020, end: CURRENT_YEAR, hpw: 5, dp: 5, rank: acts.length + 1 });
+  renderTable(acts);
+  updateAll();
+}
+
+function removeActivity(idx) {
+  const acts = getActivities();
+  acts.splice(idx, 1);
+  // Re-assign ranks
+  acts.forEach((a, i) => { if (a.rank > acts.length) a.rank = acts.length; });
+  renderTable(acts);
+  updateAll();
+}
+
+function onInputChange() {
+  updateAll();
+}
+
+function onHalflifeChange() {
+  document.getElementById('halflifeVal').textContent = document.getElementById('halflife').value;
+  updateAll();
+}
+
+function getYearRange(acts) {
+  if (acts.length === 0) return { minYear: 2000, maxYear: CURRENT_YEAR };
+  let minY = Infinity, maxY = -Infinity;
+  acts.forEach(a => {
+    if (a.start < minY) minY = a.start;
+    if (a.end > maxY) maxY = a.end;
+  });
+  return { minYear: minY, maxYear: maxY };
+}
+
+function computeData(acts, halflife) {
+  const lambda = Math.LN2 / halflife;
+  const { minYear, maxYear } = getYearRange(acts);
+  const years = [];
+  for (let y = minYear; y <= maxYear; y++) years.push(y);
+
+  // hours per year per activity
+  const hoursPerYear = acts.map(a => {
+    return years.map(y => {
+      if (y >= a.start && y <= a.end) return a.hpw * 52;
+      return 0;
+    });
+  });
+
+  // cumulative
+  const cumulative = acts.map((a, ai) => {
+    let sum = 0;
+    return years.map((y, yi) => {
+      sum += hoursPerYear[ai][yi];
+      return sum;
+    });
+  });
+
+  // decay-adjusted cumulative (recalculated at each year)
+  const decayCumulative = acts.map((a, ai) => {
+    return years.map((y, yi) => {
+      let sum = 0;
+      for (let j = 0; j <= yi; j++) {
+        const yearsAgo = y - years[j];
+        sum += hoursPerYear[ai][j] * Math.exp(-lambda * yearsAgo);
+      }
+      return Math.round(sum);
+    });
+  });
+
+  // Final decay-weighted hours (at current year)
+  const lastIdx = years.length - 1;
+  const decayWeighted = acts.map((a, ai) => decayCumulative[ai][lastIdx]);
+
+  // Total lifetime hours
+  const totalHours = acts.reduce((s, a, ai) => s + (cumulative[ai][lastIdx] || 0), 0);
+
+  // Current year hours
+  const currentYearHours = acts.reduce((s, a, ai) => {
+    const yi = years.indexOf(CURRENT_YEAR);
+    return s + (yi >= 0 ? hoursPerYear[ai][yi] : 0);
+  }, 0);
+
+  return { years, hoursPerYear, cumulative, decayCumulative, decayWeighted, totalHours, currentYearHours };
+}
+
+function olsRegression(acts, decayWeighted) {
+  // inverted_rank ~ log(decay_weighted_hours) + dp_score
+  const n = acts.length;
+  if (n < 3) return { beta0: 0, beta1: 0, beta2: 0, r2: 0, residuals: new Array(n).fill(0), predicted: new Array(n).fill(0) };
+
+  const maxRank = n;
+  const y = acts.map(a => maxRank + 1 - a.rank); // invert: rank 1 -> highest value
+  const x1 = decayWeighted.map(h => h > 0 ? Math.log(h) : 0);
+  const x2 = acts.map(a => a.dp);
+
+  // OLS: Y = b0 + b1*X1 + b2*X2
+  // Normal equations: (X'X)b = X'Y
+  let s1=0, s2=0, sy=0, s11=0, s22=0, s12=0, s1y=0, s2y=0;
+  for (let i = 0; i < n; i++) {
+    s1 += x1[i]; s2 += x2[i]; sy += y[i];
+    s11 += x1[i]*x1[i]; s22 += x2[i]*x2[i]; s12 += x1[i]*x2[i];
+    s1y += x1[i]*y[i]; s2y += x2[i]*y[i];
+  }
+
+  // Solve 3x3 system using Cramer's rule
+  // [n, s1, s2]   [b0]   [sy]
+  // [s1, s11, s12] [b1] = [s1y]
+  // [s2, s12, s22] [b2]   [s2y]
+  const A = [
+    [n, s1, s2],
+    [s1, s11, s12],
+    [s2, s12, s22]
+  ];
+  const B = [sy, s1y, s2y];
+
+  const det = (m) =>
+    m[0][0]*(m[1][1]*m[2][2]-m[1][2]*m[2][1])
+   -m[0][1]*(m[1][0]*m[2][2]-m[1][2]*m[2][0])
+   +m[0][2]*(m[1][0]*m[2][1]-m[1][1]*m[2][0]);
+
+  const D = det(A);
+  if (Math.abs(D) < 1e-10) return { beta0: 0, beta1: 0, beta2: 0, r2: 0, residuals: new Array(n).fill(0), predicted: new Array(n).fill(0) };
+
+  const D0 = det([[B[0],A[0][1],A[0][2]],[B[1],A[1][1],A[1][2]],[B[2],A[2][1],A[2][2]]]);
+  const D1 = det([[A[0][0],B[0],A[0][2]],[A[1][0],B[1],A[1][2]],[A[2][0],B[2],A[2][2]]]);
+  const D2 = det([[A[0][0],A[0][1],B[0]],[A[1][0],A[1][1],B[1]],[A[2][0],A[2][1],B[2]]]);
+
+  const beta0 = D0/D, beta1 = D1/D, beta2 = D2/D;
+
+  const predicted = [];
+  const residuals = [];
+  let ssRes = 0, ssTot = 0;
+  const yMean = sy / n;
+
+  for (let i = 0; i < n; i++) {
+    const yhat = beta0 + beta1*x1[i] + beta2*x2[i];
+    predicted.push(yhat);
+    const r = y[i] - yhat;
+    residuals.push(r);
+    ssRes += r*r;
+    ssTot += (y[i] - yMean) * (y[i] - yMean);
+  }
+
+  const r2 = ssTot > 0 ? 1 - ssRes / ssTot : 0;
+  return { beta0, beta1, beta2, r2, residuals, predicted };
+}
+
+function updateAll() {
+  const acts = getActivities();
+  const halflife = parseInt(document.getElementById('halflife').value);
+  const data = computeData(acts, halflife);
+  const reg = olsRegression(acts, data.decayWeighted);
+
+  updateSummary(data, reg);
+  updateCharts(acts, data, reg);
+  updateHash(acts, halflife);
+}
+
+function updateSummary(data, reg) {
+  const pct = data.totalHours > 0 ? ((data.currentYearHours / WAKING_HOURS_PER_YEAR) * 100).toFixed(1) : '0.0';
+  const r2pct = (Math.max(0, reg.r2) * 100).toFixed(0);
+
+  document.getElementById('summaryStats').innerHTML = `
+    <div class="stat-card"><div class="stat-value">${Math.round(data.totalHours).toLocaleString()}</div><div class="stat-label">Total lifetime hours</div></div>
+    <div class="stat-card"><div class="stat-value">${pct}%</div><div class="stat-label">Waking hours tracked (${CURRENT_YEAR})</div></div>
+    <div class="stat-card"><div class="stat-value">${r2pct}%</div><div class="stat-label">Variance explained (R²)</div></div>
+  `;
+
+  document.getElementById('interpretation').textContent = '';
+}
+
+function destroyChart(key) {
+  if (charts[key]) { charts[key].destroy(); charts[key] = null; }
+}
+
+function updateCharts(acts, data, reg) {
+  const { years, hoursPerYear, cumulative, decayCumulative, decayWeighted } = data;
+  const labels = years.map(String);
+  const n = acts.length;
+
+  // 1. Hours per year (stacked area)
+  destroyChart('hoursPerYear');
+  const datasets1 = acts.map((a, i) => ({
+    label: a.name,
+    data: hoursPerYear[i],
+    backgroundColor: COLORS_ALPHA[i % COLORS.length],
+    borderColor: COLORS[i % COLORS.length],
+    borderWidth: 1.5,
+    fill: true,
+    pointRadius: 0
+  }));
+  const hpyOpts = stackedAreaOpts('Hours');
+  hpyOpts.scales.y.max = WAKING_HOURS_PER_YEAR + 500;
+  hpyOpts.plugins.tooltip = {
+    mode: 'index',
+    callbacks: {
+      afterBody: function(items) {
+        const total = items.reduce((s, it) => s + (it.raw || 0), 0);
+        const pct = Math.round(total / WAKING_HOURS_PER_YEAR * 100);
+        return `\nTracked: ${Math.round(total).toLocaleString()} of ${WAKING_HOURS_PER_YEAR.toLocaleString()} waking hrs (${pct}%)`;
+      },
+      label: () => null
+    }
+  };
+  const wakingLinePlugin = {
+    id: 'wakingLine',
+    afterDraw(chart) {
+      const yScale = chart.scales.y;
+      const yPos = yScale.getPixelForValue(WAKING_HOURS_PER_YEAR);
+      const ctx = chart.ctx;
+      ctx.save();
+      ctx.setLineDash([6, 4]);
+      ctx.strokeStyle = '#ff5555';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(chart.chartArea.left, yPos);
+      ctx.lineTo(chart.chartArea.right, yPos);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#ff5555';
+      ctx.font = '10px -apple-system, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText('Waking hours/year (' + WAKING_HOURS_PER_YEAR.toLocaleString() + ')', chart.chartArea.right, yPos - 6);
+      ctx.restore();
+    }
+  };
+  charts.hoursPerYear = new Chart(document.getElementById('chartHoursPerYear'), {
+    type: 'line',
+    data: { labels, datasets: datasets1 },
+    options: hpyOpts,
+    plugins: [wakingLinePlugin]
+  });
+
+  // 2. Cumulative hours (stacked area)
+  destroyChart('cumulative');
+  charts.cumulative = new Chart(document.getElementById('chartCumulative'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: acts.map((a, i) => ({
+        label: a.name,
+        data: cumulative[i],
+        backgroundColor: COLORS_ALPHA[i % COLORS.length],
+        borderColor: COLORS[i % COLORS.length],
+        borderWidth: 1.5,
+        fill: true,
+        pointRadius: 0
+      }))
+    },
+    options: stackedAreaOpts('Hours')
+  });
+
+  // 3. Decay-adjusted cumulative
+  destroyChart('decay');
+  charts.decay = new Chart(document.getElementById('chartDecay'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: acts.map((a, i) => ({
+        label: a.name,
+        data: decayCumulative[i],
+        backgroundColor: COLORS_ALPHA[i % COLORS.length],
+        borderColor: COLORS[i % COLORS.length],
+        borderWidth: 1.5,
+        fill: true,
+        pointRadius: 0
+      }))
+    },
+    options: stackedAreaOpts('Decay-adjusted hours')
+  });
+
+  // 4. Bubble scatterplot
+  destroyChart('bubble');
+  const maxRank = n;
+  const bubbleData = acts.map((a, i) => ({
+    x: Math.max(decayWeighted[i], 1),
+    y: a.dp,
+    r: Math.max(4, 20 - (a.rank - 1) * 2.5),
+    label: a.name
+  }));
+
+  charts.bubble = new Chart(document.getElementById('chartBubble'), {
+    type: 'bubble',
+    data: {
+      datasets: acts.map((a, i) => ({
+        label: a.name,
+        data: [bubbleData[i]],
+        backgroundColor: COLORS[i % COLORS.length] + '99',
+        borderColor: COLORS[i % COLORS.length],
+        borderWidth: 1.5
+      }))
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              const d = ctx.raw;
+              return `${ctx.dataset.label}: ${Math.round(d.x).toLocaleString()} hrs, DP: ${d.y}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: 'logarithmic',
+          title: { display: true, text: 'Decay-weighted hours (log)', font: { size: 11 }, color: '#8b8fa3' },
+          ticks: { color: '#888' },
+          grid: { color: 'rgba(255,255,255,0.06)' }
+        },
+        y: {
+          min: 0, max: 11,
+          title: { display: true, text: 'Deliberate practice score', font: { size: 11 }, color: '#8b8fa3' },
+          ticks: { color: '#888' },
+          grid: { color: 'rgba(255,255,255,0.06)' }
+        }
+      }
+    },
+    plugins: [{
+      id: 'bubbleLabels',
+      afterDatasetsDraw(chart) {
+        const ctx = chart.ctx;
+        ctx.save();
+        ctx.font = '11px -apple-system, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#8b8fa3';
+        chart.data.datasets.forEach((ds, di) => {
+          const meta = chart.getDatasetMeta(di);
+          meta.data.forEach((el) => {
+            ctx.fillText(ds.label, el.x, el.y - el.options.radius - 4);
+          });
+        });
+        ctx.restore();
+      }
+    }]
+  });
+
+  // 5. Residual bar chart
+  destroyChart('residual');
+  const sortedIndices = acts.map((_, i) => i).sort((a, b) => reg.residuals[b] - reg.residuals[a]);
+
+  charts.residual = new Chart(document.getElementById('chartResidual'), {
+    type: 'bar',
+    data: {
+      labels: sortedIndices.map(i => acts[i].name),
+      datasets: [{
+        data: sortedIndices.map(i => +reg.residuals[i].toFixed(2)),
+        backgroundColor: sortedIndices.map(i => reg.residuals[i] >= 0 ? 'rgba(74,224,74,0.5)' : 'rgba(255,85,85,0.5)'),
+        borderColor: sortedIndices.map(i => reg.residuals[i] >= 0 ? '#4ae04a' : '#ff5555'),
+        borderWidth: 1.5
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: {
+          title: { display: true, text: 'Worse than predicted ← 0 → Better than predicted', font: { size: 10 }, color: '#8b8fa3' },
+          ticks: { color: '#888' },
+          grid: { color: 'rgba(255,255,255,0.06)' }
+        },
+        y: {
+          ticks: { color: '#8b8fa3' },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+
+  // Regression info
+  document.getElementById('regressionInfo').innerHTML =
+    `inverted_rank = ${reg.beta0.toFixed(2)} + ${reg.beta1.toFixed(2)} &times; ln(hours) + ${reg.beta2.toFixed(2)} &times; dp_score &nbsp;&nbsp; R&sup2; = ${reg.r2.toFixed(3)}`;
+}
+
+function stackedAreaOpts(yLabel) {
+  return {
+    responsive: true,
+    maintainAspectRatio: true,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: true, position: 'bottom', labels: { boxWidth: 10, font: { size: 10 }, color: '#8b8fa3' } },
+      tooltip: { mode: 'index' }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { maxTicksLimit: 8, font: { size: 10 }, color: '#888' }
+      },
+      y: {
+        stacked: true,
+        beginAtZero: true,
+        title: { display: true, text: yLabel, font: { size: 11 }, color: '#8b8fa3' },
+        grid: { color: 'rgba(255,255,255,0.06)' },
+        ticks: { font: { size: 10 }, color: '#888' }
+      }
+    }
+  };
+}
+
+let expandedChart = null;
+function expandChart(key) {
+  const acts = getActivities();
+  const halflife = parseInt(document.getElementById('halflife').value);
+  const data = computeData(acts, halflife);
+  const { years, hoursPerYear, cumulative, decayCumulative } = data;
+  const labels = years.map(String);
+  let datasets, yLabel;
+  if (key === 'hoursPerYear') {
+    yLabel = 'Hours';
+    datasets = acts.map((a, i) => ({
+      label: a.name, data: hoursPerYear[i],
+      backgroundColor: COLORS_ALPHA[i % COLORS.length], borderColor: COLORS[i % COLORS.length],
+      borderWidth: 1.5, fill: true, pointRadius: 0
+    }));
+  } else if (key === 'cumulative') {
+    yLabel = 'Hours';
+    datasets = acts.map((a, i) => ({
+      label: a.name, data: cumulative[i],
+      backgroundColor: COLORS_ALPHA[i % COLORS.length], borderColor: COLORS[i % COLORS.length],
+      borderWidth: 1.5, fill: true, pointRadius: 0
+    }));
+  } else if (key === 'decay') {
+    yLabel = 'Decay-adjusted hours';
+    datasets = acts.map((a, i) => ({
+      label: a.name, data: decayCumulative[i],
+      backgroundColor: COLORS_ALPHA[i % COLORS.length], borderColor: COLORS[i % COLORS.length],
+      borderWidth: 1.5, fill: true, pointRadius: 0
+    }));
+  } else if (key === 'bubble' || key === 'residual') {
+    if (expandedChart) { expandedChart.destroy(); expandedChart = null; }
+    document.getElementById('chartOverlay').classList.add('active');
+    const halflife = parseInt(document.getElementById('halflife').value);
+    const cdata = computeData(acts, halflife);
+    const reg = olsRegression(acts, cdata.decayWeighted);
+    const n = acts.length;
+    if (key === 'bubble') {
+      const bubbleData2 = acts.map((a, i) => ({
+        x: Math.max(cdata.decayWeighted[i], 1), y: a.dp,
+        r: Math.max(6, 28 - (a.rank - 1) * 3)
+      }));
+      expandedChart = new Chart(document.getElementById('chartExpanded'), {
+        type: 'bubble',
+        data: { datasets: acts.map((a, i) => ({
+          label: a.name, data: [bubbleData2[i]],
+          backgroundColor: COLORS[i % COLORS.length] + '99', borderColor: COLORS[i % COLORS.length], borderWidth: 1.5
+        })) },
+        options: {
+          responsive: true, maintainAspectRatio: true,
+          plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + Math.round(ctx.raw.x).toLocaleString() + ' hrs, DP: ' + ctx.raw.y } } },
+          scales: {
+            x: { type: 'logarithmic', title: { display: true, text: 'Decay-weighted hours (log)', font: { size: 12 }, color: '#8b8fa3' }, ticks: { color: '#888' }, grid: { color: 'rgba(255,255,255,0.06)' } },
+            y: { min: 0, max: 11, title: { display: true, text: 'Deliberate practice score', font: { size: 12 }, color: '#8b8fa3' }, ticks: { color: '#888' }, grid: { color: 'rgba(255,255,255,0.06)' } }
+          }
+        },
+        plugins: [{ id: 'bubbleLabelsExp', afterDatasetsDraw(chart) {
+          const ctx = chart.ctx; ctx.save(); ctx.font = '12px -apple-system, sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#8b8fa3';
+          chart.data.datasets.forEach((ds, di) => { chart.getDatasetMeta(di).data.forEach(el => { ctx.fillText(ds.label, el.x, el.y - el.options.radius - 5); }); });
+          ctx.restore();
+        }}]
+      });
+    } else {
+      const sortedIdx = acts.map((_, i) => i).sort((a, b) => reg.residuals[b] - reg.residuals[a]);
+      expandedChart = new Chart(document.getElementById('chartExpanded'), {
+        type: 'bar',
+        data: { labels: sortedIdx.map(i => acts[i].name), datasets: [{ data: sortedIdx.map(i => +reg.residuals[i].toFixed(2)),
+          backgroundColor: sortedIdx.map(i => reg.residuals[i] >= 0 ? 'rgba(74,224,74,0.5)' : 'rgba(255,85,85,0.5)'),
+          borderColor: sortedIdx.map(i => reg.residuals[i] >= 0 ? '#4ae04a' : '#ff5555'), borderWidth: 1.5 }] },
+        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } },
+          scales: { x: { title: { display: true, text: 'Worse than predicted ← 0 → Better than predicted', font: { size: 11 }, color: '#8b8fa3' }, ticks: { color: '#888' }, grid: { color: 'rgba(255,255,255,0.06)' } },
+            y: { ticks: { color: '#8b8fa3', font: { size: 12 } }, grid: { display: false } } } }
+      });
+    }
+    return;
+  }
+  if (expandedChart) { expandedChart.destroy(); expandedChart = null; }
+  document.getElementById('chartOverlay').classList.add('active');
+  const expOpts = stackedAreaOpts(yLabel);
+  const expPlugins = [];
+  if (key === 'hoursPerYear') {
+    expOpts.scales.y.max = WAKING_HOURS_PER_YEAR + 500;
+    expPlugins.push({
+      id: 'wakingLineExp',
+      afterDraw(chart) {
+        const yPos = chart.scales.y.getPixelForValue(WAKING_HOURS_PER_YEAR);
+        const ctx = chart.ctx;
+        ctx.save();
+        ctx.setLineDash([6, 4]);
+        ctx.strokeStyle = '#ff5555';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(chart.chartArea.left, yPos);
+        ctx.lineTo(chart.chartArea.right, yPos);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#ff5555';
+        ctx.font = '11px -apple-system, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText('Waking hours/year (' + WAKING_HOURS_PER_YEAR.toLocaleString() + ')', chart.chartArea.right, yPos - 6);
+        ctx.restore();
+      }
+    });
+  }
+  expandedChart = new Chart(document.getElementById('chartExpanded'), {
+    type: 'line', data: { labels, datasets }, options: expOpts, plugins: expPlugins
+  });
+}
+function closeExpanded() {
+  document.getElementById('chartOverlay').classList.remove('active');
+  if (expandedChart) { expandedChart.destroy(); expandedChart = null; }
+}
+
+let _lastRanks = [];
+function snapshotRanks() {
+  _lastRanks = [];
+  document.querySelectorAll('#activityBody tr').forEach(row => {
+    _lastRanks.push(parseInt(row.querySelector('.act-rank').value) || 0);
+  });
+}
+
+function onRankChange(changedIdx, newRank) {
+  newRank = parseInt(newRank);
+  const oldRank = _lastRanks[changedIdx];
+  if (oldRank === newRank) return;
+  const rows = document.querySelectorAll('#activityBody tr');
+  rows.forEach((row, i) => {
+    if (i === changedIdx) return;
+    const sel = row.querySelector('.act-rank');
+    let r = parseInt(sel.value);
+    if (r === newRank) {
+      sel.value = oldRank;
+    }
+  });
+  snapshotRanks();
+  updateAll();
+}
+
+// Share link
+function updateHash(acts, halflife) {
+  // Don't update hash while loading from hash
+  if (window._loadingFromHash) return;
+  const payload = { a: acts, h: halflife };
+  const json = JSON.stringify(payload);
+  const encoded = btoa(unescape(encodeURIComponent(json)));
+  history.replaceState(null, '', '#' + encoded);
+}
+
+function loadFromHash() {
+  const hash = location.hash.slice(1);
+  if (!hash) return false;
+  try {
+    const json = decodeURIComponent(escape(atob(hash)));
+    const payload = JSON.parse(json);
+    if (payload.a && Array.isArray(payload.a)) {
+      activities = payload.a;
+      if (payload.h) document.getElementById('halflife').value = payload.h;
+      document.getElementById('halflifeVal').textContent = document.getElementById('halflife').value;
+      return true;
+    }
+  } catch (e) {
+    console.warn('Could not parse hash data:', e);
+  }
+  return false;
+}
+
+function copyShareLink() {
+  const url = location.href;
+  navigator.clipboard.writeText(url).then(() => {
+    const fb = document.getElementById('copyFeedback');
+    fb.classList.add('show');
+    setTimeout(() => fb.classList.remove('show'), 2000);
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = url;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const fb = document.getElementById('copyFeedback');
+    fb.classList.add('show');
+    setTimeout(() => fb.classList.remove('show'), 2000);
+  });
+}
+
+// Init
+window._loadingFromHash = true;
+if (!loadFromHash()) {
+  activities = JSON.parse(JSON.stringify(DEFAULT_ACTIVITIES));
+}
+renderTable(activities);
+window._loadingFromHash = false;
+updateAll();
+</script>
+
+</body>
+</html>
