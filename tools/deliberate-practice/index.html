@@ -31,6 +31,8 @@ body {
   line-height: 1.6;
   padding: 0;
   font-size: 0.9rem;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 /* Sticky Nav */
@@ -408,8 +410,9 @@ input[type="range"]::-webkit-slider-thumb {
   width: 90vw;
   max-width: 900px;
   max-height: 80vh;
+  overflow: auto;
 }
-.chart-overlay-inner canvas { width: 100% !important; }
+.chart-overlay-inner canvas { width: 100% !important; height: auto !important; max-height: 70vh; }
 
 /* Responsive */
 @media (max-width: 900px) {
