@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Onelife AEO/GEO Visibility Tracker</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0f1419; --panel:#171d26; --panel2:#1e2530; --line:#2a3340;
+    --txt:#e6edf3; --muted:#9aa7b4; --accent:#3ea6ff; --good:#3fb950;
+    --warn:#d29922; --bad:#f85149; --chip:#222c38;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--txt);font-size:14px;line-height:1.5}
+  header{padding:18px 24px;border-bottom:1px solid var(--line);background:var(--panel)}
+  header h1{margin:0;font-size:18px;font-weight:650}
+  header .sub{color:var(--muted);font-size:12.5px;margin-top:3px}
+  .wrap{max-width:1180px;margin:0 auto;padding:20px 24px 80px}
+  .tabs{display:flex;gap:4px;margin:18px 0;flex-wrap:wrap}
+  .tab{padding:8px 14px;border:1px solid var(--line);background:var(--panel);border-radius:7px;
+    cursor:pointer;color:var(--muted);font-weight:550;font-size:13px}
+  .tab.active{color:var(--txt);border-color:var(--accent);background:var(--panel2)}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin-bottom:18px}
+  .panel h2{margin:0 0 4px;font-size:15px}
+  .panel .hint{color:var(--muted);font-size:12.5px;margin:0 0 14px}
+  label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
+  input[type=text],input[type=password],textarea,select{
+    width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:7px;
+    color:var(--txt);padding:8px 10px;font-size:13px;font-family:inherit}
+  textarea{min-height:70px;resize:vertical}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .row3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;align-items:end}
+  button{background:var(--accent);color:#071019;border:none;border-radius:7px;padding:9px 15px;
+    font-weight:650;cursor:pointer;font-size:13px}
+  button.sec{background:var(--panel2);color:var(--txt);border:1px solid var(--line)}
+  button.sm{padding:5px 9px;font-size:12px}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  .eng{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);
+    border-radius:8px;margin-bottom:10px;background:var(--panel2)}
+  .eng .meta{flex:1}
+  .eng .meta b{font-size:13.5px}
+  .eng .meta .d{color:var(--muted);font-size:11.5px}
+  .toggle{width:42px;height:24px;border-radius:14px;background:#2a3340;position:relative;cursor:pointer;flex:0 0 auto}
+  .toggle.on{background:var(--good)}
+  .toggle:after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;
+    background:#fff;transition:.15s}
+  .toggle.on:after{left:21px}
+  .pill{display:inline-block;padding:2px 8px;border-radius:11px;font-size:11px;background:var(--chip);color:var(--muted)}
+  .pill.dmv{background:#15324a;color:#8fd0ff}
+  .pill.atl{background:#3a2415;color:#f0b37e}
+  .pill.coa{background:#15402a;color:#8fe0b0}
+  .pill.brand{background:#2e2347;color:#c4b0f0}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px}
+  .scorecards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+  .card{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:14px}
+  .card .k{color:var(--muted);font-size:11.5px}
+  .card .v{font-size:26px;font-weight:700;margin-top:4px}
+  .card .x{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .bar{height:8px;border-radius:5px;background:#2a3340;overflow:hidden;margin-top:6px}
+  .bar > span{display:block;height:100%;background:var(--accent)}
+  .q{border:1px solid var(--line);border-radius:8px;margin-bottom:8px;background:var(--panel2)}
+  .q .qh{display:flex;gap:10px;align-items:center;padding:10px 12px;cursor:pointer}
+  .q .qh .qt{flex:1;font-size:13px}
+  .q .qbody{padding:0 12px 12px;display:none;border-top:1px solid var(--line)}
+  .q.open .qbody{display:block}
+  .ans{background:#0d1117;border:1px solid var(--line);border-radius:7px;padding:10px;
+    white-space:pre-wrap;font-size:12px;color:#c9d4df;max-height:240px;overflow:auto;margin-top:8px}
+  .sent-positive{color:var(--good)} .sent-neutral{color:var(--muted)} .sent-negative{color:var(--bad)}
+  .score-3{color:var(--good)} .score-2{color:#9fd66a} .score-1{color:var(--warn)} .score-0{color:var(--bad)}
+  .cite{font-size:11.5px;color:var(--accent);text-decoration:none;display:block;margin:2px 0;word-break:break-all}
+  .cite.owned{color:var(--good)}
+  .note{font-size:12px;color:var(--muted);background:#0d1117;border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:6px;padding:10px 12px;margin:10px 0}
+  .warnbox{border-left-color:var(--warn)}
+  .progress{height:10px;border-radius:6px;background:#2a3340;overflow:hidden;margin:10px 0}
+  .progress > span{display:block;height:100%;background:var(--accent);width:0%}
+  .log{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--muted);
+    max-height:160px;overflow:auto;background:#0d1117;border:1px solid var(--line);border-radius:7px;padding:8px;margin-top:10px}
+  .muted{color:var(--muted)} .small{font-size:11.5px}
+  .right{text-align:right} .center{text-align:center}
+  .hide{display:none}
+  canvas{max-width:100%}
+  .flex{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .grow{flex:1}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Onelife AEO/GEO Visibility Tracker</h1>
+  <div class="sub">Measure how answer engines (Gemini, ChatGPT, Claude, Perplexity) describe Onelife vs competitors — diagnose, track over time, and find content gaps. Client-side; your keys stay in your browser.</div>
+</header>
+<div class="wrap">
+  <div class="tabs" id="tabs"></div>
+
+  <!-- SETUP -->
+  <div class="section" data-sec="setup">
+    <div class="panel">
+      <h2>1. Answer engines</h2>
+      <p class="hint">Enter API keys for the engines you want to poll. Keys are stored only in this browser's localStorage and sent directly to each provider. Recommended starting point: <b>Gemini</b> (cheapest, web-grounded, returns citations, works cleanly from the browser). Gemini also powers the AI scoring/"judge" step.</p>
+      <div id="engineConfigs"></div>
+      <div class="note">CORS note: Gemini, OpenAI, and Anthropic respond to direct browser calls (Anthropic needs the dangerous-direct-browser-access header, which the tool sets). Perplexity often blocks browser calls; if it errors, leave it off or run it through a proxy. Models drift — the model name fields are editable so you can bump them without touching code.</div>
+    </div>
+  </div>
+
+  <!-- BATTERY -->
+  <div class="section hide" data-sec="battery">
+    <div class="panel">
+      <h2>2. Query battery</h2>
+      <p class="hint">The buyer-intent prompts the tool will send to each engine. Toggle off any you don't want to run. Add your own at the bottom. Markets: <span class="pill dmv">DMV</span> <span class="pill atl">Atlanta</span> <span class="pill coa">Coastal VA</span> <span class="pill brand">Brand</span></p>
+      <div id="batteryList"></div>
+      <div class="row3" style="margin-top:14px">
+        <div><label>New query text</label><input type="text" id="nqText" placeholder="best gym for new moms in Reston VA"/></div>
+        <div><label>Market</label><select id="nqMarket"><option value="DMV">DMV</option><option value="Atlanta">Atlanta</option><option value="Coastal">Coastal VA</option><option value="Brand">Brand</option></select></div>
+        <div><label>Intent</label><input type="text" id="nqIntent" placeholder="amenity / family / etc."/></div>
+      </div>
+      <div class="btnrow"><button class="sm" id="addQ">+ Add query</button><button class="sm sec" id="resetBattery">Reset to defaults</button></div>
+    </div>
+  </div>
+
+  <!-- RUN -->
+  <div class="section hide" data-sec="run">
+    <div class="panel">
+      <h2>3. Run the diagnostic</h2>
+      <p class="hint">Each enabled query is sent to each enabled engine, then an AI "judge" scores presence, prominence, recommendation, sentiment, and citations. Cost is roughly (#queries × #engines × ~$0.002) per run with Gemini Flash. A full battery runs in a couple of minutes.</p>
+      <div class="flex">
+        <button id="runBtn">Run full battery</button>
+        <button class="sec" id="loadBaseline">Load 2026-05-26 baseline</button>
+        <span class="muted small" id="runEstimate"></span>
+      </div>
+      <div class="progress hide" id="progWrap"><span id="progBar"></span></div>
+      <div class="log hide" id="runLog"></div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="section hide" data-sec="results">
+    <div id="noResults" class="panel"><p class="muted">No run yet. Go to <b>Run</b> and either run the battery (needs a Gemini key at minimum) or click <b>Load 2026-05-26 baseline</b> to see the seeded diagnostic.</p></div>
+    <div id="resultsBody" class="hide">
+      <div class="panel">
+        <h2>Visibility scorecard <span class="muted small" id="runMeta"></span></h2>
+        <div class="scorecards" id="scorecards"></div>
+        <p class="hint" style="margin-bottom:0">Share of Voice = % of queries where Onelife is mentioned at all. Prominence (0–3) = how featured it is when mentioned (3 = led/recommended, 1 = afterthought). Citation share = % of cited sources that are onelifefitness.com.</p>
+      </div>
+      <div class="panel">
+        <h2>By market</h2>
+        <table><thead><tr><th>Market</th><th>Queries</th><th>Share of Voice</th><th>Avg prominence</th><th>Recommend rate</th><th>Sentiment</th><th>Owned-citation share</th></tr></thead><tbody id="marketTable"></tbody></table>
+      </div>
+      <div class="panel">
+        <h2>Competitor share of voice</h2>
+        <p class="hint">How often each brand appears across the same queries. If competitors out-appear Onelife, that's where the AI answer is being lost.</p>
+        <canvas id="compChart" height="120"></canvas>
+      </div>
+      <div class="panel">
+        <h2>Query-by-query detail</h2>
+        <p class="hint">Click a row to see the raw answer, the score, and the sources the engine cited. Watch for content gaps (queries where no engine has real material to work with) and accuracy flags.</p>
+        <div id="queryDetail"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TREND -->
+  <div class="section hide" data-sec="trend">
+    <div class="panel">
+      <h2>Trend over time</h2>
+      <p class="hint">Each saved run is a point. Export runs to JSON and commit them to the repo's <code>/data</code> folder so trend history is durable and version-controlled, not trapped in one browser.</p>
+      <div id="noTrend"><p class="muted">No history yet. Run the battery or load the baseline, then runs accumulate here.</p></div>
+      <div id="trendBody" class="hide">
+        <label>Metric</label>
+        <select id="trendMetric" style="max-width:280px">
+          <option value="sov">Share of Voice (%)</option>
+          <option value="prominence">Avg prominence (0–3)</option>
+          <option value="recommend">Recommend rate (%)</option>
+          <option value="sentiment">Sentiment (−1 to 1)</option>
+          <option value="citation">Owned-citation share (%)</option>
+        </select>
+        <canvas id="trendChart" height="120" style="margin-top:12px"></canvas>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Data export / import</h2>
+      <div class="btnrow">
+        <button class="sec sm" id="expRun">Export latest run (JSON)</button>
+        <button class="sec sm" id="expHist">Export full history (JSON)</button>
+        <button class="sec sm" id="expCsv">Export history (CSV)</button>
+        <button class="sec sm" id="impBtn">Import history (JSON)</button>
+        <input type="file" id="impFile" class="hide" accept="application/json"/>
+        <button class="sec sm" id="clearHist">Clear history</button>
+      </div>
+      <p class="hint" style="margin-top:10px">Recommended cadence: run weekly, export, commit to git. Or schedule it (see README) to run automatically.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   Onelife AEO/GEO Visibility Tracker  —  single-file, client-side
+   ============================================================ */
+const BRAND = "Onelife";
+const BRAND_ALIASES = ["onelife","one life"];          // normalized matching
+const OWNED_DOMAINS = ["onelifefitness.com"];
+
+const COMPETITORS = ["Crunch","Planet Fitness","LA Fitness","EOS Fitness","Life Time",
+  "Equinox","Gold's Gym","Orangetheory","YMCA","Anytime Fitness","Crossfit","Barry's","VIDA Fitness"];
+
+/* ---- Default query battery (markets chosen with Adam: DMV / Atlanta / Coastal) ---- */
+const DEFAULT_BATTERY = [
+  // DMV
+  {id:"dmv1", market:"DMV", intent:"discovery", q:"best gyms in Alexandria VA", on:true},
+  {id:"dmv2", market:"DMV", intent:"amenity",   q:"gym with a pool near Fairfax VA", on:true},
+  {id:"dmv3", market:"DMV", intent:"classes",   q:"best gym in Arlington VA with group fitness classes", on:true},
+  {id:"dmv4", market:"DMV", intent:"premium",   q:"best luxury gym in Bethesda MD", on:true},
+  {id:"dmv5", market:"DMV", intent:"comparison",q:"Onelife Fitness vs Crunch Fitness in Northern Virginia", on:true},
+  {id:"dmv6", market:"DMV", intent:"persona",   q:"which gym is best for a busy professional in Alexandria VA", on:true},
+  {id:"dmv7", market:"DMV", intent:"strength",  q:"best gym for strength training in Ashburn VA", on:true},
+  // Atlanta
+  {id:"atl1", market:"Atlanta", intent:"discovery", q:"best gyms in Dunwoody GA", on:true},
+  {id:"atl2", market:"Atlanta", intent:"strength",  q:"best strength training gym in Dunwoody GA", on:true},
+  {id:"atl3", market:"Atlanta", intent:"family",    q:"best family friendly gym with childcare in Alpharetta GA", on:true},
+  {id:"atl4", market:"Atlanta", intent:"comparison",q:"Onelife Fitness vs Crunch Fitness Atlanta", on:true},
+  {id:"atl5", market:"Atlanta", intent:"premium",   q:"Onelife Fitness vs Life Time Alpharetta", on:true},
+  {id:"atl6", market:"Atlanta", intent:"discovery", q:"best gym in Newnan GA", on:true},
+  // Coastal VA
+  {id:"coa1", market:"Coastal", intent:"amenity",   q:"best gym in Virginia Beach with a pool", on:true},
+  {id:"coa2", market:"Coastal", intent:"discovery", q:"best gyms in Hampton VA", on:true},
+  {id:"coa3", market:"Coastal", intent:"family",    q:"best gym with a kids club in Chesapeake VA", on:true},
+  {id:"coa4", market:"Coastal", intent:"comparison",q:"Onelife Fitness vs Crunch Fitness Virginia Beach", on:true},
+  // Brand / sentiment
+  {id:"brn1", market:"Brand", intent:"sentiment",  q:"is Onelife Fitness worth the money", on:true},
+  {id:"brn2", market:"Brand", intent:"reputation", q:"is Onelife Fitness a good gym", on:true},
+  {id:"brn3", market:"Brand", intent:"comparison", q:"best gym chain in Virginia", on:true},
+];
+
+/* ---- Engine definitions ---- */
+const ENGINE_DEFS = [
+  {key:"gemini", name:"Google Gemini (grounded)", desc:"Proxy for Google AI Overviews. Cheapest, web-grounded, returns citations. Also runs the AI judge.", model:"gemini-2.5-flash", grounded:true},
+  {key:"openai", name:"OpenAI ChatGPT (web search)", desc:"Proxy for ChatGPT search. Uses the Responses API + web_search tool.", model:"gpt-4o", grounded:true},
+  {key:"anthropic", name:"Anthropic Claude (web search)", desc:"Proxy for Claude. Browser calls allowed via the dangerous-direct-browser-access header.", model:"claude-sonnet-4-5", grounded:true},
+  {key:"perplexity", name:"Perplexity (sonar)", desc:"Great grounding + citations, but often blocks browser calls (CORS). Experimental.", model:"sonar", grounded:true},
+];
+
+/* ============================================================
+   State + persistence
+   ============================================================ */
+const LS = {
+  cfg:"olgeo_cfg", battery:"olgeo_battery", history:"olgeo_history"
+};
+let state = {
+  cfg: loadJSON(LS.cfg, {}),
+  battery: loadJSON(LS.battery, JSON.parse(JSON.stringify(DEFAULT_BATTERY))),
+  history: loadJSON(LS.history, []),
+  lastRun: null,
+};
+function loadJSON(k, d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } }
+function saveCfg(){ localStorage.setItem(LS.cfg, JSON.stringify(state.cfg)); }
+function saveBattery(){ localStorage.setItem(LS.battery, JSON.stringify(state.battery)); }
+function saveHistory(){ localStorage.setItem(LS.history, JSON.stringify(state.history)); }
+
+/* ============================================================
+   Tabs
+   ============================================================ */
+const SECTIONS = [["setup","Setup"],["battery","Query battery"],["run","Run"],["results","Results"],["trend","Trend & data"]];
+function buildTabs(){
+  const t=document.getElementById("tabs"); t.innerHTML="";
+  SECTIONS.forEach(([id,label],i)=>{
+    const d=document.createElement("div"); d.className="tab"+(i===0?" active":""); d.textContent=label;
+    d.onclick=()=>{ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active")); d.classList.add("active");
+      document.querySelectorAll(".section").forEach(s=>s.classList.add("hide"));
+      document.querySelector('[data-sec="'+id+'"]').classList.remove("hide");
+      if(id==="results") renderResults();
+      if(id==="trend") renderTrend();
+    };
+    t.appendChild(d);
+  });
+}
+
+/* ============================================================
+   Setup UI
+   ============================================================ */
+function renderEngines(){
+  const root=document.getElementById("engineConfigs"); root.innerHTML="";
+  ENGINE_DEFS.forEach(def=>{
+    const c = state.cfg[def.key] || {enabled:false, key:"", model:def.model};
+    state.cfg[def.key]=c;
+    const wrap=document.createElement("div");
+    const keyLabel = def.key==="anthropic"?"x-api-key":"API key";
+    wrap.innerHTML=`
+      <div class="eng">
+        <div class="toggle ${c.enabled?'on':''}" data-eng="${def.key}"></div>
+        <div class="meta"><b>${def.name}</b><div class="d">${def.desc}</div></div>
+      </div>
+      <div class="row" style="margin:-4px 0 14px">
+        <div><label>${keyLabel}</label><input type="password" data-k="key" data-eng="${def.key}" value="${c.key||''}" placeholder="paste key"/></div>
+        <div><label>Model</label><input type="text" data-k="model" data-eng="${def.key}" value="${c.model||def.model}"/></div>
+      </div>`;
+    root.appendChild(wrap);
+  });
+  root.querySelectorAll(".toggle").forEach(tg=>tg.onclick=()=>{
+    const k=tg.dataset.eng; state.cfg[k].enabled=!state.cfg[k].enabled; tg.classList.toggle("on"); saveCfg(); updateEstimate();
+  });
+  root.querySelectorAll("input").forEach(inp=>inp.oninput=()=>{
+    state.cfg[inp.dataset.eng][inp.dataset.k]=inp.value; saveCfg();
+  });
+}
+
+/* ============================================================
+   Battery UI
+   ============================================================ */
+const MKT_CLASS={DMV:"dmv",Atlanta:"atl",Coastal:"coa",Brand:"brand"};
+function renderBattery(){
+  const root=document.getElementById("batteryList"); root.innerHTML="";
+  state.battery.forEach((b,i)=>{
+    const row=document.createElement("div"); row.className="eng";
+    row.innerHTML=`<div class="toggle ${b.on?'on':''}" data-i="${i}"></div>
+      <div class="meta"><b>${escapeHtml(b.q)}</b>
+        <div class="d"><span class="pill ${MKT_CLASS[b.market]||''}">${b.market}</span> &nbsp;${b.intent}</div></div>
+      <button class="sm sec" data-del="${i}">✕</button>`;
+    root.appendChild(row);
+  });
+  root.querySelectorAll(".toggle").forEach(tg=>tg.onclick=()=>{
+    const i=+tg.dataset.i; state.battery[i].on=!state.battery[i].on; tg.classList.toggle("on"); saveBattery(); updateEstimate();
+  });
+  root.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{
+    state.battery.splice(+b.dataset.del,1); saveBattery(); renderBattery(); updateEstimate();
+  });
+}
+function updateEstimate(){
+  const nq=state.battery.filter(b=>b.on).length;
+  const ne=ENGINE_DEFS.filter(d=>state.cfg[d.key]&&state.cfg[d.key].enabled).length;
+  const calls=nq*ne;
+  const el=document.getElementById("runEstimate");
+  if(el) el.textContent = ne? `${nq} queries × ${ne} engines = ${calls} answer calls + ${calls} judge calls (~$${(calls*0.004).toFixed(2)} est.)` : "No engines enabled — add a key in Setup.";
+}
+
+/* ============================================================
+   Engine adapters
+   ============================================================ */
+async function callGemini(query, cfg){
+  const model=cfg.model||"gemini-2.5-flash";
+  const url=`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(cfg.key)}`;
+  const body={contents:[{parts:[{text:query}]}], tools:[{google_search:{}}]};
+  const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  if(!r.ok) throw new Error("Gemini "+r.status+": "+(await r.text()).slice(0,160));
+  const j=await r.json();
+  const cand=j.candidates&&j.candidates[0];
+  const text=((cand&&cand.content&&cand.content.parts)||[]).map(p=>p.text||"").join("\n");
+  const chunks=(cand&&cand.groundingMetadata&&cand.groundingMetadata.groundingChunks)||[];
+  const citations=chunks.map(c=>({url:(c.web&&c.web.uri)||"",title:(c.web&&c.web.title)||""})).filter(c=>c.url);
+  return {text,citations};
+}
+async function callOpenAI(query, cfg){
+  const model=cfg.model||"gpt-4o";
+  const r=await fetch("https://api.openai.com/v1/responses",{method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+cfg.key},
+    body:JSON.stringify({model, tools:[{type:"web_search_preview"}], input:query})});
+  if(!r.ok) throw new Error("OpenAI "+r.status+": "+(await r.text()).slice(0,160));
+  const j=await r.json(); let text=j.output_text||""; const citations=[];
+  (j.output||[]).forEach(it=>{ if(it.type==="message"){ (it.content||[]).forEach(c=>{
+    if(c.type==="output_text"){ if(!j.output_text) text+=c.text||""; (c.annotations||[]).forEach(a=>{ if(a.type==="url_citation") citations.push({url:a.url,title:a.title||""}); }); }
+  });}});
+  return {text,citations};
+}
+async function callAnthropic(query, cfg){
+  const model=cfg.model||"claude-sonnet-4-5";
+  const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",
+    headers:{"Content-Type":"application/json","x-api-key":cfg.key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+    body:JSON.stringify({model,max_tokens:1024,messages:[{role:"user",content:query}],tools:[{type:"web_search_20250305",name:"web_search",max_uses:3}]})});
+  if(!r.ok) throw new Error("Anthropic "+r.status+": "+(await r.text()).slice(0,160));
+  const j=await r.json(); let text=""; const citations=[];
+  (j.content||[]).forEach(b=>{ if(b.type==="text"){ text+=b.text||""; (b.citations||[]).forEach(ct=>{ if(ct.url) citations.push({url:ct.url,title:ct.title||""}); }); }});
+  return {text,citations};
+}
+async function callPerplexity(query, cfg){
+  const model=cfg.model||"sonar";
+  const r=await fetch("https://api.perplexity.ai/chat/completions",{method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+cfg.key},
+    body:JSON.stringify({model,messages:[{role:"user",content:query}]})});
+  if(!r.ok) throw new Error("Perplexity "+r.status+": "+(await r.text()).slice(0,160));
+  const j=await r.json(); const text=(j.choices&&j.choices[0]&&j.choices[0].message.content)||"";
+  const citations=(j.citations||[]).map(u=>({url:u,title:""}));
+  return {text,citations};
+}
+const ADAPTERS={gemini:callGemini, openai:callOpenAI, anthropic:callAnthropic, perplexity:callPerplexity};
+
+/* ============================================================
+   Scoring — AI judge (Gemini) with heuristic fallback
+   ============================================================ */
+async function judge(query, answer, cfg){
+  if(state.cfg.gemini && state.cfg.gemini.enabled && state.cfg.gemini.key){
+    try{ return await judgeGemini(query, answer, state.cfg.gemini); }
+    catch(e){ /* fall through */ }
+  }
+  return heuristicScore(answer);
+}
+async function judgeGemini(query, answer, gcfg){
+  const prompt=`You score how a fitness brand appears in an AI assistant's answer to a consumer search.
+QUERY: "${query}"
+BRAND OF INTEREST: "Onelife Fitness"
+COMPETITORS TO WATCH: ${COMPETITORS.join(", ")}
+AI ANSWER:
+"""${(answer||"").slice(0,6000)}"""
+Return ONLY strict minified JSON, no markdown:
+{"mentioned":true/false,"rank":<int, 1 = first brand named in the answer, 0 if Onelife not mentioned>,"recommended":true/false (true only if Onelife is actively positioned as a top pick / recommended, not merely listed),"sentiment":"positive"|"neutral"|"negative","sentiment_score":<number -1..1>,"brands_mentioned":[<brand strings actually present>],"accuracy_concern":true/false (true if a factual claim about Onelife looks wrong or unverifiable),"notes":"<short reason, <140 chars>"}`;
+  const model=gcfg.judgeModel||"gemini-2.5-flash";
+  const url=`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(gcfg.key)}`;
+  const body={contents:[{parts:[{text:prompt}]}],generationConfig:{response_mime_type:"application/json",temperature:0}};
+  const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  if(!r.ok) throw new Error("judge "+r.status);
+  const j=await r.json();
+  const txt=(((j.candidates||[])[0]||{}).content||{}).parts?.[0]?.text||"{}";
+  const s=JSON.parse(txt);
+  s.prominence = scoreProminence(s);
+  s._judge="gemini";
+  return s;
+}
+function scoreProminence(s){
+  if(!s.mentioned) return 0;
+  if(s.recommended || s.rank===1) return 3;
+  if(s.rank && s.rank<=3) return 2;
+  return 1;
+}
+function heuristicScore(answer){
+  const t=(answer||"").toLowerCase();
+  const mentioned = BRAND_ALIASES.some(a=>t.includes(a));
+  const brands=[]; COMPETITORS.concat([BRAND]).forEach(b=>{ if(t.includes(b.toLowerCase())) brands.push(b); });
+  // rank: position of first onelife mention among brand first-mentions
+  let rank=0;
+  if(mentioned){
+    const positions=[];
+    COMPETITORS.concat([BRAND]).forEach(b=>{ const i=t.indexOf(b.toLowerCase()); if(i>=0) positions.push([b,i]); });
+    positions.sort((a,b)=>a[1]-b[1]);
+    rank=positions.findIndex(p=>p[0]===BRAND)+1;
+  }
+  const POS=["great","best","top","excellent","premier","recommend","love","state-of-the-art","favorite","standout"];
+  const NEG=["expensive","overpriced","dirty","rude","cancel","crowded","complaint","worst","avoid","poor"];
+  let sc=0; POS.forEach(w=>{if(t.includes(w))sc++;}); NEG.forEach(w=>{if(t.includes(w))sc--;});
+  const sentiment = sc>1?"positive":sc<0?"negative":"neutral";
+  const s={mentioned, rank, recommended: rank===1, sentiment, sentiment_score: Math.max(-1,Math.min(1,sc/4)),
+    brands_mentioned:brands, accuracy_concern:false, notes:"heuristic (no judge key)", _judge:"heuristic"};
+  s.prominence=scoreProminence(s);
+  return s;
+}
+
+/* ============================================================
+   Run loop
+   ============================================================ */
+let running=false;
+async function runBattery(){
+  const engines=ENGINE_DEFS.filter(d=>state.cfg[d.key]&&state.cfg[d.key].enabled&&state.cfg[d.key].key);
+  const queries=state.battery.filter(b=>b.on);
+  if(!engines.length){ alert("Enable at least one engine with an API key in Setup."); return; }
+  if(!queries.length){ alert("Enable at least one query in the battery."); return; }
+  running=true;
+  const runBtn=document.getElementById("runBtn"); runBtn.disabled=true; runBtn.textContent="Running…";
+  const pw=document.getElementById("progWrap"), pb=document.getElementById("progBar"),
+        lg=document.getElementById("runLog");
+  pw.classList.remove("hide"); lg.classList.remove("hide"); lg.innerHTML="";
+  const total=engines.length*queries.length; let done=0;
+  const results=[];
+  for(const q of queries){
+    for(const e of engines){
+      log(lg, `→ [${e.name}] ${q.q}`);
+      const rec={qid:q.id, query:q.q, market:q.market, intent:q.intent, engine:e.key, engineName:e.name};
+      try{
+        const out=await ADAPTERS[e.key](q.q, state.cfg[e.key]);
+        rec.answer=out.text; rec.citations=out.citations||[];
+        rec.ownedCitations=rec.citations.filter(c=>OWNED_DOMAINS.some(d=>(c.url||"").includes(d))).length;
+        const s=await judge(q.q, out.text, state.cfg);
+        Object.assign(rec, s); rec.error=null;
+        log(lg, `   ✓ ${s.mentioned?("rank "+s.rank+", "+s.sentiment+", prom "+s.prominence):"NOT mentioned"} (${rec.citations.length} cites, ${rec.ownedCitations} owned)`);
+      }catch(err){
+        rec.error=String(err.message||err); rec.mentioned=null;
+        log(lg, `   ✗ ${rec.error}`);
+      }
+      results.push(rec); done++; pb.style.width=(done/total*100)+"%";
+      await sleep(250);
+    }
+  }
+  const snap={ts:new Date().toISOString(), label:"Live run", engines:engines.map(e=>e.key), results, agg:aggregate(results)};
+  state.lastRun=snap; state.history.push(snap); saveHistory();
+  running=false; runBtn.disabled=false; runBtn.textContent="Run full battery";
+  log(lg, `Done. ${results.length} results saved to history.`);
+  gotoTab("Results");
+}
+function log(el,msg){ el.innerHTML+=escapeHtml(msg)+"\n"; el.scrollTop=el.scrollHeight; }
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+/* ============================================================
+   Aggregation
+   ============================================================ */
+function aggregate(results){
+  const valid=results.filter(r=>r.error==null && r.mentioned!=null);
+  const seg=(rows)=>{
+    if(!rows.length) return null;
+    const ment=rows.filter(r=>r.mentioned);
+    const sov=ment.length/rows.length;
+    const prom=ment.length? ment.reduce((a,r)=>a+(r.prominence||0),0)/ment.length : 0;
+    const rec=rows.filter(r=>r.recommended).length/rows.length;
+    const sent=ment.length? ment.reduce((a,r)=>a+(typeof r.sentiment_score==="number"?r.sentiment_score:0),0)/ment.length : 0;
+    const totCit=rows.reduce((a,r)=>a+((r.citations||[]).length),0);
+    const ownCit=rows.reduce((a,r)=>a+(r.ownedCitations||0),0);
+    const cit= totCit? ownCit/totCit : 0;
+    return {n:rows.length, sov, prominence:prom, recommend:rec, sentiment:sent, citation:cit};
+  };
+  const byMarket={};
+  ["DMV","Atlanta","Coastal","Brand"].forEach(m=>{ const rows=valid.filter(r=>r.market===m); if(rows.length) byMarket[m]=seg(rows); });
+  // competitor SoV
+  const comp={};
+  COMPETITORS.concat([BRAND]).forEach(b=>{
+    const hits=valid.filter(r=>(r.brands_mentioned||[]).some(x=>x&&x.toLowerCase().includes(b.toLowerCase().slice(0,6)))).length;
+    comp[b]=valid.length? hits/valid.length:0;
+  });
+  return {overall:seg(valid), byMarket, comp, n:valid.length, errors:results.filter(r=>r.error).length};
+}
+
+/* ============================================================
+   Results UI
+   ============================================================ */
+let compChartObj=null, trendChartObj=null;
+function renderResults(){
+  const snap=state.lastRun;
+  if(!snap){ document.getElementById("noResults").classList.remove("hide"); document.getElementById("resultsBody").classList.add("hide"); return; }
+  document.getElementById("noResults").classList.add("hide"); document.getElementById("resultsBody").classList.remove("hide");
+  const a=snap.agg; const o=a.overall||{sov:0,prominence:0,recommend:0,sentiment:0,citation:0};
+  document.getElementById("runMeta").textContent = `— ${snap.label}, ${new Date(snap.ts).toLocaleString()} · ${a.n} answers · ${snap.engines.join(", ")}` + (a.errors?` · ${a.errors} errors`:"");
+  const sc=document.getElementById("scorecards");
+  sc.innerHTML = card("Share of Voice", pct(o.sov), "Onelife mentioned", o.sov)
+    + card("Avg prominence", o.prominence.toFixed(2)+" / 3", o.prominence>=2.3?"strong":o.prominence>=1.5?"middling":"weak", o.prominence/3)
+    + card("Recommend rate", pct(o.recommend), "actively recommended", o.recommend)
+    + card("Sentiment", o.sentiment>=0?("+"+o.sentiment.toFixed(2)):o.sentiment.toFixed(2), o.sentiment>0.2?"positive":o.sentiment< -0.1?"negative":"mixed", (o.sentiment+1)/2)
+    + card("Owned-citation share", pct(o.citation), "cites onelifefitness.com", o.citation);
+  // market table
+  const mt=document.getElementById("marketTable"); mt.innerHTML="";
+  Object.keys(a.byMarket).forEach(m=>{ const s=a.byMarket[m];
+    mt.innerHTML+=`<tr><td><span class="pill ${MKT_CLASS[m]}">${m}</span></td><td>${s.n}</td>
+      <td>${pct(s.sov)}</td><td class="score-${Math.round(s.prominence)}">${s.prominence.toFixed(2)}</td>
+      <td>${pct(s.recommend)}</td><td class="sent-${s.sentiment>0.2?'positive':s.sentiment< -0.1?'negative':'neutral'}">${s.sentiment>=0?'+':''}${s.sentiment.toFixed(2)}</td>
+      <td>${pct(s.citation)}</td></tr>`;
+  });
+  renderCompChart(a.comp);
+  renderQueryDetail(snap);
+}
+function card(k,v,x,frac){
+  frac=Math.max(0,Math.min(1,frac||0));
+  return `<div class="card"><div class="k">${k}</div><div class="v">${v}</div><div class="x">${x}</div>
+    <div class="bar"><span style="width:${(frac*100).toFixed(0)}%"></span></div></div>`;
+}
+function pct(x){ return (x*100).toFixed(0)+"%"; }
+function renderCompChart(comp){
+  const entries=Object.entries(comp).filter(([k,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const labels=entries.map(e=>e[0]); const data=entries.map(e=>+(e[1]*100).toFixed(0));
+  const colors=labels.map(l=>l===BRAND?"#3ea6ff":"#4a5663");
+  if(compChartObj) compChartObj.destroy();
+  compChartObj=new Chart(document.getElementById("compChart"),{type:"bar",
+    data:{labels,datasets:[{label:"Share of Voice %",data,backgroundColor:colors}]},
+    options:{indexAxis:"y",plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#9aa7b4"},grid:{color:"#2a3340"}},y:{ticks:{color:"#e6edf3"},grid:{display:false}}}}});
+}
+function renderQueryDetail(snap){
+  const root=document.getElementById("queryDetail"); root.innerHTML="";
+  // group by query
+  const byQ={};
+  snap.results.forEach(r=>{ (byQ[r.qid]=byQ[r.qid]||{q:r.query,market:r.market,intent:r.intent,rows:[]}).rows.push(r); });
+  Object.values(byQ).forEach(g=>{
+    const best=g.rows.find(r=>r.error==null)||g.rows[0];
+    const proms=g.rows.filter(r=>r.error==null&&r.mentioned).map(r=>r.prominence||0);
+    const avgP=proms.length?(proms.reduce((a,b)=>a+b,0)/proms.length):0;
+    const gap=g.rows.every(r=>r.error||!r.mentioned)|| (best.notes&&/no (real )?content|gap|limited/i.test(best.notes||""));
+    const div=document.createElement("div"); div.className="q";
+    div.innerHTML=`<div class="qh">
+        <span class="pill ${MKT_CLASS[g.market]}">${g.market}</span>
+        <span class="qt">${escapeHtml(g.q)}</span>
+        <span class="score-${Math.round(avgP)}">prom ${avgP.toFixed(1)}</span>
+        ${gap?'<span class="pill" style="background:#3a2415;color:#f0b37e">content gap</span>':''}
+      </div><div class="qbody">${g.rows.map(rowHtml).join("")}</div>`;
+    div.querySelector(".qh").onclick=()=>div.classList.toggle("open");
+    root.appendChild(div);
+  });
+}
+function rowHtml(r){
+  if(r.error) return `<div style="margin-top:10px"><b>${r.engineName}</b> <span class="sent-negative small">error: ${escapeHtml(r.error)}</span></div>`;
+  const cites=(r.citations||[]).slice(0,8).map(c=>{
+    const owned=OWNED_DOMAINS.some(d=>(c.url||"").includes(d));
+    return `<a class="cite ${owned?'owned':''}" href="${escapeAttr(c.url)}" target="_blank" rel="noopener">${owned?'★ ':''}${escapeHtml(c.title||c.url)}</a>`;
+  }).join("");
+  return `<div style="margin-top:12px">
+    <b>${r.engineName}</b>
+    ${r.mentioned?`<span class="small">· rank <b>${r.rank}</b> · <span class="sent-${r.sentiment}">${r.sentiment}</span> · prominence <span class="score-${r.prominence}">${r.prominence}/3</span>${r.recommended?' · <b>recommended</b>':''}</span>`
+      :'<span class="sent-negative small">· Onelife NOT mentioned</span>'}
+    ${r.accuracy_concern?' <span class="pill" style="background:#3a1515;color:#f08e8e">accuracy?</span>':''}
+    ${r.notes?`<div class="small muted" style="margin-top:3px">${escapeHtml(r.notes)}</div>`:''}
+    <div class="ans">${escapeHtml(r.answer||"(no text)")}</div>
+    ${cites?`<div class="small muted" style="margin-top:6px">Sources (${(r.citations||[]).length}; ★ = owned):</div>${cites}`:'<div class="small muted" style="margin-top:6px">No citations returned.</div>'}
+  </div>`;
+}
+
+/* ============================================================
+   Trend UI
+   ============================================================ */
+function renderTrend(){
+  if(!state.history.length){ document.getElementById("noTrend").classList.remove("hide"); document.getElementById("trendBody").classList.add("hide"); return; }
+  document.getElementById("noTrend").classList.add("hide"); document.getElementById("trendBody").classList.remove("hide");
+  drawTrend();
+}
+function drawTrend(){
+  const metric=document.getElementById("trendMetric").value;
+  const labels=state.history.map(h=>new Date(h.ts).toLocaleDateString());
+  const markets=["DMV","Atlanta","Coastal","Brand"];
+  const palette={DMV:"#3ea6ff",Atlanta:"#f0b37e",Coastal:"#8fe0b0",Brand:"#c4b0f0"};
+  const scale=(metric==="sentiment")?1:(metric==="prominence")?1:100;
+  const datasets=markets.map(m=>({
+    label:m, borderColor:palette[m], backgroundColor:palette[m], tension:.25, spanGaps:true,
+    data: state.history.map(h=>{ const s=h.agg&&h.agg.byMarket&&h.agg.byMarket[m]; return s? +( (s[metric]||0)*scale ).toFixed(2):null; })
+  }));
+  // overall line
+  datasets.push({label:"Overall", borderColor:"#ffffff", borderDash:[4,4], data:state.history.map(h=>{ const o=h.agg&&h.agg.overall; return o? +(((o[metric]||0))*scale).toFixed(2):null; }), tension:.25, spanGaps:true});
+  if(trendChartObj) trendChartObj.destroy();
+  trendChartObj=new Chart(document.getElementById("trendChart"),{type:"line",
+    data:{labels,datasets},
+    options:{plugins:{legend:{labels:{color:"#e6edf3"}}},scales:{x:{ticks:{color:"#9aa7b4"},grid:{color:"#2a3340"}},y:{ticks:{color:"#9aa7b4"},grid:{color:"#2a3340"}}}}});
+}
+
+/* ============================================================
+   Export / import
+   ============================================================ */
+function download(name, text, type){
+  const b=new Blob([text],{type:type||"application/json"}); const u=URL.createObjectURL(b);
+  const a=document.createElement("a"); a.href=u; a.download=name; a.click(); URL.revokeObjectURL(u);
+}
+function exportRun(){ if(!state.lastRun){alert("No run yet.");return;} download(`olgeo-run-${state.lastRun.ts.slice(0,10)}.json`, JSON.stringify(state.lastRun,null,2)); }
+function exportHist(){ download(`olgeo-history.json`, JSON.stringify(state.history,null,2)); }
+function exportCsv(){
+  const rows=[["run_ts","market","share_of_voice","avg_prominence","recommend_rate","sentiment","owned_citation_share","n"]];
+  state.history.forEach(h=>{ const bm=h.agg&&h.agg.byMarket||{}; Object.keys(bm).forEach(m=>{ const s=bm[m];
+    rows.push([h.ts,m,s.sov.toFixed(3),s.prominence.toFixed(3),s.recommend.toFixed(3),s.sentiment.toFixed(3),s.citation.toFixed(3),s.n]); });
+    const o=h.agg&&h.agg.overall; if(o) rows.push([h.ts,"ALL",o.sov.toFixed(3),o.prominence.toFixed(3),o.recommend.toFixed(3),o.sentiment.toFixed(3),o.citation.toFixed(3),o.n]);
+  });
+  download("olgeo-history.csv", rows.map(r=>r.join(",")).join("\n"), "text/csv");
+}
+
+/* ============================================================
+   Seed baseline (Claude-run via web search, 2026-05-26)
+   ============================================================ */
+function baselineSnapshot(){
+  const R=(qid,query,market,intent,o)=>Object.assign({qid,query,market,intent,engine:"baseline",engineName:"WebSearch baseline (Claude-run)",error:null,citations:o._cites||[],ownedCitations:(o._cites||[]).filter(c=>OWNED_DOMAINS.some(d=>c.url.includes(d))).length},o);
+  const yelp=t=>({url:"https://www.yelp.com/search?find_desc=Gyms",title:t||"Yelp"});
+  const own=u=>({url:"https://www.onelifefitness.com/"+u,title:"Onelife Fitness"});
+  const results=[
+    R("dmv1","best gyms in Alexandria VA","DMV","discovery",{mentioned:true,rank:2,recommended:false,sentiment:"positive",sentiment_score:0.6,prominence:2,brands_mentioned:["Onelife","Planet Fitness","Orangetheory"],accuracy_concern:false,notes:"Featured with amenities (Old Town, saunas, courts) but DMV Iron Gym led for strength.",_cites:[yelp(),{url:"https://ambfa.com",title:"Top 10 Gyms Alexandria"},{url:"https://threebestrated.com",title:"3 Best Gyms"}]}),
+    R("dmv3","best gym in Arlington VA with group fitness classes","DMV","classes",{mentioned:true,rank:1,recommended:true,sentiment:"positive",sentiment_score:0.7,prominence:3,brands_mentioned:["Onelife","Barry's","VIDA Fitness"],accuracy_concern:false,notes:"Onelife Ballston led the answer with detailed class list; onelifefitness.com cited.",_cites:[own("gyms/ballston"),yelp(),{url:"https://arlnow.com",title:"ARLnow Best Gym"},{url:"https://quora.com",title:"Quora"}]}),
+    R("dmv4","best luxury gym in Bethesda MD","DMV","premium",{mentioned:true,rank:1,recommended:true,sentiment:"positive",sentiment_score:0.55,prominence:3,brands_mentioned:["Onelife","Equinox","Life Time"],accuracy_concern:false,notes:"Onelife led full-amenity list, but Equinox (luxury) right behind — premium intent is contested.",_cites:[yelp(),{url:"https://bethesdamagazine.com/article/gyms/",title:"Bethesda Magazine 16 places"},{url:"https://patch.com",title:"Patch"}]}),
+    R("dmv5","Onelife Fitness vs Crunch Fitness in Northern Virginia","DMV","comparison",{mentioned:true,rank:1,recommended:false,sentiment:"neutral",sentiment_score:0.0,prominence:1,brands_mentioned:["Onelife","Crunch"],accuracy_concern:false,notes:"CONTENT GAP: no real member-facing comparison exists; only Indeed (employer) + TikTok surfaced.",_cites:[{url:"https://indeed.com",title:"Indeed employer compare"},{url:"https://tiktok.com",title:"TikTok"}]}),
+    R("atl1","best gyms in Dunwoody GA","Atlanta","discovery",{mentioned:true,rank:6,recommended:false,sentiment:"neutral",sentiment_score:0.1,prominence:1,brands_mentioned:["Onelife","LA Fitness","Crunch","Life Time","Orangetheory"],accuracy_concern:false,notes:"Onelife Perimeter listed only among 'other notable gyms' at the end.",_cites:[{url:"https://discoverdunwoody.com",title:"Discover Dunwoody"},yelp(),{url:"https://gymbird.com",title:"GymBird"}]}),
+    R("atl2","best strength training gym in Dunwoody GA","Atlanta","strength",{mentioned:true,rank:7,recommended:false,sentiment:"neutral",sentiment_score:0.0,prominence:1,brands_mentioned:["Onelife","LA Fitness","Crunch","Life Time"],accuracy_concern:false,notes:"Buried last; boutiques (CrossFit, Alloy, Elite Edge, Fitness Together) won the strength intent.",_cites:[{url:"https://discoverdunwoody.com",title:"Discover Dunwoody"},yelp()]}),
+    R("atl3","best family friendly gym with childcare in Alpharetta GA","Atlanta","family",{mentioned:true,rank:5,recommended:false,sentiment:"neutral",sentiment_score:0.1,prominence:1,brands_mentioned:["Onelife","Life Time","LA Fitness","YMCA"],accuracy_concern:false,notes:"Onelife Crabapple 'also listed' behind Life Time, The Forum, LA Fitness — weak even on its amenity strength.",_cites:[{url:"https://classpass.com",title:"ClassPass"},yelp(),{url:"https://lifetime.life",title:"Life Time"}]}),
+    R("coa1","best gym in Virginia Beach with a pool","Coastal","amenity",{mentioned:true,rank:1,recommended:true,sentiment:"positive",sentiment_score:0.8,prominence:3,brands_mentioned:["Onelife"],accuracy_concern:false,notes:"DOMINANT: three Onelife locations led the answer (pool, sauna, courts); onelifefitness.com cited directly.",_cites:[own("gyms/red-mill"),own("gyms/va-beach-blvd"),own("gyms/virginia-beach"),{url:"https://tripadvisor.com",title:"Tripadvisor VB"}]}),
+    R("brn1","is Onelife Fitness worth the money","Brand","sentiment",{mentioned:true,rank:1,recommended:false,sentiment:"neutral",sentiment_score:-0.05,prominence:2,brands_mentioned:["Onelife"],accuracy_concern:false,notes:"Mixed: positives = facilities/equipment/classes; negatives = cost, cancellation friction, customer service, cleanliness. Reddit cited generically.",_cites:[{url:"https://reddit.com",title:"Reddit (generic)"}]}),
+  ];
+  return {ts:"2026-05-26T17:00:00.000Z", label:"Baseline (Claude-run via web search)", engines:["baseline"], results, agg:aggregate(results)};
+}
+function loadBaseline(){
+  const snap=baselineSnapshot();
+  state.lastRun=snap;
+  if(!state.history.some(h=>h.ts===snap.ts)){ state.history.unshift(snap); saveHistory(); }
+  gotoTab("Results");
+}
+
+/* ============================================================
+   Helpers + wiring
+   ============================================================ */
+function escapeHtml(s){ return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function escapeAttr(s){ return escapeHtml(s).replace(/'/g,"&#39;"); }
+function gotoTab(label){ const tabs=[...document.querySelectorAll(".tab")]; const t=tabs.find(x=>x.textContent===label); if(t) t.click(); }
+
+function wire(){
+  document.getElementById("runBtn").onclick=runBattery;
+  document.getElementById("loadBaseline").onclick=loadBaseline;
+  document.getElementById("addQ").onclick=()=>{
+    const q=document.getElementById("nqText").value.trim(); if(!q) return;
+    state.battery.push({id:"u"+Date.now(), market:document.getElementById("nqMarket").value, intent:document.getElementById("nqIntent").value||"custom", q, on:true});
+    document.getElementById("nqText").value=""; saveBattery(); renderBattery(); updateEstimate();
+  };
+  document.getElementById("resetBattery").onclick=()=>{ state.battery=JSON.parse(JSON.stringify(DEFAULT_BATTERY)); saveBattery(); renderBattery(); updateEstimate(); };
+  document.getElementById("trendMetric").onchange=drawTrend;
+  document.getElementById("expRun").onclick=exportRun;
+  document.getElementById("expHist").onclick=exportHist;
+  document.getElementById("expCsv").onclick=exportCsv;
+  document.getElementById("clearHist").onclick=()=>{ if(confirm("Clear all saved runs?")){ state.history=[]; state.lastRun=null; saveHistory(); renderTrend(); renderResults(); } };
+  document.getElementById("impBtn").onclick=()=>document.getElementById("impFile").click();
+  document.getElementById("impFile").onchange=(e)=>{ const f=e.target.files[0]; if(!f) return; const rd=new FileReader();
+    rd.onload=()=>{ try{ const data=JSON.parse(rd.result); if(Array.isArray(data)){ state.history=data; } else { state.history.push(data); } saveHistory(); state.lastRun=state.history[state.history.length-1]; alert("Imported."); renderTrend(); }catch(err){ alert("Bad JSON: "+err.message); } };
+    rd.readAsText(f); };
+}
+buildTabs(); renderEngines(); renderBattery(); updateEstimate(); wire();
+</script>
+</body>
+</html>
