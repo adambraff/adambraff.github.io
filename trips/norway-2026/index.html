@@ -1,1 +1,823 @@
-PLACEHOLDER_REPLACE
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Norway & London — August 2026</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  :root {
+    --navy: #1a1a2e;
+    --blue: #2563eb;
+    --orange: #ea580c;
+    --green: #059669;
+    --purple: #7c3aed;
+    --red: #dc2626;
+    --amber: #f59e0b;
+    --gray: #64748b;
+    --light: #f8fafc;
+    --card: #ffffff;
+    --border: #e2e8f0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--navy);
+    background: var(--light);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 40%, #1a4a6e 100%);
+    color: white;
+    text-align: center;
+    padding: 60px 20px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff10' d='M0,96L48,112C96,128,192,160,288,154.7C384,149,480,107,576,101.3C672,96,768,128,864,149.3C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'/%3E%3C/svg%3E") no-repeat bottom;
+    background-size: cover;
+    opacity: 0.3;
+  }
+  .hero h1 { font-size: 2.8em; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; position: relative; }
+  .hero .subtitle { font-size: 1.2em; font-weight: 300; opacity: 0.9; position: relative; }
+  .hero .travelers { font-size: 1em; font-weight: 400; opacity: 0.75; margin-top: 12px; position: relative; }
+  .hero .route {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.15); border-radius: 30px;
+    padding: 10px 24px; margin-top: 20px; font-weight: 500;
+    font-size: 0.95em; position: relative; flex-wrap: wrap; justify-content: center;
+  }
+  .hero .route .arrow { opacity: 0.5; }
+
+  /* Container */
+  .container { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+
+  /* Quick Stats */
+  .stats-bar {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px; padding: 24px 0; margin-top: -30px; position: relative; z-index: 1;
+  }
+  .stat-card {
+    background: var(--card); border-radius: 12px; padding: 16px;
+    text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .stat-card .num { font-size: 1.4em; font-weight: 700; color: var(--blue); }
+  .stat-card .label { font-size: 0.8em; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* Map */
+  .map-container {
+    background: var(--card); border-radius: 16px; overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1); margin: 30px 0;
+  }
+  .map-container h3 {
+    padding: 16px 20px 0; font-size: 1.1em; font-weight: 700; color: var(--navy);
+  }
+  .map-wrapper { height: 420px; margin: 12px; border-radius: 10px; overflow: hidden; }
+
+  /* Section heading */
+  .section-heading {
+    font-size: 1.5em; font-weight: 800; color: var(--navy);
+    margin: 40px 0 16px; padding-bottom: 8px;
+    border-bottom: 3px solid var(--blue);
+    display: inline-block;
+  }
+
+  /* Day Card */
+  .day-card {
+    background: var(--card); border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    margin-bottom: 24px; overflow: hidden;
+  }
+  .day-header {
+    padding: 18px 24px;
+    display: flex; align-items: center; gap: 14px;
+    cursor: pointer; user-select: none;
+    transition: background 0.15s;
+  }
+  .day-header:hover { background: #f1f5f9; }
+  .day-badge {
+    background: var(--blue); color: white;
+    border-radius: 10px; padding: 6px 14px;
+    font-weight: 700; font-size: 0.85em; white-space: nowrap;
+    min-width: 58px; text-align: center;
+  }
+  .day-badge.oslo { background: var(--red); }
+  .day-badge.flam { background: var(--orange); }
+  .day-badge.bergen { background: var(--green); }
+  .day-badge.london { background: var(--purple); }
+  .day-badge.travel { background: var(--gray); }
+  .day-title { font-weight: 700; font-size: 1.1em; flex: 1; }
+  .day-toggle { font-size: 1.2em; color: var(--gray); transition: transform 0.2s; }
+  .day-card.open .day-toggle { transform: rotate(180deg); }
+
+  .day-body { padding: 0 24px 24px; display: none; }
+  .day-card.open .day-body { display: block; }
+
+  /* Activity table */
+  .activity-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  .activity-table th {
+    text-align: left; padding: 8px 12px; font-size: 0.75em;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--gray); border-bottom: 2px solid var(--border);
+  }
+  .activity-table td {
+    padding: 10px 12px; border-bottom: 1px solid var(--border);
+    vertical-align: top; font-size: 0.92em;
+  }
+  .activity-table tr:last-child td { border-bottom: none; }
+  .activity-table .time { font-weight: 600; color: var(--blue); white-space: nowrap; width: 90px; }
+  .activity-table .act { font-weight: 600; }
+  .activity-table .notes { color: var(--gray); font-size: 0.88em; }
+
+  .sports-note {
+    background: #f0fdf4; border-left: 4px solid var(--green);
+    padding: 12px 16px; margin-top: 12px; border-radius: 0 8px 8px 0;
+    font-size: 0.88em; color: #166534;
+  }
+
+  /* Survey section */
+  .insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+  @media (max-width: 640px) { .insights-grid { grid-template-columns: 1fr; } }
+  .insight-card {
+    background: var(--card); border-radius: 12px; padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .insight-card h4 { font-size: 0.9em; font-weight: 700; margin-bottom: 8px; }
+  .insight-card.winners h4 { color: var(--green); }
+  .insight-card.losers h4 { color: var(--red); }
+  .insight-card ul { list-style: none; padding: 0; }
+  .insight-card li { padding: 4px 0; font-size: 0.88em; }
+  .insight-card li::before { content: '→ '; color: var(--gray); }
+
+  /* Logistics */
+  .logistics-section { margin-top: 40px; }
+  .logistics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 16px; }
+  .logistics-card {
+    background: var(--card); border-radius: 12px; padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .logistics-card h4 { font-size: 0.95em; font-weight: 700; margin-bottom: 10px; color: var(--blue); }
+  .logistics-card ul { list-style: none; padding: 0; }
+  .logistics-card li { padding: 4px 0; font-size: 0.88em; border-bottom: 1px solid var(--border); }
+  .logistics-card li:last-child { border-bottom: none; }
+  .logistics-card li strong { color: var(--navy); }
+
+  /* Hotels table */
+  .hotels-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  .hotels-table th {
+    text-align: left; padding: 10px 14px; background: #f1f5f9;
+    font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray);
+  }
+  .hotels-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 0.92em; }
+  .hotels-table tr:last-child td { border-bottom: none; }
+
+  /* Budget */
+  .budget-note {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-radius: 12px; padding: 24px; margin-top: 24px;
+    font-size: 0.92em;
+  }
+  .budget-note h4 { font-size: 1em; font-weight: 700; margin-bottom: 8px; }
+
+  /* Footer */
+  .footer {
+    text-align: center; padding: 40px 20px; margin-top: 40px;
+    color: var(--gray); font-size: 0.85em;
+    border-top: 1px solid var(--border);
+  }
+
+  /* Password gate */
+  .pw-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 40%, #1a4a6e 100%);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999; flex-direction: column; gap: 16px;
+    font-family: 'Inter', -apple-system, sans-serif; color: white;
+  }
+  .pw-overlay h2 { font-size: 1.6em; font-weight: 700; }
+  .pw-overlay input {
+    padding: 12px 20px; border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 8px; background: rgba(255,255,255,0.1);
+    color: white; font-size: 1em; width: 240px; text-align: center;
+    outline: none;
+  }
+  .pw-overlay input::placeholder { color: rgba(255,255,255,0.5); }
+  .pw-overlay input:focus { border-color: rgba(255,255,255,0.6); }
+  .pw-overlay .pw-error { color: #fca5a5; font-size: 0.85em; display: none; }
+  .pw-overlay button {
+    padding: 10px 32px; border: none; border-radius: 8px;
+    background: white; color: #1e3a5f; font-weight: 600;
+    font-size: 0.95em; cursor: pointer;
+  }
+  .pw-overlay button:hover { background: #e2e8f0; }
+
+  /* Alt plan styling */
+  .alt-plan {
+    background: #f0f9ff; border-left: 4px solid var(--blue);
+    padding: 12px 16px; margin-top: 16px; border-radius: 0 8px 8px 0;
+    font-size: 0.9em; color: #1e3a5f;
+  }
+  .alt-plan strong { font-weight: 700; }
+
+  /* Rain fallback */
+  .rain-fallback {
+    background: #f0f4ff; border-left: 4px solid #6366f1;
+    padding: 12px 16px; margin-top: 12px; border-radius: 0 8px 8px 0;
+    font-size: 0.88em; color: #312e81;
+  }
+
+  /* Leaflet popup style */
+  .leaflet-popup-content-wrapper { border-radius: 10px; }
+  .leaflet-popup-content { font-family: 'Inter', sans-serif; font-size: 13px; margin: 10px 14px; }
+
+  /* Mobile responsive */
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 2em; }
+    .hero .subtitle { font-size: 1em; }
+    .hero .route { font-size: 0.8em; padding: 8px 16px; gap: 4px; }
+    .day-header { padding: 14px 16px; gap: 10px; }
+    .day-body { padding: 0 12px 16px; }
+    .day-title { font-size: 0.9em; }
+    .map-wrapper { height: 280px; margin: 8px; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .stat-card { padding: 12px; }
+    .stat-card .num { font-size: 1.2em; }
+
+    /* Stack activity tables on mobile */
+    .activity-table thead { display: none; }
+    .activity-table, .activity-table tbody, .activity-table tr, .activity-table td {
+      display: block; width: 100%;
+    }
+    .activity-table tr {
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+    }
+    .activity-table tr:last-child { border-bottom: none; }
+    .activity-table td { padding: 2px 0; border-bottom: none; }
+    .activity-table .time { width: auto; font-size: 0.8em; }
+    .activity-table .act { font-size: 0.95em; }
+    .activity-table .notes { font-size: 0.82em; }
+
+    /* Hotels table scroll on mobile */
+    .hotels-table { font-size: 0.82em; }
+    .hotels-table th, .hotels-table td { padding: 8px 8px; }
+
+    .logistics-grid { grid-template-columns: 1fr; }
+    .map-container { margin: 20px 0; }
+
+    /* Flam/London inner maps */
+    .day-body .map-container { margin: 0 -12px 12px; }
+    .day-body .map-wrapper { height: 260px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Password gate -->
+<div class="pw-overlay" id="pwGate">
+  <h2>Norway & London 2026</h2>
+  <input type="password" id="pwInput" placeholder="Enter password" autofocus>
+  <div class="pw-error" id="pwError">Incorrect password</div>
+  <button onclick="checkPw()">Enter</button>
+</div>
+
+<div id="mainContent" style="display:none;">
+
+<div class="hero">
+  <h1>Norway & London</h1>
+  <div class="subtitle">August 21–31, 2026</div>
+  <div class="travelers">5 travelers</div>
+  <div class="route">
+    <span>NYC</span><span class="arrow">→</span>
+    <span>Oslo</span><span class="arrow">→</span>
+    <span>Flåm</span><span class="arrow">→</span>
+    <span>Bergen</span><span class="arrow">→</span>
+    <span>London</span><span class="arrow">→</span>
+    <span>NYC</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="stat-card"><div class="num">10</div><div class="label">Days</div></div>
+    <div class="stat-card"><div class="num">7+2</div><div class="label">Norway + London Nights</div></div>
+    <div class="stat-card"><div class="num">55–65°F</div><div class="label">Norway Temp</div></div>
+    <div class="stat-card"><div class="num">4</div><div class="label">Hotels Total</div></div>
+  </div>
+
+  <!-- Map 1: Norway Overview -->
+  <div class="map-container">
+    <h3>Norway Route</h3>
+    <div class="map-wrapper" id="map-norway"></div>
+    <div style="padding:10px 20px 14px;display:flex;gap:20px;flex-wrap:wrap;font-size:0.82em;color:#555;">
+      <span><span style="display:inline-block;width:24px;height:3px;background:#2563eb;vertical-align:middle;margin-right:6px;border-top:2px dashed #2563eb;"></span>Bergen Railway ~5 hrs</span>
+      <span><span style="display:inline-block;width:24px;height:3px;background:#ea580c;vertical-align:middle;margin-right:6px;"></span>Flåm Railway ~1 hr</span>
+      <span><span style="display:inline-block;width:24px;height:3px;background:#059669;vertical-align:middle;margin-right:6px;border-top:2px dashed #059669;"></span>Fjord cruise + train</span>
+    </div>
+  </div>
+
+  <!-- THE ITINERARY -->
+  <div class="section-heading">The Itinerary</div>
+
+  <!-- Day 0 -->
+  <div class="day-card open">
+    <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
+      <span class="day-badge travel">Day 0</span>
+      <span class="day-title">Fri Aug 21 — Depart NYC</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <table class="activity-table">
+        <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        <tr><td class="time">Evening</td><td class="act">FL 264 JFK → CDG, connect DL 8484 CDG → OSL BOOKED</td><td class="notes">Business class. JFK 10:30pm → CDG 12:50pm (+1) → CDG 2:15pm → Oslo 4:40pm.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Oslo map -->
+  <div class="map-container">
+    <h3>Oslo Highlights (Days 1–3)</h3>
+    <div class="map-wrapper" id="map-oslo"></div>
+  </div>
+
+  <!-- Day 1 -->
+  <div class="day-card">
+    <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
+      <span class="day-badge oslo">Day 1</span>
+      <span class="day-title">Sat Aug 22 — Arrive Oslo: Easy Does It</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <table class="activity-table">
+        <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        <tr><td class="time">~5:00 PM</td><td class="act">Arrive Oslo (OSL)</td><td class="notes">Clear customs, Flytoget express to city center (20 min). At hotel by ~6pm.</td></tr>
+        <tr><td class="time">Evening</td><td class="act">Check into The Thief, freshen up</td><td class="notes">Luxury waterfront hotel on Tjuvholmen, near Aker Brygge. Amex Fine Hotels + Resorts perks: 12pm early check-in, room upgrade, daily breakfast for two, $100 property credit, 4pm late checkout.</td></tr>
+        <tr><td class="time">Evening</td><td class="act">Quick stroll around Aker Brygge</td><td class="notes">5-min walk from the lobby. Don't push it — 18+ hrs of travel.</td></tr>
+        <tr><td class="time">Dinner</td><td class="act">Vulkan Fisk</td><td class="notes">Seafood restaurant in the Vulkan/Mathallen area. Lorrie & Emma pick. Keep it low-key after 18+ hrs of travel.</td></tr>
+      </table>
+      <div class="sports-note">⚽ <strong>Sports watch:</strong> ~55–60% chance Vålerenga has a home match this weekend at Intility Arena (~17,000 seats). Tickets cheap and easy. Check eliteserien.no.</div>
+    </div>
+  </div>
+
+  <!-- Day 2 — WEST OSLO -->
+  <div class="day-card">
+    <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
+      <span class="day-badge oslo">Day 2</span>
+      <span class="day-title">Sun Aug 23 — Oslo West: Vigeland + Bygdøy</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <table class="activity-table">
+        <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        <tr><td class="time">Morning</td><td class="act">Vigeland Sculpture Park</td><td class="notes">World's largest sculpture park by a single artist. 200+ sculptures. Free, outdoor, ~1 hr. In Frogner Park on the west side.</td></tr>
+        <tr><td class="time">Late AM</td><td class="act">Bygdøy peninsula</td><td class="notes">Short bus or ferry from Vigeland area. Kon-Tiki Museum, Fram Polar Ship Museum, or just the beaches. Pick one museum + hang out.</td></tr>
+        <tr><td class="time">Snack</td><td class="act">Åpent Bakeri</td><td class="notes">Lorrie & Emma pick. Great bakery for a casual bite between sightseeing.</td></tr>
+        <tr><td class="time">Lunch</td><td class="act">Neighbourhood café near Vigeland or Bygdøy</td><td class="notes">Grab something casual — the dinner at OEB's tonight is the main event.</td></tr>
+        <tr><td class="time">Afternoon</td><td class="act">E-scooter/bike back through Aker Brygge waterfront</td><td class="notes">Scenic ride along the harbor. Stop for ice cream or a beer on the wharf. Active without being strenuous.</td></tr>
+        <tr><td class="time">Dinner</td><td class="act">Dinner at OEB's house</td><td class="notes">Haakon den godes vei 6A, 0373 Oslo. Home-cooked dinner with Odd-Even & Priscilla. A rare chance to see the city through a resident's eyes — and to eat someone's actual cooking rather than another restaurant.</td></tr>
+      </table>
+      <div class="sports-note">⚽ <strong>Sports watch:</strong> Second chance for Vålerenga if Saturday didn't work. Norwegian football is fun, casual — similar vibe to the Yokohama Baystars game (scored 10/10).</div>
+    </div>
+  </div>
+
+  <!-- Day 3 — CENTRAL/EAST OSLO + FRIENDS -->
+  <div class="day-card">
+    <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
+      <span class="day-badge oslo">Day 3</span>
+      <span class="day-title">Mon Aug 24 — Oslo East: MUNCH + Grünerløkka + Friends</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <table class="activity-table">
+        <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        <tr><td class="time">Morning</td><td class="act">Late start + pack for train day</td><td class="notes">Sleep in, enjoy breakfast at The Thief, get organized. Pack tonight — early train tomorrow (8:25am). Bags out the door by ~8:00am.</td></tr>
+        <tr><td class="time">Late AM</td><td class="act">MUNCH Museum (Bjørvika waterfront)</td><td class="notes">The Scream + 26,000 works. Modern 13-story waterfront building. 1–1.5 hrs. Central/east Oslo.</td></tr>
+        <tr><td class="time">Lunch</td><td class="act">Mathallen Oslo food hall</td><td class="notes">Norway's Borough Market. Seafood, tacos, craft beer, pastries. Short walk from MUNCH via Grünerløkka.</td></tr>
+        <tr><td class="time">Afternoon</td><td class="act">Stroll Grünerløkka</td><td class="notes">Oslo's hipster neighborhood. Vintage shops, coffee, street art. Natural walking path between MUNCH and Mathallen.</td></tr>
+        <tr><td class="time">Late PM</td><td class="act">Slack time — Aker Brygge, shopping, or rest</td><td class="notes">Deliberately unstructured. Oslo is a great city — use this buffer to enjoy it at a human pace.</td></tr>
+        <tr><td class="time">Dinner</td><td class="act">Vulkan Fisk or repeat a favorite</td><td class="notes">If you didn't do Vulkan Fisk on arrival night, try it here. Or Alex Sushi (top-rated contemporary sushi), Kolonialen (wine bistro, Michelin Guide). Three nights — repeat winners are fine.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Day 4 - TRAIN DAY: OSLO → FLÅM (1 night) -->
+  <div class="day-card">
+    <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
+      <span class="day-badge flam">Day 4</span>
+      <span class="day-title">Tue Aug 25 — Bergen Railway + Flåm Railway</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <!-- Flam detail map -->
+      <div class="map-container" style="margin:0 -24px 16px;border-radius:0;box-shadow:none;">
+        <h3>Flåm & Fjord Area Detail</h3>
+        <div class="map-wrapper" id="map-flam" style="height:360px;"></div>
+        <div style="padding:8px 20px 12px;display:flex;gap:16px;flex-wrap:wrap;font-size:0.8em;color:#555;">
+          <span><span style="display:inline-block;width:20px;height:3px;background:#ea580c;vertical-align:middle;margin-right:5px;"></span>Flåm Railway</span>
+          <span><span style="display:inline-block;width:20px;height:3px;background:#7c3aed;vertical-align:middle;margin-right:5px;border-top:2px dashed #7c3aed;"></span>Fjord cruise (Day 5)</span>
+          <span><span style="display:inline-block;width:20px;height:3px;background:#dc2626;vertical-align:middle;margin-right:5px;border-top:2px dotted #dc2626;"></span>Drive to Stegastein</span>
+        </div>
+      </div>
+      <table class="activity-table">
+        <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        <tr><td class="time">7:00 AM</td><td class="act">Breakfast at The Thief</td><td class="notes">Weekday buffet opens 7:00am. Eat by 7:45, grab bags, taxi to Oslo S (~5 min). Plenty of time for the 8:25 train.</td></tr>
+        <tr><td class="time">8:25 AM</td><td class="act">Bergen Railway: Oslo S → Myrdal BOOKED</td><td class="notes">Train F4 to Bergen. <a href="https://www.vy.no/en/buy-tickets/train-tickets/compartment" target="_blank" style="color:var(--blue);text-decoration:underline;">Private compartment</a>, Car 5, Seats 21–26. ~5 hrs crossing the Hardangervidda plateau — widely ranked among Europe's great rail journeys. Ref: VNE-GXR-DIX (NOK 5,200).</td></tr>
+        <tr><td class="time">13:04</td><td class="act">Arrive Myrdal (867m)</td><td class="notes">Transfer to Flåm Railway. 20 min connection.</td></tr>
+        <tr><td class="time">13:24</td><td class="act">Flåm Railway: Myrdal → Flåm BOOKED</td><td class="notes">Train R45 to Flåm. Free seating (1 student + 4 adult), ~1 hr. 20 km descent, 863m drop. Waterfalls, tunnels, hairpin bends. Steepest standard-gauge rail in the world. Same ref: VNE-GXR-DIX (NOK 2,990).</td></tr>
+        <tr><td class="time">14:22</td><td class="act">Arrive Flåm, check in</td><td class="notes">292 Aurland — Ola Apartment. Order #4387, 20,580 NOK (paid). 1 apartment + 3 extra beds. One night only — travel light. BOOKED.</td></tr>
+        <tr><td class="time">Afternoon</td><td class="act">Explore area + Stegastein viewpoint</td><td class="notes">Taxi up to Stegastein (~20 min) — 30m cantilevered platform, 650m above Aurlandsfjord. Free, no booking needed. Do it today since you leave tomorrow morning.</td></tr>
+        <tr><td class="time">Dinner</td><td class="act">Eat at the hotel / apartment area</td><td class="notes">Lorrie & Emma's call: eat at the hotel for your one Flåm night. Limited dining options in Aurland anyway — keep it simple after a long train day.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Day 5 - FJORD CRUISE TO BERGEN -->
+  <div class="day-card">
+    <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
+      <span class="day-badge bergen">Day 5</span>
+      <span class="day-title">Wed Aug 26 — Fjord Cruise to Bergen</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <table class="activity-table">
+        <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        <tr><td class="time">~9:15 AM</td><td class="act">Taxi to Aurland dock</td><td class="notes">29|2 Aurland is inland — ~5 min drive to the Aurland waterfront. Arrange with hotel the night before.</td></tr>
+        <tr><td class="time">9:55 AM</td><td class="act">Fjord cruise: Aurland → Gudvangen BOOKED</td><td class="notes">Norway's Best electric catamaran, 09:55–11:30. Nærøyfjord — 250m wide at the narrowest, 1,200m walls on both sides. UNESCO-listed. THE signature Norway experience. Ref: DFCU59 (5 adults, NOK 3,325).</td></tr>
+        <tr><td class="time">11:40 AM</td><td class="act">Bus Gudvangen → Voss BOOKED</td><td class="notes">Norway's Best bus, 11:40–12:45. 10 min transfer from ferry — bus is timed to meet the cruise (same operator). Scenic mountain road. Ref: HGAJ08 (5 adults, NOK 1,000).</td></tr>
+        <tr><td class="time">1:52 PM</td><td class="act">Train Voss → Bergen BOOKED</td><td class="notes">Vy F4 to Bergen, 13:52–15:00. Plus Refundable, Car 1 Seats 38–42 (4 adult + 1 student). 1 hr buffer at Voss. Ref: 46P-FEF-PCY (NOK 2,055).</td></tr>
+        <tr><td class="time">3:00 PM</td><td class="act">Arrive Bergen, check in</td><td class="notes">Opus XVI (Small Luxury Hotels, Vågsalmenningen 16, on main square near Bryggen). 3 nights — pick a great room.</td></tr>
+        <tr><td class="time">Afternoon</td><td class="act">Walk Bryggen (UNESCO)</td><td class="notes">Colorful Hanseatic wharf, 14th-century trading history. Self-guided, no tour needed. 10-minute stroll from the hotel.</td></tr>
+        <tr><td class="time">Snack</td><td class="act">Våg Bakeri</td><td class="notes">Lorrie & Emma pick. Great for a pastry after the long transit day.</td></tr>
+        <tr><td class="time">Dinner</td><td class="act">Hoggorm or Bark</td><td class="notes">Hoggorm = pizza (email ahead for res if special occasion). Bark = another Lorrie & Emma pick. Keep the first Bergen night relaxed after a transit day. Three Bergen dinners to spread the good places out.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Bergen map -->
+  <div class="map-container">
+    <h3>Bergen Highlights (Days 5–7)</h3>
+    <div class="map-wrapper" id="map-bergen"></div>
+  </div>
+
+  <!-- Day 6 - BERGEN ADVENTURE DAY -->
+  <div class="day-card">
+    <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
+      <span class="day-badge bergen">Day 6</span>
+      <span class="day-title">Thu Aug 27 — Bergen: Adventure Day</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <table class="activity-table">
+        <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        <tr><td class="time" colspan="3" style="font-weight:700;color:var(--green);border-bottom:2px solid var(--green);padding-top:16px;">Plan A: Mountain + water</td></tr>
+        <tr><td class="time">Morning</td><td class="act">Ulriken cable car + hike down to Fløyen</td><td class="notes">Cable car to Ulriken (643m) — highest of Bergen's seven mountains. Panoramic views. Then hike the Vidden trail toward Mt. Fløyen (~3 hrs, moderate, well-marked). Or just ride up and back if the group prefers.</td></tr>
+        <tr><td class="time">Midday</td><td class="act">Fløibanen funicular down from Mt. Fløyen</td><td class="notes">7-min ride back to city center from 320m. Runs every 15 min. Completes the mountain traverse.</td></tr>
+        <tr><td class="time">Lunch</td><td class="act">Fish Market (Fisketorget)</td><td class="notes">Fresh shrimp, king crab legs, fish soup. Eat at the outdoor stalls — casual, fun, right on the harbor.</td></tr>
+        <tr><td class="time">Afternoon</td><td class="act">Coastal kayaking</td><td class="notes">2–3 hr guided paddle in Bergen's harbor and islands. Different vibe from fjord kayaking but scenic and active. Book via Bergen Sea Kayak or similar.</td></tr>
+        <tr><td class="time">Dinner</td><td class="act">Cornelius or Lola</td><td class="notes">Cornelius = take a boat to a seafood restaurant on an island — adventure + dinner in one. Lorrie & Emma pick. Lola = another family pick. Or Lysverket (1 Michelin star, KODE museum) or Gaptrast (1 Michelin star, New Nordic, charcoal fire).</td></tr>
+      </table>
+      <div class="alt-plan"><strong>Plan B: Skip the big hike.</strong> Fløibanen funicular + easy trails at the top of Fløyen in the morning. Fish Market for lunch. Afternoon: Bergen Sea Kayak or a boat tour of the harbor islands. Same dinner plan — Lysverket or Gaptrast.</div>
+      <div class="rain-fallback">🌧️ <strong>Bergen rain plan:</strong> Bergen averages rain ~60% of August days. If it's pouring: KODE Art Museums (4 buildings, includes Lysverket for lunch), Bergen Aquarium, or Bryggens Museum (medieval archaeology under Bryggen). Fløibanen still runs in rain but skip it if visibility is zero — the view IS the point. Move adventure day to Friday and swap with the cooking experience.</div>
+      <div class="sports-note">⚽ <strong>Sports watch:</strong> ~35% chance SK Brann has a home match this week at Brann Stadion (~17,000). Three Bergen nights improves your odds vs. the old 2-night plan. Brann fans are famously passionate.</div>
+    </div>
+  </div>
+
+  <!-- Day 7 - BERGEN: COOKING + FAREWELL -->
+  <div class="day-card">
+    <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
+      <span class="day-badge bergen">Day 7</span>
+      <span class="day-title">Fri Aug 28 — Bergen: Cook + Explore</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <table class="activity-table">
+        <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        <tr><td class="time" colspan="3" style="font-weight:700;color:var(--green);border-bottom:2px solid var(--green);padding-top:16px;">Version A: Fishing + cooking anchor</td></tr>
+        <tr><td class="time">Morning</td><td class="act">Fishing + outdoor cooking experience</td><td class="notes">Half-day with local guide: catch your own fish, cook it outdoors overlooking the fjord. ~5 hrs including lunch (you eat what you caught). Book via fjordexpedition.com or GetYourGuide — ages 8+ welcome.</td></tr>
+        <tr><td class="time">Afternoon</td><td class="act">Free time in Bergen center</td><td class="notes">Browse Bryggen shops, revisit the Fish Market, pick up souvenirs, or just sit at a harbor café. Three nights means no rush — you've already done the highlights.</td></tr>
+        <tr><td class="time">Dinner</td><td class="act">Farewell Norway dinner</td><td class="notes">Koji (Korean BBQ), Amateur, or Babah — all Lorrie & Emma picks. Or whichever of Cornelius/Hoggorm/Bark/Lola you haven't hit yet. Keep it special — last night in Norway. Light-ish if the fishing lunch was big.</td></tr>
+      </table>
+      <div class="alt-plan"><strong>Version B: Skip fishing, do Bergen deep-cut.</strong> Morning at KODE Art Museums or Bergen Aquarium. Lunch at Lysverket (inside KODE) or Gaptrast. Afternoon: wander neighborhoods (Nordnes, Sandviken) most tourists skip. Farewell dinner at whichever Michelin spot you haven't hit yet.</div>
+      <div class="rain-fallback">🌧️ <strong>Rain plan:</strong> If yesterday was rained out and you swapped adventure day to today, do the hike + kayak (or Fløibanen) and move the cooking class to today's afternoon slot. The fishing experience runs rain or shine — they provide gear. Bergen locals don't cancel for rain.</div>
+    </div>
+  </div>
+
+  <!-- Day 8 -->
+  <div class="day-card">
+    <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
+      <span class="day-badge london">Day 8</span>
+      <span class="day-title">Sat Aug 29 — Fly to London</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <!-- London map -->
+      <div class="map-container" style="margin:0 -24px 16px;border-radius:0;box-shadow:none;">
+        <h3>London: Key Locations</h3>
+        <div class="map-wrapper" id="map-london" style="height:340px;"></div>
+      </div>
+      <table class="activity-table">
+        <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        <tr><td class="time">Morning</td><td class="act">Early breakfast at Opus XVI</td><td class="notes">Last Bergen morning with fjord views.</td></tr>
+        <tr><td class="time">~8:30 AM</td><td class="act">Taxi to Bergen Flesland Airport</td><td class="notes">~30 min drive. Arrive with time for check-in.</td></tr>
+        <tr><td class="time">10:45 AM</td><td class="act">KLM flight BGO → Amsterdam → London</td><td class="notes">KLM, 5 passengers, economy class, NOK 19,790 total. BGO 10:45 → AMS (connection) → LHR 13:25 (1:25pm). BOOKED.</td></tr>
+        <tr><td class="time">~2:30 PM</td><td class="act">Arrive London, clear customs</td><td class="notes">Arrive ~2:30pm after customs and immigration.</td></tr>
+        <tr><td class="time">3:00 PM</td><td class="act">Check into Rosewood London</td><td class="notes">252 High Holborn, WC1V 7EN. Amex Fine Hotels + Resorts: breakfast in Holborn Dining Room, £85 F&B credit per room, room upgrade, 4pm late checkout. Arrive with 3pm check-in.</td></tr>
+        <tr><td class="time">Late afternoon</td><td class="act">Rest or light stroll</td><td class="notes">Settle in, maybe walk around Holborn area.</td></tr>
+        <tr><td class="time">Dinner</td><td class="act">Brat</td><td class="notes">Whole-beast cooking over wood fire. Michelin-starred, Shoreditch. The turbot is legendary. Book ahead — perpetually packed.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Day 9 -->
+  <div class="day-card">
+    <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
+      <span class="day-badge london">Day 9</span>
+      <span class="day-title">Sun Aug 30 — London: Chill + Great Meals</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <table class="activity-table">
+        <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        <tr><td class="time">Morning</td><td class="act">Breakfast: The Wolseley</td><td class="notes">Grand café on Piccadilly. Scored ~8.8 avg in 2022. Book ahead.</td></tr>
+        <tr><td class="time">Late AM</td><td class="act">Shopping + strolling</td><td class="notes">Fortnum & Mason (~8.6 in 2022), Liberty, Soho/Covent Garden. Self-paced.</td></tr>
+        <tr><td class="time">Lunch</td><td class="act">Borough Market or Dishoom</td><td class="notes">Borough = London's best food market. Dishoom = legendary Bombay café.</td></tr>
+        <tr><td class="time">Afternoon</td><td class="act">Free time / rest</td><td class="notes">Deliberately unstructured. Park, nap, more shopping.</td></tr>
+        <tr><td class="time">Evening</td><td class="act">Pub with Jim & Jess</td><td class="notes">Friends back from holiday Aug 19 — catch up at a local pub first. They have connections at Strawberry hotels if you need anything.</td></tr>
+        <tr><td class="time">Dinner</td><td class="act">Ma La Sichuan — invite Jim & family</td><td class="notes">Known winner (~8.8 avg in 2022). Invite Jim and his family to join after the pub. The more the merrier, and this place handles big groups well.</td></tr>
+      </table>
+      <div class="sports-note">⚽ <strong>Premier League GW2!</strong> London has 5–7 PL clubs — ~90% chance at least one has a home match. Fixtures release June 17, 2026. If Spurs are home, book immediately. Past data: Slavia Praha 8/10, Yokohama Baystars 10/10.</div>
+    </div>
+  </div>
+
+  <!-- Day 10 -->
+  <div class="day-card">
+    <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
+      <span class="day-badge travel">Day 10</span>
+      <span class="day-title">Mon Aug 31 — Fly Home</span>
+      <span class="day-toggle">▼</span>
+    </div>
+    <div class="day-body">
+      <table class="activity-table">
+        <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
+        <tr><td class="time">Morning</td><td class="act">Pack up, breakfast at Rosewood</td><td class="notes">FHR breakfast in Holborn Dining Room. 3:50pm departure gives you a full morning. Last stroll, last coffee. Note: Rosewood checkout is noon, but FHR gives 4pm late checkout option. Flight is 3:50pm so 4pm checkout would be tight — best to check out by noon and head to Heathrow.</td></tr>
+        <tr><td class="time">3:50 PM</td><td class="act">DL 5922 (Virgin Atlantic) LHR → JFK BOOKED</td><td class="notes">Premium economy. Arrives JFK 6:35pm. Others connect to home cities.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- LOGISTICS -->
+  <div class="section-heading">Logistics</div>
+
+  <div class="logistics-grid">
+    <div class="logistics-card">
+      <h4>Flights Booked</h4>
+      <ul>
+        <li><strong>Aug 21:</strong> FL 264 JFK → CDG, DL 8484 CDG → OSL. Business class. BOOKED</li>
+        <li><strong>Aug 29:</strong> KLM BGO 10:45 → AMS → LHR 13:25. Economy, 5 passengers, NOK 19,790. BOOKED</li>
+        <li><strong>Aug 31:</strong> DL 5922 (Virgin Atlantic) LHR 3:50pm → JFK 6:35pm. Premium economy. BOOKED</li>
+      </ul>
+    </div>
+    <div class="logistics-card">
+      <h4>Trains & Transit</h4>
+      <ul>
+        <li><strong>Aug 25:</strong> Bergen Railway, Oslo S → Myrdal 08:25–13:04. Private compartment, Car 5 Seats 21–26. Ref: VNE-GXR-DIX. NOK 5,200. BOOKED</li>
+        <li><strong>Aug 25:</strong> Flåm Railway, Myrdal → Flåm 13:24–14:22. Free seating (1 student + 4 adult). Ref: VNE-GXR-DIX. NOK 2,990. BOOKED</li>
+        <li><strong>Aug 26:</strong> Fjord cruise, Aurland → Gudvangen 09:55–11:30. Ref: DFCU59. NOK 3,325. BOOKED</li>
+        <li><strong>Aug 26:</strong> Bus, Gudvangen → Voss 11:40–12:45. Ref: HGAJ08. NOK 1,000. BOOKED</li>
+        <li><strong>Aug 26:</strong> Train, Voss → Bergen 13:52–15:00. Plus Refundable, Car 1 Seats 38–42. Ref: 46P-FEF-PCY. NOK 2,055. BOOKED</li>
+      </ul>
+    </div>
+    <div class="logistics-card">
+      <h4>Activities to Book Ahead</h4>
+      <ul>
+        <li>Bergen coastal kayaking — Bergen Sea Kayak or similar (Aug is peak)</li>
+        <li>Bergen fishing + cooking — fjordexpedition.com or GetYourGuide</li>
+        <li>Cornelius dinner — boat to island seafood restaurant, book ahead</li>
+        <li>Hoggorm pizza — email for reservation</li>
+        <li>The Wolseley breakfast — book ahead</li>
+        <li>Brat dinner (Sat) — Michelin star, Shoreditch, book ahead</li>
+        <li>Ma La Sichuan dinner (Sun) — invite Jim & family, book for large group</li>
+      </ul>
+    </div>
+    <div class="logistics-card">
+      <h4>Confirmation Numbers</h4>
+      <ul>
+        <li><strong>Outbound flights:</strong> FL 264 / DL 8484 — BOOKED</li>
+        <li><strong>Vy trains (Oslo→Myrdal→Flåm):</strong> Ref VNE-GXR-DIX, Order BM4ZHA7K, NOK 8,190 — BOOKED</li>
+        <li><strong>Fjord cruise (Aurland→Gudvangen):</strong> Norway's Best DFCU59, NOK 3,325 — BOOKED</li>
+        <li><strong>Bus (Gudvangen→Voss):</strong> Norway's Best HGAJ08, NOK 1,000 — BOOKED</li>
+        <li><strong>Vy train (Voss→Bergen):</strong> Ref 46P-FEF-PCY, Order 62QE4YAI, NOK 2,055 — BOOKED</li>
+        <li><strong>The Thief Oslo:</strong> Rm 1 #9100130790285, Rm 2 #9091807820675</li>
+        <li><strong>292 Aurland (Ola Apt):</strong> Order #4387, 20,580 NOK — BOOKED</li>
+        <li><strong>Opus XVI Bergen:</strong> Rm 1 #49673SG013802, Rm 2 #49673SG013803</li>
+        <li><strong>KLM Bergen→London:</strong> Check My Trip (NOK 19,790) — BOOKED</li>
+        <li><strong>Rosewood London:</strong> Rm 1 #CI5UKP1T, Rm 2 #CI5UKOWR</li>
+        <li><strong>Return flight:</strong> DL 5922 — BOOKED</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Hotels -->
+  <div class="map-container" style="margin-top:24px;">
+    <h3 style="padding-bottom:12px;">Hotels</h3>
+    <table class="hotels-table">
+      <tr><th>City</th><th>Nights</th><th>Hotel</th><th>Status</th></tr>
+      <tr><td>Oslo</td><td>3 (Sat–Mon)</td><td><strong>The Thief</strong> — Tjuvholmen, waterfront</td><td>BOOKED — Amex FHR</td></tr>
+      <tr><td>Flåm/Aurland</td><td>1 (Tue)</td><td><strong>292 Aurland — Ola Apartment</strong> (Order #4387)</td><td>BOOKED</td></tr>
+      <tr><td>Bergen</td><td>3 (Wed–Fri)</td><td><strong>Opus XVI</strong> — Vågsalmenningen 16, main square</td><td>BOOKED</td></tr>
+      <tr><td>London</td><td>2 (Sat–Sun)</td><td><strong>Rosewood London</strong> — 252 High Holborn</td><td>BOOKED — Amex FHR</td></tr>
+    </table>
+  </div>
+
+
+  <div class="footer">
+    <p><em>This is a working draft. All restaurants, hotels, and activities are suggestions — confirm availability and book before assuming.</em></p>
+    <p style="margin-top:8px;">Details last checked May 2026</p>
+  </div>
+
+</div>
+</div><!-- end mainContent -->
+
+<script>
+// ===== MAP UTILITIES =====
+function makeIcon(color, size) {
+  size = size || 16;
+  return L.divIcon({
+    className: 'x',
+    html: '<div style="background:'+color+';width:'+size+'px;height:'+size+'px;border-radius:50%;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4);"></div>',
+    iconSize: [size+6, size+6], iconAnchor: [(size+6)/2, (size+6)/2]
+  });
+}
+
+function addLabel(map, lat, lng, text, opts) {
+  opts = opts || {};
+  const size = opts.size || 14;
+  const bold = opts.bold !== false;
+  const color = opts.color || '#1a1a2e';
+  const dx = opts.dx || 0;
+  const dy = opts.dy || 0;
+  L.marker([lat, lng], {
+    icon: L.divIcon({
+      className: 'ml',
+      html: '<div style="font-family:Inter,Segoe UI,Arial,sans-serif;font-size:'+size+'px;font-weight:'+(bold?'700':'400')+';color:'+color+';text-shadow:2px 2px 0 white,-2px -2px 0 white,2px -2px 0 white,-2px 2px 0 white,0 2px 0 white,0 -2px 0 white;white-space:nowrap;">'+text+'</div>',
+      iconAnchor: [-dx, -dy]
+    })
+  }).addTo(map);
+}
+
+// ===== MAP 1: NORWAY OVERVIEW =====
+const tileUrl = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+const tileOpts = { maxZoom: 20 };
+
+const mapNorway = L.map('map-norway', { zoomControl: true, attributionControl: false, scrollWheelZoom: true }).fitBounds([[59.0, 4.8], [61.2, 11.2]]);
+L.tileLayer(tileUrl, tileOpts).addTo(mapNorway);
+
+const oslo = [59.9070, 10.7265], flam = [60.86, 7.11], myrdal = [60.74, 7.12], bergen = [60.3957, 5.3237];
+
+L.polyline([oslo,[60.05,9.8],[60.2,9.0],[60.4,8.2],[60.55,7.8],myrdal], {color:'#2563eb',weight:4,dashArray:'12,8',opacity:0.85}).addTo(mapNorway);
+L.polyline([myrdal,flam], {color:'#ea580c',weight:4,opacity:0.9}).addTo(mapNorway);
+L.polyline([flam,[60.85,6.85],[60.87,6.55],[60.82,6.2],[60.6,5.8],bergen], {color:'#059669',weight:4,dashArray:'12,8',opacity:0.85}).addTo(mapNorway);
+
+L.marker(oslo, {icon:makeIcon('#dc2626',18)}).bindPopup('<strong>Oslo</strong><br>3 nights (Sat–Mon)<br>The Thief — Tjuvholmen').addTo(mapNorway);
+L.marker(flam, {icon:makeIcon('#ea580c',14)}).bindPopup('<strong>Flåm/Aurland</strong><br>1 night (Tue)<br>292 Aurland — Ola Apartment').addTo(mapNorway);
+L.marker(myrdal, {icon:makeIcon('#6b7280',10)}).bindPopup('<strong>Myrdal</strong><br>Transfer point (867m)').addTo(mapNorway);
+L.marker(bergen, {icon:makeIcon('#059669',18)}).bindPopup('<strong>Bergen</strong><br>3 nights (Wed–Fri)<br>Opus XVI').addTo(mapNorway);
+
+addLabel(mapNorway, oslo[0], oslo[1], 'Oslo', {size:15,dx:16,dy:12});
+addLabel(mapNorway, flam[0], flam[1], 'Flåm', {size:13,dx:16,dy:12});
+addLabel(mapNorway, myrdal[0], myrdal[1], 'Myrdal', {size:11,color:'#666',dx:12,dy:-6});
+addLabel(mapNorway, bergen[0], bergen[1], 'Bergen', {size:15,dx:16,dy:12});
+
+// ===== MAP 2: FLAM DETAIL =====
+const mapFlam = L.map('map-flam', { zoomControl: true, attributionControl: false, scrollWheelZoom: true }).setView([60.84, 6.95], 11);
+L.tileLayer(tileUrl, tileOpts).addTo(mapFlam);
+
+L.polyline([myrdal,flam], {color:'#ea580c',weight:4,opacity:0.9}).addTo(mapFlam);
+L.polyline([flam,[60.87,6.95],[60.87,6.75],[60.87,6.53]], {color:'#7c3aed',weight:4,dashArray:'12,8',opacity:0.85}).addTo(mapFlam);
+L.polyline([flam,[60.90,7.25]], {color:'#dc2626',weight:3,dashArray:'6,4',opacity:0.8}).addTo(mapFlam);
+
+L.marker(flam, {icon:makeIcon('#ea580c',14)}).bindPopup('<strong>Flåm/Aurland</strong><br>1 night (Tue)<br>292 Aurland — Ola Apartment').addTo(mapFlam);
+L.marker(myrdal, {icon:makeIcon('#6b7280',10)}).bindPopup('<strong>Myrdal</strong><br>Train hub (867m)').addTo(mapFlam);
+L.marker([60.87,6.53], {icon:makeIcon('#7c3aed',10)}).bindPopup('<strong>Gudvangen</strong><br>Fjord cruise end → bus to Voss').addTo(mapFlam);
+L.marker([60.90,7.25], {icon:makeIcon('#dc2626',8)}).bindPopup('<strong>Stegastein</strong><br>Viewpoint (650m)').addTo(mapFlam);
+
+addLabel(mapFlam, flam[0], flam[1], 'Flåm', {size:14,dx:14,dy:12});
+addLabel(mapFlam, myrdal[0], myrdal[1], 'Myrdal', {size:12,dx:12,dy:12});
+addLabel(mapFlam, 60.87, 6.53, 'Gudvangen', {size:11,dx:14,dy:12});
+addLabel(mapFlam, 60.90, 7.25, 'Stegastein', {size:11,dx:10,dy:12});
+
+// ===== MAP 3: LONDON =====
+const mapLondon = L.map('map-london', { zoomControl: true, attributionControl: false, scrollWheelZoom: true }).setView([51.508, -0.115], 14);
+L.tileLayer(tileUrl, tileOpts).addTo(mapLondon);
+
+const londonPlaces = [
+  {ll:[51.5186,-0.1176], color:'#dc2626', name:'Rosewood London', desc:'Hotel — High Holborn', size:12},
+  {ll:[51.5078,-0.1397], color:'#f59e0b', name:'The Wolseley', desc:'Breakfast (~8.8 avg)', size:10},
+  {ll:[51.5254,-0.0734], color:'#dc2626', name:'Brat', desc:'Michelin star, wood-fire, Shoreditch', size:10},
+  {ll:[51.5113,-0.1312], color:'#f59e0b', name:'Ma La Sichuan', desc:'Dinner (~8.8 avg) — invite Jim & family', size:10},
+  {ll:[51.5078,-0.1370], color:'#7c3aed', name:"Fortnum & Mason", desc:'Shopping (~8.6)', size:8},
+  {ll:[51.5135,-0.1340], color:'#ea580c', name:'Soho', desc:'Dining & nightlife', size:10},
+  {ll:[51.5119,-0.1228], color:'#7c3aed', name:'Covent Garden', desc:'Shopping', size:8},
+  {ll:[51.5055,-0.0910], color:'#059669', name:'Borough Market', desc:'Food market', size:12},
+];
+londonPlaces.forEach(p => {
+  L.marker(p.ll, {icon:makeIcon(p.color,p.size)}).bindPopup('<strong>'+p.name+'</strong><br>'+p.desc).addTo(mapLondon);
+  addLabel(mapLondon, p.ll[0], p.ll[1], p.name, {size:11,dx:12,dy:12});
+});
+
+// ===== MAP: OSLO =====
+const mapOslo = L.map('map-oslo', { zoomControl: true, attributionControl: false, scrollWheelZoom: true }).setView([59.915, 10.73], 13);
+L.tileLayer(tileUrl, tileOpts).addTo(mapOslo);
+
+const osloPlaces = [
+  {ll:[59.9070,10.7265], color:'#dc2626', name:'The Thief', desc:'Hotel — Tjuvholmen', size:12},
+  {ll:[59.9270,10.7010], color:'#ea580c', name:'Vigeland Park', desc:'200+ sculptures, free', size:10},
+  {ll:[59.9060,10.7540], color:'#2563eb', name:'MUNCH Museum', desc:'The Scream + 26k works', size:10},
+  {ll:[59.9210,10.7530], color:'#f59e0b', name:'Mathallen', desc:'Food hall', size:9},
+  {ll:[59.9220,10.7580], color:'#7c3aed', name:'Grünerløkka', desc:'Hipster neighborhood', size:8},
+  {ll:[59.9040,10.6830], color:'#059669', name:'Bygdøy', desc:'Beaches + museums', size:8},
+  {ll:[59.9165,10.7460], color:'#f59e0b', name:'Alex Sushi', desc:'Contemporary sushi', size:7},
+  {ll:[59.9130,10.7380], color:'#f59e0b', name:'Kolonialen', desc:'Wine bistro, Michelin Guide', size:7},
+];
+osloPlaces.forEach(p => {
+  L.marker(p.ll, {icon:makeIcon(p.color,p.size)}).bindPopup('<strong>'+p.name+'</strong><br>'+p.desc).addTo(mapOslo);
+  addLabel(mapOslo, p.ll[0], p.ll[1], p.name, {size:11,dx:12,dy:12});
+});
+
+// ===== MAP: BERGEN =====
+const mapBergen = L.map('map-bergen', { zoomControl: true, attributionControl: false, scrollWheelZoom: true }).setView([60.393, 5.33], 14);
+L.tileLayer(tileUrl, tileOpts).addTo(mapBergen);
+
+const bergenPlaces = [
+  {ll:[60.3957,5.3237], color:'#dc2626', name:'Opus XVI', desc:'Hotel — Vågsalmenningen, main square', size:12},
+  {ll:[60.3986,5.3230], color:'#ea580c', name:'Bryggen', desc:'UNESCO Hanseatic wharf', size:10},
+  {ll:[60.3933,5.3283], color:'#059669', name:'Fish Market', desc:'Fisketorget — harbor market', size:10},
+  {ll:[60.3965,5.3447], color:'#2563eb', name:'Fløibanen', desc:'Funicular to Mt. Fløyen', size:10},
+  {ll:[60.3930,5.3160], color:'#f59e0b', name:'Enhjørningen', desc:'Classic seafood, since 1700s', size:8},
+  {ll:[60.3890,5.3320], color:'#7c3aed', name:'Pingvinen', desc:'Comfort food gastropub', size:8},
+  {ll:[60.3912,5.3265], color:'#f59e0b', name:'Lysverket', desc:'1 Michelin star, KODE museum', size:8},
+  {ll:[60.3945,5.3310], color:'#f59e0b', name:'Gaptrast', desc:'1 Michelin star (new 2025)', size:8},
+  {ll:[60.3780,5.3400], color:'#2563eb', name:'Ulriken Cable Car', desc:'643m — highest of 7 mountains', size:9},
+];
+bergenPlaces.forEach(p => {
+  L.marker(p.ll, {icon:makeIcon(p.color,p.size)}).bindPopup('<strong>'+p.name+'</strong><br>'+p.desc).addTo(mapBergen);
+  addLabel(mapBergen, p.ll[0], p.ll[1], p.name, {size:11,dx:12,dy:12});
+});
+
+// Fix maps inside collapsed day cards — Leaflet can't render in display:none containers
+// So we invalidateSize + re-center when a card opens
+const mapFixups = {
+  'map-flam': mapFlam,
+  'map-london': mapLondon
+};
+document.querySelectorAll('.day-header').forEach(header => {
+  header.addEventListener('click', function() {
+    setTimeout(() => {
+      Object.entries(mapFixups).forEach(([id, map]) => {
+        const el = document.getElementById(id);
+        if (el && el.offsetParent !== null) {
+          map.invalidateSize();
+        }
+      });
+    }, 50);
+  });
+});
+
+// ===== PASSWORD GATE =====
+function checkPw() {
+  if (document.getElementById('pwInput').value === 'norway2026') {
+    document.getElementById('pwGate').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+    // Fix all maps after content becomes visible
+    setTimeout(function() {
+      mapNorway.invalidateSize();
+      mapNorway.fitBounds([[59.0, 4.8], [61.2, 11.2]]);
+      mapOslo.invalidateSize();
+      mapOslo.setView([59.915, 10.73], 13);
+      mapBergen.invalidateSize();
+      mapBergen.setView([60.393, 5.33], 14);
+    }, 100);
+  } else {
+    document.getElementById('pwError').style.display = 'block';
+    document.getElementById('pwInput').value = '';
+  }
+}
+document.getElementById('pwInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') checkPw();
+});
+</script>
+</body>
+</html>
