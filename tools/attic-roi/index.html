@@ -18,6 +18,10 @@
   .results{position:sticky; top:0; z-index:5; background:var(--card2);
     border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:16px;
     box-shadow:0 4px 18px rgba(0,0,0,.35);}
+  /* Mobile: cap the frozen panel so inputs stay reachable, scroll inside it if needed */
+  @media (max-width:640px){
+    .results{max-height:44vh; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:12px;}
+  }
   .grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
   .stat{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px 12px;}
   .stat .label{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em;}
@@ -50,12 +54,23 @@
   .breakdown{display:flex; justify-content:space-between; font-size:12px; color:var(--muted);
     padding:4px 0;}
   .breakdown b{color:var(--text); font-weight:600;}
+  /* Chart */
+  .chartcard{background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:12px 12px 14px; margin-bottom:12px;}
+  .chartcard h2{font-size:15px; margin:2px 2px 8px;}
+  #chart{display:block; width:100%; height:240px;}
+  .legend{display:flex; flex-wrap:wrap; gap:12px; align-items:center; font-size:12px;
+    color:var(--muted); margin:8px 2px 0;}
+  .legend .sw{display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:5px;
+    vertical-align:-1px;}
+  .legend .item{display:flex; align-items:center;}
+  .cap{font-size:11px; color:var(--muted); margin:6px 2px 0; line-height:1.4;}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>Attic Insulation ROI</h1>
-  <p class="sub">Roofline ("attic ceiling") encapsulation, 56 Cooke St. Rates from your RI Energy bills. Everything's editable; payback and net position update live.</p>
+  <p class="sub">Roofline ("attic ceiling") encapsulation, 56 Cooke St. Rates from your RI Energy bills. Everything's editable; payback, net position, and the chart update live.</p>
 
   <div class="results">
     <div class="grid">
@@ -74,6 +89,16 @@
     </div>
   </div>
 
+  <div class="chartcard">
+    <h2>Monthly energy spend: before vs after</h2>
+    <canvas id="chart"></canvas>
+    <div class="legend">
+      <span class="item"><span class="sw" style="background:#f0a740"></span>Gas (heat)</span>
+      <span class="item"><span class="sw" style="background:#4da3ff"></span>Electric (AC + base)</span>
+    </div>
+    <div class="cap">Each month shows two bars: left = now, right = after insulation. Summer electric (AC) and winter gas (heat) both flatten. Seasonal shape is modeled from your annual bills and the shares below.</div>
+  </div>
+
   <section>
     <div class="head" data-toggle>Cost & horizon <span class="caret">▾</span></div>
     <div class="body">
@@ -87,7 +112,17 @@
     <div class="head" data-toggle>Resale value at sale <span class="caret">▾</span></div>
     <div class="body">
       <div class="row"><label>Share of project cost recovered at sale (%)<small>Insulation is low-visibility; appraisers rarely credit it fully. 40-60% is a reasonable range, 100% = full.</small></label><input type="number" id="resalePct" value="50" inputmode="decimal"></div>
-      <div class="note" style="font-size:11px;color:var(--muted);line-height:1.5;padding-top:2px;">Applied to gross project cost, not net of rebate, since a buyer sees the improvement regardless of who paid.</div>
+      <div class="cap" style="padding-top:2px;">Applied to gross project cost, not net of rebate, since a buyer sees the improvement regardless of who paid.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head" data-toggle>Annual bills & seasonal shares <span class="caret">▾</span></div>
+    <div class="body">
+      <div class="row"><label>Annual electric bill ($)<small>26,512 kWh × ~$0.29 ≈ 7,700</small></label><input type="number" id="annElec" value="7700" inputmode="decimal"></div>
+      <div class="row"><label>Annual gas bill ($)<small>4,186 therms all-in ≈ 6,500</small></label><input type="number" id="annGas" value="6500" inputmode="decimal"></div>
+      <div class="row"><label>Cooling share of electric (%)<small>Rest is flat baseline year-round</small></label><input type="number" id="coolShare" value="25" inputmode="decimal"></div>
+      <div class="row"><label>Heating share of gas (%)<small>Rest is hot water / cooking</small></label><input type="number" id="heatShare" value="80" inputmode="decimal"></div>
     </div>
   </section>
 
@@ -134,9 +169,19 @@
 
 <script>
 (function(){
-  var ids=["cost","rebate","years","resalePct","area","elec","gas","hdd","eff","ductHeat","cdays","dt","btuKwh","ductCool","rOld","rNew","fa","roofline"];
+  var ids=["cost","rebate","years","resalePct","annElec","annGas","coolShare","heatShare",
+    "area","elec","gas","hdd","eff","ductHeat","cdays","dt","btuKwh","ductCool","rOld","rNew","fa","roofline"];
   function v(id){var e=document.getElementById(id); return e.type==="checkbox"?e.checked:parseFloat(e.value)||0;}
   function money(n){return (n<0?"-$":"$")+Math.abs(Math.round(n)).toLocaleString();}
+
+  // Providence seasonal shapes (Jan..Dec), normalized below.
+  var MON=["J","F","M","A","M","J","J","A","S","O","N","D"];
+  var coolW=[0,0,0,0.01,0.05,0.15,0.30,0.28,0.13,0.05,0.01,0];
+  var heatW=[0.19,0.17,0.13,0.08,0.03,0.005,0,0,0.01,0.06,0.11,0.165];
+  function norm(a){var s=a.reduce(function(x,y){return x+y;},0)||1; return a.map(function(x){return x/s;});}
+  coolW=norm(coolW); heatW=norm(heatW);
+
+  var lastBefore=null, lastAfter=null;
 
   function calc(){
     var area=v("area"), rOld=Math.max(v("rOld"),0.1), rNew=Math.max(v("rNew"),0.1);
@@ -145,17 +190,17 @@
     // Winter: BTU delivered saved -> therms -> dollars
     var heatBTU=area*24*v("hdd")*dR;
     var therms=heatBTU/Math.max(v("eff"),0.1)/100000;
-    var heat=therms*v("gas");
-    if(v("fa")) heat+=v("ductHeat");
+    var heatSavings=therms*v("gas");
+    if(v("fa")) heatSavings+=v("ductHeat");
 
-    // Summer: envelope conduction saved -> kWh -> dollars
+    // Summer: envelope conduction saved -> kWh -> dollars, plus duct/leakage
     var coolBTU=area*24*v("cdays")*v("dt")*dR;
     var kWh=coolBTU/Math.max(v("btuKwh"),1);
     var coolEnv=kWh*v("elec");
     var ductCool=v("roofline")?v("ductCool"):0;
-    var cool=coolEnv+ductCool;
+    var coolSavings=coolEnv+ductCool;
 
-    var annual=heat+cool;
+    var annual=heatSavings+coolSavings;
     var net=v("cost")-v("rebate");
     var payback=annual>0?net/annual:Infinity;
     var yrs=v("years");
@@ -163,7 +208,7 @@
     var resale=v("cost")*(v("resalePct")/100);
     var netAtSale=energyOverStay+resale-net;
 
-    document.getElementById("bHeat").textContent=money(heat);
+    document.getElementById("bHeat").textContent=money(heatSavings);
     document.getElementById("bCool").textContent=money(coolEnv);
     document.getElementById("bDuct").textContent=money(ductCool+(v("fa")?v("ductHeat"):0));
     document.getElementById("rAnnual").textContent=money(annual);
@@ -181,13 +226,90 @@
       vd.textContent="Net "+money(netAtSale)+" at sale even counting resale. Energy-only payback "+payback.toFixed(1)+" yr, longer than your "+yrs+"-yr stay.";}
 
     document.getElementById("foot").textContent=
-      "Conductive loss = area × 24 × degree-days × (1/Rold − 1/Rnew), converted to therms (÷ efficiency) and kWh (÷ BTU-per-kWh). Duct/leakage and resale are entered directly since they're judgment calls. Undiscounted; ignores rate inflation (pushes savings up) and discount rate (pushes them down), which roughly offset over 3-5 yr. Estimates, not guarantees.";
+      "Conductive loss = area × 24 × degree-days × (1/Rold − 1/Rnew), converted to therms (÷ efficiency) and kWh (÷ BTU-per-kWh). Duct/leakage and resale are entered directly since they're judgment calls. Chart distributes annual bills across months using Providence heating/cooling curves. Undiscounted; estimates, not guarantees.";
+
+    // Build monthly before/after for the chart.
+    var annElec=v("annElec"), annGas=v("annGas");
+    var cShare=Math.min(Math.max(v("coolShare")/100,0),1), hShare=Math.min(Math.max(v("heatShare")/100,0),1);
+    var elecBaseMo=annElec*(1-cShare)/12, coolAnn=annElec*cShare;
+    var gasBaseMo=annGas*(1-hShare)/12, heatAnn=annGas*hShare;
+    var cFrac=coolAnn>0?Math.min(coolSavings/coolAnn,1):0;
+    var hFrac=heatAnn>0?Math.min(heatSavings/heatAnn,1):0;
+    var before=[], after=[];
+    for(var m=0;m<12;m++){
+      before.push({gas:gasBaseMo+heatAnn*heatW[m], elec:elecBaseMo+coolAnn*coolW[m]});
+      after.push({gas:gasBaseMo+heatAnn*heatW[m]*(1-hFrac), elec:elecBaseMo+coolAnn*coolW[m]*(1-cFrac)});
+    }
+    lastBefore=before; lastAfter=after;
+    drawChart();
+  }
+
+  function niceMax(x){
+    if(x<=0)return 100;
+    var pow=Math.pow(10,Math.floor(Math.log10(x)));
+    var n=x/pow;
+    var step=n<=1?1:n<=2?2:n<=5?5:10;
+    return step*pow;
+  }
+
+  function drawChart(){
+    var c=document.getElementById("chart"); if(!c||!lastBefore)return;
+    var dpr=window.devicePixelRatio||1;
+    var cssW=c.clientWidth||c.parentElement.clientWidth||320, cssH=240;
+    c.width=Math.round(cssW*dpr); c.height=Math.round(cssH*dpr);
+    var ctx=c.getContext("2d"); ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,cssW,cssH);
+
+    var padL=38, padR=8, padT=10, padB=22;
+    var W=cssW-padL-padR, H=cssH-padT-padB;
+    var maxV=0;
+    for(var m=0;m<12;m++){maxV=Math.max(maxV,lastBefore[m].gas+lastBefore[m].elec);}
+    maxV=niceMax(maxV);
+
+    // gridlines + y labels
+    ctx.font="10px -apple-system,Helvetica,Arial,sans-serif";
+    ctx.textBaseline="middle";
+    var lines=4;
+    for(var g=0;g<=lines;g++){
+      var val=maxV*g/lines, y=padT+H-(val/maxV)*H;
+      ctx.strokeStyle="rgba(159,176,195,0.15)"; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(padL+W,y); ctx.stroke();
+      ctx.fillStyle="#9fb0c3"; ctx.textAlign="right";
+      ctx.fillText("$"+Math.round(val).toLocaleString(),padL-6,y);
+    }
+
+    var group=W/12;
+    var barW=group*0.30, gap=group*0.06;
+    var y0=padT+H;
+    function bar(x,gas,elec,alpha){
+      var hg=(gas/maxV)*H, he=(elec/maxV)*H;
+      // gas at bottom
+      ctx.globalAlpha=alpha;
+      ctx.fillStyle="#f0a740";
+      ctx.fillRect(x,y0-hg,barW,hg);
+      ctx.fillStyle="#4da3ff";
+      ctx.fillRect(x,y0-hg-he,barW,he);
+      ctx.globalAlpha=1;
+      if(alpha<1){ctx.strokeStyle="rgba(232,238,245,0.35)"; ctx.lineWidth=1; ctx.strokeRect(x+0.5,y0-hg-he+0.5,barW-1,hg+he-1);}
+    }
+    ctx.textAlign="center"; ctx.textBaseline="top";
+    for(var m=0;m<12;m++){
+      var gx=padL+group*m;
+      var cx=gx+group/2;
+      var xB=cx-barW-gap/2, xA=cx+gap/2;
+      bar(xB,lastBefore[m].gas,lastBefore[m].elec,1);
+      bar(xA,lastAfter[m].gas,lastAfter[m].elec,0.5);
+      ctx.fillStyle="#9fb0c3";
+      ctx.fillText(MON[m],cx,y0+5);
+    }
   }
 
   ids.forEach(function(id){var e=document.getElementById(id);
     e.addEventListener("input",calc); e.addEventListener("change",calc);});
   document.querySelectorAll("[data-toggle]").forEach(function(h){
-    h.addEventListener("click",function(){h.parentElement.classList.toggle("collapsed");});});
+    h.addEventListener("click",function(){h.parentElement.classList.toggle("collapsed"); setTimeout(drawChart,0);});});
+  window.addEventListener("resize",function(){clearTimeout(window.__rt); window.__rt=setTimeout(drawChart,120);});
+  window.addEventListener("orientationchange",function(){setTimeout(drawChart,200);});
   calc();
 })();
 </script>
