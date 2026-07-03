@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Attic Insulation ROI</title>
+<style>
+  :root{
+    --bg:#0f1720; --card:#18222e; --card2:#1f2b3a; --line:#2c3a4c;
+    --text:#e8eef5; --muted:#9fb0c3; --accent:#4da3ff; --good:#33c27f; --warn:#f0a740;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:520px; margin:0 auto; padding:16px 16px calc(40px + env(safe-area-inset-bottom));}
+  h1{font-size:20px; margin:4px 0 2px;}
+  .sub{color:var(--muted); font-size:13px; margin:0 0 16px; line-height:1.4;}
+  .results{position:sticky; top:0; z-index:5; background:var(--card2);
+    border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:16px;
+    box-shadow:0 4px 18px rgba(0,0,0,.35);}
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px 12px;}
+  .stat .label{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em;}
+  .stat .val{font-size:20px; font-weight:700; margin-top:3px;}
+  .payback{grid-column:1 / -1; text-align:center; padding:12px;}
+  .payback .val{font-size:30px;}
+  .verdict{grid-column:1 / -1; font-size:13px; text-align:center; padding:8px 10px;
+    border-radius:8px; line-height:1.4;}
+  .v-good{background:rgba(51,194,127,.13); color:var(--good); border:1px solid rgba(51,194,127,.35);}
+  .v-warn{background:rgba(240,167,64,.13); color:var(--warn); border:1px solid rgba(240,167,64,.35);}
+  section{background:var(--card); border:1px solid var(--line); border-radius:14px;
+    margin-bottom:12px; overflow:hidden;}
+  section > .head{padding:13px 14px; font-weight:600; font-size:15px; display:flex;
+    justify-content:space-between; align-items:center; cursor:pointer; user-select:none;}
+  section .body{padding:2px 14px 12px;}
+  .row{display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:9px 0; border-top:1px solid var(--line);}
+  .row:first-child{border-top:none;}
+  .row label{font-size:14px; color:var(--text); flex:1; line-height:1.3;}
+  .row label small{display:block; color:var(--muted); font-size:11px; margin-top:2px;}
+  input[type=number]{width:110px; font-size:16px; text-align:right; padding:9px 10px;
+    background:var(--bg); color:var(--text); border:1px solid var(--line); border-radius:9px;}
+  input[type=number]:focus{outline:none; border-color:var(--accent);}
+  .chk{display:flex; align-items:center; gap:10px;}
+  input[type=checkbox]{width:26px; height:26px; accent-color:var(--accent);}
+  .caret{color:var(--muted); font-size:13px; transition:transform .15s;}
+  .collapsed .body{display:none;}
+  .collapsed .caret{transform:rotate(-90deg);}
+  .foot{color:var(--muted); font-size:11px; line-height:1.5; margin-top:18px;}
+  .breakdown{display:flex; justify-content:space-between; font-size:12px; color:var(--muted);
+    padding:4px 0;}
+  .breakdown b{color:var(--text); font-weight:600;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Attic Insulation ROI</h1>
+  <p class="sub">Roofline ("attic ceiling") encapsulation, 56 Cooke St. Rates from your RI Energy bills. Everything's editable; payback and net position update live.</p>
+
+  <div class="results">
+    <div class="grid">
+      <div class="stat"><div class="label">Annual savings</div><div class="val" id="rAnnual">$0</div></div>
+      <div class="stat"><div class="label">Net cost</div><div class="val" id="rNet">$0</div></div>
+      <div class="stat payback"><div class="label">Simple payback (energy only)</div><div class="val" id="rPayback">0 yr</div></div>
+      <div class="verdict" id="rVerdict"></div>
+      <div class="stat"><div class="label">Energy saved over stay</div><div class="val" id="rCum">$0</div></div>
+      <div class="stat"><div class="label">Est. resale bump</div><div class="val" id="rResale">$0</div></div>
+      <div class="stat" style="grid-column:1 / -1;"><div class="label">All-in net at sale (energy + resale − cost)</div><div class="val" id="rNetPos">$0</div></div>
+    </div>
+    <div style="margin-top:10px;">
+      <div class="breakdown"><span>Winter (gas)</span><b id="bHeat">$0</b></div>
+      <div class="breakdown"><span>Summer envelope (AC)</span><b id="bCool">$0</b></div>
+      <div class="breakdown"><span>Duct + leakage savings</span><b id="bDuct">$0</b></div>
+    </div>
+  </div>
+
+  <section>
+    <div class="head" data-toggle>Cost & horizon <span class="caret">▾</span></div>
+    <div class="body">
+      <div class="row"><label>Project cost</label><input type="number" id="cost" value="12000" inputmode="decimal"></div>
+      <div class="row"><label>Insurance rebate / other credits<small>Subtracted from cost</small></label><input type="number" id="rebate" value="2500" inputmode="decimal"></div>
+      <div class="row"><label>Years you'll stay</label><input type="number" id="years" value="5" inputmode="decimal"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head" data-toggle>Resale value at sale <span class="caret">▾</span></div>
+    <div class="body">
+      <div class="row"><label>Share of project cost recovered at sale (%)<small>Insulation is low-visibility; appraisers rarely credit it fully. 40-60% is a reasonable range, 100% = full.</small></label><input type="number" id="resalePct" value="50" inputmode="decimal"></div>
+      <div class="note" style="font-size:11px;color:var(--muted);line-height:1.5;padding-top:2px;">Applied to gross project cost, not net of rebate, since a buyer sees the improvement regardless of who paid.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head" data-toggle>Home & energy rates <span class="caret">▾</span></div>
+    <div class="body">
+      <div class="row"><label>Insulated area (sq ft)<small>Roof-deck / top-floor ceiling footprint</small></label><input type="number" id="area" value="1300" inputmode="decimal"></div>
+      <div class="row"><label>Electric rate ($/kWh)<small>All-in marginal, from bill ≈0.29</small></label><input type="number" id="elec" value="0.29" step="0.01" inputmode="decimal"></div>
+      <div class="row"><label>Gas rate ($/therm)<small>Winter marginal ≈1.85</small></label><input type="number" id="gas" value="1.85" step="0.05" inputmode="decimal"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head" data-toggle>Heating (winter) <span class="caret">▾</span></div>
+    <div class="body">
+      <div class="row"><label>Heating degree-days<small>Providence ≈5800</small></label><input type="number" id="hdd" value="5800" inputmode="decimal"></div>
+      <div class="row"><label>Furnace / boiler efficiency<small>0.85 = 85%</small></label><input type="number" id="eff" value="0.85" step="0.01" inputmode="decimal"></div>
+      <div class="row chk"><label>Heat is forced-air through attic ducts<small>Adds winter duct savings</small></label><input type="checkbox" id="fa"></div>
+      <div class="row"><label>Winter duct savings ($/yr)<small>Only if forced-air above</small></label><input type="number" id="ductHeat" value="400" inputmode="decimal"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head" data-toggle>Cooling (summer) <span class="caret">▾</span></div>
+    <div class="body">
+      <div class="row"><label>Cooling season length (days)</label><input type="number" id="cdays" value="120" inputmode="decimal"></div>
+      <div class="row"><label>Avg attic-to-indoor ΔT (°F)<small>Vented attic runs hot; ≈20</small></label><input type="number" id="dt" value="20" inputmode="decimal"></div>
+      <div class="row"><label>AC efficiency (BTU per kWh)<small>SEER 13 ≈13000</small></label><input type="number" id="btuKwh" value="13000" inputmode="decimal"></div>
+      <div class="row chk"><label>Roofline encapsulation (ducts in cool space)<small>Uncheck for floor-only</small></label><input type="checkbox" id="roofline" checked></div>
+      <div class="row"><label>Summer duct + leakage savings ($/yr)<small>The big roofline win</small></label><input type="number" id="ductCool" value="500" inputmode="decimal"></div>
+    </div>
+  </section>
+
+  <section class="collapsed">
+    <div class="head" data-toggle>Insulation R-values <span class="caret">▾</span></div>
+    <div class="body">
+      <div class="row"><label>Existing effective R<small>Bare attic ≈3</small></label><input type="number" id="rOld" value="3" step="0.5" inputmode="decimal"></div>
+      <div class="row"><label>New effective R<small>Spray foam roofline ≈47</small></label><input type="number" id="rNew" value="47" inputmode="decimal"></div>
+    </div>
+  </section>
+
+  <p class="foot" id="foot"></p>
+</div>
+
+<script>
+(function(){
+  var ids=["cost","rebate","years","resalePct","area","elec","gas","hdd","eff","ductHeat","cdays","dt","btuKwh","ductCool","rOld","rNew","fa","roofline"];
+  function v(id){var e=document.getElementById(id); return e.type==="checkbox"?e.checked:parseFloat(e.value)||0;}
+  function money(n){return (n<0?"-$":"$")+Math.abs(Math.round(n)).toLocaleString();}
+
+  function calc(){
+    var area=v("area"), rOld=Math.max(v("rOld"),0.1), rNew=Math.max(v("rNew"),0.1);
+    var dR=(1/rOld)-(1/rNew); if(dR<0)dR=0;
+
+    // Winter: BTU delivered saved -> therms -> dollars
+    var heatBTU=area*24*v("hdd")*dR;
+    var therms=heatBTU/Math.max(v("eff"),0.1)/100000;
+    var heat=therms*v("gas");
+    if(v("fa")) heat+=v("ductHeat");
+
+    // Summer: envelope conduction saved -> kWh -> dollars
+    var coolBTU=area*24*v("cdays")*v("dt")*dR;
+    var kWh=coolBTU/Math.max(v("btuKwh"),1);
+    var coolEnv=kWh*v("elec");
+    var ductCool=v("roofline")?v("ductCool"):0;
+    var cool=coolEnv+ductCool;
+
+    var annual=heat+cool;
+    var net=v("cost")-v("rebate");
+    var payback=annual>0?net/annual:Infinity;
+    var yrs=v("years");
+    var energyOverStay=annual*yrs;
+    var resale=v("cost")*(v("resalePct")/100);
+    var netAtSale=energyOverStay+resale-net;
+
+    document.getElementById("bHeat").textContent=money(heat);
+    document.getElementById("bCool").textContent=money(coolEnv);
+    document.getElementById("bDuct").textContent=money(ductCool+(v("fa")?v("ductHeat"):0));
+    document.getElementById("rAnnual").textContent=money(annual);
+    document.getElementById("rNet").textContent=money(net);
+    document.getElementById("rPayback").textContent=isFinite(payback)?payback.toFixed(1)+" yr":"—";
+    document.getElementById("rCum").textContent=money(energyOverStay);
+    document.getElementById("rResale").textContent=money(resale);
+    document.getElementById("rNetPos").textContent=money(netAtSale);
+
+    var vd=document.getElementById("rVerdict");
+    if(annual<=0){vd.className="verdict v-warn"; vd.textContent="No savings entered.";}
+    else if(netAtSale>=0){vd.className="verdict v-good";
+      vd.textContent="Net positive by "+money(netAtSale)+" at sale (energy over "+yrs+" yr + resale − net cost). Energy-only payback "+payback.toFixed(1)+" yr.";}
+    else{vd.className="verdict v-warn";
+      vd.textContent="Net "+money(netAtSale)+" at sale even counting resale. Energy-only payback "+payback.toFixed(1)+" yr, longer than your "+yrs+"-yr stay.";}
+
+    document.getElementById("foot").textContent=
+      "Conductive loss = area × 24 × degree-days × (1/Rold − 1/Rnew), converted to therms (÷ efficiency) and kWh (÷ BTU-per-kWh). Duct/leakage and resale are entered directly since they're judgment calls. Undiscounted; ignores rate inflation (pushes savings up) and discount rate (pushes them down), which roughly offset over 3-5 yr. Estimates, not guarantees.";
+  }
+
+  ids.forEach(function(id){var e=document.getElementById(id);
+    e.addEventListener("input",calc); e.addEventListener("change",calc);});
+  document.querySelectorAll("[data-toggle]").forEach(function(h){
+    h.addEventListener("click",function(){h.parentElement.classList.toggle("collapsed");});});
+  calc();
+})();
+</script>
+</body>
+</html>
