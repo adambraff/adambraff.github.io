@@ -53,6 +53,9 @@
   .pill.atl{background:#3a2415;color:#f0b37e}
   .pill.coa{background:#15402a;color:#8fe0b0}
   .pill.brand{background:#2e2347;color:#c4b0f0}
+  .pill.eng-gemini{background:#15324a;color:#8fd0ff}
+  .pill.eng-claude{background:#3a2a15;color:#f0c37e}
+  .pill.eng-baseline{background:#2e2347;color:#c4b0f0}
   table{width:100%;border-collapse:collapse;font-size:12.5px}
   th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
   th{color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px}
@@ -61,8 +64,12 @@
   .card .k{color:var(--muted);font-size:11.5px}
   .card .v{font-size:26px;font-weight:700;margin-top:4px}
   .card .x{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .card .delta{font-size:11.5px;font-weight:650;margin-top:2px}
+  .delta.up{color:var(--good)} .delta.down{color:var(--bad)} .delta.flat{color:var(--muted)}
   .bar{height:8px;border-radius:5px;background:#2a3340;overflow:hidden;margin-top:6px}
   .bar > span{display:block;height:100%;background:var(--accent)}
+  .minibar{display:inline-block;height:7px;border-radius:4px;background:var(--accent);vertical-align:middle}
+  .minibar.dim{background:#4a5663}
   .q{border:1px solid var(--line);border-radius:8px;margin-bottom:8px;background:var(--panel2)}
   .q .qh{display:flex;gap:10px;align-items:center;padding:10px 12px;cursor:pointer}
   .q .qh .qt{flex:1;font-size:13px}
@@ -77,6 +84,10 @@
   .note{font-size:12px;color:var(--muted);background:#0d1117;border:1px solid var(--line);border-left:3px solid var(--accent);
     border-radius:6px;padding:10px 12px;margin:10px 0}
   .warnbox{border-left-color:var(--warn)}
+  .action{border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:7px;
+    background:var(--panel2);padding:10px 12px;margin-bottom:8px;font-size:12.5px}
+  .action b{display:block;font-size:13px;margin-bottom:2px}
+  .action.p1{border-left-color:var(--bad)} .action.p2{border-left-color:var(--warn)} .action.p3{border-left-color:var(--accent)}
   .progress{height:10px;border-radius:6px;background:#2a3340;overflow:hidden;margin:10px 0}
   .progress > span{display:block;height:100%;background:var(--accent);width:0%}
   .log{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--muted);
@@ -93,7 +104,7 @@
 <body>
 <header>
   <h1>Onelife AEO/GEO Visibility Tracker</h1>
-  <div class="sub">Measure how answer engines (Gemini, ChatGPT, Claude, Perplexity) describe Onelife vs competitors — diagnose, track over time, and find content gaps. Client-side; your keys stay in your browser.</div>
+  <div class="sub">Measure how answer engines (Gemini, ChatGPT, Claude, Perplexity) describe Onelife vs competitors — diagnose, track over time, and find content gaps. Client-side; keys stay in your browser. History auto-loads from the repo's <code>data/</code> folder.</div>
 </header>
 <div class="wrap">
   <div class="tabs" id="tabs"></div>
@@ -105,6 +116,7 @@
       <p class="hint">Enter API keys for the engines you want to poll. Keys are stored only in this browser's localStorage and sent directly to each provider. Recommended starting point: <b>Gemini</b> (cheapest, web-grounded, returns citations, works cleanly from the browser). Gemini also powers the AI scoring/"judge" step.</p>
       <div id="engineConfigs"></div>
       <div class="note">CORS note: Gemini, OpenAI, and Anthropic respond to direct browser calls (Anthropic needs the dangerous-direct-browser-access header, which the tool sets). Perplexity often blocks browser calls; if it errors, leave it off or run it through a proxy. Models drift — the model name fields are editable so you can bump them without touching code.</div>
+      <div class="note">No key? <b>Claude runs</b> need no key at all: ask Claude (in Cowork) to "run the OL AEO/GEO battery" — it runs every query through live web search, scores with the same rubric, and commits the run to <code>data/olgeo-history.json</code> in the repo, which this page auto-loads. A weekly scheduled Claude run keeps the trend fed.</div>
     </div>
   </div>
 
@@ -136,6 +148,10 @@
       <div class="progress hide" id="progWrap"><span id="progBar"></span></div>
       <div class="log hide" id="runLog"></div>
     </div>
+    <div class="panel">
+      <h2>Claude runs (no API key)</h2>
+      <p class="hint" style="margin-bottom:0">A parallel engine series, run by Claude in Cowork via live web search using the same battery and rubric, saved with <code>engine: "claude"</code>. To trigger one manually, tell Claude: <i>"Run the OL AEO/GEO battery and commit the results."</i> A weekly scheduled task does this automatically. Claude runs and Gemini runs are kept as separate series — compare them in <b>Trend &amp; data → Engine comparison</b> rather than mixing them.</p>
+    </div>
   </div>
 
   <!-- RESULTS -->
@@ -143,18 +159,38 @@
     <div id="noResults" class="panel"><p class="muted">No run yet. Go to <b>Run</b> and either run the battery (needs a Gemini key at minimum) or click <b>Load 2026-05-26 baseline</b> to see the seeded diagnostic.</p></div>
     <div id="resultsBody" class="hide">
       <div class="panel">
-        <h2>Visibility scorecard <span class="muted small" id="runMeta"></span></h2>
+        <div class="flex" style="justify-content:space-between">
+          <h2 style="margin-bottom:0">Visibility scorecard</h2>
+          <select id="runPicker" style="max-width:340px"></select>
+        </div>
+        <p class="hint" id="runMeta" style="margin:6px 0 14px"></p>
         <div class="scorecards" id="scorecards"></div>
-        <p class="hint" style="margin-bottom:0">Share of Voice = % of queries where Onelife is mentioned at all. Prominence (0–3) = how featured it is when mentioned (3 = led/recommended, 1 = afterthought). Citation share = % of cited sources that are onelifefitness.com.</p>
+        <p class="hint" style="margin-bottom:0">Share of Voice = % of queries where Onelife is mentioned at all. Prominence (0–3) = how featured it is when mentioned (3 = led/recommended, 1 = afterthought). Owned-citation share = % of cited sources that are onelifefitness.com. Deltas compare against the previous run by the same engine(s).</p>
+      </div>
+      <div class="panel">
+        <h2>What to fix (auto-generated)</h2>
+        <p class="hint">Rule-based read of this run: where Onelife is invisible, buried, misdescribed, or citing itself instead of being cited by others.</p>
+        <div id="actionsList"></div>
       </div>
       <div class="panel">
         <h2>By market</h2>
         <table><thead><tr><th>Market</th><th>Queries</th><th>Share of Voice</th><th>Avg prominence</th><th>Recommend rate</th><th>Sentiment</th><th>Owned-citation share</th></tr></thead><tbody id="marketTable"></tbody></table>
       </div>
       <div class="panel">
-        <h2>Competitor share of voice</h2>
-        <p class="hint">How often each brand appears across the same queries. If competitors out-appear Onelife, that's where the AI answer is being lost.</p>
-        <canvas id="compChart" height="120"></canvas>
+        <h2>By intent</h2>
+        <p class="hint">Where the answer is won or lost by query type. Weak intents are content-strategy targets.</p>
+        <table><thead><tr><th>Intent</th><th>Queries</th><th>Share of Voice</th><th>Avg prominence</th><th>Recommend rate</th><th>Sentiment</th></tr></thead><tbody id="intentTable"></tbody></table>
+      </div>
+      <div class="panel">
+        <h2>Competitor leaderboard</h2>
+        <p class="hint">Share of answers each brand appears in, with movement vs the previous comparable run. This is who is winning the AI answer when Onelife is not.</p>
+        <table><thead><tr><th>#</th><th>Brand</th><th>Share of Voice</th><th></th><th>Δ vs prev</th></tr></thead><tbody id="leaderTable"></tbody></table>
+      </div>
+      <div class="panel">
+        <h2>Citation sources</h2>
+        <p class="hint">The domains answer engines actually cite on these queries — i.e., where they learn about Onelife. ★ = owned. Everything else is earned-media territory: reviews, roundups, comparisons.</p>
+        <div class="flex" style="margin-bottom:8px"><span class="small muted" id="citeSummary"></span></div>
+        <table><thead><tr><th>#</th><th>Domain</th><th>Citations</th><th></th><th>Share</th></tr></thead><tbody id="citeTable"></tbody></table>
       </div>
       <div class="panel">
         <h2>Query-by-query detail</h2>
@@ -168,19 +204,27 @@
   <div class="section hide" data-sec="trend">
     <div class="panel">
       <h2>Trend over time</h2>
-      <p class="hint">Each saved run is a point. Export runs to JSON and commit them to the repo's <code>/data</code> folder so trend history is durable and version-controlled, not trapped in one browser.</p>
+      <p class="hint">Each saved run is a point. History auto-loads from <code>data/olgeo-history.json</code> in the repo and merges with anything saved in this browser. AI answers are non-deterministic, so read the trend, not single points.</p>
       <div id="noTrend"><p class="muted">No history yet. Run the battery or load the baseline, then runs accumulate here.</p></div>
       <div id="trendBody" class="hide">
-        <label>Metric</label>
-        <select id="trendMetric" style="max-width:280px">
-          <option value="sov">Share of Voice (%)</option>
-          <option value="prominence">Avg prominence (0–3)</option>
-          <option value="recommend">Recommend rate (%)</option>
-          <option value="sentiment">Sentiment (−1 to 1)</option>
-          <option value="citation">Owned-citation share (%)</option>
-        </select>
+        <div class="row" style="max-width:580px">
+          <div><label>Metric</label>
+          <select id="trendMetric">
+            <option value="sov">Share of Voice (%)</option>
+            <option value="prominence">Avg prominence (0–3)</option>
+            <option value="recommend">Recommend rate (%)</option>
+            <option value="sentiment">Sentiment (−1 to 1)</option>
+            <option value="citation">Owned-citation share (%)</option>
+          </select></div>
+          <div><label>Engine series</label><select id="trendEngine"></select></div>
+        </div>
         <canvas id="trendChart" height="120" style="margin-top:12px"></canvas>
       </div>
+    </div>
+    <div class="panel">
+      <h2>Engine comparison</h2>
+      <p class="hint">Average across all saved runs, per engine series. No single engine is ground truth; the spread between them is itself information.</p>
+      <table><thead><tr><th>Engine</th><th>Runs</th><th>Share of Voice</th><th>Avg prominence</th><th>Recommend rate</th><th>Sentiment</th><th>Owned-citation share</th></tr></thead><tbody id="engineTable"></tbody></table>
     </div>
     <div class="panel">
       <h2>Data export / import</h2>
@@ -190,9 +234,9 @@
         <button class="sec sm" id="expCsv">Export history (CSV)</button>
         <button class="sec sm" id="impBtn">Import history (JSON)</button>
         <input type="file" id="impFile" class="hide" accept="application/json"/>
-        <button class="sec sm" id="clearHist">Clear history</button>
+        <button class="sec sm" id="clearHist">Clear local history</button>
       </div>
-      <p class="hint" style="margin-top:10px">Recommended cadence: run weekly, export, commit to git. Or schedule it (see README) to run automatically.</p>
+      <p class="hint" style="margin-top:10px">Import merges by timestamp (no duplicates). The durable store is <code>data/olgeo-history.json</code> in the repo — commit exports there, or let Claude runs do it automatically.</p>
     </div>
   </div>
 
@@ -200,11 +244,17 @@
 
 <script>
 /* ============================================================
-   Onelife AEO/GEO Visibility Tracker  —  single-file, client-side
+   Onelife AEO/GEO Visibility Tracker v2 — single-file, client-side
+   v2: fixed owned-citation detection (Gemini redirect URLs hid the
+   domain in the title), repo-hosted history auto-load, deltas,
+   competitor leaderboard, intent breakdown, citation-source
+   leaderboard, engine comparison, auto-generated actions,
+   Claude-run (no-key) engine series.
    ============================================================ */
 const BRAND = "Onelife";
-const BRAND_ALIASES = ["onelife","one life"];          // normalized matching
+const BRAND_ALIASES = ["onelife","one life"];
 const OWNED_DOMAINS = ["onelifefitness.com"];
+const DATA_URL = "data/olgeo-history.json";
 
 const COMPETITORS = ["Crunch","Planet Fitness","LA Fitness","EOS Fitness","Life Time",
   "Equinox","Gold's Gym","Orangetheory","YMCA","Anytime Fitness","Crossfit","Barry's","VIDA Fitness"];
@@ -246,21 +296,66 @@ const ENGINE_DEFS = [
 ];
 
 /* ============================================================
+   Citation helpers (v2 fix)
+   Gemini grounding returns vertexaisearch redirect URLs; the real
+   domain is in the citation *title*. Owned/domain detection must
+   look at both.
+   ============================================================ */
+function citeDomain(c){
+  const t=(c && c.title||"").trim().toLowerCase().replace(/^www\./,"");
+  if(/^[a-z0-9][a-z0-9.-]*\.[a-z]{2,}$/.test(t)) return t;
+  try{
+    const h=new URL(c.url).hostname.replace(/^www\./,"").toLowerCase();
+    if(h.includes("vertexaisearch")||h.includes("grounding-api")) return t||"(unresolved)";
+    return h;
+  }catch(e){ return t||"(unresolved)"; }
+}
+function isOwnedCite(c){
+  const d=citeDomain(c), u=((c&&c.url)||"").toLowerCase();
+  return OWNED_DOMAINS.some(x=>d===x||d.endsWith("."+x)||u.includes(x));
+}
+function recomputeRun(run){
+  (run.results||[]).forEach(r=>{
+    if(Array.isArray(r.citations)) r.ownedCitations=r.citations.filter(isOwnedCite).length;
+  });
+  run.agg=aggregate(run.results||[]);
+  return run;
+}
+function isAllError(run){ return (run.results||[]).length>0 && run.results.every(r=>r.error); }
+
+/* ============================================================
    State + persistence
    ============================================================ */
-const LS = {
-  cfg:"olgeo_cfg", battery:"olgeo_battery", history:"olgeo_history"
-};
+const LS = { cfg:"olgeo_cfg", battery:"olgeo_battery", history:"olgeo_history" };
 let state = {
   cfg: loadJSON(LS.cfg, {}),
   battery: loadJSON(LS.battery, JSON.parse(JSON.stringify(DEFAULT_BATTERY))),
-  history: loadJSON(LS.history, []),
+  history: [],
   lastRun: null,
+  viewIdx: -1,   // which run the Results tab is showing (index into history)
 };
 function loadJSON(k, d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } }
 function saveCfg(){ localStorage.setItem(LS.cfg, JSON.stringify(state.cfg)); }
 function saveBattery(){ localStorage.setItem(LS.battery, JSON.stringify(state.battery)); }
-function saveHistory(){ localStorage.setItem(LS.history, JSON.stringify(state.history)); }
+function saveHistory(){ try{ localStorage.setItem(LS.history, JSON.stringify(state.history)); }catch(e){ /* quota */ } }
+
+function mergeHistory(runs){
+  const byTs={};
+  state.history.forEach(h=>byTs[h.ts]=h);
+  (runs||[]).forEach(h=>{ if(h&&h.ts&&!isAllError(h)) byTs[h.ts]=h; });
+  state.history=Object.values(byTs).sort((a,b)=>a.ts<b.ts?-1:1).map(recomputeRun);
+}
+async function initHistory(){
+  // local first
+  mergeHistory(loadJSON(LS.history, []));
+  // then repo data file (works on GitHub Pages / any http server; silently skipped on file://)
+  try{
+    const r=await fetch(DATA_URL,{cache:"no-store"});
+    if(r.ok){ const data=await r.json(); if(Array.isArray(data)) mergeHistory(data); }
+  }catch(e){ /* offline or file:// — fine */ }
+  saveHistory();
+  if(state.history.length){ state.viewIdx=state.history.length-1; state.lastRun=state.history[state.viewIdx]; }
+}
 
 /* ============================================================
    Tabs
@@ -335,7 +430,7 @@ function updateEstimate(){
   const ne=ENGINE_DEFS.filter(d=>state.cfg[d.key]&&state.cfg[d.key].enabled).length;
   const calls=nq*ne;
   const el=document.getElementById("runEstimate");
-  if(el) el.textContent = ne? `${nq} queries × ${ne} engines = ${calls} answer calls + ${calls} judge calls (~$${(calls*0.004).toFixed(2)} est.)` : "No engines enabled — add a key in Setup.";
+  if(el) el.textContent = ne? `${nq} queries × ${ne} engines = ${calls} answer calls + ${calls} judge calls (~$${(calls*0.004).toFixed(2)} est.)` : "No engines enabled — add a key in Setup, or use a Claude run (no key).";
 }
 
 /* ============================================================
@@ -429,7 +524,6 @@ function heuristicScore(answer){
   const t=(answer||"").toLowerCase();
   const mentioned = BRAND_ALIASES.some(a=>t.includes(a));
   const brands=[]; COMPETITORS.concat([BRAND]).forEach(b=>{ if(t.includes(b.toLowerCase())) brands.push(b); });
-  // rank: position of first onelife mention among brand first-mentions
   let rank=0;
   if(mentioned){
     const positions=[];
@@ -470,7 +564,7 @@ async function runBattery(){
       try{
         const out=await ADAPTERS[e.key](q.q, state.cfg[e.key]);
         rec.answer=out.text; rec.citations=out.citations||[];
-        rec.ownedCitations=rec.citations.filter(c=>OWNED_DOMAINS.some(d=>(c.url||"").includes(d))).length;
+        rec.ownedCitations=rec.citations.filter(isOwnedCite).length;
         const s=await judge(q.q, out.text, state.cfg);
         Object.assign(rec, s); rec.error=null;
         log(lg, `   ✓ ${s.mentioned?("rank "+s.rank+", "+s.sentiment+", prom "+s.prominence):"NOT mentioned"} (${rec.citations.length} cites, ${rec.ownedCitations} owned)`);
@@ -483,9 +577,11 @@ async function runBattery(){
     }
   }
   const snap={ts:new Date().toISOString(), label:"Live run", engines:engines.map(e=>e.key), results, agg:aggregate(results)};
-  state.lastRun=snap; state.history.push(snap); saveHistory();
+  mergeHistory([snap]); saveHistory();
+  state.viewIdx=state.history.findIndex(h=>h.ts===snap.ts);
+  state.lastRun=state.history[state.viewIdx]||snap;
   running=false; runBtn.disabled=false; runBtn.textContent="Run full battery";
-  log(lg, `Done. ${results.length} results saved to history.`);
+  log(lg, `Done. ${results.length} results saved to history. Export from Trend & data and commit to data/olgeo-history.json to make it durable.`);
   gotoTab("Results");
 }
 function log(el,msg){ el.innerHTML+=escapeHtml(msg)+"\n"; el.scrollTop=el.scrollHeight; }
@@ -494,47 +590,80 @@ function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 /* ============================================================
    Aggregation
    ============================================================ */
+function seg(rows){
+  if(!rows.length) return null;
+  const ment=rows.filter(r=>r.mentioned);
+  const sov=ment.length/rows.length;
+  const prom=ment.length? ment.reduce((a,r)=>a+(r.prominence||0),0)/ment.length : 0;
+  const rec=rows.filter(r=>r.recommended).length/rows.length;
+  const sent=ment.length? ment.reduce((a,r)=>a+(typeof r.sentiment_score==="number"?r.sentiment_score:0),0)/ment.length : 0;
+  const totCit=rows.reduce((a,r)=>a+((r.citations||[]).length),0);
+  const ownCit=rows.reduce((a,r)=>a+(r.ownedCitations||0),0);
+  return {n:rows.length, sov, prominence:prom, recommend:rec, sentiment:sent, citation: totCit? ownCit/totCit:0};
+}
 function aggregate(results){
   const valid=results.filter(r=>r.error==null && r.mentioned!=null);
-  const seg=(rows)=>{
-    if(!rows.length) return null;
-    const ment=rows.filter(r=>r.mentioned);
-    const sov=ment.length/rows.length;
-    const prom=ment.length? ment.reduce((a,r)=>a+(r.prominence||0),0)/ment.length : 0;
-    const rec=rows.filter(r=>r.recommended).length/rows.length;
-    const sent=ment.length? ment.reduce((a,r)=>a+(typeof r.sentiment_score==="number"?r.sentiment_score:0),0)/ment.length : 0;
-    const totCit=rows.reduce((a,r)=>a+((r.citations||[]).length),0);
-    const ownCit=rows.reduce((a,r)=>a+(r.ownedCitations||0),0);
-    const cit= totCit? ownCit/totCit : 0;
-    return {n:rows.length, sov, prominence:prom, recommend:rec, sentiment:sent, citation:cit};
-  };
   const byMarket={};
   ["DMV","Atlanta","Coastal","Brand"].forEach(m=>{ const rows=valid.filter(r=>r.market===m); if(rows.length) byMarket[m]=seg(rows); });
-  // competitor SoV
+  const byIntent={};
+  [...new Set(valid.map(r=>r.intent||"other"))].forEach(x=>{ byIntent[x]=seg(valid.filter(r=>(r.intent||"other")===x)); });
   const comp={};
   COMPETITORS.concat([BRAND]).forEach(b=>{
     const hits=valid.filter(r=>(r.brands_mentioned||[]).some(x=>x&&x.toLowerCase().includes(b.toLowerCase().slice(0,6)))).length;
     comp[b]=valid.length? hits/valid.length:0;
   });
-  return {overall:seg(valid), byMarket, comp, n:valid.length, errors:results.filter(r=>r.error).length};
+  return {overall:seg(valid), byMarket, byIntent, comp, n:valid.length, errors:results.filter(r=>r.error).length};
 }
+
+/* ============================================================
+   Deltas
+   ============================================================ */
+function prevComparable(idx){
+  if(idx<=0) return null;
+  const cur=state.history[idx], key=(cur.engines||[]).slice().sort().join();
+  for(let i=idx-1;i>=0;i--){ if((state.history[i].engines||[]).slice().sort().join()===key) return state.history[i]; }
+  return null; // no cross-engine deltas: a Claude run only compares to a prior Claude run
+}
+function deltaHtml(cur, prev, fmt, eps){
+  if(prev==null||cur==null) return `<span class="delta flat">—</span>`;
+  const d=cur-prev; eps=eps||0.005;
+  if(Math.abs(d)<eps) return `<span class="delta flat">= no change</span>`;
+  const cls=d>0?"up":"down", arrow=d>0?"▲":"▼";
+  return `<span class="delta ${cls}">${arrow} ${fmt(Math.abs(d))}</span>`;
+}
+const fmtPct=x=>(x*100).toFixed(0)+"pp", fmtNum=x=>x.toFixed(2);
 
 /* ============================================================
    Results UI
    ============================================================ */
-let compChartObj=null, trendChartObj=null;
+let trendChartObj=null;
 function renderResults(){
-  const snap=state.lastRun;
+  const snap=state.history[state.viewIdx]||state.lastRun;
   if(!snap){ document.getElementById("noResults").classList.remove("hide"); document.getElementById("resultsBody").classList.add("hide"); return; }
   document.getElementById("noResults").classList.add("hide"); document.getElementById("resultsBody").classList.remove("hide");
+
+  // run picker
+  const rp=document.getElementById("runPicker"); rp.innerHTML="";
+  state.history.forEach((h,i)=>{
+    const o=document.createElement("option"); o.value=i;
+    o.textContent=`${new Date(h.ts).toLocaleDateString()} — ${h.label} [${(h.engines||[]).join(", ")}]`;
+    if(i===state.viewIdx) o.selected=true;
+    rp.appendChild(o);
+  });
+  rp.onchange=()=>{ state.viewIdx=+rp.value; state.lastRun=state.history[state.viewIdx]; renderResults(); };
+
   const a=snap.agg; const o=a.overall||{sov:0,prominence:0,recommend:0,sentiment:0,citation:0};
-  document.getElementById("runMeta").textContent = `— ${snap.label}, ${new Date(snap.ts).toLocaleString()} · ${a.n} answers · ${snap.engines.join(", ")}` + (a.errors?` · ${a.errors} errors`:"");
+  const prev=prevComparable(state.viewIdx); const po=prev&&prev.agg&&prev.agg.overall;
+  document.getElementById("runMeta").textContent = `${snap.label}, ${new Date(snap.ts).toLocaleString()} · ${a.n} answers · engines: ${(snap.engines||[]).join(", ")}` + (a.errors?` · ${a.errors} errors`:"") + (prev?` · deltas vs ${new Date(prev.ts).toLocaleDateString()}`:" · no comparable prior run");
   const sc=document.getElementById("scorecards");
-  sc.innerHTML = card("Share of Voice", pct(o.sov), "Onelife mentioned", o.sov)
-    + card("Avg prominence", o.prominence.toFixed(2)+" / 3", o.prominence>=2.3?"strong":o.prominence>=1.5?"middling":"weak", o.prominence/3)
-    + card("Recommend rate", pct(o.recommend), "actively recommended", o.recommend)
-    + card("Sentiment", o.sentiment>=0?("+"+o.sentiment.toFixed(2)):o.sentiment.toFixed(2), o.sentiment>0.2?"positive":o.sentiment< -0.1?"negative":"mixed", (o.sentiment+1)/2)
-    + card("Owned-citation share", pct(o.citation), "cites onelifefitness.com", o.citation);
+  sc.innerHTML = card("Share of Voice", pct(o.sov), deltaHtml(o.sov,po?po.sov:null,fmtPct), o.sov)
+    + card("Avg prominence", o.prominence.toFixed(2)+" / 3", deltaHtml(o.prominence,po?po.prominence:null,fmtNum,0.005), o.prominence/3)
+    + card("Recommend rate", pct(o.recommend), deltaHtml(o.recommend,po?po.recommend:null,fmtPct), o.recommend)
+    + card("Sentiment", (o.sentiment>=0?"+":"")+o.sentiment.toFixed(2), deltaHtml(o.sentiment,po?po.sentiment:null,fmtNum,0.005), (o.sentiment+1)/2)
+    + card("Owned-citation share", pct(o.citation), deltaHtml(o.citation,po?po.citation:null,fmtPct), o.citation);
+
+  renderActions(snap);
+
   // market table
   const mt=document.getElementById("marketTable"); mt.innerHTML="";
   Object.keys(a.byMarket).forEach(m=>{ const s=a.byMarket[m];
@@ -543,27 +672,114 @@ function renderResults(){
       <td>${pct(s.recommend)}</td><td class="sent-${s.sentiment>0.2?'positive':s.sentiment< -0.1?'negative':'neutral'}">${s.sentiment>=0?'+':''}${s.sentiment.toFixed(2)}</td>
       <td>${pct(s.citation)}</td></tr>`;
   });
-  renderCompChart(a.comp);
+
+  // intent table
+  const it=document.getElementById("intentTable"); it.innerHTML="";
+  const intents=Object.entries(a.byIntent||{}).sort((x,y)=>(x[1].prominence)-(y[1].prominence));
+  intents.forEach(([k,s])=>{
+    it.innerHTML+=`<tr><td>${escapeHtml(k)}</td><td>${s.n}</td><td>${pct(s.sov)}</td>
+      <td class="score-${Math.round(s.prominence)}">${s.prominence.toFixed(2)}</td><td>${pct(s.recommend)}</td>
+      <td class="sent-${s.sentiment>0.2?'positive':s.sentiment< -0.1?'negative':'neutral'}">${s.sentiment>=0?'+':''}${s.sentiment.toFixed(2)}</td></tr>`;
+  });
+
+  renderLeaderboard(snap, prev);
+  renderCitations(snap);
   renderQueryDetail(snap);
 }
-function card(k,v,x,frac){
+function card(k,v,deltaStr,frac){
   frac=Math.max(0,Math.min(1,frac||0));
-  return `<div class="card"><div class="k">${k}</div><div class="v">${v}</div><div class="x">${x}</div>
+  return `<div class="card"><div class="k">${k}</div><div class="v">${v}</div><div class="delta-wrap">${deltaStr}</div>
     <div class="bar"><span style="width:${(frac*100).toFixed(0)}%"></span></div></div>`;
 }
 function pct(x){ return (x*100).toFixed(0)+"%"; }
-function renderCompChart(comp){
-  const entries=Object.entries(comp).filter(([k,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const labels=entries.map(e=>e[0]); const data=entries.map(e=>+(e[1]*100).toFixed(0));
-  const colors=labels.map(l=>l===BRAND?"#3ea6ff":"#4a5663");
-  if(compChartObj) compChartObj.destroy();
-  compChartObj=new Chart(document.getElementById("compChart"),{type:"bar",
-    data:{labels,datasets:[{label:"Share of Voice %",data,backgroundColor:colors}]},
-    options:{indexAxis:"y",plugins:{legend:{display:false}},scales:{x:{ticks:{color:"#9aa7b4"},grid:{color:"#2a3340"}},y:{ticks:{color:"#e6edf3"},grid:{display:false}}}}});
+
+function renderLeaderboard(snap, prev){
+  const tb=document.getElementById("leaderTable"); tb.innerHTML="";
+  const cur=Object.entries(snap.agg.comp||{}).filter(([k,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  const prevComp=prev&&prev.agg&&prev.agg.comp||{};
+  const prevSorted=Object.entries(prevComp).filter(([k,v])=>v>0).sort((a,b)=>b[1]-a[1]).map(e=>e[0]);
+  const max=cur.length?cur[0][1]:1;
+  cur.slice(0,12).forEach(([brand,sov],i)=>{
+    const prevRank=prevSorted.indexOf(brand);
+    let move=`<span class="muted">—</span>`;
+    if(prev){
+      if(prevRank<0) move=`<span class="delta up">new</span>`;
+      else if(prevRank>i) move=`<span class="delta up">▲ ${prevRank-i}</span>`;
+      else if(prevRank<i) move=`<span class="delta down">▼ ${i-prevRank}</span>`;
+      else move=`<span class="delta flat">=</span>`;
+    }
+    const dSov=prev&&prevComp[brand]!=null? deltaHtml(sov,prevComp[brand],fmtPct,0.005): `<span class="delta flat">—</span>`;
+    const isBrand=brand===BRAND;
+    tb.innerHTML+=`<tr${isBrand?' style="background:#14202e"':''}><td>${i+1} ${move}</td>
+      <td>${isBrand?"<b>"+brand+" ★</b>":escapeHtml(brand)}</td>
+      <td style="min-width:60px">${pct(sov)}</td>
+      <td style="width:34%"><span class="minibar ${isBrand?'':'dim'}" style="width:${(sov/max*100).toFixed(0)}%"></span></td>
+      <td>${dSov}</td></tr>`;
+  });
 }
+
+function renderCitations(snap){
+  const tb=document.getElementById("citeTable"); tb.innerHTML="";
+  const counts={}; let total=0, owned=0;
+  (snap.results||[]).forEach(r=>(r.citations||[]).forEach(c=>{
+    const d=citeDomain(c); counts[d]=(counts[d]||0)+1; total++;
+    if(isOwnedCite(c)) owned++;
+  }));
+  const rows=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,15);
+  const max=rows.length?rows[0][1]:1;
+  document.getElementById("citeSummary").textContent =
+    total? `${total} citations in this run · ${owned} owned (${(owned/total*100).toFixed(0)}%) · ${Object.keys(counts).length} distinct domains` : "No citations in this run.";
+  rows.forEach(([d,n],i)=>{
+    const own=OWNED_DOMAINS.some(x=>d===x||d.endsWith("."+x));
+    tb.innerHTML+=`<tr><td>${i+1}</td><td class="${own?'sent-positive':''}">${own?'★ ':''}${escapeHtml(d)}</td>
+      <td>${n}</td><td style="width:34%"><span class="minibar ${own?'':'dim'}" style="width:${(n/max*100).toFixed(0)}%"></span></td>
+      <td>${(n/total*100).toFixed(0)}%</td></tr>`;
+  });
+}
+
+/* ============================================================
+   Actions (auto-generated, rule-based)
+   ============================================================ */
+function renderActions(snap){
+  const root=document.getElementById("actionsList"); root.innerHTML="";
+  const valid=(snap.results||[]).filter(r=>r.error==null&&r.mentioned!=null);
+  const acts=[];
+  const invisible=valid.filter(r=>!r.mentioned);
+  if(invisible.length) acts.push({p:1,t:`Invisible on ${invisible.length} quer${invisible.length>1?"ies":"y"}`,
+    d:invisible.map(r=>`"${r.query}"`).join(" · ")+". Onelife is not in the answer at all. These intents need dedicated owned content (per-club pages, FAQs) plus presence in the third-party roundups the engines cite."});
+  const buried=valid.filter(r=>r.mentioned&&(r.prominence||0)<=1);
+  if(buried.length) acts.push({p:2,t:`Buried (prominence ≤1) on ${buried.length} quer${buried.length>1?"ies":"y"}`,
+    d:buried.map(r=>`"${r.query}"`).join(" · ")+". Mentioned as an afterthought. Reframe owned content for these intents and pitch the roundup authors who rank competitors above Onelife."});
+  const acc=valid.filter(r=>r.accuracy_concern);
+  if(acc.length) acts.push({p:1,t:`Accuracy flags on ${acc.length} answer${acc.length>1?"s":""}`,
+    d:acc.map(r=>`"${r.query}" — ${r.notes||"unverified claim"}`).join(" · ")+". Wrong facts propagate; fix source-of-truth pages (hours, pricing, locations) and structured data."});
+  const compQ=valid.filter(r=>/comparison/.test(r.intent||""));
+  const compOwnedHeavy=compQ.filter(r=>{const t=(r.citations||[]).length;return t>0&&(r.ownedCitations||0)/t>=0.4;});
+  if(compOwnedHeavy.length) acts.push({p:3,t:"Comparison answers lean on onelifefitness.com itself",
+    d:compOwnedHeavy.map(r=>`"${r.query}"`).join(" · ")+". Good news: your comparison content is being read. Risk: no neutral third-party comparisons exist, so one negative review could flip the answer. Pitch honest comparisons to independent reviewers."});
+  const bm=snap.agg.byMarket||{};
+  Object.entries(bm).forEach(([m,s])=>{
+    if(s.citation===0) acts.push({p:2,t:`${m}: zero owned citations`,
+      d:`Engines describe Onelife in ${m} entirely from third parties. Ship per-club pages with LocalBusiness/HealthClub schema, real FAQs, current amenities.`});
+    if(s.prominence<1.8&&s.n>=3) acts.push({p:2,t:`${m}: weak prominence (${s.prominence.toFixed(2)}/3)`,
+      d:`Onelife is present but not featured in ${m}. See the intent table for which query types are dragging; that is the content roadmap.`});
+    if(s.sentiment<0.15&&s.n>=2) acts.push({p:2,t:`${m}: sentiment drag (${s.sentiment>=0?"+":""}${s.sentiment.toFixed(2)})`,
+      d:`Tone of Onelife mentions in ${m} is flat-to-negative — usually cancellation/billing complaints. AI sentiment is downstream of operations; content alone won't fix it.`});
+  });
+  if(!acts.length) acts.push({p:3,t:"No red flags this run",d:"Presence, prominence, and citations look healthy. Watch the trend for drift."});
+  acts.sort((a,b)=>a.p-b.p);
+  acts.slice(0,8).forEach(a=>{
+    const div=document.createElement("div"); div.className=`action p${a.p}`;
+    div.innerHTML=`<b>${escapeHtml(a.t)}</b>${escapeHtml(a.d)}`;
+    root.appendChild(div);
+  });
+}
+
+/* ============================================================
+   Query detail
+   ============================================================ */
 function renderQueryDetail(snap){
   const root=document.getElementById("queryDetail"); root.innerHTML="";
-  // group by query
   const byQ={};
   snap.results.forEach(r=>{ (byQ[r.qid]=byQ[r.qid]||{q:r.query,market:r.market,intent:r.intent,rows:[]}).rows.push(r); });
   Object.values(byQ).forEach(g=>{
@@ -584,9 +800,9 @@ function renderQueryDetail(snap){
 }
 function rowHtml(r){
   if(r.error) return `<div style="margin-top:10px"><b>${r.engineName}</b> <span class="sent-negative small">error: ${escapeHtml(r.error)}</span></div>`;
-  const cites=(r.citations||[]).slice(0,8).map(c=>{
-    const owned=OWNED_DOMAINS.some(d=>(c.url||"").includes(d));
-    return `<a class="cite ${owned?'owned':''}" href="${escapeAttr(c.url)}" target="_blank" rel="noopener">${owned?'★ ':''}${escapeHtml(c.title||c.url)}</a>`;
+  const cites=(r.citations||[]).slice(0,10).map(c=>{
+    const owned=isOwnedCite(c);
+    return `<a class="cite ${owned?'owned':''}" href="${escapeAttr(c.url)}" target="_blank" rel="noopener">${owned?'★ ':''}${escapeHtml(citeDomain(c))}${c.title&&citeDomain(c)!==(c.title||"").toLowerCase()?" — "+escapeHtml(c.title):""}</a>`;
   }).join("");
   return `<div style="margin-top:12px">
     <b>${r.engineName}</b>
@@ -605,24 +821,47 @@ function rowHtml(r){
 function renderTrend(){
   if(!state.history.length){ document.getElementById("noTrend").classList.remove("hide"); document.getElementById("trendBody").classList.add("hide"); return; }
   document.getElementById("noTrend").classList.add("hide"); document.getElementById("trendBody").classList.remove("hide");
+  // engine filter options
+  const sel=document.getElementById("trendEngine");
+  const engines=[...new Set(state.history.flatMap(h=>h.engines||[]))];
+  const prevVal=sel.value;
+  sel.innerHTML=`<option value="all">All runs</option>`+engines.map(e=>`<option value="${e}">${e}</option>`).join("");
+  if([...sel.options].some(o=>o.value===prevVal)) sel.value=prevVal;
   drawTrend();
+  renderEngineTable();
+}
+function trendRuns(){
+  const f=document.getElementById("trendEngine").value||"all";
+  return f==="all"? state.history : state.history.filter(h=>(h.engines||[]).includes(f));
 }
 function drawTrend(){
   const metric=document.getElementById("trendMetric").value;
-  const labels=state.history.map(h=>new Date(h.ts).toLocaleDateString());
+  const runs=trendRuns();
+  const labels=runs.map(h=>new Date(h.ts).toLocaleDateString());
   const markets=["DMV","Atlanta","Coastal","Brand"];
   const palette={DMV:"#3ea6ff",Atlanta:"#f0b37e",Coastal:"#8fe0b0",Brand:"#c4b0f0"};
-  const scale=(metric==="sentiment")?1:(metric==="prominence")?1:100;
+  const scale=(metric==="sentiment"||metric==="prominence")?1:100;
   const datasets=markets.map(m=>({
     label:m, borderColor:palette[m], backgroundColor:palette[m], tension:.25, spanGaps:true,
-    data: state.history.map(h=>{ const s=h.agg&&h.agg.byMarket&&h.agg.byMarket[m]; return s? +( (s[metric]||0)*scale ).toFixed(2):null; })
+    data: runs.map(h=>{ const s=h.agg&&h.agg.byMarket&&h.agg.byMarket[m]; return s? +((s[metric]||0)*scale).toFixed(2):null; })
   }));
-  // overall line
-  datasets.push({label:"Overall", borderColor:"#ffffff", borderDash:[4,4], data:state.history.map(h=>{ const o=h.agg&&h.agg.overall; return o? +(((o[metric]||0))*scale).toFixed(2):null; }), tension:.25, spanGaps:true});
+  datasets.push({label:"Overall", borderColor:"#ffffff", borderDash:[4,4], data:runs.map(h=>{ const o=h.agg&&h.agg.overall; return o? +(((o[metric]||0))*scale).toFixed(2):null; }), tension:.25, spanGaps:true});
   if(trendChartObj) trendChartObj.destroy();
   trendChartObj=new Chart(document.getElementById("trendChart"),{type:"line",
     data:{labels,datasets},
     options:{plugins:{legend:{labels:{color:"#e6edf3"}}},scales:{x:{ticks:{color:"#9aa7b4"},grid:{color:"#2a3340"}},y:{ticks:{color:"#9aa7b4"},grid:{color:"#2a3340"}}}}});
+}
+function renderEngineTable(){
+  const tb=document.getElementById("engineTable"); tb.innerHTML="";
+  const engines=[...new Set(state.history.flatMap(h=>h.engines||[]))];
+  engines.forEach(e=>{
+    const runs=state.history.filter(h=>(h.engines||[]).includes(e)&&h.agg&&h.agg.overall);
+    if(!runs.length) return;
+    const avg=k=>runs.reduce((a,h)=>a+(h.agg.overall[k]||0),0)/runs.length;
+    tb.innerHTML+=`<tr><td><span class="pill eng-${e}">${e}</span></td><td>${runs.length}</td>
+      <td>${pct(avg("sov"))}</td><td>${avg("prominence").toFixed(2)}</td><td>${pct(avg("recommend"))}</td>
+      <td>${avg("sentiment")>=0?"+":""}${avg("sentiment").toFixed(2)}</td><td>${pct(avg("citation"))}</td></tr>`;
+  });
 }
 
 /* ============================================================
@@ -632,41 +871,41 @@ function download(name, text, type){
   const b=new Blob([text],{type:type||"application/json"}); const u=URL.createObjectURL(b);
   const a=document.createElement("a"); a.href=u; a.download=name; a.click(); URL.revokeObjectURL(u);
 }
-function exportRun(){ if(!state.lastRun){alert("No run yet.");return;} download(`olgeo-run-${state.lastRun.ts.slice(0,10)}.json`, JSON.stringify(state.lastRun,null,2)); }
-function exportHist(){ download(`olgeo-history.json`, JSON.stringify(state.history,null,2)); }
+function exportRun(){ const r=state.history[state.history.length-1]; if(!r){alert("No run yet.");return;} download(`olgeo-run-${r.ts.slice(0,10)}.json`, JSON.stringify(r,null,1)); }
+function exportHist(){ download(`olgeo-history.json`, JSON.stringify(state.history,null,1)); }
 function exportCsv(){
-  const rows=[["run_ts","market","share_of_voice","avg_prominence","recommend_rate","sentiment","owned_citation_share","n"]];
+  const rows=[["run_ts","label","engines","market","share_of_voice","avg_prominence","recommend_rate","sentiment","owned_citation_share","n"]];
   state.history.forEach(h=>{ const bm=h.agg&&h.agg.byMarket||{}; Object.keys(bm).forEach(m=>{ const s=bm[m];
-    rows.push([h.ts,m,s.sov.toFixed(3),s.prominence.toFixed(3),s.recommend.toFixed(3),s.sentiment.toFixed(3),s.citation.toFixed(3),s.n]); });
-    const o=h.agg&&h.agg.overall; if(o) rows.push([h.ts,"ALL",o.sov.toFixed(3),o.prominence.toFixed(3),o.recommend.toFixed(3),o.sentiment.toFixed(3),o.citation.toFixed(3),o.n]);
+    rows.push([h.ts,h.label,(h.engines||[]).join("|"),m,s.sov.toFixed(3),s.prominence.toFixed(3),s.recommend.toFixed(3),s.sentiment.toFixed(3),s.citation.toFixed(3),s.n]); });
+    const o=h.agg&&h.agg.overall; if(o) rows.push([h.ts,h.label,(h.engines||[]).join("|"),"ALL",o.sov.toFixed(3),o.prominence.toFixed(3),o.recommend.toFixed(3),o.sentiment.toFixed(3),o.citation.toFixed(3),o.n]);
   });
-  download("olgeo-history.csv", rows.map(r=>r.join(",")).join("\n"), "text/csv");
+  download("olgeo-history.csv", rows.map(r=>r.map(x=>String(x).includes(",")?'"'+x+'"':x).join(",")).join("\n"), "text/csv");
 }
 
 /* ============================================================
    Seed baseline (Claude-run via web search, 2026-05-26)
    ============================================================ */
 function baselineSnapshot(){
-  const R=(qid,query,market,intent,o)=>Object.assign({qid,query,market,intent,engine:"baseline",engineName:"WebSearch baseline (Claude-run)",error:null,citations:o._cites||[],ownedCitations:(o._cites||[]).filter(c=>OWNED_DOMAINS.some(d=>c.url.includes(d))).length},o);
-  const yelp=t=>({url:"https://www.yelp.com/search?find_desc=Gyms",title:t||"Yelp"});
-  const own=u=>({url:"https://www.onelifefitness.com/"+u,title:"Onelife Fitness"});
+  const R=(qid,query,market,intent,o)=>Object.assign({qid,query,market,intent,engine:"baseline",engineName:"WebSearch baseline (Claude-run)",error:null,citations:o._cites||[],ownedCitations:(o._cites||[]).filter(isOwnedCite).length},o);
+  const yelp=t=>({url:"https://www.yelp.com/search?find_desc=Gyms",title:t||"yelp.com"});
+  const own=u=>({url:"https://www.onelifefitness.com/"+u,title:"onelifefitness.com"});
   const results=[
-    R("dmv1","best gyms in Alexandria VA","DMV","discovery",{mentioned:true,rank:2,recommended:false,sentiment:"positive",sentiment_score:0.6,prominence:2,brands_mentioned:["Onelife","Planet Fitness","Orangetheory"],accuracy_concern:false,notes:"Featured with amenities (Old Town, saunas, courts) but DMV Iron Gym led for strength.",_cites:[yelp(),{url:"https://ambfa.com",title:"Top 10 Gyms Alexandria"},{url:"https://threebestrated.com",title:"3 Best Gyms"}]}),
-    R("dmv3","best gym in Arlington VA with group fitness classes","DMV","classes",{mentioned:true,rank:1,recommended:true,sentiment:"positive",sentiment_score:0.7,prominence:3,brands_mentioned:["Onelife","Barry's","VIDA Fitness"],accuracy_concern:false,notes:"Onelife Ballston led the answer with detailed class list; onelifefitness.com cited.",_cites:[own("gyms/ballston"),yelp(),{url:"https://arlnow.com",title:"ARLnow Best Gym"},{url:"https://quora.com",title:"Quora"}]}),
-    R("dmv4","best luxury gym in Bethesda MD","DMV","premium",{mentioned:true,rank:1,recommended:true,sentiment:"positive",sentiment_score:0.55,prominence:3,brands_mentioned:["Onelife","Equinox","Life Time"],accuracy_concern:false,notes:"Onelife led full-amenity list, but Equinox (luxury) right behind — premium intent is contested.",_cites:[yelp(),{url:"https://bethesdamagazine.com/article/gyms/",title:"Bethesda Magazine 16 places"},{url:"https://patch.com",title:"Patch"}]}),
-    R("dmv5","Onelife Fitness vs Crunch Fitness in Northern Virginia","DMV","comparison",{mentioned:true,rank:1,recommended:false,sentiment:"neutral",sentiment_score:0.0,prominence:1,brands_mentioned:["Onelife","Crunch"],accuracy_concern:false,notes:"CONTENT GAP: no real member-facing comparison exists; only Indeed (employer) + TikTok surfaced.",_cites:[{url:"https://indeed.com",title:"Indeed employer compare"},{url:"https://tiktok.com",title:"TikTok"}]}),
-    R("atl1","best gyms in Dunwoody GA","Atlanta","discovery",{mentioned:true,rank:6,recommended:false,sentiment:"neutral",sentiment_score:0.1,prominence:1,brands_mentioned:["Onelife","LA Fitness","Crunch","Life Time","Orangetheory"],accuracy_concern:false,notes:"Onelife Perimeter listed only among 'other notable gyms' at the end.",_cites:[{url:"https://discoverdunwoody.com",title:"Discover Dunwoody"},yelp(),{url:"https://gymbird.com",title:"GymBird"}]}),
-    R("atl2","best strength training gym in Dunwoody GA","Atlanta","strength",{mentioned:true,rank:7,recommended:false,sentiment:"neutral",sentiment_score:0.0,prominence:1,brands_mentioned:["Onelife","LA Fitness","Crunch","Life Time"],accuracy_concern:false,notes:"Buried last; boutiques (CrossFit, Alloy, Elite Edge, Fitness Together) won the strength intent.",_cites:[{url:"https://discoverdunwoody.com",title:"Discover Dunwoody"},yelp()]}),
-    R("atl3","best family friendly gym with childcare in Alpharetta GA","Atlanta","family",{mentioned:true,rank:5,recommended:false,sentiment:"neutral",sentiment_score:0.1,prominence:1,brands_mentioned:["Onelife","Life Time","LA Fitness","YMCA"],accuracy_concern:false,notes:"Onelife Crabapple 'also listed' behind Life Time, The Forum, LA Fitness — weak even on its amenity strength.",_cites:[{url:"https://classpass.com",title:"ClassPass"},yelp(),{url:"https://lifetime.life",title:"Life Time"}]}),
-    R("coa1","best gym in Virginia Beach with a pool","Coastal","amenity",{mentioned:true,rank:1,recommended:true,sentiment:"positive",sentiment_score:0.8,prominence:3,brands_mentioned:["Onelife"],accuracy_concern:false,notes:"DOMINANT: three Onelife locations led the answer (pool, sauna, courts); onelifefitness.com cited directly.",_cites:[own("gyms/red-mill"),own("gyms/va-beach-blvd"),own("gyms/virginia-beach"),{url:"https://tripadvisor.com",title:"Tripadvisor VB"}]}),
-    R("brn1","is Onelife Fitness worth the money","Brand","sentiment",{mentioned:true,rank:1,recommended:false,sentiment:"neutral",sentiment_score:-0.05,prominence:2,brands_mentioned:["Onelife"],accuracy_concern:false,notes:"Mixed: positives = facilities/equipment/classes; negatives = cost, cancellation friction, customer service, cleanliness. Reddit cited generically.",_cites:[{url:"https://reddit.com",title:"Reddit (generic)"}]}),
+    R("dmv1","best gyms in Alexandria VA","DMV","discovery",{mentioned:true,rank:2,recommended:false,sentiment:"positive",sentiment_score:0.6,prominence:2,brands_mentioned:["Onelife","Planet Fitness","Orangetheory"],accuracy_concern:false,notes:"Featured with amenities (Old Town, saunas, courts) but DMV Iron Gym led for strength.",_cites:[yelp(),{url:"https://ambfa.com",title:"ambfa.com"},{url:"https://threebestrated.com",title:"threebestrated.com"}]}),
+    R("dmv3","best gym in Arlington VA with group fitness classes","DMV","classes",{mentioned:true,rank:1,recommended:true,sentiment:"positive",sentiment_score:0.7,prominence:3,brands_mentioned:["Onelife","Barry's","VIDA Fitness"],accuracy_concern:false,notes:"Onelife Ballston led the answer with detailed class list; onelifefitness.com cited.",_cites:[own("gyms/ballston"),yelp(),{url:"https://arlnow.com",title:"arlnow.com"},{url:"https://quora.com",title:"quora.com"}]}),
+    R("dmv4","best luxury gym in Bethesda MD","DMV","premium",{mentioned:true,rank:1,recommended:true,sentiment:"positive",sentiment_score:0.55,prominence:3,brands_mentioned:["Onelife","Equinox","Life Time"],accuracy_concern:false,notes:"Onelife led full-amenity list, but Equinox (luxury) right behind — premium intent is contested.",_cites:[yelp(),{url:"https://bethesdamagazine.com/article/gyms/",title:"bethesdamagazine.com"},{url:"https://patch.com",title:"patch.com"}]}),
+    R("dmv5","Onelife Fitness vs Crunch Fitness in Northern Virginia","DMV","comparison",{mentioned:true,rank:1,recommended:false,sentiment:"neutral",sentiment_score:0.0,prominence:1,brands_mentioned:["Onelife","Crunch"],accuracy_concern:false,notes:"CONTENT GAP: no real member-facing comparison exists; only Indeed (employer) + TikTok surfaced.",_cites:[{url:"https://indeed.com",title:"indeed.com"},{url:"https://tiktok.com",title:"tiktok.com"}]}),
+    R("atl1","best gyms in Dunwoody GA","Atlanta","discovery",{mentioned:true,rank:6,recommended:false,sentiment:"neutral",sentiment_score:0.1,prominence:1,brands_mentioned:["Onelife","LA Fitness","Crunch","Life Time","Orangetheory"],accuracy_concern:false,notes:"Onelife Perimeter listed only among 'other notable gyms' at the end.",_cites:[{url:"https://discoverdunwoody.com",title:"discoverdunwoody.com"},yelp(),{url:"https://gymbird.com",title:"gymbird.com"}]}),
+    R("atl2","best strength training gym in Dunwoody GA","Atlanta","strength",{mentioned:true,rank:7,recommended:false,sentiment:"neutral",sentiment_score:0.0,prominence:1,brands_mentioned:["Onelife","LA Fitness","Crunch","Life Time"],accuracy_concern:false,notes:"Buried last; boutiques (CrossFit, Alloy, Elite Edge, Fitness Together) won the strength intent.",_cites:[{url:"https://discoverdunwoody.com",title:"discoverdunwoody.com"},yelp()]}),
+    R("atl3","best family friendly gym with childcare in Alpharetta GA","Atlanta","family",{mentioned:true,rank:5,recommended:false,sentiment:"neutral",sentiment_score:0.1,prominence:1,brands_mentioned:["Onelife","Life Time","LA Fitness","YMCA"],accuracy_concern:false,notes:"Onelife Crabapple 'also listed' behind Life Time, The Forum, LA Fitness — weak even on its amenity strength.",_cites:[{url:"https://classpass.com",title:"classpass.com"},yelp(),{url:"https://lifetime.life",title:"lifetime.life"}]}),
+    R("coa1","best gym in Virginia Beach with a pool","Coastal","amenity",{mentioned:true,rank:1,recommended:true,sentiment:"positive",sentiment_score:0.8,prominence:3,brands_mentioned:["Onelife"],accuracy_concern:false,notes:"DOMINANT: three Onelife locations led the answer (pool, sauna, courts); onelifefitness.com cited directly.",_cites:[own("gyms/red-mill"),own("gyms/va-beach-blvd"),own("gyms/virginia-beach"),{url:"https://tripadvisor.com",title:"tripadvisor.com"}]}),
+    R("brn1","is Onelife Fitness worth the money","Brand","sentiment",{mentioned:true,rank:1,recommended:false,sentiment:"neutral",sentiment_score:-0.05,prominence:2,brands_mentioned:["Onelife"],accuracy_concern:false,notes:"Mixed: positives = facilities/equipment/classes; negatives = cost, cancellation friction, customer service, cleanliness. Reddit cited generically.",_cites:[{url:"https://reddit.com",title:"reddit.com"}]}),
   ];
   return {ts:"2026-05-26T17:00:00.000Z", label:"Baseline (Claude-run via web search)", engines:["baseline"], results, agg:aggregate(results)};
 }
 function loadBaseline(){
-  const snap=baselineSnapshot();
-  state.lastRun=snap;
-  if(!state.history.some(h=>h.ts===snap.ts)){ state.history.unshift(snap); saveHistory(); }
+  mergeHistory([baselineSnapshot()]); saveHistory();
+  state.viewIdx=state.history.findIndex(h=>h.label.startsWith("Baseline"));
+  state.lastRun=state.history[state.viewIdx];
   gotoTab("Results");
 }
 
@@ -687,16 +926,20 @@ function wire(){
   };
   document.getElementById("resetBattery").onclick=()=>{ state.battery=JSON.parse(JSON.stringify(DEFAULT_BATTERY)); saveBattery(); renderBattery(); updateEstimate(); };
   document.getElementById("trendMetric").onchange=drawTrend;
+  document.getElementById("trendEngine").onchange=drawTrend;
   document.getElementById("expRun").onclick=exportRun;
   document.getElementById("expHist").onclick=exportHist;
   document.getElementById("expCsv").onclick=exportCsv;
-  document.getElementById("clearHist").onclick=()=>{ if(confirm("Clear all saved runs?")){ state.history=[]; state.lastRun=null; saveHistory(); renderTrend(); renderResults(); } };
+  document.getElementById("clearHist").onclick=()=>{ if(confirm("Clear runs saved in this browser? (The repo data file is unaffected and will reload.)")){ state.history=[]; state.lastRun=null; state.viewIdx=-1; saveHistory(); renderTrend(); renderResults(); } };
   document.getElementById("impBtn").onclick=()=>document.getElementById("impFile").click();
   document.getElementById("impFile").onchange=(e)=>{ const f=e.target.files[0]; if(!f) return; const rd=new FileReader();
-    rd.onload=()=>{ try{ const data=JSON.parse(rd.result); if(Array.isArray(data)){ state.history=data; } else { state.history.push(data); } saveHistory(); state.lastRun=state.history[state.history.length-1]; alert("Imported."); renderTrend(); }catch(err){ alert("Bad JSON: "+err.message); } };
+    rd.onload=()=>{ try{ const data=JSON.parse(rd.result); mergeHistory(Array.isArray(data)?data:[data]); saveHistory();
+      state.viewIdx=state.history.length-1; state.lastRun=state.history[state.viewIdx];
+      alert("Imported (merged by timestamp)."); renderTrend(); }catch(err){ alert("Bad JSON: "+err.message); } };
     rd.readAsText(f); };
 }
 buildTabs(); renderEngines(); renderBattery(); updateEstimate(); wire();
+initHistory().then(()=>{ renderResults(); renderTrend(); });
 </script>
 </body>
 </html>
