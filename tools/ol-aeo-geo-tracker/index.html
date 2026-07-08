@@ -159,13 +159,15 @@
     <div id="noResults" class="panel"><p class="muted">No run yet. Go to <b>Run</b> and either run the battery (needs a Gemini key at minimum) or click <b>Load 2026-05-26 baseline</b> to see the seeded diagnostic.</p></div>
     <div id="resultsBody" class="hide">
       <div class="panel">
-        <div class="flex" style="justify-content:space-between">
-          <h2 style="margin-bottom:0">Visibility scorecard</h2>
-          <select id="runPicker" style="max-width:340px"></select>
+        <h2 style="margin-bottom:0">Visibility scorecard</h2>
+        <p class="hint" style="margin:4px 0 10px">All runs in the selected window are pooled. Defaults to the last 7 days. Drag the sliders to move or narrow the window (set both to the same run for a single-run view).</p>
+        <div class="row" style="max-width:640px;margin-bottom:6px">
+          <div><label>From: <b id="fromLabel"></b></label><input type="range" id="fromSlider" min="0" step="1" value="0"/></div>
+          <div><label>To: <b id="toLabel"></b></label><input type="range" id="toSlider" min="0" step="1" value="0"/></div>
         </div>
         <p class="hint" id="runMeta" style="margin:6px 0 14px"></p>
         <div class="scorecards" id="scorecards"></div>
-        <p class="hint" style="margin-bottom:0">Share of Voice = % of queries where Onelife is mentioned at all. Prominence (0–3) = how featured it is when mentioned (3 = led/recommended, 1 = afterthought). Owned-citation share = % of cited sources that are onelifefitness.com. Deltas compare against the previous run by the same engine(s).</p>
+        <p class="hint" style="margin-bottom:0">Share of Voice = % of queries where Onelife is mentioned at all. Prominence (0–3) = how featured it is when mentioned (3 = led/recommended, 1 = afterthought). Owned-citation share = % of cited sources that are onelifefitness.com. Deltas compare against the preceding window containing the same number of runs.</p>
       </div>
       <div class="panel">
         <h2>What to fix (auto-generated)</h2>
@@ -285,6 +287,13 @@ const DEFAULT_BATTERY = [
   {id:"brn1", market:"Brand", intent:"sentiment",  q:"is Onelife Fitness worth the money", on:true},
   {id:"brn2", market:"Brand", intent:"reputation", q:"is Onelife Fitness a good gym", on:true},
   {id:"brn3", market:"Brand", intent:"comparison", q:"best gym chain in Virginia", on:true},
+  // Aux-audit-inspired clusters (added 2026-07-09): competitor alternatives, competitor research, boutique
+  {id:"brn4", market:"Brand", intent:"alternatives", q:"what are good alternatives to Life Time Fitness", on:true},
+  {id:"brn5", market:"Brand", intent:"alternatives", q:"what are good alternatives to Crunch Fitness", on:true},
+  {id:"brn6", market:"Brand", intent:"competitor",   q:"is Life Time Fitness worth it", on:true},
+  {id:"brn7", market:"Brand", intent:"competitor",   q:"is Equinox worth it", on:true},
+  {id:"dmv8", market:"DMV",   intent:"boutique",     q:"best boxing classes in Northern Virginia", on:true},
+  {id:"atl7", market:"Atlanta", intent:"boutique",   q:"best HIIT classes in Alpharetta GA", on:true},
 ];
 
 /* ---- Engine definitions ---- */
@@ -327,12 +336,19 @@ function isAllError(run){ return (run.results||[]).length>0 && run.results.every
    State + persistence
    ============================================================ */
 const LS = { cfg:"olgeo_cfg", battery:"olgeo_battery", history:"olgeo_history" };
+function migrateBattery(stored){
+  // append any new default queries the saved battery predates (keyed by id)
+  const have=new Set(stored.map(b=>b.id));
+  DEFAULT_BATTERY.forEach(d=>{ if(!have.has(d.id)) stored.push(JSON.parse(JSON.stringify(d))); });
+  return stored;
+}
 let state = {
   cfg: loadJSON(LS.cfg, {}),
-  battery: loadJSON(LS.battery, JSON.parse(JSON.stringify(DEFAULT_BATTERY))),
+  battery: migrateBattery(loadJSON(LS.battery, JSON.parse(JSON.stringify(DEFAULT_BATTERY)))),
   history: [],
   lastRun: null,
-  viewIdx: -1,   // which run the Results tab is showing (index into history)
+  viewFrom: -1,  // window start (index into history)
+  viewTo: -1,    // window end (index into history)
 };
 function loadJSON(k, d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } }
 function saveCfg(){ localStorage.setItem(LS.cfg, JSON.stringify(state.cfg)); }
@@ -364,7 +380,32 @@ async function initHistory(){
     }
   }catch(e){ /* no manifest — fine */ }
   saveHistory();
-  if(state.history.length){ state.viewIdx=state.history.length-1; state.lastRun=state.history[state.viewIdx]; }
+  if(state.history.length){ setDefaultWindow(); state.lastRun=state.history[state.viewTo]; }
+}
+function setDefaultWindow(){
+  const n=state.history.length; if(!n){ state.viewFrom=state.viewTo=-1; return; }
+  state.viewTo=n-1;
+  const cutoff=new Date(state.history[n-1].ts).getTime()-7*86400e3;
+  state.viewFrom=n-1;
+  for(let i=0;i<n;i++){ if(new Date(state.history[i].ts).getTime()>=cutoff){ state.viewFrom=i; break; } }
+}
+function windowSnap(){
+  const runs=state.history.slice(state.viewFrom, state.viewTo+1);
+  if(!runs.length) return null;
+  const multi=runs.length>1;
+  const results=runs.flatMap(h=>(h.results||[]).map(r=>multi?Object.assign({},r,{engineName:(r.engineName||r.engine)+" · "+new Date(h.ts).toLocaleDateString()}):r));
+  return { ts:runs[runs.length-1].ts, runs:runs.length,
+    label: multi? `${runs.length} runs pooled, ${new Date(runs[0].ts).toLocaleDateString()} – ${new Date(runs[runs.length-1].ts).toLocaleDateString()}` : runs[0].label,
+    engines:[...new Set(runs.flatMap(h=>h.engines||[]))], results, agg:aggregate(results) };
+}
+function prevWindowSnap(){
+  const count=state.viewTo-state.viewFrom+1;
+  const from=state.viewFrom-count;
+  if(from<0&&state.viewFrom===0) return null;
+  const runs=state.history.slice(Math.max(0,from), state.viewFrom);
+  if(!runs.length) return null;
+  const results=runs.flatMap(h=>h.results||[]);
+  return { ts:runs[runs.length-1].ts, results, agg:aggregate(results) };
 }
 
 /* ============================================================
@@ -588,8 +629,9 @@ async function runBattery(){
   }
   const snap={ts:new Date().toISOString(), label:"Live run", engines:engines.map(e=>e.key), results, agg:aggregate(results)};
   mergeHistory([snap]); saveHistory();
-  state.viewIdx=state.history.findIndex(h=>h.ts===snap.ts);
-  state.lastRun=state.history[state.viewIdx]||snap;
+  const idx=state.history.findIndex(h=>h.ts===snap.ts);
+  state.viewFrom=state.viewTo=idx>=0?idx:state.history.length-1;
+  state.lastRun=state.history[state.viewTo]||snap;
   running=false; runBtn.disabled=false; runBtn.textContent="Run full battery";
   log(lg, `Done. ${results.length} results saved to history. Export from Trend & data and commit to data/olgeo-history.json to make it durable.`);
   gotoTab("Results");
@@ -628,12 +670,6 @@ function aggregate(results){
 /* ============================================================
    Deltas
    ============================================================ */
-function prevComparable(idx){
-  if(idx<=0) return null;
-  const cur=state.history[idx], key=(cur.engines||[]).slice().sort().join();
-  for(let i=idx-1;i>=0;i--){ if((state.history[i].engines||[]).slice().sort().join()===key) return state.history[i]; }
-  return null; // no cross-engine deltas: a Claude run only compares to a prior Claude run
-}
 function deltaHtml(cur, prev, fmt, eps){
   if(prev==null||cur==null) return `<span class="delta flat">—</span>`;
   const d=cur-prev; eps=eps||0.005;
@@ -648,23 +684,23 @@ const fmtPct=x=>(x*100).toFixed(0)+"pp", fmtNum=x=>x.toFixed(2);
    ============================================================ */
 let trendChartObj=null;
 function renderResults(){
-  const snap=state.history[state.viewIdx]||state.lastRun;
-  if(!snap){ document.getElementById("noResults").classList.remove("hide"); document.getElementById("resultsBody").classList.add("hide"); return; }
+  if(!state.history.length){ document.getElementById("noResults").classList.remove("hide"); document.getElementById("resultsBody").classList.add("hide"); return; }
+  if(state.viewTo<0) setDefaultWindow();
   document.getElementById("noResults").classList.add("hide"); document.getElementById("resultsBody").classList.remove("hide");
 
-  // run picker
-  const rp=document.getElementById("runPicker"); rp.innerHTML="";
-  state.history.forEach((h,i)=>{
-    const o=document.createElement("option"); o.value=i;
-    o.textContent=`${new Date(h.ts).toLocaleDateString()} — ${h.label} [${(h.engines||[]).join(", ")}]`;
-    if(i===state.viewIdx) o.selected=true;
-    rp.appendChild(o);
-  });
-  rp.onchange=()=>{ state.viewIdx=+rp.value; state.lastRun=state.history[state.viewIdx]; renderResults(); };
+  // window sliders
+  const n=state.history.length, fs=document.getElementById("fromSlider"), ts=document.getElementById("toSlider");
+  fs.max=ts.max=n-1; fs.value=state.viewFrom; ts.value=state.viewTo;
+  const dateOf=i=>new Date(state.history[i].ts).toLocaleDateString();
+  document.getElementById("fromLabel").textContent=dateOf(state.viewFrom);
+  document.getElementById("toLabel").textContent=dateOf(state.viewTo);
+  fs.oninput=()=>{ state.viewFrom=+fs.value; if(state.viewFrom>state.viewTo){ state.viewTo=state.viewFrom; } renderResults(); };
+  ts.oninput=()=>{ state.viewTo=+ts.value; if(state.viewTo<state.viewFrom){ state.viewFrom=state.viewTo; } renderResults(); };
 
+  const snap=windowSnap(); if(!snap) return;
   const a=snap.agg; const o=a.overall||{sov:0,prominence:0,recommend:0,sentiment:0,citation:0};
-  const prev=prevComparable(state.viewIdx); const po=prev&&prev.agg&&prev.agg.overall;
-  document.getElementById("runMeta").textContent = `${snap.label}, ${new Date(snap.ts).toLocaleString()} · ${a.n} answers · engines: ${(snap.engines||[]).join(", ")}` + (a.errors?` · ${a.errors} errors`:"") + (prev?` · deltas vs ${new Date(prev.ts).toLocaleDateString()}`:" · no comparable prior run");
+  const prev=prevWindowSnap(); const po=prev&&prev.agg&&prev.agg.overall;
+  document.getElementById("runMeta").textContent = `${snap.label} · ${a.n} answers · engines: ${(snap.engines||[]).join(", ")}` + (a.errors?` · ${a.errors} errors`:"") + (prev?` · deltas vs preceding ${state.viewTo-state.viewFrom+1} run(s) ending ${new Date(prev.ts).toLocaleDateString()}`:" · no prior window to compare");
   const sc=document.getElementById("scorecards");
   sc.innerHTML = card("Share of Voice", pct(o.sov), deltaHtml(o.sov,po?po.sov:null,fmtPct), o.sov)
     + card("Avg prominence", o.prominence.toFixed(2)+" / 3", deltaHtml(o.prominence,po?po.prominence:null,fmtNum,0.005), o.prominence/3)
@@ -914,8 +950,9 @@ function baselineSnapshot(){
 }
 function loadBaseline(){
   mergeHistory([baselineSnapshot()]); saveHistory();
-  state.viewIdx=state.history.findIndex(h=>h.label.startsWith("Baseline"));
-  state.lastRun=state.history[state.viewIdx];
+  const idx=state.history.findIndex(h=>h.label.startsWith("Baseline"));
+  state.viewFrom=state.viewTo=idx>=0?idx:0;
+  state.lastRun=state.history[state.viewTo];
   gotoTab("Results");
 }
 
@@ -940,11 +977,11 @@ function wire(){
   document.getElementById("expRun").onclick=exportRun;
   document.getElementById("expHist").onclick=exportHist;
   document.getElementById("expCsv").onclick=exportCsv;
-  document.getElementById("clearHist").onclick=()=>{ if(confirm("Clear runs saved in this browser? (The repo data file is unaffected and will reload.)")){ state.history=[]; state.lastRun=null; state.viewIdx=-1; saveHistory(); renderTrend(); renderResults(); } };
+  document.getElementById("clearHist").onclick=()=>{ if(confirm("Clear runs saved in this browser? (The repo data file is unaffected and will reload.)")){ state.history=[]; state.lastRun=null; state.viewFrom=state.viewTo=-1; saveHistory(); renderTrend(); renderResults(); } };
   document.getElementById("impBtn").onclick=()=>document.getElementById("impFile").click();
   document.getElementById("impFile").onchange=(e)=>{ const f=e.target.files[0]; if(!f) return; const rd=new FileReader();
     rd.onload=()=>{ try{ const data=JSON.parse(rd.result); mergeHistory(Array.isArray(data)?data:[data]); saveHistory();
-      state.viewIdx=state.history.length-1; state.lastRun=state.history[state.viewIdx];
+      setDefaultWindow(); state.lastRun=state.history[state.viewTo];
       alert("Imported (merged by timestamp)."); renderTrend(); }catch(err){ alert("Bad JSON: "+err.message); } };
     rd.readAsText(f); };
 }
