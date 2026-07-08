@@ -353,6 +353,16 @@ async function initHistory(){
     const r=await fetch(DATA_URL,{cache:"no-store"});
     if(r.ok){ const data=await r.json(); if(Array.isArray(data)) mergeHistory(data); }
   }catch(e){ /* offline or file:// — fine */ }
+  // plus incremental per-run files listed in data/manifest.json (how scheduled Claude runs land)
+  try{
+    const m=await fetch("data/manifest.json",{cache:"no-store"});
+    if(m.ok){ const man=await m.json();
+      for(const f of (man.files||[])){
+        try{ const rr=await fetch("data/"+f,{cache:"no-store"});
+          if(rr.ok){ const run=await rr.json(); mergeHistory(Array.isArray(run)?run:[run]); } }catch(e){}
+      }
+    }
+  }catch(e){ /* no manifest — fine */ }
   saveHistory();
   if(state.history.length){ state.viewIdx=state.history.length-1; state.lastRun=state.history[state.viewIdx]; }
 }
