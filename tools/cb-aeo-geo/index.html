@@ -251,6 +251,11 @@
    competitor leaderboard, intent breakdown, citation-source
    leaderboard, engine comparison, auto-generated actions,
    Claude-run (no-key) engine series.
+   v3: multi-brand scoring — the judge/heuristic score each query
+   against its per-query TARGET brand (targetBrandFor), not a single
+   clientName; sanity check flags brand-present-but-not-mentioned;
+   recomputeRun re-scores legacy mis-scored records from stored
+   answers; exports resolve citation domains from titles.
    ============================================================ */
 /* ============== CLIENT CONFIG — EDIT ONLY THIS BLOCK ==============
    Everything client-specific lives here. The rest of the file is generic.
@@ -274,6 +279,18 @@ const CONFIG = {
     "Everhot","Esse","Rayburn","Falcon","Stoves","Belling","Smeg","Britannia","Leisure",
     "Lacanche","Officine Gullo","Molteni","Ilve"
   ],
+  // Per-query TARGET brand: which CB brand each query is scored against. The judge/heuristic and
+  // owned-citation count use THIS, not clientName. Resolution: targetByQid (Brand market) wins,
+  // else targetByMarket, else CONFIG.brand. Each brand carries its own aliases + owned domains.
+  brands: {
+    "Viking":      {aliases:["viking"],                owned:["vikingrange.com"]},
+    "Lynx":        {aliases:["lynx"],                  owned:["lynxgrills.com"]},
+    "AGA":         {aliases:["aga"],                   owned:["agaliving.com","aga-web.co.uk","agacookshop.co.uk"]},
+    "Rangemaster": {aliases:["rangemaster"],           owned:["rangemaster.co.uk"]},
+    "La Cornue":   {aliases:["la cornue","lacornue"],  owned:["lacornue.com","lacornueusa.com"]},
+  },
+  targetByMarket: {VikingUS:"Viking", LynxUS:"Lynx", AGA:"AGA", Rangemaster:"Rangemaster", LaCornue:"La Cornue"},
+  targetByQid:    {brn1:"Viking", brn2:"Lynx", brn3:"Viking", brn4:"Rangemaster", brn5:"La Cornue"},
   // Markets: key is stored in run data, label shows in UI, color drives pills + trend lines.
   // Each brand is its own "market" (distinct category + geography). Brand = geo-free reputation.
   markets: [
@@ -332,6 +349,34 @@ const DATA_URL = CONFIG.dataUrl;
 const COMPETITORS = CONFIG.competitors;
 const DEFAULT_BATTERY = CONFIG.battery;
 const MARKETS = CONFIG.markets.map(m=>m.key);
+const CB_BRAND_NAMES = Object.keys(CONFIG.brands||{});
+
+/* ------------------------------------------------------------------
+   Per-query target-brand resolver. In a multi-brand tracker the
+   "brand of interest" differs by query, so scoring must key off THIS,
+   not CONFIG.clientName. Returns {name, aliases[], owned[]}.
+   ------------------------------------------------------------------ */
+function targetBrandFor(rec){
+  const key = rec && (rec.qid || rec.id);
+  const name = (CONFIG.targetByQid && CONFIG.targetByQid[key])
+            || (CONFIG.targetByMarket && CONFIG.targetByMarket[rec && rec.market])
+            || CONFIG.brand;
+  const b = (CONFIG.brands && CONFIG.brands[name]) || {aliases:[String(name).toLowerCase()], owned:OWNED_DOMAINS};
+  return {name, aliases:(b.aliases||[String(name).toLowerCase()]).map(a=>String(a).toLowerCase()), owned:b.owned||OWNED_DOMAINS};
+}
+function ownedCiteCountFor(citations, ownedList){
+  return (citations||[]).filter(c=>{
+    const d=citeDomain(c), u=((c&&c.url)||"").toLowerCase();
+    return (ownedList||[]).some(x=>d===x||d.endsWith("."+x)||u.includes(x));
+  }).length;
+}
+function brandInText(target, text){
+  const t=(text||"").toLowerCase();
+  return (target&&target.aliases||[]).some(a=>a&&t.includes(a));
+}
+function brandInList(target, list){
+  return (list||[]).some(x=> x && (target&&target.aliases||[]).some(a=> a && String(x).toLowerCase().includes(a)));
+}
 
 /* ---- Engine definitions ---- */
 const ENGINE_DEFS = [
@@ -361,9 +406,25 @@ function isOwnedCite(c){
   return OWNED_DOMAINS.some(x=>d===x||d.endsWith("."+x)||u.includes(x));
 }
 function recomputeRun(run){
+  let repaired=0;
   (run.results||[]).forEach(r=>{
-    if(Array.isArray(r.citations)) r.ownedCitations=r.citations.filter(isOwnedCite).length;
+    const target=targetBrandFor(r);
+    // owned-citation count is against the record's TARGET brand's domains (resolves title-domains too)
+    if(Array.isArray(r.citations)) r.ownedCitations=ownedCiteCountFor(r.citations, target.owned);
+    // Legacy repair: earlier builds scored the whole answer against CONFIG.clientName ("Composition
+    // Brands"), which never appears, so brand-present answers were mis-scored mentioned:false / prom 0.
+    // Re-derive ONLY those records from their stored raw answer; leave correctly-absent records alone.
+    if(r.error==null && r.mentioned===false &&
+       (brandInList(target, r.brands_mentioned) || brandInText(target, r.answer))){
+      const s=heuristicScore(r.answer, target);
+      r.mentioned=s.mentioned; r.rank=s.rank; r.recommended=s.recommended;
+      r.sentiment=s.sentiment; r.sentiment_score=s.sentiment_score; r.prominence=s.prominence;
+      if(!Array.isArray(r.brands_mentioned) || !r.brands_mentioned.length) r.brands_mentioned=s.brands_mentioned;
+      r.notes="[auto-repaired from stored answer] "+(s.notes||"");
+      r._rescored=true; r.scoring_error=false; repaired++;
+    }
   });
+  if(repaired){ run._repaired=repaired; try{ console.warn("[CB AEO/GEO] re-scored "+repaired+" mis-scored record(s) from stored answers in run "+run.ts+" ("+((run.results[0]||{}).engineName||"")+")"); }catch(e){} }
   run.agg=aggregate(run.results||[]);
   return run;
 }
@@ -588,24 +649,30 @@ async function callPerplexity(query, cfg){
 const ADAPTERS={gemini:callGemini, openai:callOpenAI, anthropic:callAnthropic, perplexity:callPerplexity};
 
 /* ============================================================
-   Scoring — AI judge (Gemini) with heuristic fallback
+   Scoring — AI judge (Gemini) with heuristic fallback.
+   Both take a `target` = {name, aliases[], owned[]} so scoring keys
+   off the per-query TARGET brand, never a single clientName.
    ============================================================ */
-async function judge(query, answer, cfg){
+async function judge(query, answer, cfg, target){
+  target = target || {name:CONFIG.clientName, aliases:BRAND_ALIASES, owned:OWNED_DOMAINS};
   if(state.cfg.gemini && state.cfg.gemini.enabled && state.cfg.gemini.key){
-    try{ return await judgeGemini(query, answer, state.cfg.gemini); }
+    try{ return await judgeGemini(query, answer, state.cfg.gemini, target); }
     catch(e){ /* fall through */ }
   }
-  return heuristicScore(answer);
+  return heuristicScore(answer, target);
 }
-async function judgeGemini(query, answer, gcfg){
-  const prompt=`You score how a ${CONFIG.category} brand appears in an AI assistant's answer to a consumer search.
+async function judgeGemini(query, answer, gcfg, target){
+  target = target || {name:CONFIG.clientName, aliases:BRAND_ALIASES};
+  // Competitors to watch = configured competitors PLUS the other CB brands, minus the target itself.
+  const watch = COMPETITORS.concat(CB_BRAND_NAMES).filter(b=>b && b!==target.name);
+  const prompt=`You score how the brand "${target.name}" appears in an AI assistant's answer to a consumer search about ${CONFIG.category}.
 QUERY: "${query}"
-BRAND OF INTEREST: "${CONFIG.clientName}"
-COMPETITORS TO WATCH: ${COMPETITORS.join(", ")}
+BRAND OF INTEREST: "${target.name}" (also written as: ${target.aliases.join(", ")})
+COMPETITORS TO WATCH: ${watch.join(", ")}
 AI ANSWER:
 """${(answer||"").slice(0,6000)}"""
-Return ONLY strict minified JSON, no markdown:
-{"mentioned":true/false,"rank":<int, 1 = first brand named in the answer, 0 if the brand of interest is not mentioned>,"recommended":true/false (true only if the brand of interest is actively positioned as a top pick / recommended, not merely listed),"sentiment":"positive"|"neutral"|"negative","sentiment_score":<number -1..1>,"brands_mentioned":[<brand strings actually present>],"accuracy_concern":true/false (true if a factual claim about the brand of interest looks wrong or unverifiable),"notes":"<short reason, <140 chars>"}`;
+Score ONLY the brand of interest ("${target.name}"). Return ONLY strict minified JSON, no markdown:
+{"mentioned":true/false (true if "${target.name}" appears in the answer at all),"rank":<int, 1 = first brand named in the answer, 0 if the brand of interest is not mentioned>,"recommended":true/false (true only if "${target.name}" is actively positioned as a top pick / recommended, not merely listed),"sentiment":"positive"|"neutral"|"negative","sentiment_score":<number -1..1>,"brands_mentioned":[<brand strings actually present in the answer>],"accuracy_concern":true/false (true if a factual claim about "${target.name}" looks wrong or unverifiable),"notes":"<short reason, <140 chars>"}`;
   const model=gcfg.judgeModel||"gemini-2.5-flash";
   const url=`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(gcfg.key)}`;
   const body={contents:[{parts:[{text:prompt}]}],generationConfig:{response_mime_type:"application/json",temperature:0}};
@@ -615,7 +682,7 @@ Return ONLY strict minified JSON, no markdown:
   const txt=(((j.candidates||[])[0]||{}).content||{}).parts?.[0]?.text||"{}";
   const s=JSON.parse(txt);
   s.prominence = scoreProminence(s);
-  s._judge="gemini";
+  s._judge="gemini"; s._target=target.name;
   return s;
 }
 function scoreProminence(s){
@@ -624,23 +691,33 @@ function scoreProminence(s){
   if(s.rank && s.rank<=3) return 2;
   return 1;
 }
-function heuristicScore(answer){
+function heuristicScore(answer, target){
+  target = target || {name:CONFIG.clientName, aliases:BRAND_ALIASES};
   const t=(answer||"").toLowerCase();
-  const mentioned = BRAND_ALIASES.some(a=>t.includes(a));
-  const brands=[]; COMPETITORS.concat([BRAND]).forEach(b=>{ if(t.includes(b.toLowerCase())) brands.push(b); });
+  const aliases=(target.aliases&&target.aliases.length?target.aliases:BRAND_ALIASES);
+  const bname=target.name||BRAND;
+  const mentioned = aliases.some(a=>a&&t.includes(a));
+  // brands present = configured competitors + other CB brands that appear
+  const scanList = COMPETITORS.concat(CB_BRAND_NAMES.filter(n=>n!==bname));
+  const brands=[]; scanList.forEach(b=>{ if(t.includes(b.toLowerCase())) brands.push(b); });
+  if(mentioned) brands.unshift(bname);
   let rank=0;
   if(mentioned){
     const positions=[];
-    COMPETITORS.concat([BRAND]).forEach(b=>{ const i=t.indexOf(b.toLowerCase()); if(i>=0) positions.push([b,i]); });
+    let tpos=Infinity; aliases.forEach(a=>{ const i=t.indexOf(a); if(i>=0) tpos=Math.min(tpos,i); });
+    COMPETITORS.concat(CB_BRAND_NAMES.filter(n=>n!==bname)).forEach(b=>{ const i=t.indexOf(b.toLowerCase()); if(i>=0) positions.push([b,i]); });
+    if(tpos<Infinity) positions.push([" TARGET",tpos]);
     positions.sort((a,b)=>a[1]-b[1]);
-    rank=positions.findIndex(p=>p[0]===BRAND)+1;
+    rank=positions.findIndex(p=>p[0]===" TARGET")+1;
   }
-  const POS=["great","best","top","excellent","premier","recommend","love","state-of-the-art","favorite","standout"];
-  const NEG=["expensive","overpriced","dirty","rude","cancel","crowded","complaint","worst","avoid","poor"];
+  const POS=["great","best","top","excellent","premier","recommend","love","iconic","benchmark","favorite","standout","worth it"];
+  const NEG=["expensive","overpriced","unreliable","complaint","worst","avoid","poor","mixed","caveat"];
   let sc=0; POS.forEach(w=>{if(t.includes(w))sc++;}); NEG.forEach(w=>{if(t.includes(w))sc--;});
   const sentiment = sc>1?"positive":sc<0?"negative":"neutral";
   const s={mentioned, rank, recommended: rank===1, sentiment, sentiment_score: Math.max(-1,Math.min(1,sc/4)),
-    brands_mentioned:brands, accuracy_concern:false, notes:"heuristic (no judge key)", _judge:"heuristic"};
+    brands_mentioned:brands, accuracy_concern:false,
+    notes: mentioned? ("heuristic re-score of "+bname+" from answer text") : ("heuristic: "+bname+" not found in answer"),
+    _judge:"heuristic", _target:bname};
   s.prominence=scoreProminence(s);
   return s;
 }
@@ -665,13 +742,21 @@ async function runBattery(){
     for(const e of engines){
       log(lg, `→ [${e.name}] ${q.q}`);
       const rec={qid:q.id, query:q.q, market:q.market, intent:q.intent, engine:e.key, engineName:e.name};
+      const target=targetBrandFor(rec);
       try{
         const out=await ADAPTERS[e.key](q.q, state.cfg[e.key]);
         rec.answer=out.text; rec.citations=out.citations||[];
-        rec.ownedCitations=rec.citations.filter(isOwnedCite).length;
-        const s=await judge(q.q, out.text, state.cfg);
-        Object.assign(rec, s); rec.error=null;
-        log(lg, `   ✓ ${s.mentioned?("rank "+s.rank+", "+s.sentiment+", prom "+s.prominence):"NOT mentioned"} (${rec.citations.length} cites, ${rec.ownedCitations} owned)`);
+        rec.ownedCitations=ownedCiteCountFor(rec.citations, target.owned);
+        const s=await judge(q.q, out.text, state.cfg, target);
+        Object.assign(rec, s); rec.error=null; rec._target=target.name;
+        // Sanity check: if the target brand is present (in brands_mentioned or the answer text) but the
+        // judge scored it not-mentioned, that is a scoring error — flag it loudly, don't write it silently.
+        if(rec.mentioned===false && (brandInList(target, rec.brands_mentioned) || brandInText(target, rec.answer))){
+          rec.scoring_error=true;
+          rec.notes=(rec.notes?rec.notes+" ":"")+"[SCORING ERROR: "+target.name+" present in answer but scored not-mentioned]";
+          log(lg, `   ⚠ SCORING ERROR: ${target.name} appears in the answer but the judge scored it not-mentioned (qid ${q.id}). Flagged for review.`);
+        } else { rec.scoring_error=false; }
+        log(lg, `   ✓ ${target.name}: ${s.mentioned?("rank "+s.rank+", "+s.sentiment+", prom "+s.prominence):"NOT mentioned"}${rec.scoring_error?" [FLAGGED]":""} (${rec.citations.length} cites, ${rec.ownedCitations} owned)`);
       }catch(err){
         rec.error=String(err.message||err); rec.mentioned=null;
         log(lg, `   ✗ ${rec.error}`);
@@ -713,7 +798,7 @@ function aggregate(results){
   const byIntent={};
   [...new Set(valid.map(r=>r.intent||"other"))].forEach(x=>{ byIntent[x]=seg(valid.filter(r=>(r.intent||"other")===x)); });
   const comp={};
-  COMPETITORS.concat([BRAND]).forEach(b=>{
+  COMPETITORS.concat(CB_BRAND_NAMES).forEach(b=>{
     const hits=valid.filter(r=>(r.brands_mentioned||[]).some(x=>x&&x.toLowerCase().includes(b.toLowerCase().slice(0,6)))).length;
     comp[b]=valid.length? hits/valid.length:0;
   });
@@ -808,7 +893,7 @@ function renderLeaderboard(snap, prev){
       else move=`<span class="delta flat">=</span>`;
     }
     const dSov=prev&&prevComp[brand]!=null? deltaHtml(sov,prevComp[brand],fmtPct,0.005): `<span class="delta flat">—</span>`;
-    const isBrand=brand===BRAND;
+    const isBrand=CB_BRAND_NAMES.indexOf(brand)>=0;
     tb.innerHTML+=`<tr${isBrand?' style="background:#14202e"':''}><td>${i+1} ${move}</td>
       <td>${isBrand?"<b>"+brand+" ★</b>":escapeHtml(brand)}</td>
       <td style="min-width:60px">${pct(sov)}</td>
@@ -906,7 +991,8 @@ function rowHtml(r){
   return `<div style="margin-top:12px">
     <b>${r.engineName}</b>
     ${r.mentioned?`<span class="small">· rank <b>${r.rank}</b> · <span class="sent-${r.sentiment}">${r.sentiment}</span> · prominence <span class="score-${r.prominence}">${r.prominence}/3</span>${r.recommended?' · <b>recommended</b>':''}</span>`
-      :`<span class="sent-negative small">· ${BRAND} NOT mentioned</span>`}
+      :`<span class="sent-negative small">· ${r._target||BRAND} NOT mentioned</span>`}
+    ${r.scoring_error?' <span class="pill" style="background:#3a1515;color:#f08e8e">scoring error</span>':''}
     ${r.accuracy_concern?' <span class="pill" style="background:#3a1515;color:#f08e8e">accuracy?</span>':''}
     ${r.notes?`<div class="small muted" style="margin-top:3px">${escapeHtml(r.notes)}</div>`:''}
     <div class="ans">${escapeHtml(r.answer||"(no text)")}</div>
@@ -985,8 +1071,16 @@ function download(name, text, type){
   const b=new Blob([text],{type:type||"application/json"}); const u=URL.createObjectURL(b);
   const a=document.createElement("a"); a.href=u; a.download=name; a.click(); URL.revokeObjectURL(u);
 }
-function exportRun(){ const r=state.history[state.history.length-1]; if(!r){alert("No run yet.");return;} download(`${NS}-run-${r.ts.slice(0,10)}.json`, JSON.stringify(r,null,1)); }
-function exportHist(){ download(`${NS}-history.json`, JSON.stringify(state.history,null,1)); }
+// Exports resolve the real source domain into each citation as `domain` (Gemini grounding returns
+// opaque vertexaisearch redirect URLs; the real domain lives in the citation title). Downstream
+// consumers should group on `domain`, not `url`, or they collapse all Gemini cites into one redirect host.
+function withResolvedCites(run){
+  const r=JSON.parse(JSON.stringify(run));
+  (r.results||[]).forEach(rec=>{ (rec.citations||[]).forEach(c=>{ c.domain=citeDomain(c); }); });
+  return r;
+}
+function exportRun(){ const r=state.history[state.history.length-1]; if(!r){alert("No run yet.");return;} download(`${NS}-run-${r.ts.slice(0,10)}.json`, JSON.stringify(withResolvedCites(r),null,1)); }
+function exportHist(){ download(`${NS}-history.json`, JSON.stringify(state.history.map(withResolvedCites),null,1)); }
 function exportCsv(){
   const rows=[["run_ts","label","engines","market","share_of_voice","avg_prominence","recommend_rate","sentiment","owned_citation_share","n"]];
   state.history.forEach(h=>{ const bm=h.agg&&h.agg.byMarket||{}; Object.keys(bm).forEach(m=>{ const s=bm[m];
