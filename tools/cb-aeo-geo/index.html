@@ -162,16 +162,17 @@
         </div>
         <p class="hint" id="runMeta" style="margin:6px 0 14px"></p>
         <div class="scorecards" id="scorecards"></div>
-        <p class="hint" style="margin-bottom:0">Share of Voice = % of queries where the brand is mentioned at all. Prominence (0–3) = how featured it is when mentioned (3 = led/recommended, 1 = afterthought). Owned-citation share = % of cited sources that are on an owned domain. Deltas compare against the preceding window containing the same number of runs.</p>
+        <p class="hint" style="margin-bottom:0">Share of Voice = % of queries where <b>that query's tracked brand</b> (Viking, Lynx, AGA, Rangemaster, or La Cornue) is mentioned — pooled across the five. "Composition Brands" is the portfolio owner and is never itself measured; the <b>By-brand</b> table below is the per-brand view. Prominence (0–3) = how featured the brand is when mentioned (3 = led/recommended, 1 = afterthought). Owned-citation share = % of cited sources on an owned domain. Deltas compare against the preceding window of the same size.</p>
       </div>
       <div class="panel">
         <h2>What to fix (auto-generated)</h2>
-        <p class="hint">Rule-based read of this run: where the brand is invisible, buried, misdescribed, or citing itself instead of being cited by others.</p>
+        <p class="hint">Rule-based read of this run: where a brand is invisible, buried, misdescribed, or citing itself instead of being cited by others.</p>
         <div id="actionsList"></div>
       </div>
       <div class="panel">
-        <h2>By market</h2>
-        <table><thead><tr><th>Market</th><th>Queries</th><th>Share of Voice</th><th>Avg prominence</th><th>Recommend rate</th><th>Sentiment</th><th>Owned-citation share</th></tr></thead><tbody id="marketTable"></tbody></table>
+        <h2>By brand</h2>
+        <p class="hint">Each row is one tracked consumer brand's own share of voice, prominence, and sentiment across its queries. This is the primary view — the scorecard above just pools these.</p>
+        <table><thead><tr><th>Brand</th><th>Queries</th><th>Share of Voice</th><th>Avg prominence</th><th>Recommend rate</th><th>Sentiment</th><th>Owned-citation share</th></tr></thead><tbody id="marketTable"></tbody></table>
       </div>
       <div class="panel">
         <h2>By intent</h2>
@@ -180,7 +181,7 @@
       </div>
       <div class="panel">
         <h2>Competitor leaderboard</h2>
-        <p class="hint">Share of answers each brand appears in, with movement vs the previous comparable run. This is who is winning the AI answer when the client brand is not.</p>
+        <p class="hint">Share of answers each brand appears in, with movement vs the previous comparable run. The five CB brands are ★-marked; everyone else is a competitor. This is who is winning the AI answer.</p>
         <table><thead><tr><th>#</th><th>Brand</th><th>Share of Voice</th><th></th><th>Δ vs prev</th></tr></thead><tbody id="leaderTable"></tbody></table>
       </div>
       <div class="panel">
@@ -256,13 +257,17 @@
    clientName; sanity check flags brand-present-but-not-mentioned;
    recomputeRun re-scores legacy mis-scored records from stored
    answers; exports resolve citation domains from titles.
+   v4: share of voice is measured per consumer brand (Viking, Lynx,
+   AGA, Rangemaster, La Cornue). "Composition Brands" is the portfolio
+   OWNER and is never itself a measured brand. Every record is stamped
+   with its measured brand (_target).
    ============================================================ */
 /* ============== CLIENT CONFIG — EDIT ONLY THIS BLOCK ==============
    Everything client-specific lives here. The rest of the file is generic.
    =================================================================== */
 const CONFIG = {
-  clientName: "Composition Brands",       // full display name (header, judge prompt)
-  brand: "CB brand",                      // short token used for matching + labels
+  clientName: "Composition Brands",       // portfolio owner / tool title — NOT a measured brand
+  brand: "CB brand",                      // fallback label only; measured brands are CONFIG.brands below
   // All five tracked CB brands. Each market below scores ONE of these brands (see the
   // "target" comment per query). Aliases here drive mention highlighting + owned-cite display.
   brandAliases: ["viking","lynx","aga","rangemaster","la cornue","lacornue"],
@@ -279,9 +284,9 @@ const CONFIG = {
     "Everhot","Esse","Rayburn","Falcon","Stoves","Belling","Smeg","Britannia","Leisure",
     "Lacanche","Officine Gullo","Molteni","Ilve"
   ],
-  // Per-query TARGET brand: which CB brand each query is scored against. The judge/heuristic and
-  // owned-citation count use THIS, not clientName. Resolution: targetByQid (Brand market) wins,
-  // else targetByMarket, else CONFIG.brand. Each brand carries its own aliases + owned domains.
+  // The MEASURED consumer brands. Share of voice / prominence / owned-citations are computed for these,
+  // never for "Composition Brands". Per-query TARGET brand: targetByQid (Brand market) wins, else
+  // targetByMarket, else CONFIG.brand. Each brand carries its own aliases + owned domains.
   brands: {
     "Viking":      {aliases:["viking"],                owned:["vikingrange.com"]},
     "Lynx":        {aliases:["lynx"],                  owned:["lynxgrills.com"]},
@@ -409,6 +414,9 @@ function recomputeRun(run){
   let repaired=0;
   (run.results||[]).forEach(r=>{
     const target=targetBrandFor(r);
+    // Stamp the measured consumer brand onto every record so old/exported data is self-documenting
+    // (each row is scored for ONE brand — Viking/Lynx/AGA/Rangemaster/La Cornue — never "Composition Brands").
+    r._target=target.name;
     // owned-citation count is against the record's TARGET brand's domains (resolves title-domains too)
     if(Array.isArray(r.citations)) r.ownedCitations=ownedCiteCountFor(r.citations, target.owned);
     // Legacy repair: earlier builds scored the whole answer against CONFIG.clientName ("Composition
@@ -567,7 +575,7 @@ function hexA(hex,a){ const n=parseInt(hex.slice(1),16); return `rgba(${n>>16&25
   document.head.appendChild(st);
   document.title=CONFIG.clientName+" AEO/GEO Visibility Tracker";
   document.getElementById("hdrTitle").textContent=CONFIG.clientName+" AEO/GEO Visibility Tracker";
-  document.getElementById("hdrSub").textContent="Measure how answer engines (Gemini, ChatGPT, Claude, Perplexity) describe "+CONFIG.brand+" vs competitors — diagnose, track over time, and find content gaps. Client-side; keys stay in your browser. History auto-loads from the repo's data/ folder.";
+  document.getElementById("hdrSub").textContent="Measure how answer engines (Gemini, ChatGPT, Claude, Perplexity) describe "+CB_BRAND_NAMES.join(", ")+" vs their competitors. Each consumer brand is measured on its own — Composition Brands is the portfolio owner and is NOT itself a tracked brand. Client-side; keys stay in your browser. History auto-loads from the repo's data/ folder.";
   const sel=document.getElementById("nqMarket");
   CONFIG.markets.forEach(m=>{ const o=document.createElement("option"); o.value=m.key; o.textContent=m.label; sel.appendChild(o); });
   const mp=document.getElementById("mktPills");
@@ -797,6 +805,8 @@ function aggregate(results){
   MARKETS.forEach(m=>{ const rows=valid.filter(r=>r.market===m); if(rows.length) byMarket[m]=seg(rows); });
   const byIntent={};
   [...new Set(valid.map(r=>r.intent||"other"))].forEach(x=>{ byIntent[x]=seg(valid.filter(r=>(r.intent||"other")===x)); });
+  // Competitive share of voice is computed for the MEASURED consumer brands + their competitors.
+  // "Composition Brands" (the portfolio owner) is never in this list, so it is never measured.
   const comp={};
   COMPETITORS.concat(CB_BRAND_NAMES).forEach(b=>{
     const hits=valid.filter(r=>(r.brands_mentioned||[]).some(x=>x&&x.toLowerCase().includes(b.toLowerCase().slice(0,6)))).length;
@@ -848,7 +858,7 @@ function renderResults(){
 
   renderActions(snap);
 
-  // market table
+  // by-brand table (each market key IS a tracked brand; label shows the brand name)
   const mt=document.getElementById("marketTable"); mt.innerHTML="";
   Object.keys(a.byMarket).forEach(m=>{ const s=a.byMarket[m];
     mt.innerHTML+=`<tr><td><span class="pill ${MKT_CLASS[m]}">${m}</span></td><td>${s.n}</td>
@@ -930,10 +940,10 @@ function renderActions(snap){
   const acts=[];
   const invisible=valid.filter(r=>!r.mentioned);
   if(invisible.length) acts.push({p:1,t:`Invisible on ${invisible.length} quer${invisible.length>1?"ies":"y"}`,
-    d:invisible.map(r=>`"${r.query}"`).join(" · ")+`. ${BRAND} is not in the answer at all. These intents need dedicated owned content (location/product pages, FAQs) plus presence in the third-party roundups the engines cite.`});
+    d:invisible.map(r=>`"${r.query}" (${(r._target||targetBrandFor(r).name)})`).join(" · ")+`. The tracked brand is not in the answer at all. These intents need dedicated owned content (product pages, FAQs) plus presence in the third-party roundups the engines cite.`});
   const buried=valid.filter(r=>r.mentioned&&(r.prominence||0)<=1);
   if(buried.length) acts.push({p:2,t:`Buried (prominence ≤1) on ${buried.length} quer${buried.length>1?"ies":"y"}`,
-    d:buried.map(r=>`"${r.query}"`).join(" · ")+`. Mentioned as an afterthought. Reframe owned content for these intents and pitch the roundup authors who rank competitors above ${BRAND}.`});
+    d:buried.map(r=>`"${r.query}" (${(r._target||targetBrandFor(r).name)})`).join(" · ")+`. Mentioned as an afterthought. Reframe owned content for these intents and pitch the roundup authors who rank competitors above the brand.`});
   const acc=valid.filter(r=>r.accuracy_concern);
   if(acc.length) acts.push({p:1,t:`Accuracy flags on ${acc.length} answer${acc.length>1?"s":""}`,
     d:acc.map(r=>`"${r.query}" — ${r.notes||"unverified claim"}`).join(" · ")+". Wrong facts propagate; fix source-of-truth pages (hours, pricing, locations) and structured data."});
@@ -943,12 +953,13 @@ function renderActions(snap){
     d:compOwnedHeavy.map(r=>`"${r.query}"`).join(" · ")+". Good news: your comparison content is being read. Risk: no neutral third-party comparisons exist, so one negative review could flip the answer. Pitch honest comparisons to independent reviewers."});
   const bm=snap.agg.byMarket||{};
   Object.entries(bm).forEach(([m,s])=>{
-    if(s.citation===0) acts.push({p:2,t:`${m}: zero owned citations`,
-      d:`Engines describe ${BRAND} in ${m} entirely from third parties. Ship location/product pages with structured-data schema, real FAQs, current specifics.`});
-    if(s.prominence<1.8&&s.n>=3) acts.push({p:2,t:`${m}: weak prominence (${s.prominence.toFixed(2)}/3)`,
-      d:`${BRAND} is present but not featured in ${m}. See the intent table for which query types are dragging; that is the content roadmap.`});
-    if(s.sentiment<0.15&&s.n>=2) acts.push({p:2,t:`${m}: sentiment drag (${s.sentiment>=0?"+":""}${s.sentiment.toFixed(2)})`,
-      d:`Tone of ${BRAND} mentions in ${m} is flat-to-negative. AI sentiment is downstream of operational reality; content alone won't fix it.`});
+    const bl = CONFIG.targetByMarket[m] || "the brand";  // the consumer brand this market measures
+    if(s.citation===0) acts.push({p:2,t:`${bl}: zero owned citations`,
+      d:`Engines describe ${bl} entirely from third parties. Ship product pages with structured-data schema, real FAQs, current specifics on ${bl}'s owned site.`});
+    if(s.prominence<1.8&&s.n>=3) acts.push({p:2,t:`${bl}: weak prominence (${s.prominence.toFixed(2)}/3)`,
+      d:`${bl} is present but not featured. See the intent table for which query types are dragging; that is the content roadmap.`});
+    if(s.sentiment<0.15&&s.n>=2) acts.push({p:2,t:`${bl}: sentiment drag (${s.sentiment>=0?"+":""}${s.sentiment.toFixed(2)})`,
+      d:`Tone of ${bl} mentions is flat-to-negative. AI sentiment is downstream of operational reality; content alone won't fix it.`});
   });
   if(!acts.length) acts.push({p:3,t:"No red flags this run",d:"Presence, prominence, and citations look healthy. Watch the trend for drift."});
   acts.sort((a,b)=>a.p-b.p);
@@ -991,7 +1002,7 @@ function rowHtml(r){
   return `<div style="margin-top:12px">
     <b>${r.engineName}</b>
     ${r.mentioned?`<span class="small">· rank <b>${r.rank}</b> · <span class="sent-${r.sentiment}">${r.sentiment}</span> · prominence <span class="score-${r.prominence}">${r.prominence}/3</span>${r.recommended?' · <b>recommended</b>':''}</span>`
-      :`<span class="sent-negative small">· ${r._target||BRAND} NOT mentioned</span>`}
+      :`<span class="sent-negative small">· ${r._target||targetBrandFor(r).name} NOT mentioned</span>`}
     ${r.scoring_error?' <span class="pill" style="background:#3a1515;color:#f08e8e">scoring error</span>':''}
     ${r.accuracy_concern?' <span class="pill" style="background:#3a1515;color:#f08e8e">accuracy?</span>':''}
     ${r.notes?`<div class="small muted" style="margin-top:3px">${escapeHtml(r.notes)}</div>`:''}
@@ -1082,10 +1093,10 @@ function withResolvedCites(run){
 function exportRun(){ const r=state.history[state.history.length-1]; if(!r){alert("No run yet.");return;} download(`${NS}-run-${r.ts.slice(0,10)}.json`, JSON.stringify(withResolvedCites(r),null,1)); }
 function exportHist(){ download(`${NS}-history.json`, JSON.stringify(state.history.map(withResolvedCites),null,1)); }
 function exportCsv(){
-  const rows=[["run_ts","label","engines","market","share_of_voice","avg_prominence","recommend_rate","sentiment","owned_citation_share","n"]];
+  const rows=[["run_ts","label","engines","brand","share_of_voice","avg_prominence","recommend_rate","sentiment","owned_citation_share","n"]];
   state.history.forEach(h=>{ const bm=h.agg&&h.agg.byMarket||{}; Object.keys(bm).forEach(m=>{ const s=bm[m];
-    rows.push([h.ts,h.label,(h.engines||[]).join("|"),m,s.sov.toFixed(3),s.prominence.toFixed(3),s.recommend.toFixed(3),s.sentiment.toFixed(3),s.citation.toFixed(3),s.n]); });
-    const o=h.agg&&h.agg.overall; if(o) rows.push([h.ts,h.label,(h.engines||[]).join("|"),"ALL",o.sov.toFixed(3),o.prominence.toFixed(3),o.recommend.toFixed(3),o.sentiment.toFixed(3),o.citation.toFixed(3),o.n]);
+    rows.push([h.ts,h.label,(h.engines||[]).join("|"),(CONFIG.targetByMarket[m]||m),s.sov.toFixed(3),s.prominence.toFixed(3),s.recommend.toFixed(3),s.sentiment.toFixed(3),s.citation.toFixed(3),s.n]); });
+    const o=h.agg&&h.agg.overall; if(o) rows.push([h.ts,h.label,(h.engines||[]).join("|"),"ALL (portfolio pooled)",o.sov.toFixed(3),o.prominence.toFixed(3),o.recommend.toFixed(3),o.sentiment.toFixed(3),o.citation.toFixed(3),o.n]);
   });
   download(NS+"-history.csv", rows.map(r=>r.map(x=>String(x).includes(",")?'"'+x+'"':x).join(",")).join("\n"), "text/csv");
 }
