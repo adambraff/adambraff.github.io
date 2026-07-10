@@ -123,7 +123,7 @@
       <p class="hint">The buyer-intent prompts the tool will send to each engine. Toggle off any you don't want to run. Add your own at the bottom. Markets: <span id="mktPills"></span></p>
       <div id="batteryList"></div>
       <div class="row3" style="margin-top:14px">
-        <div><label>New query text</label><input type="text" id="nqText" placeholder="best gym for new moms in Reston VA"/></div>
+        <div><label>New query text</label><input type="text" id="nqText" placeholder="best double oven for a small kitchen"/></div>
         <div><label>Market</label><select id="nqMarket"></select></div>
         <div><label>Intent</label><input type="text" id="nqIntent" placeholder="amenity / family / etc."/></div>
       </div>
@@ -215,6 +215,10 @@
           </select></div>
           <div><label>Engine series</label><select id="trendEngine"></select></div>
         </div>
+        <div class="row" style="max-width:580px;margin-top:6px">
+          <div><label>From: <b id="trendFromLabel"></b></label><input type="range" id="trendFromSlider" min="0" step="1" value="0"/></div>
+          <div><label>To: <b id="trendToLabel"></b></label><input type="range" id="trendToSlider" min="0" step="1" value="0"/></div>
+        </div>
         <canvas id="trendChart" height="120" style="margin-top:12px"></canvas>
       </div>
     </div>
@@ -302,7 +306,7 @@ const CONFIG = {
     {id:"aga5", market:"AGA", intent:"specialist", q:"best always-on heat storage cooker UK", on:true},
     // --- Rangemaster (UK mainstream/premium range cookers) — target: Rangemaster ---
     {id:"rng1", market:"Rangemaster", intent:"discovery",  q:"best range cooker under 2000 pounds UK", on:true},
-    {id:"rng2", market:"Rangemaster", intent:"comparison", q:"Rangemaster vs Falcon range cooker", on:true},
+    {id:"rng2", market:"Rangemaster", intent:"comparison", q:"Rangemaster vs Smeg range cooker", on:true},
     {id:"rng3", market:"Rangemaster", intent:"product",    q:"best 110cm dual fuel range cooker UK", on:true},
     {id:"rng4", market:"Rangemaster", intent:"persona",    q:"best range cooker for a family kitchen UK", on:true},
     // --- La Cornue (ultra-luxury French ranges, US + UK) — target: La Cornue ---
@@ -383,6 +387,8 @@ let state = {
   lastRun: null,
   viewFrom: -1,  // window start (index into history)
   viewTo: -1,    // window end (index into history)
+  trendFrom: -1, // trend chart window start (index into history)
+  trendTo: -1,   // trend chart window end (index into history)
 };
 function loadJSON(k, d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } }
 function saveCfg(){ localStorage.setItem(LS.cfg, JSON.stringify(state.cfg)); }
@@ -920,12 +926,27 @@ function renderTrend(){
   const prevVal=sel.value;
   sel.innerHTML=`<option value="all">All runs</option>`+engines.map(e=>`<option value="${e}">${e}</option>`).join("");
   if([...sel.options].some(o=>o.value===prevVal)) sel.value=prevVal;
+  // date-range sliders (default to full range; clamp to current history length)
+  const n=state.history.length;
+  if(state.trendFrom<0||state.trendFrom>n-1) state.trendFrom=0;
+  if(state.trendTo<0||state.trendTo>n-1) state.trendTo=n-1;
+  if(state.trendFrom>state.trendTo) state.trendFrom=state.trendTo;
+  const tfs=document.getElementById("trendFromSlider"), tts=document.getElementById("trendToSlider");
+  tfs.max=tts.max=n-1; tfs.value=state.trendFrom; tts.value=state.trendTo;
+  const dOf=i=>new Date(state.history[i].ts).toLocaleDateString();
+  document.getElementById("trendFromLabel").textContent=dOf(state.trendFrom);
+  document.getElementById("trendToLabel").textContent=dOf(state.trendTo);
+  tfs.oninput=()=>{ state.trendFrom=+tfs.value; if(state.trendFrom>state.trendTo){ state.trendTo=state.trendFrom; } renderTrend(); };
+  tts.oninput=()=>{ state.trendTo=+tts.value; if(state.trendTo<state.trendFrom){ state.trendFrom=state.trendTo; } renderTrend(); };
   drawTrend();
   renderEngineTable();
 }
 function trendRuns(){
   const f=document.getElementById("trendEngine").value||"all";
-  return f==="all"? state.history : state.history.filter(h=>(h.engines||[]).includes(f));
+  const lo=Math.max(0,Math.min(state.trendFrom,state.history.length-1));
+  const hi=Math.max(lo,Math.min(state.trendTo,state.history.length-1));
+  const win=state.history.slice(lo, hi+1);
+  return f==="all"? win : win.filter(h=>(h.engines||[]).includes(f));
 }
 function drawTrend(){
   const metric=document.getElementById("trendMetric").value;
