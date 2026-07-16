@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chinese models on the Arena text leaderboard</title>
+<style>
+  :root {
+    --ink: #1a1a1a; --mid: #666; --faint: #ccc; --rule: #e6e3dd;
+    --bg: #faf9f7; --card: #fff; --cn: #c0392b; --frontier: #2c3e50;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px 20px 64px; background: var(--bg); color: var(--ink);
+    font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .sub { color: var(--mid); font-size: 13px; margin-bottom: 28px; }
+  .card { background: var(--card); border: 1px solid var(--rule); border-radius: 6px; padding: 20px; margin-bottom: 20px; }
+  .card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--mid); margin: 0 0 2px; font-weight: 600; }
+  .card .note { font-size: 12px; color: var(--mid); margin: 0 0 14px; }
+  svg { display: block; width: 100%; height: auto; }
+  .grid { stroke: #eeebe6; stroke-width: 1; }
+  .axis { font-size: 10px; fill: #999; }
+  .axlab { font-size: 10px; fill: #999; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
+  .stat { background: var(--card); padding: 12px 14px; }
+  .stat .k { font-size: 11px; color: var(--mid); text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat .v { font-size: 20px; font-weight: 600; margin-top: 2px; letter-spacing: -0.02em; }
+  .stat .d { font-size: 11px; color: var(--mid); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--mid); border-bottom: 1px solid var(--rule); padding: 6px 8px; font-weight: 600; }
+  td { padding: 5px 8px; border-bottom: 1px solid #f2f0ec; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr:hover td { background: #fbfaf8; }
+  .tag { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 3px; background: #f0ede8; color: var(--mid); }
+  .tag.prelim { background: #fdf0ed; color: var(--cn); }
+  .legend { display: flex; gap: 16px; font-size: 12px; color: var(--mid); margin-top: 10px; flex-wrap: wrap; }
+  .legend i { display: inline-block; width: 10px; height: 2px; vertical-align: middle; margin-right: 5px; }
+  .caveat { font-size: 12.5px; color: var(--mid); line-height: 1.6; }
+  .caveat b { color: var(--ink); font-weight: 600; }
+  .toggle { font-size: 12px; color: var(--mid); margin-bottom: 12px; }
+  .toggle button { font: inherit; border: 1px solid var(--rule); background: var(--card); padding: 3px 10px; border-radius: 4px; cursor: pointer; color: var(--mid); }
+  .toggle button.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .tip { position: fixed; pointer-events: none; background: #1a1a1a; color: #fff; font-size: 11.5px; padding: 6px 9px; border-radius: 4px; opacity: 0; transition: opacity .1s; white-space: nowrap; z-index: 10; }
+  footer { font-size: 11.5px; color: #999; margin-top: 28px; }
+  footer a { color: #999; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Chinese models on the Arena text leaderboard</h1>
+  <div class="sub">Highest-rated Chinese model, daily, Jan 1 &ndash; Jul 15, 2026. Text arena, overall category, style control on. No vote filter &mdash; whatever the board showed that day.</div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="card">
+    <h2>Rank over time</h2>
+    <p class="note">Lower is better. Rank is a <em>relative</em> measure &mdash; it moves when other labs ship, not just when Chinese labs improve.</p>
+    <div id="rankchart"></div>
+    <div class="legend"><span><i style="background:var(--cn)"></i>rank of top Chinese model</span></div>
+  </div>
+
+  <div class="card">
+    <h2>Rating over time</h2>
+    <p class="note">The same model&rsquo;s Elo, against the day&rsquo;s frontier (highest-rated model overall).</p>
+    <div id="ratechart"></div>
+    <div class="legend">
+      <span><i style="background:var(--cn)"></i>top Chinese model</span>
+      <span><i style="background:var(--frontier)"></i>frontier (any lab)</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Lead changes</h2>
+    <p class="note">Which model held the top Chinese slot, and for how long.</p>
+    <div class="toggle">
+      <button id="tgl" class="on">show all runs</button>
+    </div>
+    <table id="runs"><thead><tr>
+      <th>from</th><th>to</th><th>days</th><th>model</th><th>lab</th>
+      <th class="num">best rank</th><th class="num">rating</th><th class="num">votes</th>
+    </tr></thead><tbody></tbody></table>
+  </div>
+
+  <div class="card">
+    <h2>How to read this</h2>
+    <p class="caveat">
+      <b>Rank got worse while rating got better.</b> The top Chinese model gained ~27 Elo points over
+      six months and finished ranked lower than it started. The field grew from 293 to 374 models, and
+      most of the new arrivals above it were US variants &mdash; thinking modes, sizes, checkpoints.
+      Rank here is partly measuring US release cadence.
+      <br><br>
+      <b>Preview models distort the top.</b> Several leaders took the Chinese #1 slot on fewer than
+      5,000 votes with &plusmn;10 confidence intervals, then decayed as samples grew. <span class="tag prelim">preliminary</span>
+      marks runs that peaked under 5k votes. <code>qwen3.7-max-preview</code> has sat at ~3,700 votes since
+      May 19 &mdash; its vote count is <em>falling</em>, so that estimate will not sharpen.
+      <br><br>
+      <b>The gap is inside the noise for recent months.</b> Frontier-to-Chinese closed from ~57 points in
+      January to low-30s by April. Everything after that is within overlapping confidence intervals.
+      Treat the recent flat stretch as &ldquo;no measurable change,&rdquo; not as a plateau you can date.
+      <br><br>
+      <b>No rebaseline artifact.</b> The lmarena.ai &rarr; arena.ai transition on Jan 22&ndash;31 shifted
+      298 common models by a median of +0.01 points. The series is continuous across it.
+    </p>
+  </div>
+
+  <footer>
+    Source: Arena text leaderboard (overall, style control), reconstructed from 144 Wayback Machine
+    snapshots. Jan 22&ndash;31 gap spans the lmarena.ai&rarr;arena.ai rebrand; May 4 snapshot unavailable.
+  </footer>
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+const DATA = [["2026-01-01",12,1447.5,4697,"ernie-5.0-preview-1203",293,1490.2],["2026-01-02",12,1447.5,4697,"ernie-5.0-preview-1203",293,1490.2],["2026-01-03",12,1447.5,4697,"ernie-5.0-preview-1203",293,1490.2],["2026-01-09",12,1447.5,4697,"ernie-5.0-preview-1203",293,1490.2],["2026-01-10",13,1445.5,7250,"ernie-5.0-preview-1203",293,1489.6],["2026-01-12",13,1445.5,7250,"ernie-5.0-preview-1203",294,1489.6],["2026-01-18",8,1459.9,4813,"ernie-5.0-0110",296,1489.0],["2026-01-22",8,1459.2,4829,"ernie-5.0-0110",298,1489.6],["2026-01-31",9,1452.6,8274,"ernie-5.0-0110",300,1487.3],["2026-02-02",9,1452.6,8274,"ernie-5.0-0110",300,1487.3],["2026-02-03",9,1452.6,8274,"ernie-5.0-0110",300,1487.3],["2026-02-04",9,1452.6,8274,"ernie-5.0-0110",300,1487.3],["2026-02-05",9,1452.6,8274,"ernie-5.0-0110",300,1487.3],["2026-02-06",10,1452.4,10184,"ernie-5.0-0110",301,1496.2],["2026-02-08",10,1452.4,10184,"ernie-5.0-0110",302,1496.2],["2026-02-09",10,1452.4,10184,"ernie-5.0-0110",302,1496.2],["2026-02-11",11,1452.4,11080,"ernie-5.0-0110",304,1505.0],["2026-02-12",11,1451.5,2875,"glm-5",305,1505.8],["2026-02-14",11,1451.5,2875,"glm-5",305,1505.8],["2026-02-16",11,1455.0,4643,"glm-5",305,1507.0],["2026-02-17",6,1472.4,3164,"dola-seed-2.0-preview",307,1506.0],["2026-02-18",6,1472.4,3164,"dola-seed-2.0-preview",307,1506.0],["2026-02-19",5,1474.3,3376,"dola-seed-2.0-preview",309,1503.9],["2026-02-21",5,1474.5,3379,"dola-seed-2.0-preview",312,1505.1],["2026-02-25",9,1472.4,4180,"dola-seed-2.0-preview",316,1503.8],["2026-02-26",10,1469.9,4620,"dola-seed-2.0-preview",316,1503.5],["2026-02-28",10,1469.9,4620,"dola-seed-2.0-preview",316,1503.5],["2026-03-01",10,1469.9,4620,"dola-seed-2.0-preview",316,1503.5],["2026-03-02",10,1469.9,4620,"dola-seed-2.0-preview",316,1503.5],["2026-03-03",10,1469.9,4620,"dola-seed-2.0-preview",316,1503.5],["2026-03-05",10,1467.4,6092,"dola-seed-2.0-preview",321,1504.1],["2026-03-06",12,1465.7,6410,"dola-seed-2.0-preview",323,1504.0],["2026-03-07",12,1464.8,6712,"dola-seed-2.0-preview",323,1503.5],["2026-03-08",12,1464.8,6712,"dola-seed-2.0-preview",323,1503.5],["2026-03-09",12,1464.8,6712,"dola-seed-2.0-preview",323,1503.5],["2026-03-10",12,1464.8,6712,"dola-seed-2.0-preview",323,1503.5],["2026-03-11",12,1464.8,6712,"dola-seed-2.0-preview",323,1503.5],["2026-03-15",12,1465.3,8049,"dola-seed-2.0-preview",324,1503.4],["2026-03-18",14,1463.8,9514,"dola-seed-2.0-preview",327,1501.4],["2026-03-19",18,1460.6,10446,"dola-seed-2.0-preview",328,1502.1],["2026-03-22",14,1463.7,4252,"qwen3.5-max-preview",330,1502.1],["2026-03-23",14,1463.7,4252,"qwen3.5-max-preview",330,1502.1],["2026-03-24",14,1463.7,4252,"qwen3.5-max-preview",330,1502.1],["2026-03-26",14,1465.0,4448,"qwen3.5-max-preview",331,1503.8],["2026-03-28",14,1464.8,4504,"qwen3.5-max-preview",333,1504.1],["2026-03-29",14,1464.8,4504,"qwen3.5-max-preview",333,1504.1],["2026-03-30",14,1464.8,4504,"qwen3.5-max-preview",333,1504.1],["2026-03-31",14,1464.8,4504,"qwen3.5-max-preview",333,1504.1],["2026-04-01",14,1467.0,5819,"qwen3.5-max-preview",334,1504.2],["2026-04-02",14,1467.0,5819,"qwen3.5-max-preview",334,1504.2],["2026-04-03",14,1466.9,5899,"qwen3.5-max-preview",337,1503.8],["2026-04-04",14,1466.9,5899,"qwen3.5-max-preview",337,1503.8],["2026-04-05",14,1466.9,5899,"qwen3.5-max-preview",337,1503.8],["2026-04-06",14,1466.9,5899,"qwen3.5-max-preview",337,1503.8],["2026-04-07",14,1466.9,5899,"qwen3.5-max-preview",337,1503.8],["2026-04-08",14,1467.4,3743,"glm-5.1",338,1502.8],["2026-04-09",14,1467.4,3743,"glm-5.1",338,1502.8],["2026-04-10",13,1470.7,5096,"glm-5.1",339,1503.5],["2026-04-11",13,1470.9,5326,"glm-5.1",339,1503.8],["2026-04-12",13,1470.9,5326,"glm-5.1",339,1503.8],["2026-04-13",13,1470.9,5326,"glm-5.1",339,1503.8],["2026-04-14",13,1470.9,5326,"glm-5.1",339,1503.8],["2026-04-15",13,1471.2,6274,"glm-5.1",339,1502.3],["2026-04-16",13,1471.2,6274,"glm-5.1",339,1502.3],["2026-04-17",13,1471.2,6274,"glm-5.1",339,1502.3],["2026-04-18",15,1471.6,7179,"glm-5.1",341,1504.5],["2026-04-19",15,1471.6,7179,"glm-5.1",341,1504.5],["2026-04-20",15,1471.6,7179,"glm-5.1",341,1504.5],["2026-04-21",16,1468.8,7927,"glm-5.1",342,1504.0],["2026-04-22",16,1468.8,7927,"glm-5.1",342,1504.0],["2026-04-23",17,1468.5,8710,"glm-5.1",343,1502.6],["2026-04-24",17,1468.5,8710,"glm-5.1",343,1502.6],["2026-04-25",15,1469.6,9028,"glm-5.1",347,1503.1],["2026-04-26",15,1469.6,9028,"glm-5.1",347,1503.1],["2026-04-27",15,1469.6,9028,"glm-5.1",347,1503.1],["2026-04-28",17,1469.9,9670,"glm-5.1",351,1503.2],["2026-04-29",17,1469.9,9670,"glm-5.1",351,1503.2],["2026-04-30",13,1475.8,3560,"ernie-5.1-preview",352,1502.9],["2026-05-01",14,1474.3,4609,"ernie-5.1-preview",354,1504.0],["2026-05-02",15,1474.6,4738,"ernie-5.1-preview",356,1502.7],["2026-05-03",15,1474.6,4738,"ernie-5.1-preview",356,1502.7],["2026-05-05",15,1474.6,4738,"ernie-5.1-preview",356,1502.7],["2026-05-06",15,1474.6,4738,"ernie-5.1-preview",356,1502.7],["2026-05-07",14,1473.7,5577,"ernie-5.1-preview",357,1503.3],["2026-05-08",14,1474.4,5733,"ernie-5.1-preview",357,1503.0],["2026-05-09",14,1474.4,5733,"ernie-5.1",357,1503.0],["2026-05-10",14,1474.4,5733,"ernie-5.1",357,1503.0],["2026-05-11",14,1474.4,5733,"ernie-5.1",357,1503.0],["2026-05-12",14,1474.4,5733,"ernie-5.1",357,1503.0],["2026-05-13",16,1472.6,6949,"ernie-5.1",357,1501.7],["2026-05-14",17,1472.4,7585,"ernie-5.1",357,1501.5],["2026-05-15",17,1472.4,7585,"ernie-5.1",357,1501.5],["2026-05-16",17,1472.4,7585,"ernie-5.1",357,1501.5],["2026-05-17",17,1472.4,7585,"ernie-5.1",357,1501.5],["2026-05-18",17,1472.4,7585,"ernie-5.1",357,1501.5],["2026-05-19",13,1475.2,3740,"qwen3.7-max-preview",359,1501.8],["2026-05-20",14,1475.2,3741,"qwen3.7-max-preview",360,1502.0],["2026-05-21",14,1475.2,3741,"qwen3.7-max-preview",360,1502.0],["2026-05-22",14,1475.2,3741,"qwen3.7-max-preview",360,1502.0],["2026-05-23",14,1475.2,3741,"qwen3.7-max-preview",360,1502.0],["2026-05-24",14,1475.2,3741,"qwen3.7-max-preview",360,1502.0],["2026-05-26",14,1475.2,3741,"qwen3.7-max-preview",360,1502.0],["2026-05-27",14,1475.2,3741,"qwen3.7-max-preview",360,1502.0],["2026-05-28",15,1474.7,3755,"qwen3.7-max-preview",360,1502.2],["2026-05-29",15,1474.7,3755,"qwen3.7-max-preview",360,1502.2],["2026-05-30",15,1474.7,3755,"qwen3.7-max-preview",360,1502.2],["2026-05-31",15,1474.7,3755,"qwen3.7-max-preview",360,1502.2],["2026-06-01",15,1474.7,3755,"qwen3.7-max-preview",360,1502.2],["2026-06-02",15,1474.7,3755,"qwen3.7-max-preview",360,1502.2],["2026-06-03",15,1474.7,3755,"qwen3.7-max-preview",360,1502.2],["2026-06-04",15,1474.7,3755,"qwen3.7-max-preview",360,1502.2],["2026-06-05",12,1475.4,15019,"glm-5.1",363,1503.5],["2026-06-06",14,1475.0,15179,"glm-5.1",365,1503.6],["2026-06-07",14,1475.0,15179,"glm-5.1",365,1503.6],["2026-06-08",14,1475.0,15179,"glm-5.1",365,1503.6],["2026-06-09",14,1475.0,15179,"glm-5.1",365,1503.6],["2026-06-10",14,1475.0,15179,"glm-5.1",365,1503.6],["2026-06-11",15,1475.2,15954,"glm-5.1",366,1510.4],["2026-06-12",15,1475.2,15954,"glm-5.1",366,1510.4],["2026-06-13",15,1475.2,15954,"glm-5.1",366,1510.4],["2026-06-14",15,1475.2,15954,"glm-5.1",366,1510.4],["2026-06-15",15,1475.2,15954,"glm-5.1",366,1510.4],["2026-06-16",15,1475.3,16101,"glm-5.1",367,1507.6],["2026-06-19",15,1475.3,16101,"glm-5.1",367,1507.6],["2026-06-20",15,1475.3,16101,"glm-5.1",367,1507.6],["2026-06-21",15,1475.3,16101,"glm-5.1",367,1507.6],["2026-06-22",15,1475.3,16101,"glm-5.1",367,1507.6],["2026-06-23",15,1475.3,16101,"glm-5.1",367,1507.6],["2026-06-25",15,1475.3,16101,"glm-5.1",367,1507.6],["2026-06-26",16,1474.8,3731,"qwen3.7-max-preview",368,1508.2],["2026-06-27",16,1474.8,3731,"qwen3.7-max-preview",368,1508.2],["2026-06-28",16,1474.8,3731,"qwen3.7-max-preview",368,1508.2],["2026-06-30",16,1474.8,3731,"qwen3.7-max-preview",368,1508.2],["2026-07-01",16,1474.8,3731,"qwen3.7-max-preview",368,1508.2],["2026-07-02",16,1474.8,3731,"qwen3.7-max-preview",368,1508.2],["2026-07-03",15,1474.8,3727,"qwen3.7-max-preview",369,1508.5],["2026-07-05",15,1474.8,3727,"qwen3.7-max-preview",369,1508.5],["2026-07-07",15,1474.8,3727,"qwen3.7-max-preview",369,1508.5],["2026-07-08",15,1474.8,3727,"qwen3.7-max-preview",369,1508.5],["2026-07-10",15,1474.9,3727,"qwen3.7-max-preview",369,1508.5],["2026-07-11",17,1475.0,3719,"qwen3.7-max-preview",374,1508.6],["2026-07-13",17,1475.0,3719,"qwen3.7-max-preview",374,1508.6],["2026-07-14",17,1475.0,3719,"qwen3.7-max-preview",374,1505.3],["2026-07-15",16,1475.0,3716,"qwen3.7-max-preview",374,1507.5]];
+
+const D = DATA.map(r => ({date:r[0], rank:r[1], rating:r[2], votes:r[3], model:r[4], n:r[5], frontier:r[6]}));
+
+const LAB = m => {
+  const n = m.toLowerCase();
+  if (n.startsWith('qwen') || n.includes('qwq')) return 'Alibaba';
+  if (n.startsWith('ernie')) return 'Baidu';
+  if (n.startsWith('glm') || n.startsWith('chatglm')) return 'Z.ai';
+  if (n.startsWith('deepseek')) return 'DeepSeek';
+  if (n.startsWith('kimi')) return 'Moonshot';
+  if (n.startsWith('dola-seed') || n.startsWith('seed-') || n.startsWith('doubao')) return 'ByteDance';
+  if (n.startsWith('hunyuan')) return 'Tencent';
+  if (n.startsWith('mimo')) return 'Xiaomi';
+  if (n.startsWith('minimax')) return 'MiniMax';
+  if (n.startsWith('longcat')) return 'Meituan';
+  if (n.startsWith('step')) return 'StepFun';
+  return '\u2014';
+};
+
+const t0 = new Date(D[0].date).getTime(), t1 = new Date(D[D.length-1].date).getTime();
+const X = d => (new Date(d).getTime() - t0) / (t1 - t0);
+
+const tip = document.getElementById('tip');
+function showTip(e, html) {
+  tip.innerHTML = html;
+  tip.style.opacity = 1;
+  tip.style.left = Math.min(e.clientX + 12, window.innerWidth - 200) + 'px';
+  tip.style.top = (e.clientY - 34) + 'px';
+}
+function hideTip(){ tip.style.opacity = 0; }
+
+// ---------- stats
+const first = D[0], last = D[D.length-1];
+const best = D.reduce((a,b) => b.rank < a.rank ? b : a);
+const worst = D.reduce((a,b) => b.rank > a.rank ? b : a);
+document.getElementById('stats').innerHTML = [
+  ['Jan 1 rank', '#'+first.rank, first.model],
+  ['Jul 15 rank', '#'+last.rank, last.model],
+  ['best', '#'+best.rank, best.date.slice(5) + ' \u00b7 ' + best.model.split('-')[0]],
+  ['worst', '#'+worst.rank, worst.date.slice(5)],
+  ['rating', '+' + (last.rating - first.rating).toFixed(1), first.rating + ' \u2192 ' + last.rating],
+  ['field size', first.n + '\u2192' + last.n, '+' + (last.n - first.n) + ' models']
+].map(([k,v,d]) => `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`).join('');
+
+// ---------- rank chart
+(function(){
+  const W = 860, H = 300, L = 42, R = 16, T = 14, B = 30;
+  const iw = W - L - R, ih = H - T - B;
+  const rmin = 4, rmax = 19;
+  const Y = r => T + ((r - rmin) / (rmax - rmin)) * ih;
+  let s = `<svg viewBox="0 0 ${W} ${H}">`;
+  [5,10,15].forEach(r => {
+    s += `<line class="grid" x1="${L}" y1="${Y(r)}" x2="${W-R}" y2="${Y(r)}"/>`;
+    s += `<text class="axis" x="${L-8}" y="${Y(r)+3}" text-anchor="end">#${r}</text>`;
+  });
+  ['2026-01-01','2026-02-01','2026-03-01','2026-04-01','2026-05-01','2026-06-01','2026-07-01'].forEach(d => {
+    const x = L + X(d)*iw;
+    s += `<line class="grid" x1="${x}" y1="${T}" x2="${x}" y2="${T+ih}"/>`;
+    s += `<text class="axis" x="${x}" y="${H-10}" text-anchor="middle">${['Jan','Feb','Mar','Apr','May','Jun','Jul'][+d.slice(5,7)-1]}</text>`;
+  });
+  // step line
+  let pts = '';
+  D.forEach((p,i) => {
+    const x = L + X(p.date)*iw, y = Y(p.rank);
+    if (i) pts += `${x},${Y(D[i-1].rank)} `;
+    pts += `${x},${y} `;
+  });
+  s += `<polyline fill="none" stroke="var(--cn)" stroke-width="1.8" stroke-linejoin="round" points="${pts}"/>`;
+  D.forEach(p => {
+    const x = L + X(p.date)*iw, y = Y(p.rank);
+    s += `<circle cx="${x}" cy="${y}" r="6" fill="transparent" data-i="1"
+      data-tip="${p.date} &middot; #${p.rank} &middot; ${p.rating} &middot; ${p.votes.toLocaleString()} votes<br>${p.model}"/>`;
+  });
+  s += `<text class="axlab" transform="rotate(-90 12 ${T+ih/2})" x="12" y="${T+ih/2}" text-anchor="middle">rank (better \u2191)</text>`;
+  s += `</svg>`;
+  const el = document.getElementById('rankchart');
+  el.innerHTML = s;
+  el.querySelectorAll('[data-tip]').forEach(c => {
+    c.addEventListener('mouseenter', e => showTip(e, c.dataset.tip));
+    c.addEventListener('mouseleave', hideTip);
+  });
+})();
+
+// ---------- rating chart
+(function(){
+  const W = 860, H = 260, L = 46, R = 16, T = 14, B = 30;
+  const iw = W - L - R, ih = H - T - B;
+  const lo = 1440, hi = 1515;
+  const Y = v => T + (1 - (v - lo)/(hi - lo)) * ih;
+  let s = `<svg viewBox="0 0 ${W} ${H}">`;
+  [1440,1460,1480,1500].forEach(v => {
+    s += `<line class="grid" x1="${L}" y1="${Y(v)}" x2="${W-R}" y2="${Y(v)}"/>`;
+    s += `<text class="axis" x="${L-8}" y="${Y(v)+3}" text-anchor="end">${v}</text>`;
+  });
+  ['2026-01-01','2026-02-01','2026-03-01','2026-04-01','2026-05-01','2026-06-01','2026-07-01'].forEach(d => {
+    const x = L + X(d)*iw;
+    s += `<line class="grid" x1="${x}" y1="${T}" x2="${x}" y2="${T+ih}"/>`;
+    s += `<text class="axis" x="${x}" y="${H-10}" text-anchor="middle">${['Jan','Feb','Mar','Apr','May','Jun','Jul'][+d.slice(5,7)-1]}</text>`;
+  });
+  const line = (key, color, w) => {
+    let p = D.map(d => `${L + X(d.date)*iw},${Y(d[key])}`).join(' ');
+    return `<polyline fill="none" stroke="${color}" stroke-width="${w}" stroke-linejoin="round" points="${p}"/>`;
+  };
+  s += line('frontier', 'var(--frontier)', 1.6);
+  s += line('rating', 'var(--cn)', 1.8);
+  D.forEach(p => {
+    const x = L + X(p.date)*iw;
+    s += `<circle cx="${x}" cy="${Y(p.rating)}" r="6" fill="transparent"
+      data-tip="${p.date}<br>${p.model} &middot; ${p.rating}<br>frontier ${p.frontier} &middot; gap ${(p.frontier-p.rating).toFixed(1)}"/>`;
+  });
+  s += `<text class="axlab" transform="rotate(-90 12 ${T+ih/2})" x="12" y="${T+ih/2}" text-anchor="middle">Elo</text>`;
+  s += `</svg>`;
+  const el = document.getElementById('ratechart');
+  el.innerHTML = s;
+  el.querySelectorAll('[data-tip]').forEach(c => {
+    c.addEventListener('mouseenter', e => showTip(e, c.dataset.tip));
+    c.addEventListener('mouseleave', hideTip);
+  });
+})();
+
+// ---------- runs table
+const runs = [];
+D.forEach(p => {
+  const cur = runs[runs.length-1];
+  if (cur && cur.model === p.model) { cur.rows.push(p); }
+  else runs.push({model: p.model, rows: [p]});
+});
+runs.forEach(r => {
+  r.from = r.rows[0].date; r.to = r.rows[r.rows.length-1].date;
+  r.days = Math.round((new Date(r.to) - new Date(r.from))/864e5) + 1;
+  r.best = Math.min(...r.rows.map(x => x.rank));
+  r.peakVotes = Math.max(...r.rows.map(x => x.votes));
+  r.rating = r.rows[r.rows.length-1].rating;
+  r.prelim = r.peakVotes < 5000;
+});
+function renderRuns(all) {
+  const show = all ? runs : runs.filter(r => r.days >= 5);
+  document.querySelector('#runs tbody').innerHTML = show.map(r => `
+    <tr>
+      <td>${r.from.slice(5)}</td><td>${r.to.slice(5)}</td>
+      <td class="num">${r.days}</td>
+      <td>${r.model} ${r.prelim ? '<span class="tag prelim">preliminary</span>' : ''}</td>
+      <td>${LAB(r.model)}</td>
+      <td class="num">#${r.best}</td>
+      <td class="num">${r.rating}</td>
+      <td class="num">${r.peakVotes.toLocaleString()}</td>
+    </tr>`).join('');
+}
+let showAll = true;
+renderRuns(showAll);
+document.getElementById('tgl').onclick = function(){
+  showAll = !showAll;
+  this.classList.toggle('on', showAll);
+  this.textContent = showAll ? 'show all runs' : 'runs \u2265 5 days';
+  renderRuns(showAll);
+};
+</script>
+</body>
+</html>
