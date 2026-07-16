@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en" style="color-scheme: light;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<title>The Seen and the Unseen: Rent Control in Providence</title>
+<meta name="description" content="An interactive data essay on the proposed 4% rent stabilization cap in Providence, Rhode Island: who gains, who pays, and how the housing supply adjusts.">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  color-scheme: light;
+  /* chart chrome & ink (dataviz reference palette, light) */
+  --surface-1: #fcfcfb;
+  --page: #f7f6f2;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --muted: #898781;
+  --grid: #e1e0d9;
+  --baseline: #c3c2b7;
+  --hairline: rgba(11,11,11,0.10);
+  /* categorical slots, fixed order */
+  --s1: #2a78d6;  /* blue */
+  --s2: #008300;  /* green */
+  --s3: #e87ba4;  /* magenta */
+  --s4: #eda100;  /* yellow */
+  --s5: #1baf7a;  /* aqua */
+  --s6: #eb6834;  /* orange */
+  --s7: #4a3aa7;  /* violet */
+  --s8: #e34948;  /* red */
+  /* sequential blue steps */
+  --seq-100: #cde2fb; --seq-200: #9ec5f4; --seq-300: #6da7ec; --seq-450: #2a78d6; --seq-600: #184f95;
+  /* diverging: blue <-> red, neutral gray midpoint */
+  --div-neutral: #f0efec;
+  --serif: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
+  --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--page); color: var(--ink);
+  font-family: var(--serif); font-size: 18px; line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+.wrap-wide { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+
+/* ---------- masthead & hero ---------- */
+.masthead {
+  border-bottom: 1px solid var(--hairline); padding: 14px 0; text-align: center;
+  font-family: var(--sans); font-size: 13px; font-weight: 600; letter-spacing: 0.03em; color: var(--muted);
+}
+.hero { padding: 64px 0 20px; text-align: center; }
+.hero h1 {
+  font-size: clamp(34px, 5.4vw, 56px); line-height: 1.12; margin: 0; font-weight: 700; letter-spacing: -0.01em;
+}
+@media (max-width: 760px) { body { font-size: 17px; } }
+
+/* ---------- article structure ---------- */
+section.chapter { padding: 34px 0 10px; }
+.chapnum {
+  font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: 0.02em;
+  color: var(--s6); border-top: 3px solid var(--ink);
+  padding-top: 14px; margin-top: 26px;
+}
+h2 { font-size: clamp(27px, 3.6vw, 36px); line-height: 1.15; margin: 10px 0 18px; letter-spacing: -0.01em; }
+h3 { font-size: 21px; margin: 30px 0 10px; }
+p { margin: 0 0 18px; }
+p.lede::first-letter { font-size: 3.1em; float: left; line-height: 0.82; padding: 6px 8px 0 0; font-weight: 700; }
+.pullquote {
+  font-size: 24px; line-height: 1.45; font-style: italic; text-align: center;
+  max-width: 560px; margin: 36px auto; padding: 18px 0; color: var(--ink);
+  border-top: 1px solid var(--baseline); border-bottom: 1px solid var(--baseline);
+}
+.pullquote .attr { display: block; font-family: var(--sans); font-style: normal; font-size: 13px; color: var(--muted); margin-top: 10px; }
+a { color: var(--s1); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+/* ---------- generic viz card ---------- */
+.viz {
+  background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 12px;
+  padding: 22px 22px 18px; margin: 26px auto; font-family: var(--sans);
+}
+.viz .viz-title { font-size: 16px; font-weight: 700; margin: 0 0 2px; letter-spacing: -0.01em; }
+.viz .viz-sub { font-size: 13px; color: var(--ink-2); margin: 0 0 14px; line-height: 1.45; }
+.viz .viz-foot { font-size: 11.5px; color: var(--muted); margin-top: 12px; line-height: 1.45; border-top: 1px solid var(--grid); padding-top: 10px; }
+.chartbox { position: relative; width: 100%; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12.5px; color: var(--ink-2); margin: 4px 0 10px; }
+.legend .li { display: flex; align-items: center; gap: 6px; }
+.swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+/* controls */
+.controls { display: flex; flex-wrap: wrap; gap: 18px 26px; margin: 6px 0 16px; align-items: flex-end; }
+.ctl { display: flex; flex-direction: column; gap: 5px; min-width: 190px; flex: 1; }
+.ctl label { font-size: 12px; font-weight: 600; color: var(--ink-2); }
+.ctl .val { font-weight: 700; color: var(--ink); font-size: 13px; }
+input[type=range] { width: 100%; accent-color: var(--s1); }
+.btn {
+  font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink);
+  background: var(--surface-1); border: 1px solid var(--baseline); border-radius: 8px;
+  padding: 8px 14px; cursor: pointer;
+}
+.btn:hover { background: var(--div-neutral); }
+.btn.primary { background: var(--s1); border-color: var(--s1); color: #fff; }
+.btn.primary:hover { background: #1c5cab; }
+.btn:disabled { opacity: 0.5; cursor: default; }
+.toggle-row { display: flex; gap: 0; border: 1px solid var(--baseline); border-radius: 8px; overflow: hidden; width: max-content; }
+.toggle-row button {
+  font-family: var(--sans); font-size: 13px; font-weight: 600; border: none; background: transparent;
+  padding: 8px 16px; cursor: pointer; color: var(--ink-2);
+}
+.toggle-row button.on { background: var(--ink); color: #fff; }
+
+/* ---------- ordinance cards ---------- */
+.ordgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin: 24px 0; font-family: var(--sans); }
+.ordcard { background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 10px; padding: 16px; }
+.ordcard .t { font-weight: 700; font-size: 14.5px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+.ordcard .t .tag { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
+.tag.cap { background: #e3edfa; color: #1c5cab; }
+.tag.exempt { background: #e2f5ec; color: #0c7a52; }
+.tag.enforce { background: #fdeae2; color: #b23e12; }
+.ordcard .d { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+.ordcard .why { font-size: 12px; color: var(--s7); margin-top: 8px; line-height: 1.45; font-style: italic; }
+
+/* ---------- coverage checker ---------- */
+.checker .q { margin-bottom: 14px; }
+.checker .q .ql { font-size: 13.5px; font-weight: 600; margin-bottom: 6px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  font-family: var(--sans); font-size: 13px; border: 1px solid var(--baseline); background: var(--surface-1);
+  border-radius: 99px; padding: 6px 14px; cursor: pointer; color: var(--ink-2); font-weight: 500;
+}
+.chip.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+.verdict { border-radius: 10px; padding: 14px 18px; font-size: 14.5px; font-weight: 600; margin-top: 14px; line-height: 1.5; }
+.verdict.covered { background: #e3edfa; color: #12457e; border: 1px solid #b7d3f6; }
+.verdict.exempt { background: #e2f5ec; color: #0a5c3e; border: 1px solid #b2e4cd; }
+.verdict small { display: block; font-weight: 400; margin-top: 4px; color: inherit; opacity: 0.85; }
+
+/* ---------- character cards ---------- */
+.people { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin: 24px 0; font-family: var(--sans); }
+.person { background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 10px; padding: 16px; display: flex; gap: 12px; }
+.avatar {
+  width: 44px; height: 44px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 16px; color: #fff;
+}
+.person .info .n { font-weight: 700; font-size: 14.5px; }
+.person .info .r { font-size: 12px; color: var(--muted); margin: 1px 0 5px; }
+.person .info .d { font-size: 13px; color: var(--ink-2); line-height: 1.45; }
+
+/* ---------- wedge output tiles ---------- */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 14px; }
+.tile { border: 1px solid var(--grid); border-radius: 8px; padding: 12px 14px; }
+.tile .tv { font-size: 24px; font-weight: 700; letter-spacing: -0.01em; }
+.tile .tl { font-size: 11.5px; color: var(--ink-2); margin-top: 3px; line-height: 1.35; }
+.tile.blue .tv { color: #1c5cab; } .tile.red .tv { color: #c22a2a; } .tile.plain .tv { color: var(--ink); }
+
+/* ---------- monte carlo queue ---------- */
+.pool-wrap { position: relative; }
+.pool { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin: 14px 0; }
+.applicant {
+  border: 1px solid var(--grid); border-radius: 8px; padding: 10px 11px; font-size: 12px; background: var(--surface-1);
+  position: relative;
+}
+.applicant .an { font-weight: 700; font-size: 12.5px; display: flex; align-items: center; gap: 6px; }
+.applicant .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.applicant .meta { color: var(--ink-2); margin-top: 4px; line-height: 1.4; }
+.applicant.leader { border: 2px solid var(--s1); box-shadow: 0 0 0 3px #e3edfa; }
+.applicant .badge {
+  position: absolute; top: -9px; right: 8px; font-size: 10px; font-weight: 700;
+  background: var(--s1); color: #fff; border-radius: 99px; padding: 2px 8px;
+}
+.applicant .wins { display: flex; align-items: center; gap: 6px; margin-top: 7px; }
+.applicant .wtrack { flex: 1; height: 6px; border-radius: 99px; background: var(--div-neutral); overflow: hidden; }
+.applicant .wfill { height: 100%; background: var(--s1); border-radius: 99px; width: 0%; transition: width 0.15s linear; }
+.applicant .wpct { font-size: 10.5px; font-weight: 700; min-width: 32px; text-align: right; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.ball {
+  position: absolute; width: 10px; height: 10px; border-radius: 50%; background: var(--s1);
+  z-index: 5; pointer-events: none; transition: transform 0.32s cubic-bezier(0.45, 0, 0.85, 0.6), opacity 0.32s linear;
+}
+.queue-msg { font-size: 13.5px; line-height: 1.55; background: var(--div-neutral); border-radius: 8px; padding: 12px 16px; margin-top: 8px; }
+
+/* ---------- block explorer ---------- */
+.block-top { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.yearctl { flex: 1; min-width: 280px; display: flex; align-items: center; gap: 12px; }
+.yearctl .yslider { flex: 1; }
+.yearctl .ylabel { font-size: 13px; font-weight: 700; white-space: nowrap; }
+.yearctl .ylabel span { font-size: 20px; color: var(--s1); }
+.kcounters { display: flex; gap: 10px; flex-wrap: wrap; }
+.kc { border: 1px solid var(--grid); border-radius: 8px; padding: 8px 13px; text-align: center; min-width: 92px; }
+.kc .kv { font-size: 21px; font-weight: 700; line-height: 1.1; }
+.kc .kl { font-size: 10.5px; color: var(--ink-2); margin-top: 2px; }
+.blockgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 10px; margin: 14px 0; }
+.bldg {
+  border: 1px solid var(--grid); border-radius: 10px; padding: 12px; cursor: pointer; background: var(--surface-1);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.bldg:hover { border-color: var(--baseline); }
+.bldg.sel { border-color: var(--ink); box-shadow: 0 0 0 2px var(--ink); }
+.bldg svg { display: block; margin: 0 auto 8px; }
+.bldg .bn { font-size: 12px; font-weight: 700; text-align: center; line-height: 1.3; }
+.bldg .bstate {
+  margin-top: 6px; font-size: 10.5px; font-weight: 700;
+  text-align: center; border-radius: 99px; padding: 3px 6px; line-height: 1.3;
+}
+.bldg .bunits { font-size: 10.5px; color: var(--muted); text-align: center; margin-top: 4px; }
+.bdetail {
+  border: 1px solid var(--grid); border-left: 4px solid var(--s1); border-radius: 10px;
+  background: var(--surface-1); padding: 16px 18px; margin-top: 6px; min-height: 120px;
+}
+.bdetail .bd-name { font-weight: 700; font-size: 15px; }
+.bdetail .bd-owner { font-size: 12.5px; color: var(--muted); margin: 2px 0 8px; }
+.bdetail .bd-now { font-size: 13.5px; line-height: 1.55; }
+.bdetail .bd-now b { color: var(--ink); }
+.bdetail .bd-margin { margin-top: 10px; font-size: 12px; color: var(--s7); font-weight: 600; }
+.state-legend { display: flex; flex-wrap: wrap; gap: 10px 14px; font-size: 11.5px; color: var(--ink-2); margin-top: 10px; }
+.state-legend .li { display: flex; align-items: center; gap: 5px; }
+
+/* ---------- proforma ---------- */
+.meter { margin: 38px 0 4px; }
+.meter .mtrack { height: 26px; border-radius: 6px; background: var(--div-neutral); position: relative; overflow: visible; }
+.meter .mfill { height: 100%; border-radius: 6px 0 0 6px; background: var(--seq-450); transition: width 0.4s, background 0.4s; }
+.meter .mhurdle { position: absolute; top: -6px; bottom: -6px; width: 2px; background: var(--ink); }
+.meter .mhlabel { position: absolute; top: -24px; transform: translateX(-50%); font-size: 11px; font-weight: 700; white-space: nowrap; }
+.meter .scale { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--muted); margin-top: 5px; }
+.pverdict { font-size: 15px; font-weight: 700; margin-top: 14px; padding: 12px 16px; border-radius: 8px; }
+.pverdict.go { background: #e2f5ec; color: #0a5c3e; }
+.pverdict.nogo { background: #fdecec; color: #a02222; }
+.pverdict small { display: block; font-weight: 400; font-size: 12.5px; margin-top: 4px; }
+
+/* ---------- evidence cards ---------- */
+.evgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 12px; margin: 24px 0; font-family: var(--sans); }
+.evcard { background: var(--surface-1); border: 1px solid var(--hairline); border-radius: 10px; padding: 18px; }
+.evcard .ev-where { font-size: 12px; font-weight: 700; color: var(--s6); }
+.evcard .ev-stat { font-size: 32px; font-weight: 700; letter-spacing: -0.01em; margin: 6px 0 2px; }
+.evcard .ev-what { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+.evcard .ev-src { font-size: 11px; color: var(--muted); margin-top: 10px; }
+.evcard.pro { border-top: 3px solid var(--s2); }
+.evcard.con { border-top: 3px solid var(--s8); }
+
+/* ---------- evidence map ---------- */
+.mapcards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; margin-top: 12px; }
+.mapcard { background: var(--surface-1); border: 1px solid var(--grid); border-radius: 10px; padding: 12px 14px; font-size: 12px; line-height: 1.5; color: var(--ink-2); transition: box-shadow 0.15s, border-color 0.15s; }
+.mapcard.hl { border-color: var(--ink); box-shadow: 0 0 0 2px var(--ink); }
+.mapcard .mc-head { display: flex; align-items: center; gap: 7px; font-weight: 700; font-size: 13px; color: var(--ink); margin-bottom: 4px; }
+.mapcard .mc-dot { width: 18px; height: 18px; border-radius: 50%; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex: none; }
+.mapcard .mc-src { color: var(--muted); font-size: 10.5px; margin-top: 6px; }
+
+/* ---------- heatmap ---------- */
+.hm { display: grid; grid-template-columns: 200px repeat(3, 1fr); gap: 3px; font-family: var(--sans); font-size: 12.5px; }
+.hm .hrow-label { display: flex; align-items: center; font-weight: 600; padding-right: 10px; line-height: 1.3; }
+.hm .hcol-label { text-align: center; font-weight: 700; color: var(--ink-2); padding-bottom: 6px; }
+.hm .cell {
+  border-radius: 6px; min-height: 44px; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 13px; cursor: default; position: relative;
+}
+.hm .cell:hover { outline: 2px solid var(--ink); outline-offset: 1px; z-index: 2; }
+@media (max-width: 620px) { .hm { grid-template-columns: 130px repeat(3, 1fr); font-size: 11px; } }
+
+/* ---------- forecast card ---------- */
+.fcast { font-family: var(--sans); margin: 22px 0; }
+.frow { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--grid); }
+.frow:last-child { border-bottom: none; }
+.frow .fq { flex: 1; font-size: 14px; line-height: 1.45; }
+.frow .fq small { display: block; color: var(--muted); font-size: 11.5px; margin-top: 2px; }
+.frow .fbar { width: 200px; flex: none; }
+.frow .fbar .ftrack { height: 10px; border-radius: 99px; background: var(--div-neutral); overflow: hidden; }
+.frow .fbar .ffill { height: 100%; border-radius: 99px; background: var(--s1); }
+.frow .fp { width: 52px; flex: none; text-align: right; font-weight: 700; font-size: 16px; }
+@media (max-width: 560px) { .frow { flex-wrap: wrap; } .frow .fq { flex-basis: 100%; } .frow .fbar { flex: 1; width: auto; } }
+
+/* ---------- footer ---------- */
+.endnote { border-top: 3px solid var(--ink); margin-top: 50px; padding: 26px 0 60px; font-family: var(--sans); font-size: 13px; color: var(--ink-2); line-height: 1.6; }
+.endnote details { border-bottom: 1px solid var(--grid); padding: 10px 0; }
+.endnote summary { cursor: pointer; font-weight: 700; color: var(--ink); font-size: 14px; }
+.endnote details > *:not(summary) { margin-top: 10px; }
+.endnote ul { padding-left: 18px; margin: 0 0 10px; }
+.endnote li { margin-bottom: 5px; }
+.endnote .credit { margin-top: 20px; color: var(--muted); }
+
+/* table-view details */
+details.tblview { font-family: var(--sans); font-size: 12px; margin-top: 10px; }
+details.tblview summary { cursor: pointer; color: var(--s1); font-weight: 600; }
+details.tblview table { border-collapse: collapse; margin-top: 8px; width: 100%; }
+details.tblview th, details.tblview td { border: 1px solid var(--grid); padding: 4px 8px; text-align: right; font-variant-numeric: tabular-nums; }
+details.tblview th:first-child, details.tblview td:first-child { text-align: left; }
+</style>
+</head>
+<body>
+
+<div class="masthead">A data essay &nbsp;·&nbsp; Providence, Rhode Island &nbsp;·&nbsp; July 2026</div>
+
+<header class="hero wrap-wide">
+  <h1>The Seen and the Unseen:<br>Rent Control in Providence</h1>
+</header>
+
+<!-- ================= CHAPTER 0: THE SETUP ================= -->
+<section class="chapter">
+  <div class="wrap">
+    <h2>Elections have consequences</h2>
+    <p class="lede">In April 2026, the Providence City Council passed a rent stabilization ordinance by a vote of 9 to 6. Mayor Brett Smiley vetoed it three days later. The override fell short in May. That would normally be the end of the story, except that David Morales, the state representative who championed the ordinance louder than anyone, is now running for mayor on a promise to bring it back and sign it. Polls have found 72 to 74 percent of residents support capping rent increases, so this is not a fringe position. It may simply be the policy of the next administration.</p>
+    <p>This essay takes the ordinance seriously and asks the question its supporters and opponents mostly talk past: <em>what do people actually do once the cap is in place?</em> Not what should happen, or what the press release says will happen, but what each person in the housing market, tenant, landlord, would-be landlord, would-be tenant, lender, developer, does when their incentives shift. Economists call these the margins of adjustment.</p>
+    <p>Everything below is built on the real terms of the 2026 ordinance and actual market facts: 59 percent of Providence households rent, rents are up about 40 percent since 2020 against 15 percent income growth, and a two-bedroom now runs $2,200 to $2,600 depending on whose survey you read. The people are invented, but their situations are drawn from the actual structure of the city's housing stock: old triple-deckers, small landlords, not nearly enough new construction.</p>
+
+    <h3>The actual terms</h3>
+    <p>Most rent control arguments are about rent control in the abstract. The Providence ordinance is a specific machine with specific parts, and the parts matter. Here is what the version passed in April does. Terms marked with an asterisk come from the introduced text and Council summaries; the final amended ordinance contains further machinery (a fair-return standard, rehabilitation provisions) that press coverage did not detail and this essay does not model.</p>
+  </div>
+  <div class="wrap-wide">
+    <div class="ordgrid">
+      <div class="ordcard"><div class="t">A 4 percent annual cap, flat</div><div class="d">Rent increases capped at 4 percent a year. Not linked to inflation: if CPI runs 6 percent, the cap is still 4.</div></div>
+      <div class="ordcard"><div class="t">Vacancy control: one 4% bump at turnover*</div><div class="d">When a tenant leaves, the landlord may raise rent 4 percent once for the next tenant. The rent history follows the unit, not the tenant. California and Oregon let rents reset between tenancies; Providence would not. St. Paul tried this and repealed it within 14 months.</div></div>
+      <div class="ordcard"><div class="t">Base rent: a 180-day lookback*</div><div class="d">The controlled base is the rent charged 180 days <em>before</em> the ordinance takes effect, to prevent last-minute spikes. It also converts every act of past generosity into a permanent ceiling. More on Walt later.</div></div>
+      <div class="ordcard"><div class="t">Exempt: owner-occupied buildings of 1&ndash;4 units</div><div class="d">Exempt if the owner lives on site, plus one additional building of the owner's choosing. The March amendments widened this from three units to four; in a city of triple-deckers it is the largest single carve-out, and a covered building becomes an exempt one the day an owner moves in.</div></div>
+      <div class="ordcard"><div class="t">Exempt: new construction, 10 or 20 years</div><div class="d">Buildings constructed after the ordinance is law are exempt for 10 years, or 20 if built with prevailing wages and apprenticeship programs. Recently built existing buildings carry a 5-year exemption. Dorms, regulated affordable housing, and future college student housing districts are excluded entirely.</div></div>
+      <div class="ordcard"><div class="t">Enforcement: a Rent Board and $250/day fines*</div><div class="d">A five-member Rent Board hears petitions and complaints. Landlords can petition for larger increases after major capital improvements; property tax increases above 5 percent pass through by formula. Estimated administration: about $576,000 per year.</div></div>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="viz checker" id="checker">
+      <div class="viz-title">Is this unit covered? Try it.</div>
+      <div class="viz-sub">Toggle a hypothetical Providence unit's attributes and see which side of the line it lands on. Notice how many of these levers the owner controls.</div>
+      <div class="q"><div class="ql">How many units in the building?</div><div class="chips" data-q="units"><button class="chip" data-v="1">1</button><button class="chip on" data-v="4">2&ndash;4</button><button class="chip" data-v="12">5+</button></div></div>
+      <div class="q"><div class="ql">Does the owner live in the building?</div><div class="chips" data-q="owner"><button class="chip" data-v="yes">Yes</button><button class="chip on" data-v="no">No</button></div></div>
+      <div class="q"><div class="ql">Who owns it?</div><div class="chips" data-q="entity"><button class="chip on" data-v="person">A person</button><button class="chip" data-v="llc">An LLC / corporation</button></div></div>
+      <div class="q"><div class="ql">When was it built?</div><div class="chips" data-q="built"><button class="chip on" data-v="old">Before 2021</button><button class="chip" data-v="recent">Recently completed</button><button class="chip" data-v="new">After the ordinance</button></div></div>
+      <div class="q"><div class="ql">Any special status?</div><div class="chips" data-q="special"><button class="chip on" data-v="none">None</button><button class="chip" data-v="lihtc">Regulated affordable</button><button class="chip" data-v="dorm">Dorm / institutional</button><button class="chip" data-v="college">College housing district</button></div></div>
+      <div class="verdict covered" id="checkerVerdict"></div>
+      <div class="viz-foot">Simplified reading of the amended ordinance as reported at passage in April 2026 (owner-occupied 1&ndash;4 unit exemption plus one additional building; 10/20-year new-construction exemptions). Simplified; not legal advice.</div>
+    </div>
+    <p>Several of the stories below turn on exactly these lines.</p>
+  </div>
+</section>
+
+<!-- ================= THE DENOMINATOR ================= -->
+<section class="chapter">
+  <div class="wrap">
+    <h2>How many units would the cap actually cover?</h2>
+    <p class="lede">Nobody knows precisely, including the city. Testifying in February, Providence's CFO estimated that fewer than 44 percent of apartments would be rent-controlled, and that was before subtracting the new-construction exemption, which the city cannot compute because it only started tracking new construction three years ago. Here is the arithmetic from public data, with the uncertainty left visible.</p>
+  </div>
+  <div class="wrap-wide">
+    <div class="viz">
+      <div class="viz-title">From 81,000 housing units to a covered core</div>
+      <div class="viz-sub">A waterfall to scale: the first bar is the city's full housing stock, each gray bar removes a category, and the final bar is what the cap would govern. Measured rows are marked; the exemption rows are the author's ranges.</div>
+      <div id="coverageWaterfall"></div>
+      <div class="viz-foot">Measured: ACS (81,131 housing units; 73,854 occupied) and HousingWorks RI (59% renter share), plus an allowance for vacant units on the rental market. Author's ranges: owner-occupied 1&ndash;4 unit buildings hold a large share of rentals in a triple-decker city (the Council's own earlier estimate was 16,000+ exempt units under the narrower 1&ndash;3 version); the deed-restricted range uses the state's low-and-moderate-income inventory, widened because buildings containing any affordable unit are wholly exempt; recent-construction and dorm ranges are rough. Central estimate: about 18,000 covered units; the assumption ranges span roughly 15,000&ndash;22,000. If a reader has better numbers, the author will happily lose the argument about the exact width of these bars.</div>
+    </div>
+  </div>
+  <div class="wrap">
+    <p>Two consequences follow from the denominator. First, the ordinance is narrower than both its champions and its critics talk as if it were: something like a third to a half of Providence's rental units would face the cap, concentrated in non-owner-occupied multifamily buildings owned by landlords like Gil, and in larger buildings owned by LLCs. Second, the city is legislating blind, and so is this essay: Providence has no rental registry, no tracking of renewal increases, and three years of construction data. Every coverage number you see in this debate, including the one above, is estimated.</p>
+  </div>
+</section>
+
+<!-- ================= CHAPTER 1: THE TRANSFER ================= -->
+<section class="chapter">
+  <div class="wrap">
+    <div class="chapnum">Chapter 1 · The Seen</div>
+    <h2>The transfer: Marisol and Gil</h2>
+    <p class="lede">Start with the effect everyone can see, because it is real and it is the reason the policy polls at 72 percent.</p>
+  </div>
+  <div class="wrap-wide">
+    <div class="people">
+      <div class="person"><div class="avatar" style="background:var(--s1)">M</div><div class="info"><div class="n">Marisol Peña</div><div class="r">Tenant · 2nd floor of an Elmwood triple-decker</div><div class="d">Medical interpreter, two kids at Roger Williams Middle School. Pays $1,450 for a two-bedroom she's rented since 2021. Market rate for her unit is now about $2,200.</div></div></div>
+      <div class="person"><div class="avatar" style="background:var(--s7)">G</div><div class="info"><div class="n">Gil Tavares</div><div class="r">Landlord · owns two triple-deckers on the same block</div><div class="d">Retired RIPTA mechanic, 67. Bought the buildings in the 1990s. Six units total, none owner-occupied, so both buildings are covered. The rents are his pension.</div></div></div>
+    </div>
+  </div>
+  <div class="wrap">
+    <p>Under the cap, Marisol's rent can rise at most 4 percent a year no matter what Gil would otherwise charge. When his renewal increases would have run above 4 percent, a wedge opens between what she pays and what she would have paid. That wedge is the point of the policy: a transfer from Gil to Marisol, delivered with none of the overhead of a housing voucher. Note what the wedge is not: it is not the full gap between her rent and the asking rent a newcomer sees, because sitting tenants get a discount everywhere, cap or no cap.</p>
+    <p>Drag the sliders and watch the wedge. Two details the simple story skips: Marisol already pays below asking, as most sitting tenants do, so part of her discount exists with or without the cap; and if the cap shrinks rental supply, the asking rents newcomers face drift higher. Flip on the supply response to see the second one.</p>
+  </div>
+  <div class="wrap-wide">
+    <div class="viz">
+      <div class="viz-title">The wedge: Marisol's rent vs. the market, 2026&ndash;2036</div>
+      <div class="viz-sub">Blue: her rent under the cap. Green dashed: what she would likely pay without the cap (landlords raise sitting tenants less than asking rents). Gray: asking rent for a newcomer. Only the shaded band between green and blue is caused by the policy.</div>
+      <div class="controls">
+        <div class="ctl"><label>Asking-rent growth (newcomers) &nbsp;<span class="val" id="wedgeGrowthVal">5.5%/yr</span></label><input type="range" id="wedgeGrowth" min="2" max="9" step="0.5" value="5.5"></div>
+        <div class="ctl"><label>Renewal increases without the cap (what Gil would ask a sitting tenant) &nbsp;<span class="val" id="wedgeRenewVal">6.0%/yr</span></label><input type="range" id="wedgeRenew" min="2" max="9" step="0.5" value="6"></div>
+        <div class="ctl"><label>Supply response (rent control shrinks rental supply, pushing market rents up about 5% over the decade — the San Francisco finding)</label>
+          <div class="toggle-row" id="supplyToggle"><button class="on" data-v="off">Off</button><button data-v="on">On</button></div>
+        </div>
+      </div>
+      <div class="chartbox" style="height:320px"><canvas id="wedgeChart"></canvas></div>
+      <div class="tiles">
+        <div class="tile blue"><div class="tv" id="tMarisol">$0</div><div class="tl">Marisol's 10-year savings caused by the cap (vs. the no-cap renewal path)</div></div>
+        <div class="tile red"><div class="tv" id="tGil">$0</div><div class="tl">Gil's forgone revenue on this one unit (same number, other side of the ledger)</div></div>
+        <div class="tile plain"><div class="tv" id="tGap">$0</div><div class="tl">Monthly gap in year 10 vs. a newcomer's asking rent (part of this discount she would have had anyway)</div></div>
+      </div>
+      <div class="viz-foot">Start: $1,450 current rent / $2,200 asking (Elmwood 2BR, 2026). The capped path grows at min(4%, the renewal rate); the cap only binds when Gil would otherwise raise more than 4%. Her total gap vs. asking rent mixes a pre-existing incumbent discount with the increment the cap causes; the tiles count only the increment. Supply-response uplift phases in linearly to +5.1% by year 10, the citywide asking-rent effect Diamond, McQuade &amp; Qian estimated for San Francisco (AER 2019).</div>
+      <details class="tblview"><summary>View as table</summary><div id="wedgeTable"></div></details>
+    </div>
+  </div>
+  <div class="wrap">
+    <p>Two things are simultaneously true. First: Marisol is better off. At the recent pace of Providence rent increases the cap saves her twenty-odd thousand dollars over a decade, counting only what the cap causes, and she is exactly who the ordinance's sponsors have in mind. Council President Rachel Miller's line, that a rent increase is "an eviction notice by another name," describes a real thing that happens to real families. The best research agrees on this point: in San Francisco, covered tenants were about 20 percent more likely to stay at their address.</p>
+    <p>Second: Gil is not a corporation. He's a man holding an asset whose income is capped while his costs (insurance, up 30 percent in three years in coastal New England; taxes; a roof) are not. The transfer doesn't come from "landlords" as a class of abstraction. It comes from Gil's pension, one month at a time. What Gil does about that is Chapter 3.</p>
+    <p>But first: notice the wedge itself creates a new problem. That gap between $1,450 and the market price is now attached to a physical apartment. Whenever it empties, someone gets a prize worth thousands of dollars a year. Who?</p>
+  </div>
+</section>
+
+<!-- ================= CHAPTER 2: THE QUEUE ================= -->
+<section class="chapter">
+  <div class="wrap">
+    <div class="chapnum">Chapter 2 · The Queue</div>
+    <h2>Who gets the $750-a-month prize?</h2>
+    <p class="lede">Prices do two jobs. They transfer money, which everyone notices, and they allocate scarce things, which almost nobody does. Cap the price below the market rate and demand exceeds supply. The apartment still gets allocated. Just not by price.</p>
+  </div>
+  <div class="wrap-wide">
+    <div class="people">
+      <div class="person"><div class="avatar" style="background:var(--s6)">T</div><div class="info"><div class="n">Tenaya Brooks</div><div class="r">Would-be tenant · moving to Providence</div><div class="d">24, just hired as a surgical tech at Rhode Island Hospital. First apartment on her own: thin credit file, no rental history, no co-signer. Solid income, no track record.</div></div></div>
+      <div class="person"><div class="avatar" style="background:var(--s7)">M</div><div class="info"><div class="n">Marcus Toledo</div><div class="r">Would-be tenant · union electrician</div><div class="d">Solid income, 590 credit, and a contested 2019 eviction on his record. Paper screening rejects him everywhere, so when he finds a unit he can get, he offers more: higher rent, months prepaid.</div></div></div>
+      <div class="person"><div class="avatar" style="background:var(--s5)">D</div><div class="info"><div class="n">The Delgado-Kims</div><div class="r">Would-be tenants · dual income, 780 credit</div><div class="d">Two hospital residents relocating from Boston. Flawless on paper, with plenty of alternatives, so they never overpay for any one unit.</div></div></div>
+    </div>
+  </div>
+  <div class="wrap-wide">
+    <div class="viz">
+      <div class="viz-title">One vacancy, six applicants: an illustrative allocation model</div>
+      <div class="viz-sub">A 2BR in Gil's building turns over. Under the cap it lists at $1,508 (one 4% bump on $1,450), roughly $750 under market, and the applications pour in. This is a toy model with disclosed coefficients (below), not an estimate from data. Each falling ball is one simulated turnover landing on the applicant who gets the lease; the bars accumulate win rates. Run it under both regimes and compare who wins.</div>
+      <div class="controls">
+        <div class="toggle-row" id="queueToggle"><button class="on" data-v="market">Market pricing</button><button data-v="capped">Under the cap</button></div>
+        <button class="btn primary" id="queueRun">Run 100 turnovers</button>
+      </div>
+      <div class="pool-wrap" id="poolWrap">
+        <div class="pool" id="queuePool"></div>
+      </div>
+      <div class="queue-msg" id="queueMsg">Press the button to simulate 100 turnovers of the same unit under the selected regime.</div>
+      <div class="viz-foot">Repeated draws from the toy model with modest random noise. Under market pricing, the rent rises until most of the pool peels off (to cheaper units, smaller places, roommates); the lease goes to whoever will pay the most. Under the cap, the landlord ranks the surplus applicants on entirely legal screening criteria: credit score, income multiple, rental history. Nothing illegal is depicted; that is rather the point.</div>
+      <details class="tblview"><summary>Model coefficients (change them mentally; the direction survives, the exact percentages do not)</summary><div style="padding-top:6px; line-height:1.6;">Under the cap, score = (credit &minus; 560)/2.6 + 3 &times; min(years of history, 10) + min(income, $150k)/3 + noise (&plusmn;16). Under market pricing, score = 14 &times; min(income &times; stretch, $125k) + noise (&plusmn;160). Stretch is how far each household will go, given its alternatives: Tenaya 2.0 (roommate), Marcus 1.9 (prepaid months; screening rejects him elsewhere, so this unit is worth more to him), Osei 1.2, Erin 1.15, Big Blue 1.0 (fixed corporate budget), Delgado-Kims 0.8 (plenty of alternatives). Highest score wins. The asymmetry being illustrated: money is a margin a newcomer can adjust; credit history is not.</div></details>
+    </div>
+  </div>
+  <div class="wrap">
+    <p>Under market pricing, the unit goes to whoever values it most, and the people who value it most are the ones with the fewest alternatives: Tenaya splits the rent with a roommate, Marcus offers prepaid months because his record fails every screen in town. Under the cap, the price is fixed, so the competition moves entirely to paperwork: credit history, income multiple, references. The landlord, who bears all the downside of a bad tenancy at a rent he can never reset (remember: 4 percent at turnover, once), picks the safest file every time, and the safest file is never a thin one.</p>
+    <p>A binding price ceiling does not reduce competition for apartments. It changes what the competition is denominated in, from money, which newcomers can offer, to accumulated paperwork, which they cannot. The marginal renter the policy means to help, the one with a real job and a thin file, is the first one sorted out of the queue.</p>
+    <p>Meanwhile a subtler misallocation compounds. Marisol's neighbors, the Hendersons, raised three kids in their capped three-bedroom. The kids are gone. In a market, the Hendersons would downsize and free the 3BR for a family; under the cap, leaving means surrendering a below-market deal they can never get back, so they stay. Glaeser and Luttmer estimated that about a fifth of New York's controlled apartments are occupied by the "wrong" household in exactly this sense. The cap pays people to sit still, on housing they've outgrown and on jobs they'd otherwise leave: Marisol herself will turn down a better-paying job in Worcester in 2029, because the raise is smaller than the deal she'd forfeit by moving.</p>
+  </div>
+</section>
+
+<!-- ================= CHAPTER 3: THE MARGINS ================= -->
+<section class="chapter">
+  <div class="wrap">
+    <div class="chapnum">Chapter 3 · The Unseen</div>
+    <h2>Ten years on one Providence block</h2>
+    <p class="lede">Nobody repeals the housing supply by decree. It leaks away, one private, legal, individually reasonable decision at a time, along margins most people never think to watch. Below is one block in Elmwood with 10 lots. Play the decade under each scenario, or drag the year slider. Click any building for its story.</p>
+  </div>
+  <div class="wrap-wide">
+    <div class="viz">
+      <div class="viz-title">Alder Street: 10 properties, 2026 &rarr; 2036</div>
+      <div class="viz-sub">Play the same decade twice: once without the ordinance, once with it. Blue means units on the long-term rental market (dark blue capped, light blue exempt); gray means they've left it, or never joined it. The table at the bottom compares the two scenarios at the year shown.</div>
+      <div class="block-top">
+        <div class="yearctl">
+          <div class="toggle-row" id="blockScenario"><button data-v="market">No rent control</button><button class="on" data-v="cap">Under the cap</button></div>
+          <button class="btn primary" id="blockPlay">Play</button>
+          <div class="ylabel">Year: <span id="blockYearLabel">2026</span></div>
+          <input type="range" id="blockYear" class="yslider" min="0" max="10" step="1" value="0">
+        </div>
+        <div class="kcounters">
+          <div class="kc"><div class="kv" id="kcHousing">–</div><div class="kl">housing units on the block</div></div>
+          <div class="kc"><div class="kv" id="kcRental">–</div><div class="kl">of them long-term rentals</div></div>
+          <div class="kc"><div class="kv" id="kcCovered">–</div><div class="kl">of them under the cap</div></div>
+          <div class="kc"><div class="kv" id="kcLost">–</div><div class="kl">rental units exited since 2026</div></div>
+          <div class="kc"><div class="kv" id="kcGhost">–</div><div class="kl">units never created</div></div>
+        </div>
+      </div>
+      <div class="blockgrid" id="blockGrid"></div>
+      <div class="state-legend" id="stateLegend"></div>
+      <div class="bdetail" id="blockDetail"></div>
+      <div id="blockSummary" style="margin-top:14px;"></div>
+      <div class="viz-foot">Fictional properties on a composite street; each pathway is drawn from a documented adjustment margin (condo conversion and owner move-in: Diamond, McQuade &amp; Qian 2019; maintenance decline: Sims 2007, Autor, Palmer &amp; Pathak 2014; development flight: St. Paul 2022&ndash;24; exemption-seeking and short-term-rental conversion: standard practice everywhere these rules exist). The timing is illustrative. Each pathway reflects a mechanism documented in the research; its Providence-specific frequency is unknown, which is why the counters describe this fictional block, not the city.</div>
+    </div>
+  </div>
+  <div class="wrap" id="marginNarrative">
+    <h3>The margins, named</h3>
+    <p><b>1. The maintenance margin.</b> Gil can't raise the rent, but nobody can make him renew the kitchen. A unit is a bundle of rent <em>and</em> upkeep; when the law fixes one, the other adjusts. Massachusetts rent-controlled units were measurably older, shabbier, and less renovated than their neighbors (Sims 2007). The rent stays capped; the product shrinks to fit it.</p>
+    <p><b>2. The exit margin: condo conversion.</b> A triple-decker is worth more as three condos sold to owner-occupants than as a capped income stream. In San Francisco, buildings subject to rent control saw a 15 percent decline in rental supply, much of it through exactly this door. Gil sells; three renter households' units become two owner households' homes; the block gets richer and the rental stock gets smaller.</p>
+    <p><b>3. The exemption margin: owner move-in.</b> Eddie owns the two-family at number 20 and lives in Cranston. The day the cap takes effect, the cheapest renovation available to him is a mattress: move into unit 1, and the building is owner-occupied, 1&ndash;4 units, exempt. One rental unit exits the market so that the other can leave the cap. Perfectly legal; the ordinance drew the line, and Eddie walked to it.</p>
+    <p><b>4. The platform margin.</b> Karen inherits her mother's triple-decker at number 22. She can become a regulated landlord with a Rent Board file, or she can furnish two units and list them nightly to tourists and traveling nurses, entirely outside the ordinance. Every unit that shifts to short-term rental is a long-term home that no longer exists.</p>
+    <p><b>5. The never-built margin.</b> Dev and Priya had an accepted offer on the gut-job three-family at number 24: renovate, rent two units, live in neither. Under the cap their spreadsheet dies (capped income, uncapped renovation costs, no rent reset, ever), so they walk. The house sells to a flipper who makes condos. Three rental units that would have existed, never do. You will not see this on any eviction docket or Rent Board complaint.</p>
+    <p><b>6. The generosity margin.</b> Walt, at number 18, has charged his longtime tenants $300 under market for years, because they're good tenants and he's a decent man. The 180-day lookback means his kindness is about to become a legal ceiling, permanently. Every landlord in Providence who reads the ordinance learns the same lesson at the same moment: <em>never</em> price below the maximum again, and get your increase in before the base-rent date. Cities that pass rent control reliably see a burst of pre-effective-date hikes, the law's first observable effect arriving before the law does.</p>
+    <p><b>7. The unbundling margin.</b> The 12-unit building on the corner, owned by a Boston LLC, stays rental. But parking is now $150 a month, laundry is app-metered, there's a $95 "amenity and administration fee," and the heat included in the lease becomes tenant-paid utilities at renewal. Rent is capped; the price of renting is not. Regulators everywhere chase this and rarely catch it.</p>
+    <p><b>8. The screening margin.</b> Same building: with a queue at every vacancy and no way to price risk, management tightens to 700+ credit, 3.5&times; income, and documented rental history. Chapter 2, institutionalized.</p>
+    <p><b>9. The spillover margin.</b> Rosa and Manny live in their three-family at number 16, so they're exempt. They didn't ask for pricing power, but as covered units leak out of the market, the demand lands on whatever remains. Exempt-sector rents rise faster than they would have. The cap doesn't lower the market price; by shrinking supply it raises it, about 5 percent in the San Francisco study, which is how tenants as a whole can end up paying <em>more</em> in a city that capped the rent.</p>
+    <p><b>10. The stayers.</b> And in Marisol's building at number 26, the cap does exactly what it promised: she's still there in 2036, kids through school, savings account no longer empty. Any account of the block keeps her on the ledger too. The question this block poses is never whether Marisol gains. It's how many Tenayas, standing outside a smaller housing stock, paid for it.</p>
+  </div>
+</section>
+
+<!-- ================= CHAPTER 4: THE SPREADSHEET ================= -->
+<section class="chapter">
+  <div class="wrap">
+    <div class="chapnum">Chapter 4 · The Marginal Building</div>
+    <h2>The spreadsheet that decides whether Providence grows</h2>
+    <p class="lede">The new-construction exemption (10 years, or 20 for projects built with prevailing wages and apprentices) is supposed to hold developers harmless. It only half works: buildings live for 60 years, and spreadsheets can see past 20.</p>
+  </div>
+  <div class="wrap-wide">
+    <div class="people">
+      <div class="person"><div class="avatar" style="background:var(--s8)">B</div><div class="info"><div class="n">Brightline Development</div><div class="d">A mid-size regional developer weighing a 48-unit project on the corner lot. Their capital doesn't care about Providence; it cares about clearing a 7.5 percent hurdle rate. Pawtucket is a ten-minute drive.</div></div></div>
+    </div>
+    <div class="viz">
+      <div class="viz-title">Brightline's pro forma: does the corner lot pencil?</div>
+      <div class="viz-sub">A simplified underwriting model for the 48-unit project: $21.0M all-in cost ($438k per unit, the going rate for New England new construction), rents start at $2,350/unit, 25-year hold, sale at exit. Defaults are set to the ordinance's actual terms. Move the sliders the way a developer's risk committee would.</div>
+      <div class="controls">
+        <div class="ctl"><label>New-construction exemption &nbsp;<span class="val" id="pfExemptVal">10 years (ordinance)</span></label><input type="range" id="pfExempt" min="0" max="30" step="1" value="10"></div>
+        <div class="ctl"><label>Prevailing wages + apprenticeships: buys the 20-year exemption, raises construction cost about 10%</label><div class="toggle-row" id="pfLabor"><button class="on" data-v="off">Off</button><button data-v="on">On (20-yr exemption)</button></div></div>
+        <div class="ctl"><label>Odds the exemption is shortened or repealed later &nbsp;<span class="val" id="pfRiskVal">20%</span></label><input type="range" id="pfRisk" min="0" max="60" step="5" value="20"></div>
+        <div class="ctl"><label>Market rent growth &nbsp;<span class="val" id="pfGrowthVal">5.0%/yr</span></label><input type="range" id="pfGrowth" min="1" max="7" step="0.5" value="5"></div>
+      </div>
+      <div class="meter">
+        <div class="mtrack" id="pfTrack">
+          <div class="mfill" id="pfFill" style="width:50%"></div>
+          <div class="mhurdle" style="left:62.5%"><div class="mhlabel" style="left:0">hurdle 7.5%</div></div>
+        </div>
+        <div class="scale"><span>0%</span><span>IRR (unlevered, 25-yr)</span><span>12%</span></div>
+      </div>
+      <div class="tiles">
+        <div class="tile plain"><div class="tv" id="pfIRR">–</div><div class="tl">expected project IRR</div></div>
+        <div class="tile plain"><div class="tv" id="pfNoCtl">–</div><div class="tl">same project, no ordinance at all</div></div>
+        <div class="tile plain"><div class="tv" id="pfDrag">–</div><div class="tl">IRR cost of the cap regime</div></div>
+      </div>
+      <div class="pverdict go" id="pfVerdict"></div>
+      <div class="viz-foot">Model: NOI = 62% of revenue; rents grow at the market rate during exemption, then at min(market, 4%); exit value = year-25 NOI &divide; 6% cap rate, with covered buildings trading at a wider cap rate (capped income is worth less per dollar). "Repeal risk" is modeled as the exemption ending at year 5, and the expected IRR is computed on probability-weighted cash flows (averaging IRRs directly is a known error). The labor toggle overrides the slider to 20 years and adds a 10% cost premium, a typical prevailing-wage estimate. Every number is adjustable in spirit; the shape of the conclusion is not.</div>
+    </div>
+  </div>
+  <div class="wrap">
+    <p>Notice three things. First, the asymmetry: at the ordinance's actual terms the cap shaves half a point to a point off the return. That sounds survivable, and for a project that penciled at 9 percent, it is. But development is decided <em>at the margin</em>. The marginal project is the one that penciled at 8.2 against a 7.5 hurdle, and for that one, half a point is the whole ballgame. It dies in a Tuesday investment-committee meeting in Boston, and its 48 units are never missed because they never exist; Cranston and Pawtucket, same workers, same rents, no cap, get the building instead. Second, the labor-linked exemption is a real option with a real price: at a typical prevailing-wage premium, the extra ten years of exemption don't pay for the extra construction cost in this model, so the 20-year track functions more as a labor standard than as developer relief. Third, everything here is one developer's spreadsheet; the model is disclosed so you can disagree with it slider by slider.</p>
+    <p>You don't have to take the model's word for it. St. Paul ran the experiment.</p>
+  </div>
+  <div class="wrap-wide">
+    <div class="viz">
+      <div class="viz-title">St. Paul, Minnesota: multifamily units permitted by year</div>
+      <div class="viz-sub">Voters passed a 3% cap with no new-construction exemption in Nov 2021, the strictest big-city ordinance in America and the closest cousin to Providence's vacancy-control design. The city amended it within 14 months (20-year new-construction exemption, vacancy decontrol) after development stalled.</div>
+      <div class="chartbox" style="height:300px"><canvas id="stpChart"></canvas></div>
+      <div class="viz-foot">Units in permitted multifamily projects, Minneapolis Fed reporting (2026). 2022&ndash;25 also brought the sharpest interest-rate shock in 40 years, which crushed multifamily starts everywhere; St. Paul's collapse was deeper and longer than its twin city's, but this is one confounded natural experiment, not a controlled trial.</div>
+      <details class="tblview"><summary>View as table</summary><div id="stpTable"></div></details>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CHAPTER 5: THE EVIDENCE ================= -->
+<section class="chapter">
+  <div class="wrap">
+    <div class="chapnum">Chapter 5 · The Literature</div>
+    <h2>What forty years of evidence says</h2>
+    <p class="lede">Rent control is among the most-studied policies in urban economics, and the findings are unusually consistent: real protection for incumbents, paid for in supply, quality, and misallocation. Both halves are true at once.</p>
+  </div>
+  <div class="wrap-wide">
+    <div class="viz">
+      <div class="viz-title">The evidence, on the map</div>
+      <div class="viz-sub">Four natural experiments and the city about to run the fifth. Hover a marker or a card.</div>
+      <div style="max-width:820px;margin:0 auto;">
+        <svg viewBox="0 0 780 500" style="width:100%;height:auto;display:block;" id="usmap">
+          <path d="M66,29L68,25L74,31L84,36L88,36L88,40L83,44L89,40L89,43L85,52L89,50L90,42L93,39L91,35L93,35L94,26L91,25L92,21L103,25L256,42L408,65L408,58L412,60L414,69L423,71L424,73L429,71L433,71L439,74L441,78L442,75L448,78L450,80L458,76L460,79L467,78L470,80L474,80L469,83L463,85L456,91L452,96L445,102L447,104L458,99L461,100L459,105L461,103L465,105L472,100L477,100L491,88L496,88L491,92L488,96L489,100L491,97L498,98L502,103L511,103L516,99L524,98L530,96L530,101L535,101L540,99L542,106L545,108L548,105L549,109L542,108L539,109L535,108L534,111L531,109L525,108L523,111L517,111L515,115L511,117L513,114L507,115L504,122L497,135L498,138L502,133L504,131L508,124L508,128L504,137L504,144L502,149L502,153L500,161L502,168L503,177L506,185L509,188L515,186L519,183L523,173L522,163L517,152L516,145L519,140L519,134L520,130L524,128L525,124L526,131L529,128L528,122L534,120L531,117L535,112L542,114L544,117L551,118L554,123L553,125L555,129L555,135L553,141L550,142L549,147L553,149L557,142L561,139L565,143L570,157L570,164L566,164L563,176L560,180L567,184L568,182L573,185L579,182L582,182L591,174L599,170L612,158L615,154L611,146L618,142L628,142L630,143L637,141L643,135L645,134L645,127L642,126L642,123L646,119L652,109L657,105L665,104L678,100L697,95L697,91L702,89L707,77L706,69L707,62L712,47L714,47L717,51L724,45L730,49L737,72L742,72L743,77L747,78L751,83L748,86L746,92L743,91L741,95L736,98L736,103L732,98L731,95L729,106L721,111L717,117L717,120L715,129L718,132L715,138L720,142L723,146L731,146L723,151L722,148L719,153L714,155L712,150L713,157L702,162L696,164L687,170L690,171L700,167L703,164L707,166L695,175L682,181L686,182L687,193L685,199L679,210L679,206L669,202L672,209L677,212L679,219L678,229L675,232L674,243L671,242L671,235L673,228L670,230L670,225L665,225L662,221L666,219L660,215L661,207L658,209L660,221L662,227L657,227L653,224L655,228L660,228L666,231L665,240L668,245L666,249L673,247L676,256L673,255L676,259L667,266L679,263L680,270L676,275L663,275L672,277L669,284L673,281L676,282L674,289L671,288L666,289L660,295L657,300L656,306L650,306L646,309L641,315L639,324L631,333L624,336L625,339L619,344L617,351L615,368L620,384L627,395L634,403L635,412L646,429L648,436L649,452L647,452L646,461L636,464L631,455L624,453L620,444L613,439L604,427L608,421L603,418L605,421L601,421L600,415L602,411L601,403L599,399L596,399L589,394L585,388L578,385L575,385L574,389L571,389L564,396L559,395L559,391L550,386L539,384L521,389L518,381L516,387L505,387L497,390L491,394L494,397L496,393L498,396L498,401L494,401L497,405L501,406L503,412L492,407L486,411L483,407L477,413L469,408L464,401L460,399L454,405L441,401L426,404L417,409L418,402L413,404L415,410L417,409L408,418L395,424L383,434L384,431L391,427L386,426L386,429L379,431L382,432L380,436L376,435L379,438L376,444L375,453L376,459L380,468L376,470L370,466L363,466L359,463L349,459L347,452L344,449L344,441L338,435L337,432L332,426L327,412L315,399L307,399L303,397L298,399L293,408L289,412L274,403L269,398L267,393L267,388L263,380L258,376L251,366L247,364L243,358L218,355L217,363L175,357L124,327L127,323L92,319L90,317L91,309L89,304L82,295L78,294L78,289L74,289L69,285L65,279L53,275L51,272L53,263L47,252L42,235L46,230L39,221L41,211L45,218L43,208L41,210L35,205L37,201L30,187L34,171L29,162L30,159L35,153L39,143L40,133L39,131L41,123L40,118L49,105L59,82L65,65L70,64L63,62L69,56L66,54L66,50L67,35Z" fill="#f0efec" stroke="#c3c2b7" stroke-width="1"/>
+          <g id="mapMarkers"></g>
+        </svg>
+      </div>
+      <div class="mapcards" id="mapCards"></div>
+    </div></div>
+  </div>
+  <div class="wrap">
+    <div class="pullquote">"Rent control appears to help affordability in the short run for current tenants, but in the long run decreases affordability, fuels gentrification, and creates negative externalities on the surrounding neighborhood."<span class="attr">Rebecca Diamond (Stanford), summarizing the literature, 2018 — a researcher whose own work documents rent control's benefits to incumbents</span></div>
+    <p>Note what the literature does <em>not</em> say. It does not say rents fall for everyone (they rise for newcomers). It does not say landlords are impoverished as a class (they adapt, exit, or convert). And it does not say incumbent tenants aren't helped (they demonstrably are). The economist's objection to rent control was never "it helps no one." It's that the help is financed by an invisible tax on the city's future tenants. In San Francisco the accounting was almost exactly symmetric: $2.9 billion in gains to covered tenants between 1995 and 2012, and $2.9 billion in costs to the renters who came after them, paid through higher market rents on a smaller stock.</p>
+  </div>
+  <div class="wrap-wide">
+    <div class="viz">
+      <div class="viz-title">The mechanics, in one picture: a price ceiling on the supply-and-demand diagram</div>
+      <div class="viz-sub">Press play. The rectangle is Chapter 1, the gap is Chapter 2, the triangle is Chapters 3 and 4. Dollar figures assume roughly 18,000 covered units (the coverage estimate above) and a cap that binds.</div>
+      <div class="controls" style="margin-top:4px;">
+        <button class="btn primary" id="pqPlay">Play the mechanics</button>
+        <div id="pqCaption" style="flex:1;min-width:240px;font-size:13px;line-height:1.5;color:var(--ink);background:var(--div-neutral);border-radius:8px;padding:10px 14px;"></div>
+      </div>
+      <div style="max-width:660px;margin:0 auto;">
+        <svg viewBox="0 0 660 400" style="width:100%;height:auto;display:block;" id="pqSvg">
+          <!-- axes -->
+          <line x1="70" y1="360" x2="620" y2="360" stroke="#c3c2b7" stroke-width="1.5"/>
+          <line x1="70" y1="360" x2="70" y2="30" stroke="#c3c2b7" stroke-width="1.5"/>
+          <text x="620" y="382" font-size="12" fill="#52514e" text-anchor="end">Q (units)</text>
+          <text x="58" y="24" font-size="12" fill="#52514e" text-anchor="end">Rent</text>
+          <!-- transfer rectangle -->
+          <rect id="pqTransfer" x="70" y="200" width="189" height="48" fill="#2a78d6" opacity="0" style="transition:opacity 0.6s;"/>
+          <!-- DWL triangle -->
+          <polygon id="pqDWL" points="259,248 259,152 373,200" fill="#e34948" opacity="0" style="transition:opacity 0.6s;"/>
+          <!-- curves -->
+          <line x1="70" y1="72" x2="600" y2="296" stroke="#0b0b0b" stroke-width="2"/>
+          <line x1="70" y1="328" x2="600" y2="104" stroke="#0b0b0b" stroke-width="2"/>
+          <text x="606" y="300" font-size="12" fill="#0b0b0b">D</text>
+          <text x="606" y="104" font-size="12" fill="#0b0b0b">S</text>
+          <!-- equilibrium guides -->
+          <g id="pqEq" style="transition:opacity 0.6s;">
+            <line x1="70" y1="200" x2="373" y2="200" stroke="#898781" stroke-width="1" stroke-dasharray="3,3"/>
+            <line x1="373" y1="200" x2="373" y2="360" stroke="#898781" stroke-width="1" stroke-dasharray="3,3"/>
+            <circle cx="373" cy="200" r="4" fill="#0b0b0b"/>
+            <text x="56" y="204" font-size="12" fill="#52514e" text-anchor="end">P*</text>
+            <text x="373" y="378" font-size="12" fill="#52514e" text-anchor="middle">Q*</text>
+          </g>
+          <!-- ceiling -->
+          <g id="pqCeil" opacity="0" style="transition:opacity 0.6s;">
+            <line x1="70" y1="248" x2="600" y2="248" stroke="#e34948" stroke-width="2" stroke-dasharray="7,5"/>
+            <text x="56" y="252" font-size="12" fill="#c22a2a" text-anchor="end" font-weight="700">Pc</text>
+          </g>
+          <!-- Qs / Qd -->
+          <g id="pqQ" opacity="0" style="transition:opacity 0.6s;">
+            <line x1="259" y1="248" x2="259" y2="360" stroke="#898781" stroke-width="1" stroke-dasharray="3,3"/>
+            <line x1="486" y1="248" x2="486" y2="360" stroke="#898781" stroke-width="1" stroke-dasharray="3,3"/>
+            <text x="259" y="378" font-size="12" fill="#52514e" text-anchor="middle">Qs</text>
+            <text x="486" y="378" font-size="12" fill="#52514e" text-anchor="middle">Qd</text>
+            <line x1="263" y1="342" x2="482" y2="342" stroke="#eb6834" stroke-width="2"/>
+            <text x="372" y="334" font-size="11.5" fill="#9c3a10" text-anchor="middle" font-weight="600">shortage: the queue</text>
+          </g>
+          <text id="pqTLabel" x="160" y="228" font-size="12" fill="#fff" font-weight="700" opacity="0" style="transition:opacity 0.6s;">the transfer</text>
+          <text id="pqDLabel" x="298" y="196" font-size="12" fill="#c22a2a" font-weight="700" opacity="0" style="transition:opacity 0.6s;">deadweight loss</text>
+        </svg>
+      </div>
+      <div style="font-size:13px;color:var(--ink-2);line-height:1.6;margin-top:12px;">
+        The itemized efficiency losses, with what dollar anchors exist:
+        <ul style="margin:6px 0 0;padding-left:20px;">
+          <li><b>Withdrawn and never-built supply</b> (the red triangle): units that exit or never arrive. This is the loss that compounds; it took years to accumulate in San Francisco and St. Paul.</li>
+          <li><b>Misallocation</b> (not in the diagram): the units still supplied go to the wrong households, worth about $400 per covered unit per year in today's dollars (Glaeser &amp; Luttmer), roughly $7M a year on 18,000 units, from day one.</li>
+          <li><b>Queueing and search costs</b> (the orange gap): time, applications, and side payments spent competing for scarce units. Real, and unmeasured anywhere.</li>
+          <li><b>Quality depreciation</b>: deferred maintenance is supply withdrawal in slow motion (Sims 2007), so part of the triangle arrives disguised as peeling paint.</li>
+        </ul>
+        For contrast, the blue rectangle, the transfer to sitting tenants, runs roughly $50&ndash;60M a year at a $250 monthly wedge. Money changing hands, not money destroyed.
+      </div>
+      <div class="viz-foot">Author's arithmetic on published estimates; every dollar input is uncertain by a factor of about two. The structure is the point: the transfer is an order of magnitude larger than the near-term deadweight loss, which is why the policy is popular, and the deadweight loss compounds while the transfer doesn't, which is why economists keep objecting anyway. Curves drawn for legibility, not estimated from Providence data.</div>
+    </div>
+    </div>
+</section>
+
+<!-- ================= CHAPTER 6: THE LEDGER ================= -->
+<section class="chapter">
+  <div class="wrap">
+    <div class="chapnum">Chapter 6 · The Ledger</div>
+    <h2>Winners and losers, by year</h2>
+    <p class="lede">Price controls don't create or destroy much value on day one; they reassign it, and the reassignment drifts over time. Green is gains and red is losses, both relative to the no-rent-control status quo. Hover any cell.</p>
+  </div>
+  <div class="wrap-wide">
+    <div class="viz">
+      <div class="viz-title">Who's up, who's down: the author's scorecard</div>
+      <div class="viz-sub">Directional judgment calls for Providence under the 2026 ordinance terms, calibrated to the research above, not outputs of a model. Every cell is relative to the same decade with no rent control.</div>
+      <div class="hm" id="heatmap"></div>
+      <div class="legend" style="margin-top:14px">
+        <div class="li"><span class="swatch" style="background:#008300"></span>large gain</div>
+        <div class="li"><span class="swatch" style="background:#b2e4cd"></span>gain</div>
+        <div class="li"><span class="swatch" style="background:var(--div-neutral);border:1px solid var(--grid)"></span>no change</div>
+        <div class="li"><span class="swatch" style="background:#f2b1b1"></span>loss</div>
+        <div class="li"><span class="swatch" style="background:#c22a2a"></span>large loss</div>
+      </div>
+      <div class="viz-foot" id="hmTip">Hover a cell for the reasoning.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CHAPTER 7: FORECASTS ================= -->
+<section class="chapter">
+  <div class="wrap">
+    <div class="chapnum">Chapter 7 · Skin in the Game</div>
+    <h2>The forecast card</h2>
+    <p class="lede">Anyone can tell a story; the discipline is attaching probabilities you'd be embarrassed to miss. Each outcome below gets two probabilities: one if Providence enacts the ordinance (say, in 2027 under a Morales administration), one under the status quo. The difference between the bars is the policy's fingerprint.</p>
+  </div>
+  <div class="wrap-wide">
+    <div class="viz">
+      <div class="viz-title">Each outcome in two worlds: with the ordinance, and without</div>
+      <div class="fcast" id="fcast"></div>
+      <div class="viz-foot">Blue bar: probability if the ordinance takes effect with the April 2026 terms. Gray bar: probability under the status quo. The right-hand column is the difference, the part attributable to the policy. Author's subjective probabilities; base rates lean on St. Paul (the nearest design twin), San Francisco, and Cambridge. Score them against reality; that's what they're for. Forecast card v3, July 16, 2026.</div>
+    </div>
+  </div>
+  <div class="wrap">
+    <h3>What would change this analysis</h3>
+    <p>The costs above shrink if: the cap rarely binds (market rent growth stays under 4 percent, which is exactly what happened in post-2023 St. Paul, where soft demand, not the ordinance, did the "stabilizing"); the Rent Board runs its pass-throughs generously; or enforcement is light. And the strongest steelman for the ordinance is distributional and temporal: the gains land now, on identifiable struggling households, while the costs land later, diffusely, on people who mostly don't live here yet. A city is allowed to make that trade with open eyes. The argument of this essay is only that the eyes be open: the trade is real, the margins are many, and the bill for Marisol's protection lands on Tenaya.</p>
+    <p>If the goal is more people affordably housed, experience points to a boring answer: legalize more housing (Providence's stock barely grows), subsidize the poorest directly, and let prices keep doing the one job no board can do for them, telling builders where homes are worth building. The 4 percent cap does something different: it makes the existing shortage more comfortable for the people already housed, while slowly shrinking the stock of homes available to everyone who comes after.</p>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="endnote">
+  <div class="wrap">
+    <details>
+      <summary>Method</summary>
+      <p>All characters are fictional composites; neighborhoods, prices, and ordinance terms are real. Interactive models are deliberately simple and their assumptions are printed on their faces; The probabilities in the forecast card are the author's subjective estimates, stated so they can be scored against reality.</p>
+      <p>A note on the legal foundation: the ordinance terms here reflect the amended version passed in April 2026 as reported at passage (owner-occupied 1&ndash;4 unit exemption plus a second building; 10-year new-construction exemption, 20 with prevailing wages and apprenticeships; 5-year exemption for recently built existing buildings; college housing district exclusion). Provisions carried over from the introduced text and Council summaries (180-day lookback, vacancy control, Rent Board structure, fines) are marked with an asterisk where they appear; the full amended text contains additional provisions (a fair-return standard, rehabilitation rules) that press coverage did not detail and this essay does not model.</p>
+    </details>
+    <details>
+      <summary>Sources</summary>
+      <ul>
+        <li>Ordinance terms and political timeline: Providence City Council rent stabilization ordinance and FAQ (2026); Steve Ahlquist's reporting on the introduced ordinance; Rhode Island Current coverage of the April 2026 passage (9&ndash;6), the Smiley veto, and the failed May 2026 override; HousingWire's national coverage of the 4% cap and its exemptions.</li>
+        <li>Morales's position: candidate platform and forum coverage (Brown Daily Herald, April 2026); his public statements urging override of the veto.</li>
+        <li>Providence market data: HousingWorks RI (59% renter share; about 70,300 households; $2,019 average 2BR); Zumper (June 2026 medians); Council task force (+40% rents vs +15% incomes since 2020; about $2,600 average 2BR; 24,000 eviction filings since March 2020).</li>
+        <li>Research: Diamond, McQuade &amp; Qian (AER 2019; welfare figures via Stanford GSB); Autor, Palmer &amp; Pathak (JPE 2014); Glaeser &amp; Luttmer (AER 2003; $200/unit misallocation estimate from NBER WP 6220); Sims (JUE 2007); Ahern &amp; Giacoletti (NBER WP 30083, 2022); Favilukis, Mabille &amp; Van Nieuwerburgh (ReStud 2023); Kholodilin's literature surveys; Minneapolis Fed on St. Paul permitting (2026).</li>
+      <li>As-passed ordinance terms: Boston Globe coverage of the April 2026 vote (1&ndash;4 unit owner-occupied exemption; 10/20-year tiered new-construction exemption; college housing districts) and of the February 2026 coverage estimate (CFO testimony: fewer than 44% of apartments, before the new-construction exemption; city has three years of construction-tracking data); Council press releases on the March amendments.</li>
+      <li>Coverage arithmetic: ACS via Census Reporter (81,131 housing units, 73,854 households); HousingWorks RI (59% renter share); state low-and-moderate-income housing inventory (deed-restricted range).</li>
+      </ul>
+    </details>
+    <p class="credit">Built July 2026 · <a href="https://adambraff.github.io">adambraff.github.io</a></p>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   The Seen and the Unseen — interactive logic
+   ============================================================ */
+(function(){
+'use strict';
+
+/* ---------- shared tokens ---------- */
+const C = {
+  s1:'#2a78d6', s2:'#008300', s3:'#e87ba4', s4:'#eda100', s5:'#1baf7a',
+  s6:'#eb6834', s7:'#4a3aa7', s8:'#e34948',
+  ink:'#0b0b0b', ink2:'#52514e', muted:'#898781', grid:'#e1e0d9', baseline:'#c3c2b7',
+  seq100:'#cde2fb', seq200:'#9ec5f4', seq450:'#2a78d6', seq600:'#184f95',
+  neutral:'#f0efec'
+};
+const fmt$ = n => '$' + Math.round(n).toLocaleString('en-US');
+const fmtK = n => (n >= 1000 ? '$' + (n/1000).toFixed(n>=10000?0:1) + 'k' : fmt$(n));
+
+if (window.Chart) {
+  Chart.defaults.font.family = 'system-ui, -apple-system, "Segoe UI", sans-serif';
+  Chart.defaults.font.size = 12;
+  Chart.defaults.color = C.ink2;
+  Chart.defaults.borderColor = C.grid;
+  Chart.defaults.plugins.legend.labels.boxWidth = 12;
+  Chart.defaults.plugins.legend.labels.boxHeight = 12;
+  Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(11,11,11,0.92)';
+  Chart.defaults.plugins.tooltip.cornerRadius = 6;
+  Chart.defaults.plugins.tooltip.padding = 10;
+}
+
+/* ============================================================
+   1) COVERAGE CHECKER
+   ============================================================ */
+(function checker(){
+  const root = document.getElementById('checker');
+  const verdict = document.getElementById('checkerVerdict');
+  const state = { units:'3', owner:'no', entity:'person', built:'old', special:'none' };
+  root.querySelectorAll('.chips').forEach(group => {
+    group.addEventListener('click', e => {
+      const btn = e.target.closest('.chip'); if(!btn) return;
+      group.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+      btn.classList.add('on');
+      state[group.dataset.q] = btn.dataset.v;
+      render();
+    });
+  });
+  function render(){
+    let exempt = null;
+    if (state.special === 'lihtc') exempt = 'Regulated affordable housing is excluded from the ordinance entirely.';
+    else if (state.special === 'dorm') exempt = 'Dorms and institutional lodging are excluded entirely.';
+    else if (state.special === 'college') exempt = 'Units inside college student housing districts are exempt (the districts themselves have not been created yet).';
+    else if (state.built === 'new') exempt = 'New construction: exempt for 10 years after completion, or 20 years if built with prevailing wages and apprenticeship standards. Year 11 (or 21) is inside Brightline’s spreadsheet.';
+    else if (state.built === 'recent') exempt = 'Recently completed existing buildings carry a 5-year exemption under the April amendments. (The exact qualifying window in the final text is not detailed in press coverage.)';
+    else if (state.owner === 'yes' && (state.units === '1' || state.units === '4') && state.entity === 'person') exempt = 'Owner-occupied, four or fewer units, owned by a person: exempt, plus one additional building if the owner chooses. This is the seam Eddie finds in Chapter 3.';
+    if (exempt) {
+      verdict.className = 'verdict exempt';
+      verdict.innerHTML = '<b>Exempt.</b> The cap does not apply.<small>' + exempt + '</small>';
+    } else {
+      let why = 'Annual increases capped at 4%, one 4% bump allowed at turnover, Rent Board jurisdiction, $250/day fines for violations.';
+      if (state.owner === 'yes' && state.entity === 'llc') why += ' (Owner lives here, but LLC ownership forfeits the owner-occupant exemption.)';
+      if (state.owner === 'yes' && !(state.units === '1' || state.units === '4')) why += ' (Owner lives here, but the building is too big for the 1–4 unit exemption.)';
+      verdict.className = 'verdict covered';
+      verdict.innerHTML = '<b>Covered.</b><small>' + why + '</small>';
+    }
+  }
+  render();
+})();
+
+/* ============================================================
+   2) WEDGE SIMULATOR
+   ============================================================ */
+(function wedge(){
+  const el = document.getElementById('wedgeChart'); if(!el || !window.Chart) return;
+  const startCtl = 1450, startMkt = 2200, CAP = 0.04, YEARS = 10;
+  let growth = 5.5, renew = 6.0, supply = false, chart = null;
+
+  function series(){
+    const years = [], ctl = [], cf = [], mkt = [];
+    for (let t=0; t<=YEARS; t++){
+      years.push(2026 + t);
+      ctl.push(startCtl * Math.pow(1 + Math.min(CAP, renew/100), t));   /* cap binds only vs what Gil would ask */
+      cf.push(startCtl * Math.pow(1 + renew/100, t));                    /* no-cap renewal counterfactual */
+      let m = startMkt * Math.pow(1 + growth/100, t);
+      if (supply) m *= 1 + 0.051 * (t/YEARS);   /* SF supply-response uplift, phased */
+      mkt.push(m);
+    }
+    return { years, ctl, cf, mkt };
+  }
+  function render(){
+    const d = series();
+    const data = {
+      labels: d.years,
+      datasets: [
+        { label:'Asking rent (newcomer pays)', data:d.mkt, borderColor:C.ink2, backgroundColor:'transparent',
+          borderWidth:2, pointRadius:0, pointHitRadius:12, tension:0.15 },
+        { label:'Her rent without the cap (renewals)', data:d.cf, borderColor:C.s2, backgroundColor:'rgba(0,131,0,0.08)',
+          borderWidth:2, borderDash:[6,4], pointRadius:0, pointHitRadius:12, fill:'+1', tension:0.15 },
+        { label:"Marisol's rent (capped 4%)", data:d.ctl, borderColor:C.s1, backgroundColor:'transparent',
+          borderWidth:2.5, pointRadius:0, pointHitRadius:12, tension:0.15 }
+      ]
+    };
+    const opts = {
+      responsive:true, maintainAspectRatio:false, interaction:{ mode:'index', intersect:false },
+      scales:{
+        y:{ grid:{ color:C.grid, drawTicks:false }, border:{ color:C.baseline },
+            ticks:{ callback:v=>'$'+(v/1000).toFixed(1)+'k', font:{size:11} } },
+        x:{ grid:{ display:false }, border:{ color:C.baseline }, ticks:{ font:{size:11}, maxTicksLimit:11 } }
+      },
+      plugins:{
+        legend:{ position:'top', align:'start' },
+        tooltip:{ callbacks:{ label: c => ' ' + c.dataset.label + ': ' + fmt$(c.parsed.y) + '/mo' } }
+      }
+    };
+    if (chart){ chart.data = data; chart.update(); } else { chart = new Chart(el, { type:'line', data, options:opts }); }
+
+    /* tiles: policy-caused savings = counterfactual renewal path minus capped path */
+    let cum = 0;
+    for (let t=1; t<=YEARS; t++) cum += (d.cf[t] - d.ctl[t]) * 12;
+    document.getElementById('tMarisol').textContent = fmtK(cum);
+    document.getElementById('tGil').textContent = '−' + fmtK(cum);
+    document.getElementById('tGap').textContent = fmt$(d.mkt[YEARS] - d.ctl[YEARS]) + '/mo';
+
+    /* table view */
+    let rows = '<table><tr><th>Year</th><th>Capped rent</th><th>No-cap renewal</th><th>Asking rent</th><th>Cap-caused gap</th></tr>';
+    d.years.forEach((y,i)=>{ rows += `<tr><td>${y}</td><td>${fmt$(d.ctl[i])}</td><td>${fmt$(d.cf[i])}</td><td>${fmt$(d.mkt[i])}</td><td>${fmt$(d.cf[i]-d.ctl[i])}</td></tr>`; });
+    document.getElementById('wedgeTable').innerHTML = rows + '</table>';
+  }
+  document.getElementById('wedgeGrowth').addEventListener('input', e=>{
+    growth = parseFloat(e.target.value);
+    document.getElementById('wedgeGrowthVal').textContent = growth.toFixed(1) + '%/yr';
+    render();
+  });
+  document.getElementById('wedgeRenew').addEventListener('input', e=>{
+    renew = parseFloat(e.target.value);
+    document.getElementById('wedgeRenewVal').textContent = renew.toFixed(1) + '%/yr';
+    render();
+  });
+  document.getElementById('supplyToggle').addEventListener('click', e=>{
+    const b = e.target.closest('button'); if(!b) return;
+    document.querySelectorAll('#supplyToggle button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); supply = b.dataset.v === 'on'; render();
+  });
+  render();
+})();
+
+/* ============================================================
+   3) MONTE CARLO ALLOCATION
+   ============================================================ */
+(function queue(){
+  const pool = document.getElementById('queuePool'); if(!pool) return;
+  const poolWrap = document.getElementById('poolWrap');
+  const msg = document.getElementById('queueMsg');
+  const runBtn = document.getElementById('queueRun');
+  let regime = 'market', running = false;
+
+  const cast = [
+    { n:'Tenaya B.', tag:'tenaya', income:58, credit:640, hist:0, flex:2.0, note:'surgical tech, first solo lease; would split with a roommate' },
+    { n:'Marcus T.', tag:'marcus', income:63, credit:590, hist:4, flex:1.9, note:'union electrician, contested 2019 eviction; offers prepaid months' },
+    { n:'Delgado-Kims', tag:'dk', income:142, credit:785, hist:6, flex:0.8, note:'two MDs from Boston; many alternatives, never overpay' },
+    { n:'Big Blue LLC', income:105, credit:760, hist:10, flex:1.0, note:'corporate relo unit; fixed per-unit budget' },
+    { n:'The Osei family', income:69, credit:685, hist:8, flex:1.2, note:'CNA + bus driver, three kids' },
+    { n:'Erin M.', income:83, credit:745, hist:3, flex:1.15, note:'biotech associate, new to RI' }
+  ];
+  /* one simulated turnover: returns index of the applicant who gets the lease */
+  function simulateOne(){
+    let best = -1, bestScore = -Infinity;
+    cast.forEach((a, i) => {
+      const jitter = () => (Math.random()-0.5);
+      let score;
+      if (regime === 'capped'){
+        /* paper quality: credit, history, income multiple */
+        score = (a.credit-560)/2.6 + Math.min(a.hist,10)*3 + Math.min(a.income,150)/3 + jitter()*32;
+      } else {
+        /* highest bid wins: income times how far each household will stretch, given its alternatives */
+        score = Math.min(a.income*a.flex,125)*14 + jitter()*320;
+      }
+      if (score > bestScore){ bestScore = score; best = i; }
+    });
+    return best;
+  }
+  let counts = new Array(cast.length).fill(0), draws = 0;
+  let cardEls = [];
+
+  function paperScore(a){ return (a.credit-560)/2.6 + Math.min(a.hist,10)*3 + Math.min(a.income,150)/3; }
+  function buildPool(){
+    counts = new Array(cast.length).fill(0); draws = 0;
+    pool.innerHTML = cast.map((a)=>{
+      const p = paperScore(a);
+      const dot = p > 88 ? C.s2 : p > 65 ? C.s4 : C.s6;
+      return `<div class="applicant">
+        <div class="an"><span class="dot" style="background:${dot}"></span>${a.n}</div>
+        <div class="meta">$${a.income}k · ${a.credit} credit · ${a.hist} yrs history<br>${a.note}</div>
+        <div class="wins"><div class="wtrack"><div class="wfill"></div></div><span class="wpct">–</span></div>
+      </div>`;
+    }).join('');
+    cardEls = [...pool.querySelectorAll('.applicant')];
+  }
+  function updateBars(){
+    cardEls.forEach((el, i)=>{
+      const pct = draws ? Math.round(100*counts[i]/draws) : 0;
+      el.querySelector('.wfill').style.width = pct + '%';
+      el.querySelector('.wpct').textContent = draws ? pct + '%' : '–';
+    });
+  }
+  function dropBall(targetIdx, done){
+    const card = cardEls[targetIdx];
+    const wrapRect = poolWrap.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    const startX = wrapRect.width/2 - 5, startY = -14;
+    const endX = cardRect.left - wrapRect.left + cardRect.width/2 - 5;
+    const endY = cardRect.top - wrapRect.top + cardRect.height/2 - 5;
+    const ball = document.createElement('div');
+    ball.className = 'ball';
+    ball.style.left = '0px'; ball.style.top = '0px';
+    ball.style.transform = `translate(${startX}px, ${startY}px)`;
+    poolWrap.appendChild(ball);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      ball.style.transform = `translate(${endX}px, ${endY}px)`;
+      ball.style.opacity = '0.25';
+    }));
+    setTimeout(()=>{ ball.remove(); if(done) done(); }, 340);
+  }
+  function summarize(){
+    const order = counts.map((c,i)=>[c,i]).sort((a,b)=>b[0]-a[0]);
+    const leader = order[0][1];
+    cardEls.forEach(el=>{ el.classList.remove('leader'); const b = el.querySelector('.badge'); if(b) b.remove(); });
+    const lc = cardEls[leader];
+    lc.classList.add('leader');
+    lc.insertAdjacentHTML('afterbegin', '<span class="badge">Most likely winner</span>');
+    const tIdx = cast.findIndex(a=>a.tag==='tenaya'), mIdx = cast.findIndex(a=>a.tag==='marcus');
+    const top3 = order.slice(0,3).filter(x=>x[0]>0).map(x=>`<b>${cast[x[1]].n}</b> ${Math.round(100*x[0]/draws)}%`).join(', ');
+    const thin = Math.round(100*(counts[tIdx]+counts[mIdx])/draws);
+    if (regime === 'capped'){
+      msg.innerHTML = `<b>Rent fixed at $1,508.</b> Every turnover draws the same six applications and the landlord takes the safest file. Win rates over ${draws} turnovers: ${top3}. Tenaya and Marcus combined: <b>${thin}%</b>. Screening on credit, income multiple, and history is fully legal, and it sorts the same way nearly every time.`;
+    } else {
+      msg.innerHTML = `<b>Rent floats (clears around $2,100–2,350).</b> The lease goes to whoever will pay the most, and willingness to pay runs on need as much as income: Tenaya splits with a roommate, Marcus offers prepaid months because paper screening rejects him everywhere else, while the Delgado-Kims, with the most alternatives, decline to overpay for any one unit. Win rates over ${draws} turnovers: ${top3}. Tenaya and Marcus combined: <b>${thin}%</b>.`;
+    }
+  }
+  function run(){
+    if (running) return;
+    running = true; runBtn.disabled = true;
+    buildPool(); updateBars();
+    msg.innerHTML = 'Simulating 100 turnovers…';
+    const N = 100; let i = 0;
+    const timer = setInterval(()=>{
+      const w = simulateOne();
+      counts[w]++; draws++;
+      dropBall(w);
+      updateBars();
+      i++;
+      if (i >= N){
+        clearInterval(timer);
+        setTimeout(()=>{ summarize(); running = false; runBtn.disabled = false; }, 400);
+      }
+    }, 42);
+  }
+  document.getElementById('queueToggle').addEventListener('click', e=>{
+    const b = e.target.closest('button'); if(!b || running) return;
+    document.querySelectorAll('#queueToggle button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); regime = b.dataset.v;
+    buildPool(); updateBars();
+    msg.innerHTML = 'Press the button to simulate 100 turnovers of the same unit under the selected regime.';
+  });
+  runBtn.addEventListener('click', run);
+  buildPool(); updateBars();
+})();
+
+/* ============================================================
+   COVERAGE WATERFALL
+   ============================================================ */
+(function coverage(){
+  const el = document.getElementById('coverageWaterfall'); if(!el) return;
+  const TOTAL = 81131;
+  /* waterfall: [label, decrement (null for start/final), remainingAfter, tag] */
+  const rows = [
+    { label:'All housing units', type:'start', value:81131, note:'ACS \u00b7 measured' },
+    { label:'\u2212 owner-occupied homes & vacants not for rent', type:'drop', dec:35381, after:45750, note:'ACS + HousingWorks \u00b7 measured' },
+    { label:'\u2212 rentals in owner-occupied 1\u20134 unit buildings', type:'drop', dec:15000, after:30750, note:'author range 14k\u201318k' },
+    { label:'\u2212 deed-restricted affordable (incl. mixed buildings)', type:'drop', dec:9000, after:21750, note:'author range 8k\u201312k' },
+    { label:'\u2212 recent construction (5/10/20-yr exemptions)', type:'drop', dec:2500, after:19250, note:'author range 2k\u20134k' },
+    { label:'\u2212 dorms & institutional', type:'drop', dec:1000, after:18250, note:'author range' },
+    { label:'Covered by the cap', type:'final', value:18250, bandLo:15000, bandHi:22000, note:'residual \u00b7 about 18,000' }
+  ];
+  const pct = n => (n/TOTAL*100).toFixed(2);
+  const fmt = n => Math.round(n).toLocaleString();
+  el.innerHTML = rows.map(r=>{
+    let bar = '', val = '';
+    if (r.type === 'start'){
+      bar = `<div style="position:absolute;left:0;width:${pct(r.value)}%;top:0;bottom:0;background:#2a78d6;border-radius:4px;"></div>`;
+      val = fmt(r.value);
+    } else if (r.type === 'drop'){
+      bar = `<div style="position:absolute;left:${pct(r.after)}%;width:${pct(r.dec)}%;top:0;bottom:0;background:#c3c2b7;border-radius:4px;"></div>
+             <div style="position:absolute;left:${pct(r.after)}%;width:1px;top:-7px;bottom:-7px;background:var(--baseline);"></div>`;
+      val = '\u2212' + fmt(r.dec) + '<div style="font-weight:400;color:var(--muted);font-size:10.5px;">leaves \u2248' + fmt(r.after) + '</div>';
+    } else {
+      bar = `<div style="position:absolute;left:${pct(r.bandLo)}%;width:${pct(r.bandHi-r.bandLo)}%;top:0;bottom:0;background:#184f95;opacity:0.3;border-radius:4px;"></div>
+             <div style="position:absolute;left:0;width:${pct(r.value)}%;top:0;bottom:0;background:#184f95;border-radius:4px;"></div>`;
+      val = '\u224818,000';
+    }
+    return `<div style="display:grid;grid-template-columns:minmax(180px,320px) 1fr 100px;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--grid);font-size:12.5px;">
+      <div style="line-height:1.3;${r.type==='final'?'font-weight:700;':''}">${r.label}<span style="color:var(--muted);font-size:10.5px;"> \u00b7 ${r.note}</span></div>
+      <div style="position:relative;height:18px;background:var(--surface-1);border-radius:4px;">${bar}</div>
+      <div style="text-align:right;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.25;">${val}</div>
+    </div>`;
+  }).join('');
+})();
+
+/* ============================================================
+   4) BLOCK EXPLORER
+   ============================================================ */
+(function block(){
+  const grid = document.getElementById('blockGrid'); if(!grid) return;
+  const detail = document.getElementById('blockDetail');
+  /* blue = on the long-term rental market; gray = off it (or never on it) */
+  const STATES = {
+    rental:   { label:'Rental',                  color:'#2a78d6', bg:'#e3edfa', fg:'#12457e' },
+    covered:  { label:'Rental · covered',        color:'#2a78d6', bg:'#e3edfa', fg:'#12457e' },
+    exempt:   { label:'Rental · exempt',         color:'#86b6ef', bg:'#eef5fd', fg:'#1c5cab' },
+    ownerocc: { label:'Owner-occupied · off market', color:'#898781', bg:'#f0efec', fg:'#52514e' },
+    condo:    { label:'Condos · off market',     color:'#898781', bg:'#f0efec', fg:'#52514e' },
+    str:      { label:'Short-term rental · off market', color:'#898781', bg:'#f0efec', fg:'#52514e' },
+    ghost:    { label:'Never built / never rented', color:'#c3c2b7', bg:'#f0efec', fg:'#898781' }
+  };
+  /* timeline rows: [startYear, state, rentalUnits, cappedUnits, note] — tl = under the cap; tlM = no rent control */
+  const P = [
+    { id:'gil1', name:'12 Alder St', owner:'Gil Tavares', units:3,
+      tl:[
+        [0,'covered',3,3,'Three units, all covered. Gil reads the ordinance twice and calls his accountant.'],
+        [2,'covered',3,3,'<b>Maintenance margin.</b> Insurance is up again; rent isn\u2019t. The porch gets patched, not rebuilt. The kitchens stay 1998.'],
+        [6,'condo',0,0,'<b>Exit margin.</b> Gil sells the building as three condos. Two go to owner-occupants, one to a part-time Brown parent. Three rental units leave the market; the sale price beats ten more capped years.']
+      ],
+      tlM:[
+        [0,'rental',3,0,'No cap. Gil holds the building: rents at market, insurance passed through in renewals.'],
+        [2,'rental',3,0,'The kitchens get renovated in 2028, and the rent reflects it.']
+      ], margin:'Maintenance \u2192 condo conversion (Diamond et al.: \u221215% rental supply in SF)' },
+    { id:'gil2', name:'14 Alder St', owner:'Gil Tavares', units:3,
+      tl:[
+        [0,'covered',3,3,'Covered. Same math as next door, one year behind.'],
+        [7,'ownerocc',2,0,'<b>Exemption margin.</b> Sold to the Fontes family, who move into the first floor. Owner-occupied, four units or fewer: the two remaining rentals are now exempt, and their next listing is at full market.']
+      ],
+      tlM:[
+        [0,'rental',3,0,'Held as a rental.'],
+        [7,'rental',3,0,'Sold in 2033 to another small landlord. Still three rentals.']
+      ], margin:'Sale to owner-occupant \u2192 coverage evaporates, rents reset' },
+    { id:'rosa', name:'16 Alder St', owner:'Rosa & Manny Duarte', units:3,
+      tl:[
+        [0,'exempt',2,0,'Owner-occupied three-family: exempt. Two rented units, priced fair.'],
+        [4,'exempt',2,0,'<b>Spillover margin.</b> Covered units keep leaking out of the market; every vacancy Rosa lists now draws 30 applications. She raises to full market. Wouldn\u2019t you?']
+      ],
+      tlM:[
+        [0,'rental',2,0,'Owner-occupied three-family; two units rented a bit under market, as always.']
+      ], margin:'Exempt sector absorbs displaced demand; its rents rise faster' },
+    { id:'walt', name:'18 Alder St', owner:'Walt Kowalski', units:3,
+      tl:[
+        [0,'covered',3,3,'<b>Generosity margin.</b> Walt has charged $300 under market for years. The 180-day lookback means that discount is about to become his permanent legal ceiling. His lawyer\u2019s advice, and every landlord forum\u2019s: raise now, before the base-rent date.'],
+        [1,'covered',3,3,'Rents up 12% in one jump, the largest increase his tenants have ever seen, caused by the anti-increase law\u2019s own lookback provision.'],
+        [9,'condo',0,0,'Walt, 74, was going to leave the building to his tenants\u2019 kids in his will, informally. Instead the estate planner says condo-map it now. Three more units out.']
+      ],
+      tlM:[
+        [0,'rental',3,0,'Walt keeps charging $300 under market, because nothing forces the issue.'],
+        [9,'rental',3,0,'The will stays as written: the building goes to his tenants\u2019 kids someday.']
+      ], margin:'Pre-effective-date hikes; never price below the max again' },
+    { id:'eddie', name:'20 Alder St', owner:'Eddie Machado', units:2,
+      tl:[
+        [0,'covered',2,2,'Eddie lives in Cranston; both units here are rented. Covered.'],
+        [1,'ownerocc',1,0,'<b>Exemption margin.</b> Eddie moves into unit 1. The building is now owner-occupied, four units or fewer: exempt. One rental unit exits the market so the other can exit the cap. Perfectly legal; the ordinance drew the line, and Eddie walked to it.']
+      ],
+      tlM:[
+        [0,'rental',2,0,'Eddie stays in Cranston; both units stay rented.']
+      ], margin:'Owner move-in: the carve-out is the escape hatch' },
+    { id:'karen', name:'22 Alder St', owner:'Karen Iafrate', units:3,
+      tl:[
+        [0,'covered',2,2,'Karen inherits from her mother. Unit 3 was already empty; two tenants remain.'],
+        [3,'str',0,0,'<b>Platform margin.</b> Rather than become a regulated landlord with a Rent Board file, Karen furnishes the units for short-term stays: tourists, traveling nurses, WaterFire weekends. Nightly pricing is uncapped. Two long-term homes stop existing.']
+      ],
+      tlM:[
+        [0,'rental',2,0,'Karen inherits and keeps the tenants.'],
+        [1,'rental',3,0,'She re-lists the vacant third unit. Three long-term rentals.']
+      ], margin:'Long-term \u2192 short-term conversion, fully outside the ordinance' },
+    { id:'devpriya', name:'24 Alder St', owner:'(would-be: Dev & Priya)', units:3,
+      tl:[
+        [0,'ghost',0,0,'<b>Never-built margin.</b> Dev & Priya\u2019s renovate-and-rent plan for this gut job dies at their own kitchen table: capped income, uncapped renovation costs, no rent reset ever. They withdraw the offer and buy a condo in Edgewood instead.'],
+        [2,'condo',0,0,'A flipper buys the shell and maps it as condos. The three rental units that would have existed here never appear in any statistic.']
+      ],
+      tlM:[
+        [0,'ghost',0,0,'The gut job. Dev & Priya close in the fall and start renovating.'],
+        [2,'rental',3,0,'All three units rented by 2028. This is the marginal supply arriving on schedule.']
+      ], margin:'Marginal supply that never arrives, the invisible cost' },
+    { id:'marisol', name:'26 Alder St', owner:'(landlord: R. Almeida)', units:3,
+      tl:[
+        [0,'covered',3,3,'Marisol pays $1,450 against a $2,200 market. The cap is why she\u2019s still here.'],
+        [3,'covered',3,3,'<b>Lock-in margin.</b> Marisol turns down a better job in Worcester: the raise is smaller than the below-market deal she\u2019d forfeit. Upstairs, the Hendersons\u2019 3BR has one empty bedroom, then two.'],
+        [10,'covered',3,3,'<b>The stayers.</b> 2036: Marisol\u2019s kids finished school in one district. Real, valuable, and the ledger keeps it, alongside everything else on this block.']
+      ],
+      tlM:[
+        [0,'rental',3,0,'Marisol pays $1,450 against a $2,200 asking market; renewals run about 6% a year.'],
+        [3,'rental',3,0,'2029: the Worcester job pays more than her discount is worth. She takes it; the unit re-lets at market. Mobility cuts both ways.'],
+        [10,'rental',3,0,'2036: three units still rented, to mostly different households than in 2026.']
+      ], margin:'Incumbent protection works, and pays people to sit still' },
+    { id:'corp', name:'28 Alder St · 12 units (corner)', owner:'Beacon Yield Partners LLC', units:12,
+      tl:[
+        [0,'covered',12,12,'Institutional owner, stays rental. The spreadsheet fights back differently here.'],
+        [2,'covered',12,12,'<b>Unbundling margin.</b> Parking: now $150/mo. Laundry: app-metered. New $95 "amenity and administration fee." Heat included becomes heat separate at renewal. Rent capped; cost of renting, not.'],
+        [5,'covered',12,12,'<b>Screening margin.</b> 700+ credit, 3.5\u00d7 income, documented history. The queue from Chapter 2, now a corporate policy PDF.']
+      ],
+      tlM:[
+        [0,'rental',12,0,'Rents at market. Parking still costs extra, because it always did downtown.']
+      ], margin:'Fees, unbundling, and screening: compliance in letter, adjustment in spirit' },
+    { id:'brightline', name:'30 Alder St · corner lot (proposed)', owner:'Brightline Development', units:48,
+      tl:[
+        [0,'ghost',0,0,'<b>Development margin.</b> A 48-unit project penciled at 8.2% against a 7.5% hurdle. The 10-year exemption helps (and the 20-year labor-linked one costs more than it extends), but year 11 is inside the model and the committee has read about St. Paul.'],
+        [3,'ghost',0,0,'Brightline breaks ground in Pawtucket instead, ten minutes away, no cap. The corner lot stays a parking lot.']
+      ],
+      tlM:[
+        [0,'ghost',0,0,'Penciled at 8.2% against a 7.5% hurdle: approved.'],
+        [3,'rental',48,0,'48 units open in 2029.']
+      ], margin:'The marginal project relocates; 48 units, zero headlines' }
+  ];
+  const tlOf = (p, scn) => scn === 'cap' ? p.tl : p.tlM;
+  function stateAt(p, y, scn){
+    const tl = tlOf(p, scn);
+    let cur = tl[0];
+    for (const row of tl){ if (row[0] <= y) cur = row; }
+    return cur; /* [year, state, rentalUnits, cappedUnits, note] */
+  }
+  function statsAt(scn, y){
+    let housing = 0, rental = 0, covered = 0, lost = 0, ghost = 0;
+    P.forEach(p => {
+      const s = stateAt(p, y, scn);
+      housing += (s[1] === 'ghost') ? 0 : p.units;
+      rental += s[2]; covered += s[3];
+      const base = stateAt(p, 0, scn);
+      if (p.id !== 'brightline' && p.id !== 'devpriya') lost += Math.max(0, base[2] - s[2]);
+    });
+    if (scn === 'cap'){ ghost = (y >= 3 ? 48 : 0) + (y >= 1 ? 3 : 0); }
+    const mRent = Math.round(1450 * Math.pow(scn === 'cap' ? 1.04 : 1.06, y));
+    return { housing, rental, covered, lost, ghost, mRent };
+  }
+  function house(color, big){
+    const w = big ? 66 : 54, h = big ? 56 : 50;
+    return `<svg width="${w}" height="${h}" viewBox="0 0 60 52" aria-hidden="true">
+      <rect x="12" y="18" width="36" height="30" rx="2" fill="${color}" opacity="0.88"/>
+      <polygon points="8,20 30,4 52,20" fill="${color}"/>
+      <rect x="18" y="24" width="8" height="7" rx="1" fill="#fcfcfb" opacity="0.9"/>
+      <rect x="34" y="24" width="8" height="7" rx="1" fill="#fcfcfb" opacity="0.9"/>
+      <rect x="18" y="36" width="8" height="7" rx="1" fill="#fcfcfb" opacity="0.9"/>
+      <rect x="34" y="36" width="8" height="12" rx="1" fill="#fcfcfb" opacity="0.9"/>
+    </svg>`;
+  }
+  let year = 0, selected = 'gil1', scenario = 'cap';
+  const slider = document.getElementById('blockYear');
+  function render(){
+    document.getElementById('blockYearLabel').textContent = 2026 + year;
+    grid.innerHTML = P.map(p=>{
+      const s = stateAt(p, year, scenario), st = STATES[s[1]];
+      return `<div class="bldg ${p.id===selected?'sel':''}" data-id="${p.id}">
+        ${house(st.color, p.units>10)}
+        <div class="bn">${p.name}</div>
+        <div class="bstate" style="background:${st.bg};color:${st.fg}">${st.label}</div>
+        <div class="bunits">${s[2]} long-term rental unit${s[2]===1?'':'s'}${s[3]>0 ? ' \u00b7 '+s[3]+' capped' : ''}</div>
+      </div>`;
+    }).join('');
+    const cur = statsAt(scenario, year);
+    document.getElementById('kcHousing').textContent = cur.housing;
+    document.getElementById('kcRental').textContent = cur.rental;
+    document.getElementById('kcCovered').textContent = cur.covered;
+    document.getElementById('kcLost').textContent = cur.lost === 0 ? '0' : '\u2212' + cur.lost;
+    document.getElementById('kcGhost').textContent = cur.ghost;
+    const p = P.find(x=>x.id===selected), s = stateAt(p, year, scenario), st = STATES[s[1]];
+    detail.style.borderLeftColor = st.color;
+    detail.innerHTML = `<div class="bd-name">${p.name} \u00b7 ${2026+year} \u00b7 ${scenario==='cap'?'under the cap':'no rent control'}</div>
+      <div class="bd-owner">${p.owner} \u00b7 status: ${st.label}</div>
+      <div class="bd-now">${s[4]}</div>
+      <div class="bd-margin">Margin illustrated: ${p.margin}</div>`;
+    /* summary comparison */
+    const m = statsAt('market', year), c = statsAt('cap', year);
+    const hl = scn => scn === scenario ? 'font-weight:700;color:var(--ink);' : 'color:var(--ink-2);';
+    const row = (label, mv, cv) => `<tr><td style="text-align:left;">${label}</td><td style="${hl('market')}">${mv}</td><td style="${hl('cap')}">${cv}</td></tr>`;
+    document.getElementById('blockSummary').innerHTML = `
+      <div style="font-size:13px;font-weight:700;margin-bottom:6px;">The two scenarios, side by side \u00b7 ${2026+year}</div>
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums;">
+        <tr style="border-bottom:1px solid var(--baseline);"><th style="text-align:left;padding:4px 8px 4px 0;">On this block</th><th style="${hl('market')}text-align:right;">No rent control</th><th style="${hl('cap')}text-align:right;">Under the cap</th></tr>
+        ${row('Housing units', m.housing, c.housing)}
+        ${row('Long-term rental units', m.rental, c.rental)}
+        ${row('Units under the cap', m.covered, c.covered)}
+        ${row('Rental units exited since 2026', m.lost, c.lost)}
+        ${row('Units never created', m.ghost, c.ghost)}
+        ${row('Rent on Marisol\u2019s unit', '$'+m.mRent.toLocaleString(), '$'+c.mRent.toLocaleString())}
+        ${row('Marisol takes the Worcester job', year>=3 ? 'yes (2029)' : '\u2014', year>=3 ? 'no' : '\u2014')}
+      </table>
+      <style>#blockSummary td{padding:4px 8px 4px 0;text-align:right;border-bottom:1px solid var(--grid);}</style>`;
+  }
+  document.getElementById('stateLegend').innerHTML =
+    `<div class="li"><span class="swatch" style="background:#2a78d6"></span>on the rental market (dark blue: capped)</div>
+     <div class="li"><span class="swatch" style="background:#86b6ef"></span>on the rental market \u00b7 exempt</div>
+     <div class="li"><span class="swatch" style="background:#898781"></span>off the rental market (condo, owner-occupied, short-term)</div>
+     <div class="li"><span class="swatch" style="background:#c3c2b7"></span>never built / never rented</div>`;
+  grid.addEventListener('click', e=>{
+    const b = e.target.closest('.bldg'); if(!b) return;
+    selected = b.dataset.id; render();
+  });
+  slider.addEventListener('input', e=>{ stopPlay(); year = +e.target.value; render(); });
+  document.getElementById('blockScenario').addEventListener('click', e=>{
+    const b = e.target.closest('button'); if(!b) return;
+    document.querySelectorAll('#blockScenario button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); scenario = b.dataset.v === 'market' ? 'market' : 'cap';
+    stopPlay(); year = 0; slider.value = 0; render();
+  });
+  /* play button */
+  const playBtn = document.getElementById('blockPlay');
+  let timer = null;
+  function stopPlay(){ if(timer){ clearInterval(timer); timer = null; playBtn.textContent = 'Play'; } }
+  playBtn.addEventListener('click', ()=>{
+    if (timer){ stopPlay(); return; }
+    if (year >= 10){ year = 0; slider.value = 0; render(); }
+    playBtn.textContent = 'Pause';
+    timer = setInterval(()=>{
+      year++; slider.value = year; render();
+      if (year >= 10) stopPlay();
+    }, 900);
+  });
+  render();
+})();
+
+/* ============================================================
+   5) PRO FORMA
+   ============================================================ */
+(function proforma(){
+  const fill = document.getElementById('pfFill'); if(!fill) return;
+  const UNITS=48, RENT0=2350, COST=21.0e6, NOI=0.62, HOLD=25, EXITCAP=0.06, CAP=0.04;
+  let exemptYrs=10, risk=20, growth=5, labor=false;
+
+  function irrOf(cash){ /* bisection on rate */
+    let lo=-0.5, hi=0.8;
+    const npv = r => cash.reduce((s,c,t)=> s + c/Math.pow(1+r,t), 0);
+    if (npv(lo) < 0) return lo; if (npv(hi) > 0) return hi;
+    for(let i=0;i<80;i++){ const mid=(lo+hi)/2; if(npv(mid)>0) lo=mid; else hi=mid; }
+    return (lo+hi)/2;
+  }
+  function cashflows(exYrs, cost){
+    const cash = [-cost];
+    let rent = RENT0;
+    for(let t=1;t<=HOLD;t++){
+      const g = t <= exYrs ? growth/100 : Math.min(growth/100, CAP);
+      rent *= (1+g);
+      cash.push(rent*12*UNITS*NOI);
+    }
+    /* exit: capped buildings trade wider */
+    const coveredAtExit = HOLD > exYrs;
+    const exitCap = coveredAtExit ? EXITCAP + 0.0075 : EXITCAP;
+    cash[HOLD] += (rent*12*UNITS*NOI) / exitCap;
+    return cash;
+  }
+  function render(){
+    const effExempt = labor ? Math.max(exemptYrs, 20) : exemptYrs;
+    const effCost = labor ? COST*1.10 : COST;
+    const a = cashflows(effExempt, effCost);
+    const b = cashflows(Math.min(effExempt,5), effCost);
+    /* expected IRR = IRR of probability-weighted cash flows */
+    const exp = irrOf(a.map((v,i)=> (1-risk/100)*v + (risk/100)*b[i]));
+    const free = irrOf(cashflows(999, effCost));
+    const pct = x => (x*100).toFixed(1)+'%';
+    document.getElementById('pfIRR').textContent = pct(exp);
+    document.getElementById('pfNoCtl').textContent = pct(free);
+    document.getElementById('pfDrag').textContent = '−' + (Math.max(0,(free-exp))*100).toFixed(1) + ' pts';
+    const w = Math.max(0, Math.min(1, exp/0.12));
+    fill.style.width = (w*100).toFixed(1)+'%';
+    const go = parseFloat((exp*100).toFixed(1)) >= 7.5;   /* judge on the displayed figure */
+    fill.style.background = go ? '#2a78d6' : '#e34948';
+    const v = document.getElementById('pfVerdict');
+    v.className = 'pverdict ' + (go?'go':'nogo');
+    v.innerHTML = go
+      ? '<b>Build in Providence.</b> <small>Clears the hurdle; at these settings the exemption does its job. Now nudge the repeal-risk slider the way a risk committee would after reading one St. Paul article.</small>'
+      : '<b>Build in Pawtucket instead.</b> <small>Below hurdle. No press release announces this decision; Providence simply has 48 fewer homes in 2029, and no one will ever connect the dots.</small>';
+  }
+  const bind = (id, valId, setter, suffix) => {
+    document.getElementById(id).addEventListener('input', e=>{
+      setter(parseFloat(e.target.value));
+      document.getElementById(valId).textContent = e.target.value + suffix;
+      render();
+    });
+  };
+  bind('pfExempt','pfExemptVal', v=>exemptYrs=v, ' years');
+  bind('pfRisk','pfRiskVal', v=>risk=v, '%');
+  bind('pfGrowth','pfGrowthVal', v=>growth=v, '%/yr');
+  document.getElementById('pfLabor').addEventListener('click', e=>{
+    const b = e.target.closest('button'); if(!b) return;
+    document.querySelectorAll('#pfLabor button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); labor = b.dataset.v === 'on'; render();
+  });
+  render();
+})();
+
+/* ============================================================
+   6) ST PAUL CHART
+   ============================================================ */
+(function stp(){
+  const el = document.getElementById('stpChart'); if(!el || !window.Chart) return;
+  const years = ['2020','2021','2022','2023','2024','2025'];
+  const units = [2049, 2088, 1169, 1204, 404, 357];
+  const colors = years.map(y => (+y <= 2021 ? '#9ec5f4' : '#2a78d6'));
+  new Chart(el, {
+    type:'bar',
+    data:{ labels:years, datasets:[{ label:'Multifamily units permitted', data:units,
+      backgroundColor:colors, borderRadius:{topLeft:4,topRight:4}, borderSkipped:'bottom',
+      barPercentage:0.62, categoryPercentage:0.9 }]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      scales:{
+        y:{ grid:{ color:C.grid, drawTicks:false }, border:{ color:C.baseline }, ticks:{ font:{size:11} },
+            title:{ display:true, text:'units permitted', font:{size:11}, color:C.muted } },
+        x:{ grid:{ display:false }, border:{ color:C.baseline }, ticks:{ font:{size:11} } }
+      },
+      plugins:{
+        legend:{ display:false },
+        tooltip:{ callbacks:{
+          label: c => ' ' + c.parsed.y.toLocaleString() + ' units',
+          afterLabel: c => ({'2021':'Nov: 3% cap passes, no new-build exemption','2022':'Ordinance in force from May','2023':'Amended: vacancy decontrol + 20-yr exemption','2024':'Rates high; permits crater anyway'}[c.label] || '')
+        } }
+      }
+    }
+  });
+  document.getElementById('stpTable').innerHTML =
+    '<table><tr><th>Year</th><th>Units permitted</th></tr>' +
+    years.map((y,i)=>`<tr><td>${y}${+y<=2021?' (pre-ordinance)':''}</td><td>${units[i].toLocaleString()}</td></tr>`).join('') + '</table>';
+})();
+
+/* ============================================================
+   EVIDENCE MAP
+   ============================================================ */
+(function evmap(){
+  const g = document.getElementById('mapMarkers'); if(!g) return;
+  const spots = [
+    { n:1, x:42, y:212, color:'#2a78d6', name:'San Francisco',
+      body:'Covered tenants were 20% more likely to stay; covered landlords cut rental supply 15%, pushing citywide rents up about 5%. Gains to incumbents: $2.9B. Costs to later renters: $2.9B.',
+      src:'Diamond, McQuade & Qian, AER 2019' },
+    { n:2, x:434, y:135, color:'#e34948', name:'St. Paul',
+      body:'A 3% cap with vacancy control and no new-build exemption (2021). Property values fell $1.6B, roughly a third of it destroyed value rather than transfer; multifamily permits fell from 2,088 to 404; the city walked it back within 14 months.',
+      src:'Ahern & Giacoletti 2022; Minneapolis Fed 2026' },
+    { n:3, x:684, y:176, color:'#4a3aa7', name:'New York',
+      body:'About 21% of controlled units held by mismatched households, costing $200 per unit per year in misallocation alone. A calibrated NYC model also makes the strongest pro case: insurance value for the neediest can outweigh the costs.',
+      src:'Glaeser & Luttmer 2003; Favilukis et al. 2023' },
+    { n:4, x:706, y:128, color:'#eb6834', name:'Cambridge, Mass.',
+      body:'Decontrol in 1995 raised residential values about $2B in a decade, a quarter of it on never-controlled properties nearby; renovation rose. Statewide, controlled units had been measurably older and shabbier.',
+      src:'Autor, Palmer & Pathak 2014; Sims 2007' },
+    { n:5, x:717, y:152, color:'#008300', name:'Providence',
+      body:'You are here. A 4% cap with vacancy control: stricter than San Francisco or Cambridge ever were, and closest to the original St. Paul design, with wider exemptions.',
+      src:'Ordinance as passed, April 2026' }
+  ];
+  g.innerHTML = spots.map(s=>`
+    <g class="mspot" data-n="${s.n}" style="cursor:pointer;">
+      <circle cx="${s.x}" cy="${s.y}" r="13" fill="${s.color}" opacity="0.18"/>
+      <circle cx="${s.x}" cy="${s.y}" r="8.5" fill="${s.color}"/>
+      <text x="${s.x}" y="${s.y+3.5}" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">${s.n}</text>
+    </g>`).join('');
+  document.getElementById('mapCards').innerHTML = spots.map(s=>`
+    <div class="mapcard" data-n="${s.n}">
+      <div class="mc-head"><span class="mc-dot" style="background:${s.color}">${s.n}</span>${s.name}</div>
+      ${s.body}
+      <div class="mc-src">${s.src}</div>
+    </div>`).join('');
+  const hl = (n, on) => {
+    document.querySelectorAll(`.mapcard[data-n="${n}"]`).forEach(c=>c.classList.toggle('hl', on));
+    document.querySelectorAll(`.mspot[data-n="${n}"] circle`).forEach((c,i)=>{ if(i===0) c.setAttribute('opacity', on?'0.4':'0.18'); });
+  };
+  document.querySelectorAll('.mspot, .mapcard').forEach(el=>{
+    el.addEventListener('mouseenter', ()=>hl(el.dataset.n, true));
+    el.addEventListener('mouseleave', ()=>hl(el.dataset.n, false));
+  });
+})();
+
+/* ============================================================
+   7) HEATMAP
+   ============================================================ */
+(function heat(){
+  const hm = document.getElementById('heatmap'); if(!hm) return;
+  const tip = document.getElementById('hmTip');
+  /* scale: -2 large loss .. +2 large gain */
+  const COLS = ['Year 1','Year 5','Year 10'];
+  const ROWS = [
+    ['Incumbent covered tenants (Marisol)', [2,2,2], 'The point of the policy, and it works: below-market rent, security of tenure, compounding savings.'],
+    ['Future & marginal renters (Tenaya)', [0,-1,-2], 'Year 1: little change. Then the queue lengthens, screening hardens, and the stock of listings thins. The costs compound exactly as the incumbents’ gains do.'],
+    ['Covered small landlords (Gil, Walt)', [-1,-1,-2], 'Capped income against uncapped insurance, taxes, and repairs. The exit door (selling to owner-occupants) cushions the wealth loss but removes the units.'],
+    ['Exempt landlords (Rosa & Manny)', [0,1,1], 'Spillover demand raises exempt-sector rents. They didn’t lobby for this; the ordinance’s boundary did it for them.'],
+    ['Owner-occupant buyers', [0,1,1], 'More triple-deckers get condo-mapped and sold; buyers get inventory that used to be rentals.'],
+    ['Developers & building trades', [0,-1,-1], 'Marginal projects migrate to uncapped suburbs; the exemption softens but can’t erase the year-16 shadow and repeal risk.'],
+    ['The city’s rental stock (quantity & quality)', [0,-1,-2], 'Conversions, short-term rentals, owner move-ins, deferred maintenance, unbuilt projects. Slow, compounding, and mostly invisible in real time.']
+  ];
+  const colorFor = v => ({'-2':'#c22a2a','-1':'#f2b1b1','0':'var(--div-neutral)','1':'#b2e4cd','2':'#008300'})[String(v)];
+  let html = '<div></div>' + COLS.map(c=>`<div class="hcol-label">${c}</div>`).join('');
+  ROWS.forEach((r,ri)=>{
+    html += `<div class="hrow-label">${r[0]}</div>`;
+    r[1].forEach((v,ci)=>{
+      html += `<div class="cell" data-r="${ri}" data-c="${ci}" style="background:${colorFor(v)}"></div>`;
+    });
+  });
+  hm.innerHTML = html;
+  hm.addEventListener('mouseover', e=>{
+    const c = e.target.closest('.cell'); if(!c) return;
+    const r = ROWS[+c.dataset.r];
+    tip.innerHTML = `<b>${r[0]}, ${COLS[+c.dataset.c].toLowerCase()}:</b> ${r[2]}`;
+  });
+})();
+
+/* ============================================================
+   P-Q CEILING DIAGRAM
+   ============================================================ */
+(function pq(){
+  const btn = document.getElementById('pqPlay'); if(!btn) return;
+  const cap = document.getElementById('pqCaption');
+  const stages = [
+    { show:[], text:'A rental market: demand slopes down, supply slopes up, and the market rent P* clears it at Q* units.' },
+    { show:['pqCeil'], text:'The ordinance sets a ceiling Pc below the market rent for covered units.' },
+    { show:['pqCeil','pqQ'], text:'At the lower rent, fewer units are supplied (Qs: conversions, move-ins, projects that don\u2019t pencil) and more are wanted (Qd). The orange gap is the queue from Chapter 2, allocated by paperwork instead of price.' },
+    { show:['pqCeil','pqQ','pqTransfer','pqTLabel'], text:'The blue rectangle is Chapter 1: on the units still supplied, sitting tenants pay Pc instead of P*. In Providence terms, roughly $50\u201360M a year of transfer.' },
+    { show:['pqCeil','pqQ','pqTransfer','pqTLabel','pqDWL','pqDLabel'], text:'The red triangle is the deadweight loss: tenancies that would have existed at P* and now never do. Dev & Priya\u2019s three units and Brightline\u2019s 48 live inside this triangle. Misallocation and queueing costs come on top of it.' }
+  ];
+  const all = ['pqCeil','pqQ','pqTransfer','pqTLabel','pqDWL','pqDLabel'];
+  let stage = 0, timer = null;
+  function renderStage(){
+    const s = stages[stage];
+    all.forEach(id => { document.getElementById(id).style.opacity = s.show.includes(id) ? (id==='pqTransfer' ? '0.75' : id==='pqDWL' ? '0.7' : '1') : '0'; });
+    cap.innerHTML = '<b>' + (stage+1) + '/5.</b> ' + s.text;
+  }
+  function stop(){ if(timer){ clearInterval(timer); timer=null; btn.textContent='Play the mechanics'; } }
+  btn.addEventListener('click', ()=>{
+    if (timer){ stop(); return; }
+    stage = 0; renderStage();
+    btn.textContent = 'Pause';
+    timer = setInterval(()=>{
+      stage++;
+      if (stage >= stages.length){ stop(); stage = stages.length-1; return; }
+      renderStage();
+    }, 2600);
+  });
+  renderStage();
+})();
+
+/* ============================================================
+   8) FORECAST CARD
+   ============================================================ */
+(function fcast(){
+  const el = document.getElementById('fcast'); if(!el) return;
+  const F = [
+    ['Listed rents in covered-class buildings jump abnormally in the 6 months before the base-rent date', 'The 180-day lookback makes this nearly mechanical; St. Paul and every California expansion saw it.', 90, 10, 'Zillow/Zumper Providence listing rents, 6 months pre-base-date vs. the same window a year earlier; resolves YES if the excess is 3+ points.'],
+    ['Incumbent covered-class tenants\u2019 measured displacement/turnover falls within 3 years', 'The one thing rent control reliably delivers (SF: +20% stay rates). Could also happen in a soft market without it.', 85, 35, 'Providence eviction filings (RI courts) plus ACS mover rates, 3 years post vs. 3 years pre.'],
+    ['Condo conversions + owner move-in filings in covered-class buildings run above the 2020\u201325 trend within 3 years', 'The SF playbook, adapted for triple-deckers; the exemption seam invites it.', 80, 25, 'City condo-map filings and assessor tenure-status changes vs. the 2020\u201325 baseline.'],
+    ['Advertised fees (parking, amenity, admin) rise measurably in covered-class buildings within 3 years', 'Unbundling is the lowest-friction margin for landlords who stay; but fee-ification is also a secular trend.', 80, 40, 'Fee prevalence in a fixed audit of Providence listings, year 0 vs. year 3.'],
+    ['Multifamily permits in Providence underperform Cranston + Pawtucket over the following 3 years', 'Direction confident, attribution messy (rates, land, permitting all confound).', 65, 35, 'Census Building Permits Survey, 3-year multifamily totals, Providence share vs. its 2019\u201325 share.'],
+    ['Median asking rent for vacant Providence units rises faster than the metro after 5 years', 'The Diamond result; depends on how much supply actually exits.', 60, 40, 'Zillow ZORI, city vs. metro, cumulative 5-year growth; resolves YES at a 2+ point excess.'],
+    ['Providence rental regulations are loosened within 5 years', 'With the ordinance: St. Paul lasted 14 months before vacancy decontrol. Without it: there is little on the books to loosen.', 55, 10, 'Council and General Assembly record; loosening = vacancy decontrol, a higher cap, broader exemptions, or state preemption.'],
+    ['Providence\u2019s measured average rent growth slows for 2\u20133 years post-enactment', 'Composition effect: capped renewals dominate the averages early. Some slowdown is possible either way if the market cools.', 70, 45, 'HousingWorks RI average rents or ZORI, years 1\u20133 post vs. 3 years pre.']
+  ];
+  el.innerHTML = F.map(f=>{
+    const d = f[2]-f[3];
+    return `
+    <div class="frow">
+      <div class="fq">${f[0]}<small>${f[1]}</small><small style="color:var(--s7)">Resolves by: ${f[4]}</small></div>
+      <div class="fbar">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><div class="ftrack" style="flex:1;"><div class="ffill" style="width:${f[2]}%"></div></div><span style="font-size:11px;font-weight:700;width:34px;text-align:right;">${f[2]}%</span></div>
+        <div style="display:flex;align-items:center;gap:6px;"><div class="ftrack" style="flex:1;"><div class="ffill" style="width:${f[3]}%;background:var(--baseline);"></div></div><span style="font-size:11px;font-weight:700;color:var(--ink-2);width:34px;text-align:right;">${f[3]}%</span></div>
+      </div>
+      <div class="fp">+${d}<div style="font-size:9.5px;font-weight:600;color:var(--muted);">pts</div></div>
+    </div>`;
+  }).join('');
+})();
+
+})();
+</script>
+</body>
+</html>
