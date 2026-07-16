@@ -174,15 +174,6 @@
   .logistics-card li:last-child { border-bottom: none; }
   .logistics-card li strong { color: var(--navy); }
 
-  /* Hotels table */
-  .hotels-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-  .hotels-table th {
-    text-align: left; padding: 10px 14px; background: #f1f5f9;
-    font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray);
-  }
-  .hotels-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 0.92em; }
-  .hotels-table tr:last-child td { border-bottom: none; }
-
   /* Budget */
   .budget-note {
     background: linear-gradient(135deg, #fef3c7, #fde68a);
@@ -268,10 +259,6 @@
     .activity-table .time { width: auto; font-size: 0.8em; }
     .activity-table .act { font-size: 0.95em; }
     .activity-table .notes { font-size: 0.82em; }
-
-    /* Hotels table scroll on mobile */
-    .hotels-table { font-size: 0.82em; }
-    .hotels-table th, .hotels-table td { padding: 8px 8px; }
 
     .logistics-grid { grid-template-columns: 1fr; }
     .map-container { margin: 20px 0; }
@@ -458,6 +445,7 @@
         <tr><td class="time">1:52 PM</td><td class="act">Train Voss → Bergen BOOKED</td><td class="notes">Vy F4 to Bergen, 13:52–15:00. Plus Refundable, Car 1 Seats 38–42 (4 adult + 1 student). 1 hr buffer at Voss. Ref: 46P-FEF-PCY (NOK 2,055).</td></tr>
         <tr><td class="time">3:00 PM</td><td class="act">Arrive Bergen, check in</td><td class="notes">Opus XVI, Vågsalmenningen 16, near Bryggen. 3 nights.</td></tr>
         <tr><td class="time">Afternoon</td><td class="act">Walk Bryggen (UNESCO)</td><td class="notes">UNESCO Hanseatic wharf. Self-guided. 10-min walk from the hotel.</td></tr>
+        <tr><td class="time">Afternoon</td><td class="act">Buy hiking boots (Xhibition mall)</td><td class="notes">Not traveling with boots — buy a pair before Friday's Ulriken hike. Sport 1 or Stormberg at Xhibition, Torgallmenningen (city centre). Fallback: Thursday.</td></tr>
         <tr><td class="time">Snack</td><td class="act">Våg Bakeri</td><td class="notes">Bakery.</td></tr>
         <tr><td class="time">Dinner</td><td class="act">Hoggorm or Bark</td><td class="notes">Hoggorm = pizza (email ahead for reservation). Bark = alternative. First of three Bergen dinners.</td></tr>
       </table>
@@ -574,71 +562,50 @@
   </div>
 
   <!-- LOGISTICS -->
-  <div class="section-heading">Logistics</div>
+  <div class="section-heading">Logistics &amp; Confirmations</div>
 
   <div class="logistics-grid">
     <div class="logistics-card">
-      <h4>Flights Booked</h4>
+      <h4>Flights — all BOOKED</h4>
       <ul>
-        <li><strong>Aug 21:</strong> DL 264 JFK → CDG, DL 8484 CDG → OSL. Business class. BOOKED</li>
-        <li><strong>Aug 29:</strong> KLM BGO 10:45 → AMS → LHR 13:25. Economy, 5 passengers, NOK 19,790. BOOKED</li>
-        <li><strong>Aug 31:</strong> DL 5922 (Virgin Atlantic) LHR 3:50pm → JFK 6:35pm. Premium economy. BOOKED</li>
+        <li><strong>Aug 21:</strong> DL 264 JFK→CDG · DL 8484 CDG→OSL — business</li>
+        <li><strong>Aug 29:</strong> KLM BGO→AMS→LHR — economy · NOK 19,790 (Check My Trip)</li>
+        <li><strong>Aug 31:</strong> DL 5922 (Virgin Atlantic) LHR→JFK — premium economy</li>
       </ul>
     </div>
     <div class="logistics-card">
-      <h4>Trains & Transit</h4>
+      <h4>Norway transit — all BOOKED</h4>
       <ul>
-        <li><strong>Aug 25:</strong> Bergen Railway, Oslo S → Myrdal 08:25–13:04. Private compartment, Car 5 Seats 21–26. Ref: VNE-GXR-DIX. NOK 5,200. BOOKED</li>
-        <li><strong>Aug 25:</strong> Flåm Railway, Myrdal → Flåm 13:24–14:22. Free seating (1 student + 4 adult). Ref: VNE-GXR-DIX. NOK 2,990. BOOKED</li>
-        <li><strong>Aug 26:</strong> Fjord cruise, Aurland → Gudvangen 09:55–11:30. Ref: DFCU59. NOK 3,325. BOOKED</li>
-        <li><strong>Aug 26:</strong> Bus, Gudvangen → Voss 11:40–12:45. Ref: HGAJ08. NOK 1,000. BOOKED</li>
-        <li><strong>Aug 26:</strong> Train, Voss → Bergen 13:52–15:00. Plus Refundable, Car 1 Seats 38–42. Ref: 46P-FEF-PCY. NOK 2,055. BOOKED</li>
+        <li><strong>Vy Oslo→Myrdal→Flåm</strong> (Aug 25): Ref VNE-GXR-DIX · Order BM4ZHA7K · NOK 8,190</li>
+        <li><strong>Cruise Aurland→Gudvangen</strong> (Aug 26): Ref DFCU59 · NOK 3,325</li>
+        <li><strong>Bus Gudvangen→Voss</strong> (Aug 26): Ref HGAJ08 · NOK 1,000</li>
+        <li><strong>Vy Voss→Bergen</strong> (Aug 26): Ref 46P-FEF-PCY · Order 62QE4YAI · NOK 2,055</li>
       </ul>
     </div>
     <div class="logistics-card">
-      <h4>Activities to Book Ahead</h4>
+      <h4>Stays &amp; tables — BOOKED</h4>
       <ul>
-        <li>Hillesvåg wool factory tour (Thu 8/27, 10am) — TENTATIVE, pending decision; would need a car/transfer</li>
-        <li>Kulinarisk Akademi cooking class, Oslo (Mon 8/24 eve) — book on kulinariskakademi.no</li>
-        <li>Transfers: Flåm station → 29|2 Aurland (Tue 8/25) &amp; 29|2 Aurland → Aurland dock (Wed 8/26) — still to book</li>
-        <li>Hoggorm pizza — email for reservation</li>
-        <li>Spurs v Newcastle (Sat 8/29, 5:30pm) — buy 3 tickets: Adam, Jeremy, Andrew</li>
-        <li>The Wolseley breakfast — book ahead</li>
+        <li><strong>The Thief, Oslo</strong> (3 nts): #9100130790285 · #9091807820675</li>
+        <li><strong>29|2 Aurland</strong> (1 nt): Order #4387</li>
+        <li><strong>Opus XVI, Bergen</strong> (3 nts): #49673SG013802 · #49673SG013803</li>
+        <li><strong>Rosewood, London</strong> (2 nts): #CI5UKP1T · #CI5UKOWR</li>
+        <li><strong>Bergen kayak</strong> (Thu 2pm, 5 pax): Ref #1423291633</li>
+        <li><strong>Ambassadors Clubhouse</strong> (Sat, 2 pax): Ref 4F5SFR4FX9DB</li>
+        <li><strong>Brat, London</strong> (Sun, 5 pax, 7:30pm)</li>
       </ul>
     </div>
     <div class="logistics-card">
-      <h4>Confirmation Numbers</h4>
+      <h4>Still to do / book</h4>
       <ul>
-        <li><strong>Outbound flights:</strong> DL 264 / DL 8484 — BOOKED</li>
-        <li><strong>Vy trains (Oslo→Myrdal→Flåm):</strong> Ref VNE-GXR-DIX, Order BM4ZHA7K, NOK 8,190 — BOOKED</li>
-        <li><strong>Fjord cruise (Aurland→Gudvangen):</strong> Norway's Best DFCU59, NOK 3,325 — BOOKED</li>
-        <li><strong>Bus (Gudvangen→Voss):</strong> Norway's Best HGAJ08, NOK 1,000 — BOOKED</li>
-        <li><strong>Vy train (Voss→Bergen):</strong> Ref 46P-FEF-PCY, Order 62QE4YAI, NOK 2,055 — BOOKED</li>
-        <li><strong>The Thief Oslo:</strong> Rm 1 #9100130790285, Rm 2 #9091807820675</li>
-        <li><strong>292 Aurland (Ola Apt):</strong> Order #4387, 20,580 NOK — BOOKED</li>
-        <li><strong>Opus XVI Bergen:</strong> Rm 1 #49673SG013802, Rm 2 #49673SG013803</li>
-        <li><strong>Bergen kayak (Thu 8/27, 2pm):</strong> Fjord Expedition, 5 adults, Ref #1423291633 — BOOKED</li>
-        <li><strong>KLM Bergen→London:</strong> Check My Trip (NOK 19,790) — BOOKED</li>
-        <li><strong>Rosewood London:</strong> Rm 1 #CI5UKP1T, Rm 2 #CI5UKOWR</li>
-        <li><strong>Ambassadors Clubhouse (Sat 8/29, 6pm):</strong> Table for 2, Ref 4F5SFR4FX9DB — BOOKED</li>
-        <li><strong>Brat London (Sun 8/30):</strong> Table for 5, 7:30pm — BOOKED</li>
-        <li><strong>Return flight:</strong> DL 5922 — BOOKED</li>
+        <li><strong>Hiking boots</strong> — in Bergen before Fri's hike (Sport 1 / Stormberg, Xhibition mall)</li>
+        <li>Spurs v Newcastle tickets ×3 (Sat 5:30pm)</li>
+        <li>Wool factory tour + car/transfer (Thu — tentative)</li>
+        <li>Kulinarisk Akademi cooking class (Mon eve)</li>
+        <li>Transfers: Flåm ↔ 29|2 Aurland (Aug 25–26)</li>
+        <li>Reservations: Hoggorm, The Wolseley</li>
       </ul>
     </div>
   </div>
-
-  <!-- Hotels -->
-  <div class="map-container" style="margin-top:24px;">
-    <h3 style="padding-bottom:12px;">Hotels</h3>
-    <table class="hotels-table">
-      <tr><th>City</th><th>Nights</th><th>Hotel</th><th>Status</th></tr>
-      <tr><td>Oslo</td><td>3 (Sat–Mon)</td><td><strong>The Thief</strong> — Tjuvholmen, waterfront</td><td>BOOKED — Amex FHR</td></tr>
-      <tr><td>Flåm/Aurland</td><td>1 (Tue)</td><td><strong>292 Aurland — Ola Apartment</strong> (Order #4387)</td><td>BOOKED</td></tr>
-      <tr><td>Bergen</td><td>3 (Wed–Fri)</td><td><strong>Opus XVI</strong> — Vågsalmenningen 16, main square</td><td>BOOKED</td></tr>
-      <tr><td>London</td><td>2 (Sat–Sun)</td><td><strong>Rosewood London</strong> — 252 High Holborn</td><td>BOOKED — Amex FHR</td></tr>
-    </table>
-  </div>
-
 
   <div class="footer">
     <p><em>This is a working draft. All restaurants, hotels, and activities are suggestions — confirm availability and book before assuming.</em></p>
