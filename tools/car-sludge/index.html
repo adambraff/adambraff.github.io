@@ -270,8 +270,8 @@ const ROUNDS = [
     intro: "Same car, same Dale, alternate timeline. This time your phone has read every transaction in the region, and it is not sentimental.",
     showDeltas: true,
     best: 0,
-    bestNote: "Best possible play: $0 over fair, by treating every dealer within 250 miles as one big lot.",
-    time: "Your time: 41 minutes. Your AI sent 214 emails, all polite.",
+    bestNote: "Best possible play: $0 over fair, by treating every dealer within a two-hour drive as one big searchable lot.",
+    time: "Your time: 41 minutes at a desk, plus one scenic drive. Your AI: one inventory table and five polite emails.",
     auto: {
       label: "Documentation fee, $599, still preprinted",
       delta: 0,
@@ -281,16 +281,16 @@ const ROUNDS = [
       {
         title: "The price",
         setup: "Same sticker, same adjustment. But before Dale finishes the word “hot,” your phone is already out collecting quotes.",
-        ai: "This trim transacts at $36,400 in your region. Invoice minus holdback: $35,900. I emailed every dealer within 250 miles: nineteen of them. Local quotes cluster at $36,650. One dealer 240 miles away is overstocked and will do $35,950.",
+        ai: "This trim transacts at $36,400 in your region. Overnight I scraped the inventory of every dealer within a two-hour drive into a searchable table: 217 cars, six in the exact spec your household has ruled acceptable. I drafted emails to the five dealers holding them. Best reply: $36,900, from a dealer 95 minutes away. One more thing: you qualify for an unadvertised $500 military incentive, and it stacks.",
         options: [
-          { label: "Forward the $36,650 quote and ask Dale to beat it.",
+          { label: "Forward the best quote and ask Dale to beat it.",
             delta: 250,
-            response: "The sales manager says something unkind about “these apps” and signs at $36,650.",
-            reveal: "Fair was $36,400. The last $250 is the price of staying local." },
-          { label: "Take the overstocked dealer's $35,950, plus $450 to truck it here.",
+            response: "The sales manager says something unkind about “these apps” and signs at $36,650. The interior is the wrong one. You will be hearing about this for years.",
+            reveal: "Fair was $36,400, and $250 of the gap is the price of staying local. The interior is a separate, uncosted liability." },
+          { label: "Drive the 95 minutes for the exact spec, minus the military discount.",
             delta: 0,
-            response: "Signed by email. The car arrives Thursday. Dale never learns why you stopped replying.",
-            reveal: "Exactly fair, net of the truck. The discount was sitting 240 miles away the whole time; without the wide net you'd never have seen it." },
+            response: "Ninety-five minutes of podcasts. The car matches its table row down to the stitching. Signing takes eleven minutes; your AI had already emailed the numbers.",
+            reveal: "Exactly fair: $36,900 minus the $500 incentive that nobody at any desk had mentioned." },
           { label: "Ignore the phone and pay the adjusted sticker. Dale seems nice.",
             delta: 3560,
             response: "Your phone buzzes twice, then stops trying.",
@@ -379,7 +379,7 @@ const ROUNDS = [
       {
         title: "The price",
         setup: "You never reach the lot. The quote arrives first: $36,900, “personalized for you.” The dealer's system knows your zip code, your browsing history, and that your lease ends in three weeks.",
-        ai: "Fair value is still $36,400. I widened the net to 400 miles: ninety-one dealers, all running one of two pricing platforms. Ninety quotes came back between $36,900 and $36,910, plus one maverick at $36,880. The overstock discounts from round 2 no longer exist; the platforms rebalance regional pricing hourly. The floor is firm, and it knows when your lease ends.",
+        ai: "Fair value is still $36,400. I widened the net to 400 miles: ninety-one dealers, all running one of two pricing platforms. Ninety quotes came back between $36,900 and $36,910, plus one maverick at $36,880. The inventory scrape still works; the price dispersion it used to exploit is gone, rebalanced hourly. Your military incentive is already assumed in the personalized quote. The floor is firm, and it knows when your lease ends.",
         options: [
           { label: "Take the maverick's $36,880 and keep your week.",
             delta: 480,
@@ -675,7 +675,7 @@ function renderFinal() {
         <tr><td>Financing</td><td>5.9% for 60 months (credit-union preapproval)</td></tr>
         <tr><td>Documentation fee</td><td>$150 (approximate actual filing cost)</td></tr>
       </table>
-      <p>Overpayment is the sum of dollar gaps between each choice and this baseline, including interest differences over the life of the loan. The car, dealer, platforms, and fees are fictional; the tactics (market-adjustment stickers, four-square worksheets, payment packing, rate markup, pre-applied add-ons, preprinted fees) are documented industry practice. The round 3 dynamics (algorithmic price floors, personalized quotes, margin migration into fees and bundles) are extrapolations, clearly marked as such by being in round 3.</p>
+      <p>Overpayment is the sum of dollar gaps between each choice and this baseline, including interest differences over the life of the loan. The car, dealer, platforms, and fees are fictional; the tactics (market-adjustment stickers, four-square worksheets, payment packing, rate markup, pre-applied add-ons, preprinted fees, inventory scraping, dealer email fan-outs, unadvertised incentives) are documented industry practice. The round 3 dynamics (algorithmic price floors, personalized quotes, margin migration into fees and bundles) are extrapolations, clearly marked as such by being in round 3.</p>
       <p>“Sludge” is Richard Thaler's term for friction that works against you, the dark twin of the nudge. See the Freakonomics Radio two-part series: <a href="https://freakonomics.com/podcast/sludge-part-1-the-world-is-drowning-in-it/">episode 627, “Sludge, Part 1: The World Is Drowning in It”</a> and <a href="https://freakonomics.com/podcast/sludge-part-2-is-government-the-problem-or-the-solution/">episode 628, “Sludge, Part 2: Is Government the Problem, or the Solution?”</a></p>
     </details>`;
   document.getElementById("again").onclick = () => {
