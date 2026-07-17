@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Sludge Machine: a car-buying game</title>
+<meta name="description" content="Buy the same car three times: alone, with an AI on your side, and after the dealer gets one too. A toy model of sludge and game theory.">
+<style>
+  :root {
+    --ink: #1c1c1c;
+    --muted: #6b6b6b;
+    --bg: #faf9f7;
+    --card: #ffffff;
+    --line: #e4e1da;
+    --accent: #1f4e79;
+    --accent-dark: #173a5a;
+    --loss: #b3261e;
+    --gain: #1e7d3c;
+    --ai-bg: #eef4fb;
+    --ai-border: #1f4e79;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 28px 18px 60px; }
+  h1 { font-family: Georgia, "Times New Roman", serif; font-size: 2.1em; line-height: 1.15; margin: 0 0 4px; }
+  h2 { font-family: Georgia, "Times New Roman", serif; font-size: 1.45em; line-height: 1.25; margin: 0 0 12px; }
+  h3 { font-size: 1.05em; margin: 22px 0 8px; }
+  .subtitle { color: var(--muted); margin: 0 0 26px; font-size: 1.05em; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 22px 24px;
+    margin-bottom: 18px;
+  }
+  .progress { font-size: 0.85em; color: var(--muted); margin-bottom: 14px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .meter { font-variant-numeric: tabular-nums; }
+  .meter .loss { color: var(--loss); font-weight: 600; }
+  .setup { margin: 0 0 16px; }
+  .ainote {
+    background: var(--ai-bg);
+    border-left: 3px solid var(--ai-border);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 14px;
+    margin: 0 0 16px;
+    font-size: 0.95em;
+  }
+  .ainote .who { font-weight: 700; color: var(--accent); }
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  button {
+    font: inherit;
+    cursor: pointer;
+  }
+  .opt {
+    display: block; width: 100%; text-align: left;
+    padding: 12px 16px;
+    border: 1px solid #cfd6df;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+    transition: background 0.12s ease, border-color 0.12s ease;
+  }
+  .opt:hover:not(:disabled) { background: #f0f4f8; border-color: var(--accent); }
+  .opt:disabled { cursor: default; opacity: 0.55; }
+  .opt.chosen { opacity: 1; border-color: var(--accent); background: #f0f4f8; font-weight: 600; }
+  .response {
+    margin: 16px 0 0;
+    padding: 12px 14px;
+    border-left: 3px solid #c9c4ba;
+    background: #f6f4f0;
+    border-radius: 0 8px 8px 0;
+  }
+  .btnrow { margin-top: 18px; }
+  .primary {
+    background: var(--accent);
+    border: none;
+    color: #fff;
+    padding: 11px 22px;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+  .primary:hover { background: var(--accent-dark); }
+  .ghost {
+    background: none;
+    border: 1px solid #cfd6df;
+    color: var(--ink);
+    padding: 10px 20px;
+    border-radius: 8px;
+  }
+  .ghost:hover { border-color: var(--accent); }
+  table.results { width: 100%; border-collapse: collapse; margin: 14px 0 4px; }
+  table.results td, table.results th { padding: 9px 8px; vertical-align: top; border-bottom: 1px solid #eeeae3; text-align: left; }
+  table.results th { font-size: 0.85em; color: var(--muted); font-weight: 600; }
+  table.results td.amount, table.results th.amount { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .loss { color: var(--loss); }
+  .gain { color: var(--gain); }
+  .reveal { font-size: 0.88em; color: var(--muted); margin-top: 4px; }
+  tr.totalrow td { border-top: 2px solid var(--ink); border-bottom: none; font-weight: 700; }
+  .timeline { color: var(--muted); font-size: 0.95em; margin: 12px 0 0; }
+  .bestline { font-size: 0.95em; margin: 10px 0 0; }
+  /* bars */
+  .barrow { margin: 0 0 18px; }
+  .barlabel { font-size: 0.95em; margin-bottom: 5px; display: flex; justify-content: space-between; gap: 10px; }
+  .barlabel .val { font-weight: 700; color: var(--loss); font-variant-numeric: tabular-nums; }
+  .bartrack { position: relative; background: #efece6; border-radius: 4px; height: 26px; }
+  .barfill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--loss); border-radius: 4px 4px 4px 4px; min-width: 4px; }
+  .bartick { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); }
+  .barnote { font-size: 0.83em; color: var(--muted); margin-top: 5px; }
+  /* payoff matrix */
+  table.payoff { width: 100%; border-collapse: collapse; margin: 14px 0 6px; }
+  table.payoff th, table.payoff td { border: 1px solid var(--line); padding: 10px 12px; text-align: center; }
+  table.payoff th { background: #f3f1ec; font-size: 0.9em; font-weight: 600; }
+  table.payoff td .big { font-size: 1.2em; font-weight: 700; color: var(--loss); font-variant-numeric: tabular-nums; }
+  table.payoff td .cellnote { display: block; font-size: 0.8em; color: var(--muted); margin-top: 3px; }
+  table.payoff td.played { background: #fdf9f2; }
+  details { border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; margin-top: 20px; background: var(--card); }
+  summary { cursor: pointer; font-weight: 600; }
+  details p, details ul { font-size: 0.93em; }
+  details table { font-size: 0.9em; border-collapse: collapse; margin: 10px 0; }
+  details table td { padding: 4px 14px 4px 0; border-bottom: 1px solid #f0ede7; }
+  footer { margin-top: 34px; font-size: 0.85em; color: var(--muted); }
+  footer a { color: var(--accent); }
+  a { color: var(--accent); }
+  @media (max-width: 520px) {
+    body { font-size: 16px; }
+    .card { padding: 16px 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>The Sludge Machine</h1>
+    <p class="subtitle">A car-buying game in three rounds.</p>
+  </header>
+  <div id="app"></div>
+  <footer>
+    A toy model by <a href="https://adambraff.github.io/">Adam Braff</a>.
+    Inspired by the Freakonomics Radio series on sludge
+    (<a href="https://freakonomics.com/podcast/sludge-part-1-the-world-is-drowning-in-it/">part 1</a>,
+    <a href="https://freakonomics.com/podcast/sludge-part-2-is-government-the-problem-or-the-solution/">part 2</a>).
+  </footer>
+</div>
+
+<script>
+"use strict";
+
+const fmt = n => "$" + Math.round(n).toLocaleString("en-US");
+
+const ROUNDS = [
+  {
+    name: "Round 1: just you",
+    intro: "Saturday, 10:15 a.m. You've had one coffee and read one review. The salesperson's name is Dale, and Dale is delighted to see you. You are here to buy a 2026 Meridian XL, trade in your old car, and finance the difference.",
+    showDeltas: false,
+    best: 4309,
+    bestNote: "Best possible play, unaided: $4,309 over fair. You can't negotiate a number you can't see.",
+    time: "Time inside the dealership: 5 hours, 40 minutes.",
+    auto: {
+      label: "Documentation fee, $599, preprinted on the contract",
+      delta: 449,
+      reveal: "The state's actual filing cost is about $150. Nobody asked you, because it isn't a question."
+    },
+    decisions: [
+      {
+        title: "The price",
+        setup: "The Meridian XL you want is on the lot. Sticker: $38,460, plus a second window sticker: “Market Adjustment +$1,500.” Dale explains that this model is very hot right now.",
+        ai: null,
+        options: [
+          { label: "Agree to $39,960. It's a hot model; Dale said so.",
+            delta: 3560,
+            response: "Dale shakes your hand for slightly too long.",
+            reveal: "The adjustment was printed at the dealership. Regional transaction price for this trim: $36,400." },
+          { label: "Haggle until the adjustment dies and the sticker gives up $500.",
+            delta: 1560,
+            response: "Forty minutes and two trips to “the manager” later, you land at $37,960. You feel like a wolf.",
+            reveal: "Your hard-won price was still $1,560 over what this dealer regularly accepts." },
+          { label: "Bluff: “Another dealer offered me less.”",
+            delta: 2310,
+            response: "Dale asks to see the quote in writing. You check your phone with great focus. The adjustment gets cut in half.",
+            reveal: "Dealers hear this bluff nine times a day. It has a going rate, and you got it." }
+        ]
+      },
+      {
+        title: "The trade-in",
+        setup: "The used-car manager circles your trade-in twice, exhales through his teeth at a door ding, and offers $7,500.",
+        ai: null,
+        options: [
+          { label: "Take the $7,500. The ding is real, after all.",
+            delta: 2300,
+            response: "He nods gravely, as if you have both survived something.",
+            reveal: "Wholesale value: $9,800. The ding accounted for about $150 of the gap." },
+          { label: "Push. Settle at $8,300.",
+            delta: 1500,
+            response: "He signs like you've taken bread from his children.",
+            reveal: "Still $1,500 short of what two national buyers would have paid, sight mostly unseen." },
+          { label: "Tell him you'll just sell it yourself.",
+            delta: 1100,
+            response: "“$8,700. Final, and only because the auction's Thursday.” There is no auction Thursday.",
+            reveal: "Closer. The remaining gap to fair: $1,100." }
+        ]
+      },
+      {
+        title: "The protection package",
+        setup: "A new office, a new title: the finance manager. First offer: the Platinum Protection Package. Paint sealant, fabric guard, VIN etching. $2,795, “or really just $39 a month.”",
+        ai: null,
+        options: [
+          { label: "Protect your investment.",
+            delta: 2710,
+            response: "You are now the owner of sealant.",
+            reveal: "Wholesale cost of the package contents: about $85." },
+          { label: "Decline the package, but pay $399 for the VIN etching that's “already been applied.”",
+            delta: 379,
+            response: "You pay $399 for someone having scratched numbers into glass you already bought.",
+            reveal: "Etching kits are $20 online, and in this state the charge is optional even after it's applied. They tell nobody." },
+          { label: "Decline everything and sign the form titled “Customer Declines Protection.”",
+            delta: 0,
+            response: "The finance manager signs it sadly, noting that hail exists.",
+            reveal: "Correct. The form's title is doing the selling." }
+        ]
+      },
+      {
+        title: "The warranty",
+        setup: "Next: the extended warranty. $3,180, “or $44 a month, and one transmission pays for it.”",
+        ai: null,
+        options: [
+          { label: "Buy it. Transmissions are scary.",
+            delta: 1730,
+            response: "You are covered, extensively, for things the factory warranty already covers for three more years.",
+            reveal: "The identical policy runs about $1,450 direct. Claims paid per premium dollar: about 42 cents." },
+          { label: "Compromise: powertrain-only, $1,900.",
+            delta: 1300,
+            response: "Half the coverage, most of the margin.",
+            reveal: "Compromising on price and compromising on value are different moves. This was the second one." },
+          { label: "Decline.",
+            delta: 0,
+            response: "“Bold,” says the finance manager, bolding something on his screen.",
+            reveal: "Correct." }
+        ]
+      },
+      {
+        title: "The financing",
+        setup: "Last page: financing. “Great news, you're approved at $684 a month.” No other numbers are visible on the sheet.",
+        ai: null,
+        options: [
+          { label: "Sign. $684 fits the budget.",
+            delta: 2600,
+            response: "It's 72 months at 8.9%. Nobody says this out loud.",
+            reveal: "The rate carried 2.5 points of dealer markup. Cost over the loan: about $2,600." },
+          { label: "“Can you get it under $650?”",
+            delta: 3400,
+            response: "They can! $647 a month. The term is now 84 months. Everyone smiles.",
+            reveal: "You negotiated the number you could see. The numbers you couldn't see got worse: about $3,400 over fair." },
+          { label: "Ask the question printed nowhere: “What's the APR?”",
+            delta: 1200,
+            response: "A pause. A reprint. 7.4%, “as a favor.”",
+            reveal: "Asking cut the markup roughly in half. The bank's actual rate to the dealer was 6.4%. Your credit union would have done 5.9%." }
+        ]
+      }
+    ]
+  },
+  {
+    name: "Round 2: you bring an AI",
+    intro: "Same car, same Dale, alternate timeline. This time your phone has read every transaction in the region, and it is not sentimental.",
+    showDeltas: true,
+    best: 100,
+    bestNote: "Best possible play: $100 over fair, if you count your afternoon as free.",
+    time: "Your time: 41 minutes. Your AI sent 214 emails, all polite.",
+    auto: {
+      label: "Documentation fee, $599, still preprinted",
+      delta: 0,
+      reveal: "Your AI deducted the $449 of excess from its price target before the first email went out. Net effect: $0."
+    },
+    decisions: [
+      {
+        title: "The price",
+        setup: "Same sticker, same adjustment. But before Dale finishes the word “hot,” your phone has already emailed five dealers for out-the-door quotes.",
+        ai: "This trim transacts at $36,400 in your region. Invoice minus holdback: $35,900. Two competing quotes are already in: $36,700 and $36,650.",
+        options: [
+          { label: "Forward the $36,650 quote and ask Dale to beat it.",
+            delta: 250,
+            response: "The sales manager says something unkind about “these apps” and signs at $36,650.",
+            reveal: "Fair was $36,400. The last $250 is the price of not driving anywhere." },
+          { label: "Hold out for invoice, $35,900.",
+            delta: 100,
+            response: "Dale lets you walk. Dealer #2, ninety minutes away, does $36,500. Your afternoon is gone.",
+            reveal: "$150 saved, three hours spent. Sludge can always be repaid in time." },
+          { label: "Ignore the phone and pay the adjusted sticker. Dale seems nice.",
+            delta: 3560,
+            response: "Your phone buzzes twice, then stops trying.",
+            reveal: "The tool only works if you use it." }
+        ]
+      },
+      {
+        title: "The trade-in",
+        setup: "The used-car manager begins his walk toward your trade, frowning preemptively.",
+        ai: "Two national buyers will pay $9,800 for your car today. Screenshots attached.",
+        options: [
+          { label: "Show the screenshots.",
+            delta: 0,
+            response: "The frown completes its journey for nothing. They match $9,800.",
+            reveal: "Fair, to the dollar." },
+          { label: "Skip the theater; sell to the online buyer this afternoon.",
+            delta: 0,
+            response: "One errand, zero frowns.",
+            reveal: "Also fair, minus one errand. The frown changed nothing either way." },
+          { label: "Take their $7,500 anyway. He came all this way.",
+            delta: 2300,
+            response: "He is very grateful.",
+            reveal: "Sentiment, itemized: $2,300." }
+        ]
+      },
+      {
+        title: "The protection package",
+        setup: "The Platinum Protection Package again. Still $2,795.",
+        ai: "Wholesale cost of the contents: about $85. The “pre-applied” etching charge is optional in this state, even after application. Decline all of it.",
+        options: [
+          { label: "Decline all of it.",
+            delta: 0,
+            response: "The finance manager doesn't fight it. You wonder how often the package survives contact with a phone.",
+            reveal: "Correct." },
+          { label: "Meet him at $1,400. He seems tired.",
+            delta: 1400,
+            response: "He rallies impressively.",
+            reveal: "A discount on sealant is still sealant." }
+        ]
+      },
+      {
+        title: "The warranty",
+        setup: "The warranty. Still $3,180. The transmission story has new details.",
+        ai: "This warranty pays out about 42 cents per premium dollar. If you want coverage, the identical policy is $1,450 online. Decline it here either way.",
+        options: [
+          { label: "Decline here. Decide about the online one later, on a couch.",
+            delta: 0,
+            response: "The story wraps up early.",
+            reveal: "Correct. Whether you want coverage is a preference. The venue was the ripoff." },
+          { label: "Buy the dealer's. The couch is far away.",
+            delta: 1730,
+            response: "Convenience, premium tier.",
+            reveal: "$1,730 for not opening a browser." }
+        ]
+      },
+      {
+        title: "The financing",
+        setup: "“Great news, you're approved at $684 a month.”",
+        ai: "You're preapproved at 5.9% with your credit union. This quote is 8.9%; the dealer's own buy rate is about 6.4%. The markup would cost you about $2,600.",
+        options: [
+          { label: "Slide the preapproval across the desk.",
+            delta: 0,
+            response: "A pause. A counteroffer at 5.8% appears, because the dealer keeps a small fee either way. You take it.",
+            reveal: "Zero over fair." },
+          { label: "Let them “see what they can do.”",
+            delta: 950,
+            response: "They do 7.9%, presented as a triumph.",
+            reveal: "Better than 8.9%. Also $950 worse than the preapproval already in your pocket." }
+        ]
+      }
+    ]
+  },
+  {
+    name: "Round 3: Dale has one too",
+    intro: "Two years on. Every dealership in the state runs a Revenue Intelligence Suite. Your AI is better now. So is theirs.",
+    showDeltas: true,
+    best: 1004,
+    bestNote: "Best possible play: $1,004 over fair, and it costs six weeks and several thousand robot messages. In round 2, best play was $100. That window is what closed.",
+    time: "Your time: about an hour. Your AI: 6,240 messages. Their AI: 6,241.",
+    auto: {
+      label: "A $249 “digital delivery fee” on the final screen",
+      delta: 249,
+      reveal: "The doc fee, meanwhile, is now capped at $85 by statute after a class action. Fees are conserved: cap one, and another appears with a newer-sounding name."
+    },
+    decisions: [
+      {
+        title: "The price",
+        setup: "You never reach the lot. The quote arrives first: $36,900, “personalized for you.” The dealer's system knows your zip code, your browsing history, and that your lease ends in three weeks.",
+        ai: "Fair value is still $36,400. I asked five dealers: $36,900, $36,900, $36,910, $36,900, and one maverick at $36,880. They all run one of two pricing platforms. The floor is firm, and it knows when your lease ends.",
+        options: [
+          { label: "Take the maverick's $36,880 and keep your week.",
+            delta: 480,
+            response: "Done in an hour. The maverick's platform logs that the discount worked, and reprices.",
+            reveal: "$480 over fair. In round 1 that would have been a triumph. In round 2 it would have been a scandal." },
+          { label: "Set your AI to grind all five dealers for a week.",
+            delta: 350,
+            response: "Six thousand messages later, one dealer's system yields $36,750 to hit a monthly target.",
+            reveal: "$130 saved, nine days spent. The sludge didn't disappear; it changed units." },
+          { label: "Wait for quarter-end, carless, on principle.",
+            delta: 250,
+            response: "Six weeks later an algorithm blinks: $36,650. You have been borrowing your neighbor's Corolla.",
+            reveal: "The best price left in the market, and it cost you six weeks." }
+        ]
+      },
+      {
+        title: "The trade-in",
+        setup: "Your trade is appraised by camera in ninety seconds: $9,650. The system notes, unprompted, that this is “$150 below your best online quote, due to transport calibration.”",
+        ai: "It's right about the quotes. The online buyers all dropped theirs by $100 this morning. They watch each other's APIs.",
+        options: [
+          { label: "Take the $9,650 and don't ask what transport calibration is.",
+            delta: 150,
+            response: "Nobody knows what it is. It appears on every appraisal in the state.",
+            reveal: "$150 is the fee for the other side knowing exactly what your alternatives are." },
+          { label: "Arbitrage: sell to the online buyer at $9,700.",
+            delta: 100,
+            response: "One more errand. Fifty dollars.",
+            reveal: "The spread between robots is thinner than the spread between humans was." }
+        ]
+      },
+      {
+        title: "The protection package",
+        setup: "There is no pitch. “Meridian Care” ($795) is already inside the listed price of every car on the platform. Removing it costs a $295 “configuration adjustment” and a five-day delay.",
+        ai: "The contents still cost about $85 wholesale. Unbundling nets you $500 and costs you five days.",
+        options: [
+          { label: "Pay the $795 and keep your delivery date.",
+            delta: 710,
+            response: "The line item never appears anywhere again.",
+            reveal: "Round 1 sold you the package across a desk. Round 3 sold it to you before you arrived." },
+          { label: "Unbundle: pay the $295 and wait five days.",
+            delta: 210,
+            response: "A human has to be located to authorize it. The human sighs by email.",
+            reveal: "$210 over fair, and the cheapest sealant removal on record." }
+        ]
+      },
+      {
+        title: "The warranty",
+        setup: "The warranty offer is now $1,495, priced this morning.",
+        ai: "The identical policy is $1,450 online. The margin is $45.",
+        options: [
+          { label: "Decline, out of habit.",
+            delta: 0,
+            response: "Fine.",
+            reveal: "Where AI made a product easy to compare, the margin collapsed on its own. Note what it didn't collapse on: floors, bundles, and fees." },
+          { label: "Take it. $45 over fair is a fair fight.",
+            delta: 45,
+            response: "Covered.",
+            reveal: "The one purchase in this game where the sludge is mostly gone." }
+        ]
+      },
+      {
+        title: "The financing",
+        setup: "The dealer's system beats your credit union by 0.05% before you ask. Then, at signing: a $395 “digital origination fee.”",
+        ai: "The rate markup didn't survive the arms race. It came back with a new name. I can probably get the fee to $195 by invoking the maverick, but their system knows I say that to everyone.",
+        options: [
+          { label: "Pay the $395.",
+            delta: 395,
+            response: "The fee has a help-center article. The article does not explain it.",
+            reveal: "Rate markup, reincarnated." },
+          { label: "Have your AI grind it to $195.",
+            delta: 195,
+            response: "Two days of robot correspondence. The fee, like the frown, was negotiable.",
+            reveal: "$200 saved. The fee will be renamed by next quarter." }
+        ]
+      }
+    ]
+  }
+];
+
+const TYPICAL = { nn: 6300, na: 7600, an: 250, aa: 1200 };
+
+const state = {
+  screen: "intro",   // intro | round-intro | decision | round-results | final
+  r: 0,
+  d: 0,
+  picked: null,       // option index picked on current decision, or null
+  picks: [[], [], []] // option indices per round
+};
+
+const app = document.getElementById("app");
+
+function roundTotal(r) {
+  const round = ROUNDS[r];
+  let t = round.auto.delta;
+  state.picks[r].forEach((oi, di) => { t += round.decisions[di].options[oi].delta; });
+  return t;
+}
+
+function runningTotal() {
+  const round = ROUNDS[state.r];
+  let t = 0;
+  state.picks[state.r].forEach((oi, di) => { t += round.decisions[di].options[oi].delta; });
+  return t;
+}
+
+function deltaCell(d) {
+  return d > 0
+    ? '<span class="loss">+' + fmt(d) + '</span>'
+    : '<span class="gain">$0</span>';
+}
+
+function render() {
+  if (state.screen === "intro") return renderIntro();
+  if (state.screen === "round-intro") return renderRoundIntro();
+  if (state.screen === "decision") return renderDecision();
+  if (state.screen === "round-results") return renderRoundResults();
+  if (state.screen === "final") return renderFinal();
+}
+
+function renderIntro() {
+  app.innerHTML = `
+    <div class="card">
+      <p>You're going to buy the same car three times: once on your own, once with an AI negotiating for you, and once after the dealership buys an AI of its own.</p>
+      <p>The sticker price is $38,460. Somewhere under the paperwork there is a fair deal. Your score is how far above it you land.</p>
+      <p>The car, the dealer, and the fees are inventions. The tactics are not.</p>
+      <div class="btnrow"><button class="primary" id="start">Start round 1</button></div>
+    </div>`;
+  document.getElementById("start").onclick = () => { state.screen = "round-intro"; render(); };
+}
+
+function renderRoundIntro() {
+  const round = ROUNDS[state.r];
+  app.innerHTML = `
+    <div class="card">
+      <h2>${round.name}</h2>
+      <p>${round.intro}</p>
+      <div class="btnrow"><button class="primary" id="go">Walk in</button></div>
+    </div>`;
+  document.getElementById("go").onclick = () => { state.screen = "decision"; state.d = 0; state.picked = null; render(); };
+}
+
+function renderDecision() {
+  const round = ROUNDS[state.r];
+  const dec = round.decisions[state.d];
+  const meter = round.showDeltas
+    ? `Overpaid so far: <span class="loss">${fmt(runningTotal())}</span>`
+    : `Overpaid so far: you'll find out`;
+  const aiHtml = dec.ai
+    ? `<div class="ainote"><span class="who">Your AI:</span> ${dec.ai}</div>`
+    : "";
+  let optsHtml = dec.options.map((o, i) => {
+    const chosen = state.picked === i ? " chosen" : "";
+    const dis = state.picked !== null ? " disabled" : "";
+    return `<button class="opt${chosen}" data-i="${i}"${dis}>${o.label}</button>`;
+  }).join("");
+  let after = "";
+  if (state.picked !== null) {
+    const o = dec.options[state.picked];
+    const deltaLine = round.showDeltas
+      ? `<div style="margin-top:8px;">${o.delta > 0 ? '<span class="loss">+' + fmt(o.delta) + ' over fair</span>' : '<span class="gain">$0 over fair</span>'}</div>`
+      : "";
+    after = `
+      <div class="response">${o.response}${deltaLine}</div>
+      <div class="btnrow"><button class="primary" id="next">${state.d < round.decisions.length - 1 ? "Continue" : "See the damage"}</button></div>`;
+  }
+  app.innerHTML = `
+    <div class="card">
+      <div class="progress">
+        <span>${round.name} &middot; decision ${state.d + 1} of ${round.decisions.length}: ${dec.title.toLowerCase()}</span>
+        <span class="meter">${meter}</span>
+      </div>
+      <p class="setup">${dec.setup}</p>
+      ${aiHtml}
+      <div class="options">${optsHtml}</div>
+      ${after}
+    </div>`;
+  if (state.picked === null) {
+    app.querySelectorAll(".opt").forEach(btn => {
+      btn.onclick = () => {
+        state.picked = parseInt(btn.dataset.i, 10);
+        state.picks[state.r][state.d] = state.picked;
+        render();
+      };
+    });
+  } else {
+    document.getElementById("next").onclick = () => {
+      if (state.d < round.decisions.length - 1) {
+        state.d += 1; state.picked = null; render();
+      } else {
+        state.screen = "round-results"; render();
+      }
+    };
+  }
+}
+
+function renderRoundResults() {
+  const round = ROUNDS[state.r];
+  const total = roundTotal(state.r);
+  const rows = round.decisions.map((dec, di) => {
+    const o = dec.options[state.picks[state.r][di]];
+    return `<tr>
+      <td>${dec.title}<div class="reveal">${o.reveal}</div></td>
+      <td class="amount">${deltaCell(o.delta)}</td>
+    </tr>`;
+  }).join("");
+  const autoRow = `<tr>
+      <td>${round.auto.label}<div class="reveal">${round.auto.reveal}</div></td>
+      <td class="amount">${deltaCell(round.auto.delta)}</td>
+    </tr>`;
+  app.innerHTML = `
+    <div class="card">
+      <h2>${round.name.split(":")[0]}: you overpaid <span class="loss">${fmt(total)}</span></h2>
+      <table class="results">
+        <tr><th>What happened</th><th class="amount">Over fair</th></tr>
+        ${rows}
+        ${autoRow}
+        <tr class="totalrow"><td>Total over the fair deal</td><td class="amount loss">${fmt(total)}</td></tr>
+      </table>
+      <p class="timeline">${round.time}</p>
+      <p class="bestline">${round.bestNote}</p>
+      <div class="btnrow"><button class="primary" id="next">${state.r < 2 ? "On to " + ROUNDS[state.r + 1].name.split(":")[0].toLowerCase() : "See all three rounds together"}</button></div>
+    </div>`;
+  document.getElementById("next").onclick = () => {
+    if (state.r < 2) {
+      state.r += 1; state.screen = "round-intro"; render();
+      window.scrollTo(0, 0);
+    } else {
+      state.screen = "final"; render();
+      window.scrollTo(0, 0);
+    }
+  };
+}
+
+function renderFinal() {
+  const totals = [roundTotal(0), roundTotal(1), roundTotal(2)];
+  const maxVal = Math.max(...totals, ROUNDS[0].best, 1);
+  const barLabels = ["Round 1: you alone", "Round 2: your AI only", "Round 3: both sides armed"];
+  const bars = totals.map((t, i) => {
+    const w = Math.max(1.5, t / maxVal * 100);
+    const tick = ROUNDS[i].best / maxVal * 100;
+    return `<div class="barrow">
+      <div class="barlabel"><span>${barLabels[i]}</span><span class="val">${fmt(t)}</span></div>
+      <div class="bartrack">
+        <div class="barfill" style="width:${w}%"></div>
+        <div class="bartick" style="left:${tick}%"></div>
+      </div>
+      <div class="barnote">Best possible play this round: ${fmt(ROUNDS[i].best)} (marked)</div>
+    </div>`;
+  }).join("");
+
+  const cell = (val, note, played) => `
+    <td${played ? ' class="played"' : ""}>
+      <span class="big">${fmt(val)}</span>
+      <span class="cellnote">${note}</span>
+    </td>`;
+
+  app.innerHTML = `
+    <div class="card">
+      <h2>The same car, three regimes</h2>
+      <p>Your overpayment versus the fair deal, by round:</p>
+      ${bars}
+    </div>
+    <div class="card">
+      <h2>The payoff matrix</h2>
+      <p>Generalize your three purchases (plus one you were spared) into the buyer's overpayment under each combination. Typical outcomes shown; your actual results in the shaded cells.</p>
+      <table class="payoff">
+        <tr><th></th><th>Dealer: no AI</th><th>Dealer: AI</th></tr>
+        <tr>
+          <th>You: no AI</th>
+          ${cell(TYPICAL.nn, "you played this: " + fmt(totals[0]), true)}
+          ${cell(TYPICAL.na, "modeled; their system knows your reservation price and you're still reading the four-square sheet", false)}
+        </tr>
+        <tr>
+          <th>You: AI</th>
+          ${cell(TYPICAL.an, "you played this: " + fmt(totals[1]), true)}
+          ${cell(TYPICAL.aa, "you played this: " + fmt(totals[2]), true)}
+        </tr>
+      </table>
+      <p>Read it like a game theorist. Whatever the dealer does, you do better with an AI. Whatever you do, the dealer does better with one. Both sides have a dominant strategy, so both adopt, and the market settles in the bottom-right cell.</p>
+      <p>Buyers in that cell do better than in the old world, and worse than in the brief window when only buyers were armed. Dealers claw back part of the surplus. The software vendors collect rent from both sides regardless. And the sludge that gets blocked at the desk reappears upstream: firm algorithmic floors, packages embedded in the listed price, and fees with modern names.</p>
+      <div class="btnrow">
+        <button class="ghost" id="again">Play again</button>
+      </div>
+    </div>
+    <details>
+      <summary>Assumptions, math, and sources</summary>
+      <p>The hidden fair deal, against which every choice is scored:</p>
+      <table>
+        <tr><td>Vehicle price</td><td>$36,400 (regional transaction price; sticker $38,460)</td></tr>
+        <tr><td>Trade-in</td><td>$9,800 (best same-day offer from national buyers)</td></tr>
+        <tr><td>Add-ons</td><td>$0 (wholesale cost of the package contents: about $85)</td></tr>
+        <tr><td>Extended warranty</td><td>declined, or $1,450 for the identical policy direct</td></tr>
+        <tr><td>Financing</td><td>5.9% for 60 months (credit-union preapproval)</td></tr>
+        <tr><td>Documentation fee</td><td>$150 (approximate actual filing cost)</td></tr>
+      </table>
+      <p>Overpayment is the sum of dollar gaps between each choice and this baseline, including interest differences over the life of the loan. The car, dealer, platforms, and fees are fictional; the tactics (market-adjustment stickers, four-square worksheets, payment packing, rate markup, pre-applied add-ons, preprinted fees) are documented industry practice. The round 3 dynamics (algorithmic price floors, personalized quotes, margin migration into fees and bundles) are extrapolations, clearly marked as such by being in round 3.</p>
+      <p>“Sludge” is Richard Thaler's term for friction that works against you, the dark twin of the nudge. See the Freakonomics Radio two-part series: <a href="https://freakonomics.com/podcast/sludge-part-1-the-world-is-drowning-in-it/">episode 627, “Sludge, Part 1: The World Is Drowning in It”</a> and <a href="https://freakonomics.com/podcast/sludge-part-2-is-government-the-problem-or-the-solution/">episode 628, “Sludge, Part 2: Is Government the Problem, or the Solution?”</a></p>
+    </details>`;
+  document.getElementById("again").onclick = () => {
+    state.screen = "intro"; state.r = 0; state.d = 0; state.picked = null;
+    state.picks = [[], [], []];
+    render();
+    window.scrollTo(0, 0);
+  };
+}
+
+render();
+</script>
+</body>
+</html>
