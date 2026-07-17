@@ -5,8 +5,8 @@ A car-buying game in three rounds, built to illustrate a blog post on sludge (Ri
 You buy the same fictional car three times:
 
 1. **Round 1: just you.** Market-adjustment stickers, lowballed trade-ins, protection packages, payment packing, preprinted fees. Best possible play still leaves $4,309 on the table, because you can't negotiate numbers you can't see.
-2. **Round 2: you bring an AI.** Transaction data, instant trade quotes, wholesale costs, and rate preapprovals collapse the information asymmetry. Best play: $100 over fair.
-3. **Round 3: the dealer has one too.** Personalized quotes, firm algorithmic floors, packages embedded upstream in the listed price, and fees with modern names. Best play: $1,004 over fair, plus a lot of robot correspondence.
+2. **Round 2: you bring an AI.** Transaction data, instant trade quotes, wholesale costs, rate preapprovals, and a 250-mile dealer net (emailing nineteen dealers costs the AI nothing) collapse the information asymmetry. Best play: $0 over fair, via an overstocked dealer 240 miles away.
+3. **Round 3: the dealer has one too.** Personalized quotes, firm algorithmic floors that erase regional overstock discounts, packages embedded upstream in the listed price, and fees with modern names. Best play: $1,004 over fair, plus a lot of robot correspondence.
 
 The game ends with a 2x2 payoff matrix (buyer AI x dealer AI). Both sides have a dominant strategy, so both adopt; buyers end up better off than the no-AI world, worse off than the brief window when only buyers were armed, and the software vendors collect rent from everyone.
 
