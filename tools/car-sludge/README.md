@@ -4,7 +4,7 @@ A car-buying game in three rounds, built to illustrate a blog post on sludge (Ri
 
 You buy the same fictional car three times:
 
-1. **Round 1: just you.** Market-adjustment stickers, lowballed trade-ins, protection packages, payment packing, preprinted fees. Best possible play still leaves $4,309 on the table, because you can't negotiate numbers you can't see.
+1. **Round 1: just you.** Market-adjustment stickers, lowballed trade-ins, protection packages, payment packing, preprinted fees. Best possible play still leaves $5,559 on the table, because you can't negotiate numbers you can't see.
 2. **Round 2: you bring an AI.** A scraped inventory table covering every dealer within a two-hour drive, emails to the five dealers holding the right spec, an unadvertised military incentive, transaction data, instant trade quotes, wholesale costs, and rate preapprovals collapse the information asymmetry. Best play: $0 over fair.
 3. **Round 3: the dealer has one too.** Personalized quotes, firm algorithmic floors that erase regional price dispersion, packages embedded upstream in the listed price, and fees with modern names. Best play: $1,004 over fair, plus a lot of robot correspondence.
 
