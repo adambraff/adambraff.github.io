@@ -1,1 +1,6 @@
-{"files":["runs/cbgeo-run-2026-07-10.json"]}
+{
+ "files": [
+  "runs/cbgeo-run-2026-07-10.json",
+  "runs/cbgeo-run-2026-07-20.json"
+ ]
+}
