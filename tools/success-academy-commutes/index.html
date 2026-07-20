@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Success Academy Commutes</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb;
+    --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+    --grid: #e1e0d9; --border: rgba(11,11,11,0.10);
+    --elem: #2a78d6; --mid: #008300; --high: #e87ba4; --k12: #eda100;
+    --link: #1c5cab;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --page: #0d0d0d; --surface: #1a1a19;
+      --ink: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+      --grid: #2c2c2a; --border: rgba(255,255,255,0.10);
+      --elem: #3987e5; --mid: #008300; --high: #d55181; --k12: #c98500;
+      --link: #86b6ef;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--page); color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 14px; line-height: 1.45;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 60px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--ink-2); font-size: 13px; margin: 0 0 18px; max-width: 900px; }
+  .sub a { color: var(--link); }
+
+  #map {
+    height: 440px; border: 1px solid var(--border); border-radius: 10px;
+    background: #abd0e6; margin-bottom: 10px;
+  }
+  .boro-label { color: #6b7d8f; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+  .legend-row {
+    display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
+    font-size: 12.5px; color: var(--ink-2); margin-bottom: 22px;
+  }
+  .lg { display: inline-flex; align-items: center; gap: 6px; }
+  .dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; border: 1.5px solid var(--surface); box-shadow: 0 0 0 1px var(--border); }
+  .home-swatch { font-size: 14px; line-height: 1; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 12px; }
+  .controls .lbl { color: var(--muted); font-size: 12.5px; margin-right: 2px; }
+  .chip {
+    border: 1px solid var(--border); background: var(--surface); color: var(--ink-2);
+    border-radius: 999px; padding: 5px 14px; font-size: 13px; cursor: pointer;
+  }
+  .chip:hover { border-color: var(--muted); }
+  .chip.on { background: var(--ink); color: var(--page); border-color: var(--ink); font-weight: 600; }
+  .count { color: var(--muted); font-size: 12.5px; margin-left: auto; }
+
+  .tbl-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 1050px; }
+  th {
+    text-align: left; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--grid);
+    position: sticky; top: 0; background: var(--surface); cursor: pointer; white-space: nowrap;
+  }
+  th .arr { font-size: 10px; }
+  td { padding: 9px 12px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  td.num { font-variant-numeric: tabular-nums; text-align: right; }
+  td.rank { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .school { font-weight: 600; }
+  .lvl { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .feat, .route-cell { color: var(--ink-2); font-size: 12.5px; max-width: 340px; }
+  .addr { white-space: nowrap; }
+  a.gmap { color: var(--link); text-decoration: none; white-space: nowrap; }
+  a.gmap:hover { text-decoration: underline; }
+  .foot { color: var(--muted); font-size: 12px; margin-top: 14px; max-width: 900px; }
+
+  #cards { display: none; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 14px; margin-bottom: 10px;
+  }
+  .card .c-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .card .c-name { font-weight: 600; font-size: 15px; }
+  .card .c-min { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 17px; white-space: nowrap; }
+  .card .c-min small { font-weight: 400; color: var(--muted); font-size: 11px; }
+  .card .c-sub { color: var(--ink-2); font-size: 12.5px; margin: 2px 0 6px; }
+  .card .c-route { font-size: 12.5px; margin-bottom: 6px; }
+  .card .c-feat { color: var(--muted); font-size: 12px; margin-top: 6px; }
+  @media (max-width: 700px) {
+    .wrap { padding: 14px 12px 40px; }
+    h1 { font-size: 19px; }
+    #map { height: 320px; }
+    .tbl-card { display: none; }
+    #cards { display: block; }
+    .count { flex-basis: 100%; margin-left: 0; }
+  }
+  .leaflet-popup-content { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 13px; line-height: 1.4; }
+  .leaflet-popup-content .pname { font-weight: 600; }
+  .leaflet-popup-content a { color: #1c5cab; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Success Academy Commutes</h1>
+  <p class="sub">All 59 Success Academy locations (58 map points; Bronx&nbsp;5 Lower/Upper share a building), ranked by estimated door-to-door subway commute from E&nbsp;87th&nbsp;St &amp; Madison&nbsp;Ave, weekday AM rush. Times are estimates (&plusmn;10&nbsp;min); miles are straight-line. Click any journey&rsquo;s <strong>Directions</strong> link to open Google&nbsp;Maps in transit mode. Source: <a href="https://www.successacademies.org/schools/" target="_blank" rel="noopener">successacademies.org</a>, July&nbsp;2026.</p>
+
+  <div id="map"></div>
+  <div class="legend-row">
+    <span class="lg"><span class="home-swatch">&#9733;</span> Home (87th &amp; Madison)</span>
+    <span class="lg"><span class="dot" style="background:var(--elem)"></span> Elementary</span>
+    <span class="lg"><span class="dot" style="background:var(--mid)"></span> Middle</span>
+    <span class="lg"><span class="dot" style="background:var(--high)"></span> High</span>
+    <span class="lg"><span class="dot" style="background:var(--k12)"></span> K&ndash;12</span>
+    <span class="lg" style="color:var(--muted)">Click a dot for details + directions</span>
+  </div>
+
+  <div class="controls">
+    <span class="lbl">Filter by level:</span>
+    <button class="chip on" data-lvl="All">All</button>
+    <button class="chip" data-lvl="Elementary">Elementary</button>
+    <button class="chip" data-lvl="Middle">Middle</button>
+    <button class="chip" data-lvl="High">High</button>
+    <button class="chip" data-lvl="K-12">K&ndash;12</button>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div class="tbl-card">
+    <table id="tbl">
+      <thead><tr>
+        <th data-k="rank">#</th>
+        <th data-k="name">School <span class="arr"></span></th>
+        <th data-k="level">Level <span class="arr"></span></th>
+        <th data-k="hood">Borough / Neighborhood <span class="arr"></span></th>
+        <th>Address</th>
+        <th>Trains &amp; Route</th>
+        <th data-k="mins">Est. Min <span class="arr">&#9650;</span></th>
+        <th data-k="miles">Miles <span class="arr"></span></th>
+        <th>Directions</th>
+        <th>Notes</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div id="cards"></div>
+
+  <p class="foot">Commute model: walk to 86&nbsp;St (4/5/6, ~4&nbsp;min) or 86&nbsp;St (Q, ~10&nbsp;min) + average wait + ride + transfers + final walk. Where the subway is impractical (crosstown to the UWS, far southeast Queens) the realistic bus or LIRR option is noted. Verify finalists in Google Maps or Citymapper at the actual departure time&mdash;SA staff arrive before student drop-off (~7:30&nbsp;AM), slightly pre-peak. Grades and application status change year to year; Bronx&nbsp;5 folds into the new Bronx&nbsp;K-12 campus and the two Queens&nbsp;Village schools merge in Aug&nbsp;2026.</p>
+</div>
+
+<script>
+const ORIGIN = "E 87th St & Madison Ave, New York, NY 10128";
+const DATA = [
+ {
+  "name": "Harlem East MS",
+  "level": "Middle",
+  "grades": "5-8",
+  "hood": "Manhattan / East Harlem",
+  "addr": "141 E 111th St, Fl 3, NY 10029",
+  "trains": "6",
+  "route": "6 local to 110 St, 2-min walk",
+  "mins": 18,
+  "miles": 1.3,
+  "feat": "Founded 2013; co-located; accepting gr. 5-6 for 2026-27",
+  "lat": 40.7968,
+  "lon": -73.9445
+ },
+ {
+  "name": "Harlem 3 ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Manhattan / East Harlem",
+  "addr": "410 E 100th St, Fl 4, NY 10029",
+  "trains": "Q (or walk)",
+  "route": "Q to 96 St + 7-min walk; also just a 20-min walk from 87th & Madison",
+  "mins": 20,
+  "miles": 0.9,
+  "feat": "Founded 2008; co-located; on-site Beacon after-school program",
+  "lat": 40.7864,
+  "lon": -73.9427
+ },
+ {
+  "name": "Harlem 2 ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Manhattan / East Harlem",
+  "addr": "144 E 128th St, Fl 3, NY 10035",
+  "trains": "4, 5",
+  "route": "4/5 express to 125 St, 5-min walk",
+  "mins": 20,
+  "miles": 2.2,
+  "feat": "Founded 2008; co-located",
+  "lat": 40.8086,
+  "lon": -73.937
+ },
+ {
+  "name": "Upper West ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Manhattan / UWS",
+  "addr": "145 W 84th St, Fl 2, NY 10024",
+  "trains": "M86-SBS bus",
+  "route": "No subway crosses the park at 86th; M86-SBS crosstown + 3-min walk",
+  "mins": 22,
+  "miles": 0.8,
+  "feat": "Founded 2011; co-located; closest school as the crow flies",
+  "lat": 40.7857,
+  "lon": -73.972
+ },
+ {
+  "name": "HSLA-Manhattan HS",
+  "level": "High",
+  "grades": "9-12",
+  "hood": "Manhattan / Murray Hill",
+  "addr": "111 E 33rd St, Fl 4, NY 10016",
+  "trains": "6 (or 4/5)",
+  "route": "6 local to 33 St, 1-min walk",
+  "mins": 22,
+  "miles": 2.7,
+  "feat": "Founded 2014; co-located; not currently accepting applications",
+  "lat": 40.7465,
+  "lon": -73.9812
+ },
+ {
+  "name": "Union Square ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Manhattan / Union Sq",
+  "addr": "40 Irving Pl, Fl 2, NY 10003",
+  "trains": "4, 5",
+  "route": "4/5 express to 14 St-Union Sq, 3-min walk",
+  "mins": 25,
+  "miles": 3.5,
+  "feat": "Founded 2013; co-located",
+  "lat": 40.7352,
+  "lon": -73.9877
+ },
+ {
+  "name": "Bronx 1 ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Bronx / Mott Haven",
+  "addr": "339 Morris Ave, Fl 2, Bronx 10451",
+  "trains": "4, 5",
+  "route": "4/5 to 138 St-Grand Concourse, 8-min walk",
+  "mins": 27,
+  "miles": 2.8,
+  "feat": "Founded 2010 (first SA Bronx school); District 7; co-located",
+  "lat": 40.8128,
+  "lon": -73.924
+ },
+ {
+  "name": "Bronx 1 MS",
+  "level": "Middle",
+  "grades": "5-8",
+  "hood": "Bronx / Mott Haven",
+  "addr": "339 Morris Ave, Fl 2, Bronx 10451",
+  "trains": "4, 5",
+  "route": "4/5 to 138 St-Grand Concourse, 8-min walk",
+  "mins": 27,
+  "miles": 2.8,
+  "feat": "Opened 2023; same building as Bronx 1 ES",
+  "lat": 40.8128,
+  "lon": -73.924
+ },
+ {
+  "name": "Harlem 1 ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Manhattan / Harlem",
+  "addr": "34 W 118th St, Fl 2, NY 10026",
+  "trains": "6",
+  "route": "6 local to 116 St, 12-min walk (or 2/3 to 116 St side)",
+  "mins": 28,
+  "miles": 1.6,
+  "feat": "Founded 2006 - SA's original flagship school; co-located",
+  "lat": 40.802,
+  "lon": -73.9457
+ },
+ {
+  "name": "Bronx 5 ES (Lower & Upper)",
+  "level": "Elementary",
+  "grades": "K-5",
+  "hood": "Bronx / Mott Haven",
+  "addr": "604 E 139th St, Bronx 10454",
+  "trains": "6",
+  "route": "6 local to Cypress Av, 2-min walk",
+  "mins": 29,
+  "miles": 2.9,
+  "feat": "Founded 2022; folding into new Bronx K-12 campus for 2026-27",
+  "lat": 40.8054,
+  "lon": -73.913
+ },
+ {
+  "name": "Bronx K-12 Campus",
+  "level": "K-12",
+  "grades": "K-12 (opening K-6)",
+  "hood": "Bronx / Concourse",
+  "addr": "586 River Ave, Bronx 10451",
+  "trains": "4",
+  "route": "4 to 149 St-Grand Concourse, 8-min walk",
+  "mins": 29,
+  "miles": 3.4,
+  "feat": "Opens Aug 2026: purpose-built campus w/ STEM labs, rooftop soccer field, theater, recording studio",
+  "lat": 40.8232,
+  "lon": -73.9268
+ },
+ {
+  "name": "Astor Place MS",
+  "level": "Middle",
+  "grades": "5-8",
+  "hood": "Manhattan / East Village",
+  "addr": "215 E 6th St, NY 10003",
+  "trains": "6",
+  "route": "6 local to Astor Pl, 6-min walk",
+  "mins": 30,
+  "miles": 4,
+  "feat": "New school opening 2026, adds a grade each year",
+  "lat": 40.728,
+  "lon": -73.989
+ },
+ {
+  "name": "Harlem North Central MS",
+  "level": "Middle",
+  "grades": "5-8",
+  "hood": "Manhattan / Central Harlem",
+  "addr": "175 W 134th St, Fl 3, NY 10030",
+  "trains": "4, 5 + walk (or 2/3)",
+  "route": "4/5 to 125 St, then 10-min walk to Lenox (or transfer 2/3 to 135 St)",
+  "mins": 32,
+  "miles": 2.5,
+  "feat": "Founded 2013; co-located; accepting gr. 5-6 for 2026-27",
+  "lat": 40.8148,
+  "lon": -73.944
+ },
+ {
+  "name": "Harlem 4 ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Manhattan / South Harlem",
+  "addr": "240 W 113th St, Fl 3, NY 10026",
+  "trains": "M86 + B, C",
+  "route": "M86-SBS to Central Park West, B/C to 116 St, 4-min walk",
+  "mins": 33,
+  "miles": 1.5,
+  "feat": "Founded 2008; co-located",
+  "lat": 40.8025,
+  "lon": -73.956
+ },
+ {
+  "name": "Harlem West MS",
+  "level": "Middle",
+  "grades": "5-8",
+  "hood": "Manhattan / South Harlem",
+  "addr": "215 W 114th St, Fl 5, NY 10026",
+  "trains": "M86 + B, C",
+  "route": "M86-SBS to Central Park West, B/C to 116 St, 3-min walk",
+  "mins": 33,
+  "miles": 1.6,
+  "feat": "Founded 2012; co-located",
+  "lat": 40.803,
+  "lon": -73.9555
+ },
+ {
+  "name": "Hell's Kitchen ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Manhattan / Hell's Kitchen",
+  "addr": "439 W 49th St, Fl 2, NY 10019",
+  "trains": "6 + E",
+  "route": "6 to 51 St, E (at Lex-53) to 50 St, 7-min walk",
+  "mins": 34,
+  "miles": 2,
+  "feat": "Founded 2013; District 2; co-located",
+  "lat": 40.7645,
+  "lon": -73.9905
+ },
+ {
+  "name": "Midtown West MS",
+  "level": "Middle",
+  "grades": "5-8",
+  "hood": "Manhattan / Hell's Kitchen",
+  "addr": "439 W 49th St, Fl 3, NY 10019",
+  "trains": "6 + E",
+  "route": "6 to 51 St, E (at Lex-53) to 50 St, 7-min walk",
+  "mins": 34,
+  "miles": 2,
+  "feat": "Founded 2015; same building as Hell's Kitchen ES",
+  "lat": 40.7645,
+  "lon": -73.9905
+ },
+ {
+  "name": "Bronx 2 MS",
+  "level": "Middle",
+  "grades": "5-8",
+  "hood": "Bronx / Morrisania",
+  "addr": "270 E 167th St, Fl 2, Bronx 10456",
+  "trains": "4",
+  "route": "4 to 167 St, 10-min walk",
+  "mins": 35,
+  "miles": 4.4,
+  "feat": "Founded 2014; District 9; co-located",
+  "lat": 40.8358,
+  "lon": -73.9165
+ },
+ {
+  "name": "Hudson Yards ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Manhattan / Hudson Yards",
+  "addr": "500 W 41st St, NY 10018",
+  "trains": "4, 5 + 7",
+  "route": "4/5 to Grand Central, 7 to 34 St-Hudson Yards, 8-min walk",
+  "mins": 36,
+  "miles": 2.6,
+  "feat": "Founded 2017; shares building with Hudson Yards MS",
+  "lat": 40.7592,
+  "lon": -73.9987
+ },
+ {
+  "name": "Hudson Yards MS",
+  "level": "Middle",
+  "grades": "5-8",
+  "hood": "Manhattan / Hudson Yards",
+  "addr": "500 W 41st St, NY 10018",
+  "trains": "4, 5 + 7",
+  "route": "4/5 to Grand Central, 7 to 34 St-Hudson Yards, 8-min walk",
+  "mins": 36,
+  "miles": 2.6,
+  "feat": "Founded 2017; same building as Hudson Yards ES",
+  "lat": 40.7592,
+  "lon": -73.9987
+ },
+ {
+  "name": "Bronx MS",
+  "level": "Middle",
+  "grades": "5-8",
+  "hood": "Bronx / Longwood",
+  "addr": "965 Longwood Ave, Fl 2, Bronx 10459",
+  "trains": "5 (or 6)",
+  "route": "5 to Prospect Av, 8-min walk (6 to Longwood Av also works)",
+  "mins": 36,
+  "miles": 4,
+  "feat": "Opened 2017; co-located",
+  "lat": 40.8172,
+  "lon": -73.899
+ },
+ {
+  "name": "Bronx 3 ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Bronx / Concourse",
+  "addr": "1000 Teller Ave, Fl 4, Bronx 10456",
+  "trains": "4",
+  "route": "4 to 161 St-Yankee Stadium, 14-min walk",
+  "mins": 38,
+  "miles": 4.2,
+  "feat": "Opened 2013; co-located",
+  "lat": 40.8332,
+  "lon": -73.916
+ },
+ {
+  "name": "HSLA-Harlem HS",
+  "level": "High",
+  "grades": "9-12",
+  "hood": "Manhattan / Manhattanville",
+  "addr": "509 W 129th St, Fl 3, NY 10027",
+  "trains": "4, 5 + M125 bus",
+  "route": "4/5 to 125 St, M125 crosstown bus to Amsterdam Ave",
+  "mins": 40,
+  "miles": 2.4,
+  "feat": "Opened 2021; co-located; not currently accepting applications",
+  "lat": 40.8153,
+  "lon": -73.9547
+ },
+ {
+  "name": "Hamilton Heights MS",
+  "level": "Middle",
+  "grades": "5-8",
+  "hood": "Manhattan / Hamilton Heights",
+  "addr": "461 W 131st St, NY 10027",
+  "trains": "4, 5 + M125 bus",
+  "route": "4/5 to 125 St, M125 bus to Amsterdam, 5-min walk north",
+  "mins": 42,
+  "miles": 2.5,
+  "feat": "Founded 2022; serving gr. 5-6 for 2026-27",
+  "lat": 40.8168,
+  "lon": -73.9535
+ },
+ {
+  "name": "Kingsbridge Heights ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Bronx / Kingsbridge Hts",
+  "addr": "124 Eames Pl, Bronx 10468",
+  "trains": "4",
+  "route": "4 to Kingsbridge Rd, 8-min walk",
+  "mins": 42,
+  "miles": 6.7,
+  "feat": "Opened 2024",
+  "lat": 40.8686,
+  "lon": -73.9022
+ },
+ {
+  "name": "Cobble Hill ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Brooklyn / Cobble Hill",
+  "addr": "284 Baltic St, Lower Level, Bklyn 11201",
+  "trains": "4, 5",
+  "route": "4/5 to Borough Hall, 12-min walk (or transfer F/G to Bergen St)",
+  "mins": 44,
+  "miles": 6.8,
+  "feat": "Founded 2012; co-located",
+  "lat": 40.6855,
+  "lon": -73.993
+ },
+ {
+  "name": "Bronx 2 ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Bronx / Claremont",
+  "addr": "450 St. Paul's Pl, Fl 5, Bronx 10456",
+  "trains": "5 + Bx15 bus",
+  "route": "5 to 3 Av-149 St, Bx15 bus up Third Ave",
+  "mins": 45,
+  "miles": 4.6,
+  "feat": "Founded 2010; District 9; co-located; after-school partners on site",
+  "lat": 40.8345,
+  "lon": -73.906
+ },
+ {
+  "name": "Williamsbridge ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Bronx / Williamsbridge",
+  "addr": "760 E Gun Hill Rd, Bronx 10467",
+  "trains": "5",
+  "route": "5 express to Gun Hill Rd, 6-min walk",
+  "mins": 45,
+  "miles": 8,
+  "feat": "Founded 2024; District 11",
+  "lat": 40.8712,
+  "lon": -73.8635
+ },
+ {
+  "name": "Norwood ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Bronx / Norwood",
+  "addr": "268 E 207th St, Bronx 10467",
+  "trains": "4 (or D)",
+  "route": "4 to Mosholu Pkwy, 8-min walk (D to Norwood-205 St is closer but no direct D access)",
+  "mins": 47,
+  "miles": 7.7,
+  "feat": "Opened 2023; District 10",
+  "lat": 40.8748,
+  "lon": -73.8788
+ },
+ {
+  "name": "Williamsburg ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Brooklyn / Williamsburg",
+  "addr": "183 S 3rd St, Fl 4, Bklyn 11211",
+  "trains": "4, 5 + J, M",
+  "route": "4/5 to Fulton St, J/M to Marcy Av, 8-min walk",
+  "mins": 48,
+  "miles": 4.8,
+  "feat": "Founded 2012; District 14; co-located",
+  "lat": 40.7112,
+  "lon": -73.9591
+ },
+ {
+  "name": "Unionport MS",
+  "level": "Middle",
+  "grades": "5-8",
+  "hood": "Bronx / Unionport",
+  "addr": "2169 Blackrock Ave, Bronx 10472",
+  "trains": "6",
+  "route": "6 to Castle Hill Av, 6-min walk",
+  "mins": 48,
+  "miles": 6.6,
+  "feat": "Founded 2024",
+  "lat": 40.8318,
+  "lon": -73.8508
+ },
+ {
+  "name": "Prospect Heights ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Brooklyn / Crown Heights",
+  "addr": "801 Park Pl, Fl 4, Bklyn 11216",
+  "trains": "4 (or +3)",
+  "route": "4 to Franklin Av, 10-min walk (or 3 one stop to Nostrand Av)",
+  "mins": 50,
+  "miles": 7.3,
+  "feat": "Founded 2013; District 17; co-located",
+  "lat": 40.6745,
+  "lon": -73.9483
+ },
+ {
+  "name": "Crown Heights ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Brooklyn / Crown Heights",
+  "addr": "330 Crown St, Fl 5, Bklyn 11225",
+  "trains": "5",
+  "route": "One seat: 5 to President St, 5-min walk",
+  "mins": 50,
+  "miles": 8,
+  "feat": "Founded 2013; District 17; co-located",
+  "lat": 40.6655,
+  "lon": -73.948
+ },
+ {
+  "name": "East Flatbush MS",
+  "level": "Middle",
+  "grades": "5-8",
+  "hood": "Brooklyn / Flatbush",
+  "addr": "3109 Newkirk Ave, Fl 1, Bklyn 11226",
+  "trains": "5 (or 2)",
+  "route": "One seat: 5 to Newkirk Av-Little Haiti, 2-min walk",
+  "mins": 52,
+  "miles": 9.7,
+  "feat": "Founded 2018; District 22; not accepting new gr. 5-8 applicants for 2026-27",
+  "lat": 40.64,
+  "lon": -73.947
+ },
+ {
+  "name": "Bronx 4 ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Bronx / Soundview",
+  "addr": "1880 Story Ave, Fl 3, Bronx 10473",
+  "trains": "6",
+  "route": "6 local to Morrison Av-Soundview, 14-min walk",
+  "mins": 53,
+  "miles": 5.3,
+  "feat": "Founded 2014; co-located",
+  "lat": 40.823,
+  "lon": -73.8745
+ },
+ {
+  "name": "Washington Heights ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Manhattan / Wash. Heights",
+  "addr": "701 Fort Washington Ave, NY 10040",
+  "trains": "M86 + B,C + A",
+  "route": "M86-SBS to CPW, B/C to 125 St, A express to 190 St",
+  "mins": 53,
+  "miles": 5.5,
+  "feat": "Founded 2014; District 6; shares building with WH MS; accepting K-6",
+  "lat": 40.8583,
+  "lon": -73.9338
+ },
+ {
+  "name": "Washington Heights MS",
+  "level": "Middle",
+  "grades": "5-8",
+  "hood": "Manhattan / Wash. Heights",
+  "addr": "701 Fort Washington Ave, NY 10040",
+  "trains": "M86 + B,C + A",
+  "route": "M86-SBS to CPW, B/C to 125 St, A express to 190 St",
+  "mins": 53,
+  "miles": 5.5,
+  "feat": "Founded 2024; same building as WH ES",
+  "lat": 40.8583,
+  "lon": -73.9338
+ },
+ {
+  "name": "Bed-Stuy MS",
+  "level": "Middle",
+  "grades": "5-8",
+  "hood": "Brooklyn / Bed-Stuy",
+  "addr": "70 Tompkins Ave, Fl 2, Bklyn 11206",
+  "trains": "4, 5 + J, M",
+  "route": "4/5 to Fulton St, J/M to Myrtle Av, 10-min walk",
+  "mins": 55,
+  "miles": 5.9,
+  "feat": "Founded 2015; shares building with HSLA-Brooklyn",
+  "lat": 40.696,
+  "lon": -73.9448
+ },
+ {
+  "name": "HSLA-Brooklyn HS",
+  "level": "High",
+  "grades": "9-12",
+  "hood": "Brooklyn / Bed-Stuy",
+  "addr": "70 Tompkins Ave, Fl 2, Bklyn 11206",
+  "trains": "4, 5 + J, M",
+  "route": "4/5 to Fulton St, J/M to Myrtle Av, 10-min walk",
+  "mins": 55,
+  "miles": 5.9,
+  "feat": "Opened 2022; not currently accepting applications",
+  "lat": 40.696,
+  "lon": -73.9448
+ },
+ {
+  "name": "Bed-Stuy ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Brooklyn / Bed-Stuy",
+  "addr": "211 Throop Ave, Fl 3, Bklyn 11206",
+  "trains": "4, 5 + J, M",
+  "route": "4/5 to Fulton St, J/M to Myrtle Av, 10-min walk",
+  "mins": 55,
+  "miles": 6,
+  "feat": "Founded 2012; District 14; co-located",
+  "lat": 40.695,
+  "lon": -73.9418
+ },
+ {
+  "name": "Flatbush ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Brooklyn / Flatbush",
+  "addr": "15 Snyder Ave, Bklyn 11226",
+  "trains": "Q (or 2, 5)",
+  "route": "One seat: Q to Church Av, 8-min walk",
+  "mins": 55,
+  "miles": 9,
+  "feat": "Founded 2016; District 17",
+  "lat": 40.6507,
+  "lon": -73.957
+ },
+ {
+  "name": "Ditmas Park MS",
+  "level": "Middle",
+  "grades": "5-8",
+  "hood": "Brooklyn / Flatbush",
+  "addr": "72 Veronica Pl, Fl 3, Bklyn 11226",
+  "trains": "5 (or 2)",
+  "route": "5 to Church Av (Nostrand), 8-min walk",
+  "mins": 55,
+  "miles": 9.1,
+  "feat": "Founded 2017; co-located",
+  "lat": 40.6495,
+  "lon": -73.956
+ },
+ {
+  "name": "Bushwick ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Brooklyn / Bushwick",
+  "addr": "139 Menahan St, Bklyn 11221",
+  "trains": "6 + M",
+  "route": "6 to 51 St, M (at Lex-53) to Knickerbocker Av, 5-min walk",
+  "mins": 58,
+  "miles": 6.2,
+  "feat": "Founded 2016; District 32",
+  "lat": 40.6972,
+  "lon": -73.9138
+ },
+ {
+  "name": "Lafayette MS",
+  "level": "Middle",
+  "grades": "5-8",
+  "hood": "Brooklyn / Bed-Stuy",
+  "addr": "787 Lafayette Ave, Bklyn 11221",
+  "trains": "4, 5 + J",
+  "route": "4/5 to Fulton St, J to Kosciuszko St, 10-min walk",
+  "mins": 60,
+  "miles": 6.3,
+  "feat": "Founded 2018; District 16; accepting gr. 5-6 for 2026-27",
+  "lat": 40.6905,
+  "lon": -73.9415
+ },
+ {
+  "name": "Ridgewood ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Queens / Ridgewood",
+  "addr": "58-23 Catalpa Ave, Queens 11385",
+  "trains": "6 + M",
+  "route": "6 to 51 St, M (at Lex-53) to Fresh Pond Rd, 8-min walk",
+  "mins": 65,
+  "miles": 6.1,
+  "feat": "Opened 2025; newest Queens elementary",
+  "lat": 40.7038,
+  "lon": -73.9
+ },
+ {
+  "name": "Bensonhurst ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Brooklyn / Bensonhurst",
+  "addr": "99 Avenue P, Fl 4, Bklyn 11204",
+  "trains": "Q + F",
+  "route": "Q to Lexington Av-63 St, F (cross-platform) to Avenue P, 8-min walk",
+  "mins": 72,
+  "miles": 11.9,
+  "feat": "Founded 2014; District 21; co-located",
+  "lat": 40.6095,
+  "lon": -73.9838
+ },
+ {
+  "name": "South Jamaica ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Queens / South Jamaica",
+  "addr": "120-27 141st St, Queens 11436",
+  "trains": "6 + E + bus",
+  "route": "6 to 51 St, E express to Sutphin-Archer, Q6 bus or 25-min walk",
+  "mins": 75,
+  "miles": 11,
+  "feat": "Opened 2016",
+  "lat": 40.68,
+  "lon": -73.794
+ },
+ {
+  "name": "Sheepshead Bay ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Brooklyn / Sheepshead Bay",
+  "addr": "3000 Avenue X, Bklyn 11235",
+  "trains": "Q + walk/bus",
+  "route": "One seat: Q to Neck Rd, 15-min walk (or B4 bus)",
+  "mins": 75,
+  "miles": 13.4,
+  "feat": "Opened 2023; District 22",
+  "lat": 40.5877,
+  "lon": -73.9365
+ },
+ {
+  "name": "Bergen Beach ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Brooklyn / Bergen Beach",
+  "addr": "1420 E 68th St, Fl 3, Bklyn 11234",
+  "trains": "5 + B41/B6 bus",
+  "route": "5 to Flatbush Av-Brooklyn College, then bus - no subway serves Bergen Beach",
+  "mins": 85,
+  "miles": 11.5,
+  "feat": "Founded 2014; District 22; accepting K-6 for 2026-27",
+  "lat": 40.619,
+  "lon": -73.905
+ },
+ {
+  "name": "Ozone Park MS",
+  "level": "Middle",
+  "grades": "5-8",
+  "hood": "Queens / South Ozone Park",
+  "addr": "109-55 128th St, Queens 11420",
+  "trains": "4, 5 + A",
+  "route": "4/5 to Fulton St, A (Lefferts branch) to Lefferts Blvd, 16-min walk",
+  "mins": 90,
+  "miles": 10.3,
+  "feat": "Opened 2020; District 28",
+  "lat": 40.679,
+  "lon": -73.814
+ },
+ {
+  "name": "Queens Village ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Queens / Queens Village",
+  "addr": "92-53 Springfield Blvd, Queens 11428",
+  "trains": "6 + E + bus (LIRR ~60)",
+  "route": "Subway+bus ~90 min; better: 4/5 to Grand Central, LIRR to Queens Village, 6-min walk (~60 min)",
+  "mins": 90,
+  "miles": 12.2,
+  "feat": "Opened 2023; District 29; merging with QV MS Aug 2026",
+  "lat": 40.7182,
+  "lon": -73.739
+ },
+ {
+  "name": "Queens Village MS",
+  "level": "Middle",
+  "grades": "5-8",
+  "hood": "Queens / Queens Village",
+  "addr": "92-53 Springfield Blvd, Queens 11428",
+  "trains": "6 + E + bus (LIRR ~60)",
+  "route": "Subway+bus ~90 min; better: 4/5 to Grand Central, LIRR to Queens Village, 6-min walk (~60 min)",
+  "mins": 90,
+  "miles": 12.2,
+  "feat": "Opened 2023; shares building with QV ES; merging Aug 2026",
+  "lat": 40.7182,
+  "lon": -73.739
+ },
+ {
+  "name": "Springfield Gardens ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Queens / Springfield Gardens",
+  "addr": "132-55 Ridgedale St, Fl 3, Queens 11413",
+  "trains": "6 + E + bus",
+  "route": "6 to 51 St, E to Jamaica Center, Q bus - no subway nearby",
+  "mins": 90,
+  "miles": 13.2,
+  "feat": "Opened 2014; District 29; co-located",
+  "lat": 40.6685,
+  "lon": -73.7545
+ },
+ {
+  "name": "Springfield Gardens MS",
+  "level": "Middle",
+  "grades": "5-8",
+  "hood": "Queens / Springfield Gardens",
+  "addr": "132-55 Ridgedale St, Queens 11413",
+  "trains": "6 + E + bus",
+  "route": "6 to 51 St, E to Jamaica Center, Q bus - no subway nearby",
+  "mins": 90,
+  "miles": 13.2,
+  "feat": "Opened 2018; same building as Springfield Gardens ES",
+  "lat": 40.6685,
+  "lon": -73.7545
+ },
+ {
+  "name": "Howard Beach MS",
+  "level": "Middle",
+  "grades": "5-8 (opening 5-6)",
+  "hood": "Queens / Howard Beach",
+  "addr": "158-20 101st St, Queens 11414",
+  "trains": "4, 5 + A",
+  "route": "4/5 to Fulton St, A (Rockaway branch) to Howard Beach-JFK, 15-min walk",
+  "mins": 95,
+  "miles": 10.4,
+  "feat": "New school opened 2025; District 27",
+  "lat": 40.66,
+  "lon": -73.839
+ },
+ {
+  "name": "Rosedale ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Queens / Rosedale",
+  "addr": "147-65 249th St, Queens 11422",
+  "trains": "Subway+bus (LIRR ~70)",
+  "route": "Subway+bus ~100 min; better: 4/5 to Grand Central, LIRR to Rosedale, 14-min walk (~70 min)",
+  "mins": 100,
+  "miles": 14.3,
+  "feat": "Opened 2014; farthest-southeast school",
+  "lat": 40.661,
+  "lon": -73.7345
+ },
+ {
+  "name": "Far Rockaway ES",
+  "level": "Elementary",
+  "grades": "K-4",
+  "hood": "Queens / Far Rockaway",
+  "addr": "10-45 Nameoke St, Fl 3, Queens 11691",
+  "trains": "4, 5 + A",
+  "route": "4/5 to Fulton St, A to Far Rockaway-Mott Av, 5-min walk",
+  "mins": 100,
+  "miles": 16.1,
+  "feat": "Founded 2016; District 27; co-located",
+  "lat": 40.6046,
+  "lon": -73.7555
+ },
+ {
+  "name": "Rockaway Park MS",
+  "level": "Middle",
+  "grades": "5-8",
+  "hood": "Queens / Rockaway Park",
+  "addr": "190 Beach 110th St, Queens 11694",
+  "trains": "4, 5 + A + S",
+  "route": "4/5 to Fulton St, A to Broad Channel, S shuttle to Beach 105 St",
+  "mins": 105,
+  "miles": 15.3,
+  "feat": "Opened 2020 (formerly Far Rockaway MS); District 27",
+  "lat": 40.5797,
+  "lon": -73.8352
+ }
+];
+
+const LVL_COLOR = { "Elementary": getCss('--elem'), "Middle": getCss('--mid'), "High": getCss('--high'), "K-12": getCss('--k12') };
+function getCss(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+function gmapUrl(d){
+  return "https://www.google.com/maps/dir/?api=1&origin=" + encodeURIComponent(ORIGIN) +
+         "&destination=" + encodeURIComponent(d.addr) + "&travelmode=transit";
+}
+function lvlKey(l){ return l.startsWith("K-12") ? "K-12" : l; }
+
+// ---- map ----
+let markers = [];
+try {
+const map = L.map('map', { scrollWheelZoom: false }).setView([40.72, -73.92], 11);
+map.createPane('landfallback');
+map.getPane('landfallback').style.zIndex = 150;   // below tilePane (200): real street tiles cover this when they load
+const NYC_LAND = {"type":"FeatureCollection","features":[{"type":"Feature","id":"36061","properties":{"name":"New York"},"geometry":{"type":"Polygon","coordinates":[[[-74.04563329873298,40.69014346352463],
+[-74.02409753477535,40.70904277671776],
+[-74.00974035880358,40.76488165660656],
+[-73.98461530085301,40.799244044230434],
+[-73.93436518495184,40.88171377452774],
+[-73.90565083300832,40.87312317762177],
+[-73.93436518495184,40.83532455123551],
+[-73.91282942099421,40.79580780546805],
+[-73.96307953689536,40.73653268681686],
+[-73.97384741887419,40.70904277671776],
+[-74.0205082407824,40.68069380692806],
+[-74.04563329873298,40.69014346352463]]]}},{"type":"Feature","id":"36047","properties":{"name":"Kings"},"geometry":{"type":"Polygon","coordinates":[[[-74.0205082407824,40.68069380692806],
+[-73.97384741887419,40.70904277671776],
+[-73.96307953689536,40.73653268681686],
+[-73.92718659696597,40.7262239705297],
+[-73.8948829510295,40.68241192630926],
+[-73.86975789307893,40.694438761977615],
+[-73.85540071710717,40.6428951805418],
+[-73.83386495314953,40.62829116580165],
+[-73.84822212912128,40.58877442003419],
+[-73.93436518495184,40.56901604715046],
+[-74.01332965279653,40.57417040529405],
+[-74.0025617708177,40.59564689755897],
+[-74.04204400474005,40.629150225492246],
+[-74.0205082407824,40.68069380692806]]]}},{"type":"Feature","id":"36081","properties":{"name":"Queens"},"geometry":{"type":"Polygon","coordinates":[[[-73.91282942099421,40.79580780546805],
+[-73.78720413124131,40.80182122330223],
+[-73.76925766127661,40.80010310392103],
+[-73.70106107541075,40.752854820938204],
+[-73.72618613336134,40.72450585114851],
+[-73.72618613336134,40.65320389682896],
+[-73.76925766127661,40.62399586734867],
+[-73.75131119131191,40.58963347972479],
+[-73.83386495314953,40.57760664405643],
+[-73.94154377293773,40.54324425643256],
+[-73.93436518495184,40.56901604715046],
+[-73.84822212912128,40.58877442003419],
+[-73.83386495314953,40.62829116580165],
+[-73.85540071710717,40.6428951805418],
+[-73.86975789307893,40.694438761977615],
+[-73.8948829510295,40.68241192630926],
+[-73.92718659696597,40.7262239705297],
+[-73.96307953689536,40.73653268681686],
+[-73.91282942099421,40.79580780546805]]]}},{"type":"Feature","id":"36085","properties":{"name":"Richmond"},"geometry":{"type":"Polygon","coordinates":[[[-74.20356223442234,40.59306971848718],
+[-74.20356223442234,40.63086834487344],
+[-74.16049070650706,40.644613299922995],
+[-74.07075835668357,40.66093543404433],
+[-74.05281188671887,40.60337843477434],
+[-74.08511553265532,40.56987510684106],
+[-74.22150870438705,40.5028684509745],
+[-74.26099093830938,40.502009391283906],
+[-74.25022305633055,40.54496237581375],
+[-74.2179194103941,40.5587073308633],
+[-74.20356223442234,40.59306971848718]]]}},{"type":"Feature","id":"36005","properties":{"name":"Bronx"},"geometry":{"type":"Polygon","coordinates":[[[-73.93436518495184,40.88171377452774],
+[-73.91641871498715,40.91779428153281],
+[-73.76566836728367,40.876559416384154],
+[-73.76566836728367,40.844774207832074],
+[-73.81232918919189,40.84649232721326],
+[-73.78720413124131,40.80182122330223],
+[-73.91282942099421,40.79580780546805],
+[-73.93436518495184,40.83532455123551],
+[-73.90565083300832,40.87312317762177],
+[-73.93436518495184,40.88171377452774]]]}}]};
+L.geoJSON(NYC_LAND, { pane: 'landfallback', style: { color: '#8fa3b3', weight: 1, fillColor: '#f3f1ea', fillOpacity: 1 } }).addTo(map);
+[['MANHATTAN',40.727,-74.005],['THE BRONX',40.868,-73.815],['BROOKLYN',40.645,-73.955],['QUEENS',40.71,-73.80],['STATEN ISLAND',40.58,-74.15]].forEach(([n,la,lo]) =>
+  L.marker([la,lo], { pane: 'landfallback', interactive: false,
+    icon: L.divIcon({ className: 'boro-label', html: n, iconSize: [90,14], iconAnchor: [45,7] }) }).addTo(map));
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; OpenStreetMap contributors &copy; CARTO', maxZoom: 19
+}).addTo(map);
+
+const home = L.marker([40.7806, -73.9578], {
+  icon: L.divIcon({ className: '', html: '<div style="font-size:22px;line-height:1;text-shadow:0 0 3px #fff, 0 0 3px #fff;">&#9733;</div>', iconSize: [22,22], iconAnchor: [11,11] })
+}).addTo(map).bindPopup('<span class="pname">E 87th St &amp; Madison Ave</span>');
+
+
+DATA.forEach(d => {
+  if (d.lat == null) return;
+  const m = L.circleMarker([d.lat, d.lon], {
+    radius: 7, weight: 1.5, color: '#ffffff', fillColor: LVL_COLOR[lvlKey(d.level)], fillOpacity: 0.95
+  }).bindPopup(
+    '<span class="pname">' + d.name + '</span><br>' + d.level + ' &middot; ' + d.hood + '<br>' +
+    d.addr + '<br>~' + d.mins + ' min &middot; ' + d.miles.toFixed(1) + ' mi &middot; ' + d.trains + '<br>' +
+    '<a href="' + gmapUrl(d) + '" target="_blank" rel="noopener">Open in Google Maps (transit) &rarr;</a>'
+  );
+  m._lvl = lvlKey(d.level);
+  m.addTo(map);
+  markers.push(m);
+});
+map.fitBounds(L.latLngBounds(DATA.filter(d=>d.lat!=null).map(d=>[d.lat,d.lon])).extend([40.7806,-73.9578]), { padding: [18,18] });
+
+} catch(e) { console.log('map init failed', e); document.getElementById('map').innerHTML = '<div style="padding:20px;color:var(--muted)">Map unavailable offline &mdash; table below still works.</div>'; }
+
+// ---- table ----
+let sortKey = 'mins', sortAsc = true, activeLvl = 'All';
+const tbody = document.querySelector('#tbl tbody');
+
+function render(){
+  const rows = DATA
+    .filter(d => activeLvl === 'All' || lvlKey(d.level) === activeLvl)
+    .sort((a,b) => {
+      const va = a[sortKey], vb = b[sortKey];
+      const cmp = (typeof va === 'number') ? va - vb : String(va).localeCompare(String(vb));
+      return sortAsc ? cmp : -cmp;
+    });
+  tbody.innerHTML = rows.map((d,i) =>
+    '<tr>' +
+    '<td class="rank">' + (i+1) + '</td>' +
+    '<td class="school">' + d.name + '</td>' +
+    '<td><span class="lvl"><span class="dot" style="background:' + LVL_COLOR[lvlKey(d.level)] + '"></span>' + d.level + ' (' + d.grades + ')</span></td>' +
+    '<td>' + d.hood + '</td>' +
+    '<td class="addr">' + d.addr + '</td>' +
+    '<td class="route-cell"><strong>' + d.trains + '</strong> &mdash; ' + d.route + '</td>' +
+    '<td class="num"><strong>' + d.mins + '</strong></td>' +
+    '<td class="num">' + d.miles.toFixed(1) + '</td>' +
+    '<td><a class="gmap" href="' + gmapUrl(d) + '" target="_blank" rel="noopener">Directions &rarr;</a></td>' +
+    '<td class="feat">' + d.feat + '</td>' +
+    '</tr>'
+  ).join('');
+  document.getElementById('count').textContent = rows.length + ' of ' + DATA.length + ' schools';
+  document.getElementById('cards').innerHTML = rows.map((d,i) =>
+    '<div class="card">' +
+    '<div class="c-top"><span class="c-name">' + (i+1) + '. ' + d.name + '</span>' +
+    '<span class="c-min">~' + d.mins + ' <small>min &middot; ' + d.miles.toFixed(1) + ' mi</small></span></div>' +
+    '<div class="c-sub"><span class="lvl"><span class="dot" style="background:' + LVL_COLOR[lvlKey(d.level)] + '"></span>' + d.level + ' (' + d.grades + ')</span> &middot; ' + d.hood + '<br>' + d.addr + '</div>' +
+    '<div class="c-route"><strong>' + d.trains + '</strong> &mdash; ' + d.route + '</div>' +
+    '<a class="gmap" href="' + gmapUrl(d) + '" target="_blank" rel="noopener">Directions in Google Maps &rarr;</a>' +
+    '<div class="c-feat">' + d.feat + '</div>' +
+    '</div>'
+  ).join('');
+
+  markers.forEach(m => {
+    const show = activeLvl === 'All' || m._lvl === activeLvl;
+    m.setStyle({ opacity: show ? 1 : 0, fillOpacity: show ? 0.95 : 0 });
+    if (show) { m.bringToFront(); } else { m.closePopup(); }
+  });
+
+  document.querySelectorAll('th[data-k]').forEach(th => {
+    const arr = th.querySelector('.arr');
+    if (!arr) return;
+    arr.innerHTML = th.dataset.k === sortKey ? (sortAsc ? '&#9650;' : '&#9660;') : '';
+  });
+}
+
+document.querySelectorAll('th[data-k]').forEach(th => {
+  th.addEventListener('click', () => {
+    const k = th.dataset.k === 'rank' ? 'mins' : th.dataset.k;
+    if (sortKey === k) sortAsc = !sortAsc; else { sortKey = k; sortAsc = true; }
+    render();
+  });
+});
+document.querySelectorAll('.chip').forEach(ch => {
+  ch.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+    ch.classList.add('on');
+    activeLvl = ch.dataset.lvl;
+    render();
+  });
+});
+render();
+</script>
+</body>
+</html>
