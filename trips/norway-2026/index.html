@@ -462,19 +462,19 @@
   <div class="day-card">
     <div class="day-header" onclick="this.parentElement.classList.toggle('open')">
       <span class="day-badge bergen">Day 6</span>
-      <span class="day-title">Thu Aug 27 — Bergen: Wool Factory (tentative) + Kayak</span>
+      <span class="day-title">Thu Aug 27 — Bergen: Wool Factory + Kayak</span>
       <span class="day-toggle">▼</span>
     </div>
     <div class="day-body">
       <table class="activity-table">
         <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
-        <tr><td class="time">10:00 AM</td><td class="act">Hillesvåg Ullvarefabrikk — wool factory tour (Emma's pick) — TENTATIVE</td><td class="notes"><strong>Pending decision</strong> — the ~40-min drive each way makes the same-day 2pm kayak tight. 1-hr guided tour, wool to yarn, ending in the mill shop. kr 200/person. Leknesvegen 259, Hjelmås — you'd need a car or private transfer. Book on ull.no (groups over 10 email post@ull.no; you're 5). Machines run outside weeks 28–31, so they'd be operating on the 27th.</td></tr>
-        <tr><td class="time">Late AM</td><td class="act">Drive back to Bergen (if wool tour is on)</td><td class="notes">~40 min. Aim to be back in the center by ~12:30 to eat before the kayak.</td></tr>
+        <tr><td class="time">10:00 AM</td><td class="act">Hillesvåg Ullvarefabrikk — wool factory tour (Emma's pick) BOOKED</td><td class="notes">1-hr guided tour (10:00–11:00), wool to yarn, ending in the mill shop. 5 adults, kr 1,000 total (paid, PayPal). Order 6890148. Leknesvegen 259, Hjelmås — ~40 min north of Bergen; still need to arrange a car or private transfer. Machines run outside weeks 28–31, so they'll be operating on the 27th.</td></tr>
+        <tr><td class="time">~11:00 AM</td><td class="act">Drive back to Bergen</td><td class="notes">~40 min. Back in the center by ~11:45 — comfortable margin before the 2pm kayak.</td></tr>
         <tr><td class="time">Lunch</td><td class="act">Fish Market (Fisketorget)</td><td class="notes">Outdoor stalls. Keep it quick to make the 1:50pm kayak meet.</td></tr>
         <tr><td class="time">2:00 PM</td><td class="act">Guided Kayak Tour Bergen — Fjord Expedition BOOKED</td><td class="notes">4h15m, 5 adults. Meet at Bergen Tourist Information, Strandkaien 3 — outside the main door at street level, 10 min early; look for the Fjord Expedition sign. Waterproof gear provided; snacks (lefse + local apple juice) included. Ends ~6:15pm back at the meeting point. Ref #1423291633.</td></tr>
         <tr><td class="time">Dinner</td><td class="act">Lola, Lysverket, or Gaptrast</td><td class="notes">Lola, Lysverket (1 Michelin star, KODE museum), or Gaptrast (1 Michelin star, New Nordic, charcoal fire).</td></tr>
       </table>
-      <div class="alt-plan"><strong>Wool tour is tentative.</strong> The 10am tour + ~40-min drive each way runs close to the 1:50pm kayak meet. If you drop it, Thursday morning is free (sleep in, Bryggen, coffee) and you just show up for the 2pm kayak. If you keep it, grab a quick bite near Strandkaien rather than a sit-down lunch.</div>
+      <div class="alt-plan"><strong>Wool tour + kayak both booked.</strong> The 10–11am tour plus the ~40-min drive back leaves a comfortable buffer before the 2pm kayak meet. Grab a quick bite near Strandkaien rather than a long sit-down lunch and you're set.</div>
       <div class="rain-fallback">🌧️ <strong>Bergen rain plan:</strong> The wool tour is indoors, so weather doesn't affect it. The kayak is a fixed 2pm booking (Ref #1423291633); if the operator cancels for weather they offer a reschedule or full refund. Indoor backups if needed: KODE Art Museums, Bergen Aquarium, or Bryggens Museum.</div>
     </div>
   </div>
@@ -594,6 +594,7 @@
         <li><strong>Opus XVI, Bergen</strong> (3 nts): #49673SG013802 · #49673SG013803</li>
         <li><strong>Rosewood, London</strong> (2 nts): #CI5UKP1T · #CI5UKOWR</li>
         <li><strong>Bergen kayak</strong> (Thu 2pm, 5 pax): Ref #1423291633</li>
+        <li><strong>Wool factory tour</strong> (Thu 10am, 5 pax): Order 6890148</li>
         <li><strong>Spurs v Newcastle</strong> (Sat, 3 pax): Premier Events · Ref PE198417 · £990</li>
         <li><strong>Ambassadors Clubhouse</strong> (Sat, 2 pax): Ref 4F5SFR4FX9DB</li>
         <li><strong>Brat, London</strong> (Sun, 5 pax, 7:30pm)</li>
@@ -604,7 +605,7 @@
       <ul>
         <li style="color:#dc2626;"><strong>Cancel KLM by Aug 25</strong> (booking XK4XDR) — refund NOK 19,525; hold as Norwegian backup until then. Hard cutoff: before 10:45am Aug 29.</li>
         <li><strong>Hiking boots</strong> — in Bergen before Fri's hike (Sport 1 / Stormberg, Xhibition mall)</li>
-        <li>Wool factory tour + car/transfer (Thu — tentative)</li>
+        <li><strong>Car / transfer to wool factory</strong> (Thu, Hjelmås ~40 min each way)</li>
         <li>Transfers: Flåm ↔ 29|2 Aurland (Aug 25–26)</li>
         <li>Reservations: Hoggorm, The Wolseley</li>
         <li>Abigail's Party tickets (Sat ~7:30pm, Harold Pinter Theatre) — book ahead</li>
@@ -672,7 +673,7 @@ addLabel(mapNorway, bergen[0], bergen[1], 'Bergen', {size:15,dx:16,dy:12});
 
 L.marker([60.1939,11.1004], {icon:makeIcon('#6b7280',10)}).bindPopup('<strong>Oslo Airport (OSL)</strong><br>Gardermoen').addTo(mapNorway);
 L.marker([60.2934,5.2181], {icon:makeIcon('#6b7280',10)}).bindPopup('<strong>Bergen Airport (BGO)</strong><br>Flesland').addTo(mapNorway);
-L.marker([60.5926,5.3636], {icon:makeIcon('#7c3aed',9)}).bindPopup('<strong>Hillesvåg Ullvarefabrikk</strong><br>Wool factory (tentative)').addTo(mapNorway);
+L.marker([60.5926,5.3636], {icon:makeIcon('#7c3aed',9)}).bindPopup('<strong>Hillesvåg Ullvarefabrikk</strong><br>Wool factory tour (Thu 10am)').addTo(mapNorway);
 addLabel(mapNorway, 60.1939, 11.1004, 'OSL', {size:11,color:'#666',dx:12,dy:12});
 addLabel(mapNorway, 60.2934, 5.2181, 'BGO', {size:11,color:'#666',dx:12,dy:12});
 
@@ -760,7 +761,7 @@ const bergenPlaces = [
   {ll:[60.3780,5.3400], color:'#2563eb', name:'Ulriken Cable Car', desc:'643m', size:9},
   {ll:[60.3900,5.3327], color:'#6b7280', name:'Bergen stasjon', desc:'Train station', size:8},
   {ll:[60.2934,5.2181], color:'#6b7280', name:'Bergen Airport (BGO)', desc:'Flesland — to London', size:8},
-  {ll:[60.5926,5.3636], color:'#7c3aed', name:'Hillesvåg Ullvarefabrikk', desc:'Wool factory (tentative) — Hjelmås, ~40 min N', size:8},
+  {ll:[60.5926,5.3636], color:'#7c3aed', name:'Hillesvåg Ullvarefabrikk', desc:'Wool factory tour (Thu 10am) — Hjelmås, ~40 min N', size:8},
 ];
 bergenPlaces.forEach(p => {
   L.marker(p.ll, {icon:makeIcon(p.color,p.size)}).bindPopup('<strong>'+p.name+'</strong><br>'+p.desc).addTo(mapBergen);
