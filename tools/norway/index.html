@@ -1,1 +1,354 @@
-PLACEHOLDER_WILL_BE_OVERWRITTEN
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Norway, by the numbers</title>
+<meta name="description" content="A data-forward field guide to Norway: history, economy, culture, Oslo, Bergen, and the fjords.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e13; --card:#0e141b; --line:#1c2733; --line2:#22303f;
+  --tx:#f4f7fa; --tx2:#a9b8c6; --tx3:#6d8095; --tx4:#4a5b6b;
+  --plate:#f4f7fa; --pink:#0a0e13; --pink2:#5a6a7a; --pline:#d4dde5;
+  --blue:#4ea3d8; --red:#e5544b; --red2:#c8392f; --amber:#f0b429;
+  --rail:212px; --wrap:1080px; --pad:48px;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --disp:Archivo,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.6 var(--sans);-webkit-text-size-adjust:100%;
+  display:grid;grid-template-columns:var(--rail) 1fr;align-items:start}
+img{max-width:100%;display:block}
+a{color:var(--blue)} a:hover{color:#7cc0ea}
+
+/* ---------- RAIL ---------- */
+#rail{position:sticky;top:0;height:100vh;background:#0d1219;border-right:1px solid var(--line);z-index:40}
+.railin{height:100%;display:flex;flex-direction:column;padding:20px 0 20px}
+.railbrand{display:block;padding:0 18px 16px;margin-bottom:14px;border-bottom:1px solid var(--line)}
+.marksvg{height:22px;width:auto;opacity:.9}
+.railtitle{padding:0 18px 16px}
+.railtitle b{display:block;font:800 17px/1.1 var(--disp);letter-spacing:.04em;color:var(--tx)}
+.railtitle b span{color:var(--red)}
+.railtitle em{display:block;font:400 11px/1.4 var(--sans);font-style:normal;color:var(--tx4);margin-top:4px}
+#navlinks{display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:none}
+#navlinks::-webkit-scrollbar{display:none}
+#navlinks a{display:flex;align-items:center;gap:11px;padding:8px 18px;text-decoration:none;
+  font:500 12.5px/1.25 var(--sans);color:var(--tx3);border-left:3px solid transparent;transition:color .15s,background .15s}
+#navlinks a i{font:600 9.5px/1 ui-monospace,Menlo,monospace;font-style:normal;color:#33465a;width:15px;flex:none}
+#navlinks a:hover{color:var(--tx2)}
+#navlinks a.on{color:var(--tx);background:#131c26;border-left-color:var(--red)}
+#navlinks a.on i{color:var(--red)}
+.railread{margin:16px 18px 0;padding-top:14px;border-top:1px solid var(--line)}
+.railread .rl{font:500 10px/1.3 var(--sans);letter-spacing:.12em;color:var(--tx4);margin-bottom:7px}
+.rbar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:6px}
+.rbar i{display:block;height:4px;width:0;background:var(--blue);transition:width .12s linear}
+.rpct{font:400 11px/1.3 var(--sans);color:var(--tx4)}
+#saveoff{margin:16px 18px 0;padding:10px;background:#131c26;border:1px solid #2a3a4a;border-radius:7px;
+  color:var(--tx2);font:600 11.5px/1 var(--sans);cursor:pointer;min-height:40px;transition:all .18s}
+#saveoff:hover{background:#1a2734;border-color:var(--blue);color:var(--tx)}
+#saveoff[disabled]{opacity:.6;cursor:default}
+.railnote{margin:7px 18px 0;font:400 10.5px/1.4 var(--sans);color:var(--tx4);text-align:center}
+.railback{margin:auto 18px 0;display:block;padding:15px 0 0;border-top:1px solid var(--line);
+  font:600 10.5px/1 var(--sans);letter-spacing:.12em;color:var(--tx4);text-decoration:none}
+.railback:hover{color:var(--blue)}
+
+/* ---------- MAIN ---------- */
+main{min-width:0}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 var(--pad)}
+section{scroll-margin-top:0}
+p{color:var(--tx2);max-width:66ch;text-wrap:pretty}
+h1{font:800 clamp(40px,6vw,74px)/.96 var(--disp);letter-spacing:-.032em;margin:0 0 16px;color:var(--tx)}
+h2{font:800 clamp(30px,3.6vw,44px)/1.05 var(--disp);letter-spacing:-.026em;margin:0;color:#fff}
+h3{font:700 22px/1.28 var(--disp);letter-spacing:-.015em;color:var(--tx);margin:38px 0 12px}
+h4{font:700 16px/1.3 var(--disp);color:var(--tx);margin:0 0 7px}
+.lede{font:400 17px/1.62 var(--sans);color:#c3d0dc;max-width:58ch;margin:0}
+.small{font:400 13px/1.55 var(--sans);color:var(--tx3)}
+hr{display:none}
+
+/* ---------- HERO ---------- */
+#hero{position:relative;min-height:min(640px,86vh);display:flex;align-items:flex-end;
+  background:#101822;overflow:hidden;border-bottom:1px solid var(--line)}
+#hero .heroph{position:absolute;inset:0;margin:0}
+#hero .heroph img{width:100%;height:100%;object-fit:cover;opacity:.5}
+#hero .scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,14,19,.3) 0%,rgba(10,14,19,.55) 42%,var(--bg) 100%)}
+#hero .wrap{position:relative;z-index:2;padding-top:70px;padding-bottom:34px}
+#hero .lede{color:#c8d5e1;max-width:62ch;font-size:18px}
+.heroflag{display:flex;gap:6px;margin-bottom:22px}
+.heroflag i{display:block;height:5px;border-radius:3px}
+.heroflag i:nth-child(1){width:56px;background:var(--red)}
+.heroflag i:nth-child(2){width:22px;background:#fff}
+.heroflag i:nth-child(3){width:34px;background:#2c4a8a}
+.herostats{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;background:var(--line);
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.herostats div{background:#0e141b;padding:15px 18px}
+.herostats b{display:block;font:700 clamp(18px,1.7vw,24px)/1.1 var(--disp);color:var(--tx);font-variant-numeric:tabular-nums}
+.herostats span{font:400 11.5px/1.35 var(--sans);letter-spacing:.004em;color:var(--tx3)}
+#hero .herostats{margin:32px calc(-1*var(--pad)) 0;border-bottom:0}
+
+/* ---------- SECTION OPENERS ---------- */
+.opener{position:relative;min-height:420px;display:flex;align-items:center;background:#0c1219;overflow:hidden}
+.opener>.ophoto{position:absolute;inset:0;margin:0}
+.opener>.ophoto img{width:100%;height:100%;object-fit:cover;opacity:.6}
+.opener .scrim{position:absolute;inset:0;
+  background:linear-gradient(102deg,rgba(10,14,19,.94) 0%,rgba(10,14,19,.66) 46%,rgba(10,14,19,.14) 100%)}
+.openerin{position:relative;z-index:2;max-width:var(--wrap);width:100%;margin:0 auto;padding:44px var(--pad)}
+.openerin .inner{max-width:62%}
+.secno{font:800 96px/.8 var(--disp);letter-spacing:-.05em;color:var(--red2);margin-bottom:18px}
+.opener h2{margin-bottom:14px}
+.opener .lede{color:#c3d0dc}
+.ocredit{position:absolute;right:0;bottom:0;z-index:3;background:rgba(10,14,19,.72);backdrop-filter:blur(6px);
+  padding:7px 13px;font:400 11px/1.4 var(--sans);color:#8ea0b0;max-width:60%}
+.ocredit a{color:#8ea0b0}
+section>.wrap:first-of-type{padding-top:38px}
+section>.wrap{padding-bottom:44px}
+
+/* ---------- CHART PLATES ---------- */
+figure.ch{margin:34px calc(-1*var(--pad));background:var(--plate);border-top:3px solid var(--red2);
+  padding:26px var(--pad) 24px;color:var(--pink)}
+.chtitle{font:700 26px/1.2 var(--disp);letter-spacing:-.018em;color:var(--pink);margin-bottom:4px}
+.chsub{font:400 14px/1.5 var(--sans);color:var(--pink2);margin-bottom:18px;max-width:74ch}
+figure.ch figcaption{margin-top:16px;padding-top:13px;border-top:1px solid var(--pline);
+  font:400 13.5px/1.6 var(--sans);color:var(--pink2);max-width:82ch}
+figure.ch figcaption b{color:var(--pink)}
+figure.ch svg{display:block;width:100%;height:auto;overflow:visible}
+figure.ch .legend{display:flex;flex-wrap:wrap;gap:16px;margin:14px 0 0;font:500 12.5px/1 var(--sans);color:var(--pink2)}
+figure.ch .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+figure.ch .legend b{color:var(--pink)!important}
+.axis{stroke:#b6c2cd}
+.gridl{stroke:#dde4ea;stroke-dasharray:2 4}
+figure.ch text{font-family:var(--sans);fill:var(--pink2)}
+figure.ch text.val{fill:var(--pink);font-variant-numeric:tabular-nums;font-weight:700}
+figure.ch text.lab{fill:#47576a;font-weight:500}
+figure.ch rect,figure.ch circle{transition:opacity .12s}
+figure.ch svg.hot rect:not(.nohit),figure.ch svg.hot circle:not(.nohit){opacity:.42}
+figure.ch svg.hot .hot{opacity:1}
+.grid:has(> figure.ch){display:block}
+.grid:has(> figure.ch) figure.ch{margin-top:26px}
+
+/* ---------- CARDS / STATS ---------- */
+.grid{display:grid;gap:16px;margin-top:8px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(176px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:17px 19px}
+.card p{margin:0;font:400 14.5px/1.62 var(--sans)}
+.card h4+p{margin-top:0}
+.tag{display:inline-block;font:600 11px/1 var(--sans);letter-spacing:.02em;color:var(--amber);margin-bottom:9px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:15px 17px}
+.stat b{display:block;font:700 27px/1.08 var(--disp);font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:var(--tx)}
+.stat span{display:block;font:400 12px/1.42 var(--sans);letter-spacing:.004em;color:var(--tx3);margin-top:6px}
+.stat em{font-style:normal;color:var(--tx2);font:400 12.5px/1.5 var(--sans);display:block;margin-top:9px}
+.flag{border-left:3px solid var(--red);background:linear-gradient(90deg,rgba(229,84,75,.10),transparent 70%);
+  padding:15px 19px;border-radius:0 10px 10px 0;margin:24px 0}
+.flag h4{color:#fff}
+.flag p{margin:0;color:#dbe4ec;font:400 15px/1.65 var(--sans);max-width:70ch}
+
+/* ---------- TIMELINE ---------- */
+.tl{position:relative;margin:26px 0 0;padding-left:30px}
+.tl:before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;
+  background:linear-gradient(var(--blue),#a98bd8,var(--red))}
+.tl .ev{position:relative;padding:0 0 26px}
+.tl .ev:before{content:"";position:absolute;left:-27px;top:7px;width:11px;height:11px;border-radius:50%;
+  background:var(--bg);border:2px solid var(--blue)}
+.tl .ev.hi:before{border-color:var(--red);background:var(--red)}
+.tl .yr{font:700 12px/1 var(--sans);letter-spacing:.08em;color:var(--amber);font-variant-numeric:tabular-nums}
+.tl .ti{font:700 17px/1.3 var(--disp);color:var(--tx);margin:5px 0 5px}
+.tl .tx{margin:0;font:400 15px/1.66 var(--sans);color:var(--tx2);max-width:64ch}
+
+/* ---------- TABLES ---------- */
+.tbl{width:100%;border-collapse:collapse;font:400 14.5px/1.55 var(--sans);margin-top:16px}
+.tbl th{text-align:left;font:700 13.5px/1.35 var(--sans);letter-spacing:0;
+  color:var(--tx);border-bottom:2px solid var(--blue);padding:8px 12px 9px 0}
+.tbl td{border-bottom:1px solid var(--line);padding:11px 12px 11px 0;color:var(--tx2);vertical-align:top}
+.tbl td b{color:var(--tx);font-weight:600}
+.tbl td.n{text-align:right;font-variant-numeric:tabular-nums;color:var(--tx);white-space:nowrap}
+.tbl tr:hover td{background:rgba(78,163,216,.05)}
+.scroller{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ---------- PHOTOS ---------- */
+figure.ph{margin:26px calc(-1*var(--pad)) 0;background:#0e141b;overflow:hidden;position:relative}
+figure.ph img{width:100%;height:auto;max-height:520px;object-fit:cover;background:#0e141b;aspect-ratio:21/9}
+figure.ph figcaption{font:400 11.5px/1.5 var(--sans);color:var(--tx3);padding:9px var(--pad) 0}
+figure.ph figcaption a{color:var(--tx3)}
+.phgrid{display:grid;gap:2px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  margin:26px calc(-1*var(--pad)) 0}
+.phgrid figure.ph{margin:0}
+.phgrid figure.ph img{aspect-ratio:4/3;max-height:none}
+.phgrid:has(> figure:only-child) figure.ph img{aspect-ratio:21/9;max-height:460px}
+.phgrid:has(> figure:only-child) figure.ph figcaption{padding-left:var(--pad)}
+.phgrid figure.ph figcaption{padding:9px 14px 12px}
+
+/* ---------- PHRASES ---------- */
+.ph-row{display:grid;grid-template-columns:minmax(96px,1fr) minmax(96px,1.1fr) minmax(120px,1.3fr);gap:12px;
+  padding:11px 0;border-bottom:1px solid var(--line);font:400 14.5px/1.5 var(--sans);align-items:baseline}
+.ph-row b{color:var(--tx)}
+.ph-row i{color:var(--amber);font-style:normal;font-size:13.5px}
+.ph-row span{color:var(--tx2);font-size:13.5px}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.pill{display:inline-block;font:500 12.5px/1 var(--sans);padding:8px 12px;border:1px solid var(--line2);
+  border-radius:20px;color:var(--tx2);background:#0e141b;text-decoration:none;transition:all .18s ease}
+a.pill:hover{color:var(--tx);border-color:var(--blue);background:#101a24}
+
+/* inline source references */
+a.src{color:inherit;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:2px;
+  text-decoration-color:rgba(78,163,216,.5);transition:color .15s ease,text-decoration-color .15s ease}
+a.src:hover{color:var(--blue);text-decoration-color:var(--blue)}
+figure.ch a.src{text-decoration-color:rgba(31,95,143,.45)}
+figure.ch a.src:hover{color:#1f5f8f;text-decoration-color:#1f5f8f}
+
+/* sources accordion */
+details.srcs{margin-top:22px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+details.srcs summary{cursor:pointer;list-style:none;padding:16px 0;display:flex;align-items:center;gap:10px;
+  font:700 15px/1.2 var(--disp);color:var(--tx);letter-spacing:-.01em}
+details.srcs summary::-webkit-details-marker{display:none}
+details.srcs summary:before{content:"+";font:400 17px/1 var(--sans);color:var(--blue);width:12px}
+details.srcs[open] summary:before{content:"–"}
+details.srcs summary:hover{color:var(--blue)}
+.srcbody{display:grid;gap:22px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));padding:2px 0 26px}
+.srcbody h5{font:700 11.5px/1.3 var(--sans);letter-spacing:.06em;color:var(--tx3);margin:0 0 9px}
+.srcbody ul{margin:0;padding:0;list-style:none;display:grid;gap:7px}
+.srcbody li{font:400 13.5px/1.45 var(--sans)}
+.srcbody a{color:var(--tx2);text-decoration:none;border-bottom:1px solid transparent}
+.srcbody a:hover{color:var(--blue);border-bottom-color:var(--blue)}
+footer{border-top:1px solid var(--line);padding:32px 0 70px;color:var(--tx3);font:400 13.5px/1.65 var(--sans);margin-top:20px}
+.uncertain{border-bottom:0}
+
+/* ---------- EXPLAINERS ---------- */
+.term{cursor:help;color:#cfdae5;box-shadow:inset 0 -1px 0 var(--blue)}
+.gloss{cursor:help;color:#cfdae5;border-bottom:1.5px dotted var(--blue)}
+.term:focus,.gloss:focus{outline:2px solid rgba(78,163,216,.45);outline-offset:2px;border-radius:2px}
+#nrwcard{position:fixed;z-index:998;width:326px;background:#131c26;border:1px solid #2a3a4a;border-radius:11px;
+  box-shadow:0 18px 44px rgba(0,0,0,.62);overflow:hidden;opacity:0;visibility:hidden;transition:opacity .16s ease;font-family:var(--sans)}
+#nrwtip{position:fixed;z-index:999;pointer-events:none;opacity:0;transition:opacity .1s ease;background:#0a0e13;
+  color:#f4f7fa;font:600 12.5px/1.35 var(--sans);padding:7px 10px;border-radius:6px;
+  box-shadow:0 8px 24px rgba(0,0,0,.5);border:1px solid #2a3a4a;white-space:nowrap}
+#nrwtip em{display:block;font-style:normal;font-weight:500;color:#8ea0b0;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px}
+
+/* ---------- RESPONSIVE ---------- */
+@media(max-width:1000px){
+  body{display:block}
+  #rail{position:sticky;top:0;height:auto;border-right:0;border-bottom:1px solid var(--line);
+    background:rgba(13,18,25,.95);backdrop-filter:blur(12px)}
+  .railin{flex-direction:row;align-items:center;gap:14px;padding:0 14px;height:auto}
+  .railbrand{padding:10px 14px 10px 0;margin:0;border-bottom:0;border-right:1px solid var(--line);flex:none}
+  .marksvg{height:18px}
+  .railtitle{padding:0;flex:none}
+  .railtitle em,.railread,#saveoff,.railnote{display:none}
+  #navlinks{flex-direction:row;overflow-x:auto;flex:1}
+  #navlinks a{border-left:0;border-bottom:2px solid transparent;padding:14px 10px;white-space:nowrap}
+  #navlinks a i{display:none}
+  #navlinks a.on{background:none;border-left:0;border-bottom-color:var(--red)}
+  .railback{margin:0;padding:0;border-top:0;flex:none;white-space:nowrap}
+  .opener{min-height:330px}
+  .secno{font-size:68px}
+  .openerin .inner{max-width:100%}
+  :root{--pad:22px}
+  #hero{min-height:auto}
+  .herostats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  #hero .wrap{padding-top:44px}
+}
+@media(max-width:560px){
+  .ph-row{grid-template-columns:1fr 1fr;row-gap:3px}
+  .ph-row span{grid-column:1/-1}
+  .chtitle{font-size:21px}
+  #nrwcard{width:min(326px,calc(100vw - 24px))}
+}
+@media print{
+  #rail,#saveoff,#nrwcard,#nrwtip{display:none!important}
+  body{display:block;background:#fff;color:#000}
+}
+</style>
+</head>
+<body>
+
+<aside id="rail"><div class="railin">
+  <a class="railbrand" href="https://braff.co/" aria-label="Braff &amp; Co."><svg class="marksvg" preserveAspectRatio="xMinYMid meet" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 3097.7198697068407 674.2671009771988" width="3097.7198697068407" height="674.2671009771988"><g transform="scale(4.88599348534202) translate(10, 10)"><defs id="SvgjsDefs3418"></defs><g id="SvgjsG3419" featureKey="root" fill="#fff"></g><g id="SvgjsG3420" featureKey="container1" fill="#fff" transform="matrix(2.25,0,0,2.25,0,3)"><circle cx="25" cy="25" r="25"></circle></g><g id="SvgjsG3421" featureKey="symbol1" fill="#000000" transform="matrix(1.3476656769629345,0,0,1.3476656769629345,-13.308513185327243,-13.15338821503451)"><g xmlns="http://www.w3.org/2000/svg" transform="translate(0,-952.36218)"><path style="text-indent:0;text-transform:none;direction:ltr;block-progression:tb;baseline-shift:baseline;color:;enable-background:accumulate;" d="m 55.538322,990.35099 a 2.0550817,2.0550817 0 0 0 -1.6268,1.4554 l -7.192,22.43241 -5.651,-13.3568 a 2.0550817,2.0550817 0 0 0 -3.6816,-0.2575 l -4.3666,7.62 -5.4797,0 a 2.0550817,2.0550817 0 1 0 0,4.1098 l 6.6784,0 a 2.0550817,2.0550817 0 0 0 1.798,-1.0274 l 2.9111,-5.0514 6.1646,14.7266 a 2.0550817,2.0550817 0 0 0 3.8529,-0.1699 l 6.9352,-21.74751 5.5653,16.78151 a 2.0550817,2.0550817 0 0 0 3.7672,0.3425 l 3.9386,-6.8496 6.1646,0 a 2.0550817,2.0550817 0 1 0 0,-4.1098 l -7.3633,0 a 2.0550817,2.0550817 0 0 0 -1.798,1.0275 l -2.2261,3.9385 -6.0791,-18.49381 a 2.0550817,2.0550817 0 0 0 -2.3117,-1.37 z" fill="#7a7a7a" fill-opacity="1" stroke="none" marker="none" visibility="visible" display="inline" overflow="visible"></path></g></g><g id="SvgjsG3422" featureKey="text1" fill="#fff" transform="matrix(5.2574670024427235,0,0,5.2574670024427235,126.16529314752002,-39.840784776479616)"><path d="M9.38 16.42 c0.86 0.56 1.44 1.5 1.44 2.84 l0 1 c0 2.52 -1.36 3.74 -4.12 3.74 l-4.1 0 l-1 0 c-0.2 0 -0.3 -0.1 -0.3 -0.3 l0 -13.4 c0 -0.2 0.1 -0.3 0.3 -0.3 l1.68 0 l3.34 0 c2.52 0 3.66 1.1 3.66 3.8 c0 1.16 -0.34 2.02 -0.9 2.62 z M8 13.8 c0 -1.52 -0.34 -1.74 -1.38 -1.74 l-3.04 0 l0 3.6 l3.04 0 c1.04 0 1.38 -0.32 1.38 -1.86 z M8.54 20.259999999999998 l0 -1 c0 -1.38 -0.56 -1.74 -1.84 -1.74 l-3.12 0 l0 4.42 l3.12 0 c1.28 0 1.84 -0.3 1.84 -1.68 z M18.5155 15.88 c-0.12 0.2 -0.3 0.26 -0.5 0.2 c-0.3 -0.1 -0.66 -0.16 -1.04 -0.16 l-0.26 0 c-1.04 0 -1.74 0.5 -1.98 0.9 l0 6.88 c0 0.2 -0.1 0.3 -0.3 0.3 l-1.62 0 c-0.2 0 -0.3 -0.1 -0.3 -0.3 l0 -9.4 c0 -0.2 0.1 -0.3 0.3 -0.3 l1.62 0 c0.2 0 0.3 0.1 0.3 0.3 l0 0.96 c0.56 -0.88 1.56 -1.34 2.8 -1.34 c0.6 0 1.06 0.1 1.46 0.28 c0.2 0.12 0.26 0.3 0.14 0.54 z M28.251 23.82 c0.02 0.08 0.04 0.18 -0.06 0.18 l-1.84 0 c-0.22 0 -0.36 -0.2 -0.36 -0.48 l0 -0.68 c-0.46 0.7 -1.12 1.26 -2.14 1.26 l-0.62 0 c-1.86 0 -3.22 -1.12 -3.22 -3.12 s1.1 -2.9 3.18 -2.9 l2.8 0 l0 -0.82 c0 -1.06 -0.38 -1.34 -1.42 -1.34 l-0.54 0 c-1.02 0 -1.78 0.26 -2.2 0.44 c-0.32 0.12 -0.54 0.12 -0.66 -0.16 l-0.42 -0.98 c-0.08 -0.2 -0.1 -0.36 0.1 -0.48 c0.84 -0.52 2.08 -0.82 3.18 -0.82 l0.54 0 c2.48 0 3.64 1.1 3.64 3.44 l0 6.16 c0 0.1 0.02 0.22 0.04 0.3 z M24.291000000000004 22.1 c1.08 0 1.46 -0.44 1.7 -0.96 l0 -1.32 l-2.76 0 c-0.6 0 -1.02 0.26 -1.02 1.14 c0 0.84 0.42 1.14 1.02 1.14 l1.06 0 z M35.5865 9.48 c0.2 0 0.3 0.1 0.3 0.3 l0 1.46 c0 0.2 -0.1 0.3 -0.3 0.3 l-1.22 0 c-0.64 0 -1.02 0.4 -1.02 1.28 l0 1.18 l2.04 0 c0.2 0 0.3 0.1 0.3 0.3 l0 1.4 c0 0.2 -0.1 0.3 -0.3 0.3 l-2.04 0 l0 7.7 c0 0.2 -0.1 0.3 -0.3 0.3 l-1.62 0 c-0.2 0 -0.3 -0.1 -0.3 -0.3 l0 -7.7 l-1.06 0 c-0.2 0 -0.3 -0.1 -0.3 -0.3 l0 -1.4 c0 -0.2 0.1 -0.3 0.3 -0.3 l1.06 0 l0 -1.16 c0 -2.24 1.14 -3.36 3.24 -3.36 l1.22 0 z M42.602000000000004 9.48 c0.2 0 0.3 0.1 0.3 0.3 l0 1.46 c0 0.2 -0.1 0.3 -0.3 0.3 l-1.22 0 c-0.64 0 -1.02 0.4 -1.02 1.28 l0 1.18 l2.04 0 c0.2 0 0.3 0.1 0.3 0.3 l0 1.4 c0 0.2 -0.1 0.3 -0.3 0.3 l-2.04 0 l0 7.7 c0 0.2 -0.1 0.3 -0.3 0.3 l-1.62 0 c-0.2 0 -0.3 -0.1 -0.3 -0.3 l0 -7.7 l-1.06 0 c-0.2 0 -0.3 -0.1 -0.3 -0.3 l0 -1.4 c0 -0.2 0.1 -0.3 0.3 -0.3 l1.06 0 l0 -1.16 c0 -2.24 1.14 -3.36 3.24 -3.36 l1.22 0 z  M62.33300000000001 23.64 c0.18 0.16 0.08 0.36 -0.18 0.36 l-1.74 0 c-0.16 0 -0.24 -0.06 -0.36 -0.16 l-0.76 -0.66 c-0.68 0.74 -1.74 1.12 -3.02 1.12 l-2.9 0 c-2.3 0 -3.88 -1.2 -3.88 -3.68 l0 -1.18 c0 -1.02 0.24 -2.08 1.88 -2.82 l0.24 -0.12 l-0.36 -0.32 c-0.94 -0.84 -0.96 -1.56 -0.96 -2.64 l0 -0.42 c0 -1.78 0.88 -3.22 3.66 -3.22 l1.48 0 c2.78 0 3.68 1.5 3.68 3.22 l0 1.56 l-2.28 0 l0 -1.56 c0 -0.9 -0.42 -1.22 -1.4 -1.22 l-1.48 0 c-1 0 -1.38 0.32 -1.38 1.22 l0 0.42 c0 0.9 -0.02 1.26 0.92 2.12 l4.38 3.96 l0 -2.56 c0 -0.24 0.14 -0.38 0.4 -0.38 l2.8 0 c0.26 0 0.4 0.14 0.4 0.38 l0 1.18 c0 0.26 -0.14 0.4 -0.4 0.4 l-0.92 0 l0 1.98 c0 0.36 -0.02 0.68 -0.08 0.98 z M56.09300000000001 22.3 c0.82 0 1.3 -0.14 1.56 -0.54 l-4.36 -3.8 l-0.8 0.38 c-0.58 0.26 -0.72 0.66 -0.72 1.22 l0 1.06 c0 1.3 0.44 1.68 1.78 1.68 l2.54 0 z  M79.04400000000001 19.740000000000002 c0.26 0 0.4 0.14 0.38 0.38 c-0.12 2.52 -1.44 3.98 -4 3.98 l-1.78 0 c-2.7 0 -4.02 -1.62 -4.02 -4.16 l0 -5.88 c0 -2.54 1.32 -4.16 4.02 -4.16 l1.78 0 c2.56 0 3.88 1.46 4 3.96 c0.02 0.26 -0.12 0.4 -0.38 0.4 l-1.5 0 c-0.24 0 -0.38 -0.14 -0.4 -0.4 c-0.06 -1.42 -0.6 -1.9 -1.72 -1.9 l-1.78 0 c-1.22 0 -1.74 0.56 -1.74 2.1 l0 5.88 c0 1.56 0.52 2.1 1.74 2.1 l1.78 0 c1.12 0 1.66 -0.46 1.72 -1.92 c0.02 -0.24 0.16 -0.38 0.4 -0.38 l1.5 0 z M85.55950000000001 13.92 c2.2 0 3.52 1.48 3.52 3.62 l0 2.98 c0 2.12 -1.32 3.58 -3.52 3.58 l-1.02 0 c-2.2 0 -3.52 -1.46 -3.52 -3.58 l0 -2.98 c0 -2.14 1.32 -3.62 3.52 -3.62 l1.02 0 z M86.85950000000001 20.759999999999998 l0 -3.5 c0 -0.96 -0.52 -1.34 -1.3 -1.34 l-1.02 0 c-0.78 0 -1.3 0.38 -1.3 1.34 l0 3.5 c0 0.92 0.52 1.34 1.3 1.34 l1.02 0 c0.78 0 1.3 -0.42 1.3 -1.34 z M90.27500000000002 21.64 c0 -0.2 0.1 -0.3 0.3 -0.3 l2.06 0 c0.2 0 0.3 0.1 0.3 0.3 l0 2.06 c0 0.2 -0.1 0.3 -0.3 0.3 l-2.06 0 c-0.2 0 -0.3 -0.1 -0.3 -0.3 l0 -2.06 z"></path></g><g id="SvgjsG3423" featureKey="text3" fill="#fff" transform="matrix(2.25,0,0,2.25,374,108)"><path d=""></path></g></g></svg></a>
+  <div class="railtitle"><b>NORGE<span>.</span></b><em>25 charts · 26 photographs</em></div>
+  <nav id="navlinks" aria-label="Sections">
+    <a href="#hero"><i>—</i>Top</a>
+    <a href="#history"><i>01</i>History</a>
+    <a href="#peoples"><i>02</i>Peoples</a>
+    <a href="#economy"><i>03</i>Economy</a>
+    <a href="#culture"><i>04</i>Culture</a>
+    <a href="#sport"><i>05</i>Sport</a>
+    <a href="#oslo"><i>06</i>Oslo</a>
+    <a href="#bergen"><i>07</i>Bergen</a>
+    <a href="#fjords"><i>08</i>Fjords</a>
+    <a href="#language"><i>09</i>Language</a>
+    <a href="#different"><i>10</i>Differences</a>
+  </nav>
+  <div class="railread"><div class="rl">Read</div><div class="rbar"><i id="rprog"></i></div><div class="rpct" id="rpct">0% · 34 min</div></div>
+  <button id="saveoff" type="button">↓ Save for offline</button>
+  <div class="railnote">Works on the train with no signal</div>
+  <a class="railback" href="https://braff.co/">← All tools</a>
+</div></aside>
+<main>
+
+<!-- ============ HERO ============ -->
+<header id="hero">
+  <figure class="heroph" data-wiki="Lofoten" data-nocap="1"><img alt=""></figure>
+  <div class="scrim"></div>
+  <div class="wrap">
+  <div class="heroflag"><i></i><i></i><i></i></div>
+  <h1>Norway,<br>by the numbers.</h1>
+  <p class="lede">A country of 5.6 million owns roughly 1.5% of every listed company on earth, runs on 88% hydropower, and pays for it by selling other people the fossil fuels it won't burn itself.</p>
+  <div class="herostats">
+    <div><b>5.63M</b><span>Population, Q1 2026</span></div>
+    <div><b>1.48</b><span>Births per woman, 2025</span></div>
+    <div><b>385,207</b><span>km² incl. Svalbard</span></div>
+    <div><b>NOK 21.3T</b><span>Sovereign fund, end-2025</span></div>
+    <div><b>$364k</b><span>Fund value per citizen</span></div>
+    <div><b>96%</b><span>New cars electric, 2025</span></div>
+    <div><b>447</b><span>Winter Olympic medals</span></div>
+  </div>
+  </div>
+</header>
+
+<!-- ============ HISTORY ============ -->
+<section id="history">
+<div class="opener">
+  <figure class="ophoto" data-wiki="Oseberg ship" data-credit="1"><img alt=""></figure>
+  <div class="scrim"></div>
+  <div class="openerin"><div class="inner">
+    <div class="secno">01</div>
+    <h2>A short, contested history</h2>
+    <p class="lede">Norway spent about 400 years as a Danish province and 91 as a junior partner to Sweden. It has been fully independent since 1905, which makes it younger than the Brooklyn Bridge. Almost everything you associate with Norwegian national identity was invented in the 19th century by people trying to prove it existed.</p>
+  </div></div>
+  <div class="ocredit"></div>
+</div>
+<div class="wrap">
+
+  <div class="phgrid">
+    <figure class="ph" data-wiki="Roald Amundsen"><img alt="Roald Amundsen"><figcaption></figcaption></figure>
+  </div>
+
+  <div class="tl">
+    <div class="ev"><div class="yr">c. 9500 BC</div><div class="ti">The ice leaves, people arrive</div><p class="tx">Hunter-gatherers reach an ice-free coast within a few centuries of deglaciation, from two directions: up the Atlantic coast (the Fosna culture) and around the top from the northeast (Komsa). Ancient DNA shows Western and Eastern Hunter-Gatherer ancestry meeting here early. Scandinavia was a genetic collision zone from the start.</p></div>
+    <div class="ev"><div class="yr">c. 4000 BC</div><div class="ti">Farming arrives, mostly in the south</div><p class="tx">Anatolian-descended farmers spread up through Denmark. Norway's geography means agriculture never fully displaces hunting and fishing. That pattern holds for the next 6,000 years.</p></div>
+    <div class="ev hi"><div class="yr">c. 2800 BC</div><div class="ti">The steppe replacement</div><p class="tx">Corded Ware / Yamnaya-descended herders sweep into Scandinavia from the Pontic steppe, bringing Indo-European language and horses. The genetic turnover in Scandinavia is among the most complete anywhere in Europe. Modern Norwegian ancestry is overwhelmingly this layer.</p></div>
+    <div class="ev"><div class="yr">793</div><div class="ti">Lindisfarne</div><p class="tx">The raid on the Northumbrian monastery is the conventional start of the Viking Age, mostly because a literate monk wrote it down. Norse traders had been moving through the North Sea for generations.</p></div>
+    <div class="ev"><div class="yr">c. 872–930</div><div class="ti">Harald Fairhair "unifies" Norway</div><p class="tx">The founding myth: Harald vows not to cut his hair until he rules all Norway, wins at Hafrsfjord, gets a haircut. Historians are sceptical. The sagas were written 300 years later by Icelanders with motives, and real unification took until roughly 1130. Treat it as national mythology with a kernel of truth.</p></div>
+    <div class="ev"><div class="yr">c. 985–1000</div><div class="ti">Iceland, Greenland, Vinland</div><p class="tx">Erik the Red settles Greenland; his son Leif reaches North America around 1000. The Norse site at L'Anse aux Meadows in Newfoundland is dated by tree rings to <b>exactly AD 1021</b>, 471 years before Columbus. It is the only confirmed pre-Columbian European settlement in the Americas.</p></div>
+    <div class="ev"><div class="yr">1030</div><div class="ti">Stiklestad and the invention of St. Olav</div><p class="tx">Olav Haraldsson loses the battle and his life, then wins the argument posthumously: declared a saint within a year, he becomes Norway's eternal king and the engine of Christianization. Nidaros (Trondheim) becomes a major pilgrimage destination.</p></div>
+    <div class="ev"><div class="yr">1066</div><div class="ti">Stamford Bridge ends the Viking Age</div><p class="tx">Harald Hardrada is killed invading England. He was Norwegian king, former commander of the Byzantine emperor's Varangian Guard, and the most well-travelled man of his century. Three weeks later Harold Godwinson loses to William at Hastings, and Norway's medieval high-water mark passes.</p></div>
+    <div class="ev"><div class="yr">1262</div><div class="ti">Peak Norway</div><p class="tx">The realm covers Iceland, Greenland, the Faroes, Orkney, Shetland, the Hebrides and the Isle of Man. This is the largest Norway ever gets. It is downhill for the next 550 years.</p></div>
+    <div class="ev hi"><div class="yr">1349</div><div class="ti">The Black Death, and why Norway lost 460 years</div><p class="tx">Plague arrives at Bergen on an English ship and kills an estimated <b>60–65% of the population</b>. Norway's thin aristocracy is effectively wiped out along with its administrative class and written language. The country never recovers institutional independence on its own terms. This single event does more to explain the next four centuries than any king.</p></div>
+    <div class="ev"><div class="yr">1397</div><div class="ti">Kalmar Union</div><p class="tx">Denmark, Sweden and Norway unite under one crown. Norway is the weakest leg and stays in after Sweden leaves.</p></div>
+    <div class="ev"><div class="yr">1537–1814</div><div class="ti">The "400-year night"</div><p class="tx">Reformation imposed from Copenhagen; Norway is downgraded to a Danish province. Written Norwegian disappears and Danish becomes the language of church, law and letters. Greenland, Iceland and the Faroes are transferred to Danish administration. The phrase "400-year night" is Ibsen's, and it stuck.</p></div>
+    <div class="ev hi"><div class="yr">1814</div><div class="ti">The busiest year in Norwegian history</div><p class="tx">January: Denmark backs Napoleon, loses, and cedes Norway to Sweden at the Treaty of Kiel. April: Norwegians ignore this, convene at Eidsvoll and sign a constitution on <b>17 May</b>, still the national day and still one of the oldest constitutions in force anywhere. Summer: Sweden invades and wins in about two weeks. November: Norway enters a personal union with Sweden but <em>keeps its constitution and parliament</em>. A defeat that functioned as a founding.</p></div>
+    <div class="ev"><div class="yr">1825–1925</div><div class="ti">A third of the country leaves</div><p class="tx">Roughly <b>800,000</b> Norwegians emigrate, overwhelmingly to Minnesota, Wisconsin, the Dakotas and Iowa. Per capita, only Ireland sent a larger share of its population to America. About <b>3.9 million</b> Americans still claim Norwegian ancestry on recent American Community Survey estimates, revised down from the 4.5 million of the 2000 Census. Either figure is comparable to Norway's entire present population.</p></div>
+    <div class="ev hi"><div class="yr">1905</div><div class="ti">Independence, by referendum, 99.95% to 0.05%</div><p class="tx">The union with Sweden dissolves peacefully. The confirming referendum runs <b>368,208 to 184</b>. Norwegians then vote 79% to be a monarchy rather than a republic and import a Danish prince, who takes the deliberately archaic name Haakon VII. His son Olav and grandson Harald V follow. Harald V, the current king, is the grandson of a man elected to the job.</p></div>
+    <div class="ev"><div class="yr">1911</div><div class="ti">Amundsen reaches the South Pole</div><p class="tx">14 December, five weeks ahead of Scott, using dogs and skis while the British hauled sledges by hand. Polar exploration becomes central to Norwegian self-image. See also Nansen (Nobel Peace Prize 1922) and Heyerdahl's Kon-Tiki raft in 1947.</p></div>
+    <div class="ev hi"><div class="yr">1940–45</div><div class="ti">Occupation</div><p class="tx">Germany invades 9 April 1940. In Oslofjord the 19th-century fortress at Oscarsborg sinks the brand-new cruiser <em>Blücher</em> with obsolete guns and torpedoes, delaying the assault long enough for the king, government and gold reserve to escape north and then to London. Vidkun Quisling's name enters English as a common noun. Norwegian saboteurs destroy the heavy-water plant at Vemork in February 1943. Of 772 Jews deported, <b>34 survived</b>. Retreating Germans burn Finnmark to the ground in 1944. Norway's merchant fleet, around 1,000 ships under Nortraship, is one of the Allies' most valuable assets and takes heavy losses.</p></div>
+    <div class="ev"><div class="yr">1949</div><div class="ti">NATO founding member</div><p class="tx">Neutrality died on 9 April 1940 and has never come back. Norway shares a 196 km Arctic land border with Russia.</p></div>
+    <div class="ev hi"><div class="yr">1969</div><div class="ti">Ekofisk</div><p class="tx">Phillips Petroleum, drilling its last contractual well before giving up, hits oil on 23 December. Production starts 1971. Norway already had strong institutions, a competent bureaucracy and an established social contract before the money arrived. That is the standard explanation for why it avoided the resource curse that flattened comparable discoveries elsewhere.</p></div>
+    <div class="ev"><div class="yr">1972 & 1994</div><div class="ti">Norway says no to Europe. Twice.</div><p class="tx">EEC membership rejected 53.5–46.5 in 1972; EU membership rejected 52.2–47.8 in 1994. Both times the cities voted yes and the countryside, fishermen and farmers voted no. Norway joined the EEA anyway, so it adopts most EU rules with no vote on them. Norwegians re-litigate the trade-off periodically and then decline to change it.</p></div>
+    <div class="ev"><div class="yr">1996</div><div class="ti">First deposit into the oil fund</div><p class="tx">The Government Pension Fund Global receives its first transfer. The stated point was to keep petroleum money <em>out</em> of the domestic economy and smooth spending across generations.</p></div>
+    <div class="ev hi"><div class="yr">2011</div><div class="ti">22 July</div><p class="tx">A far-right terrorist bombs the government quarter in Oslo and shoots dead 69 people, most of them teenagers, at a Labour Party youth camp on Utøya. 77 dead in total. The national response was no emergency powers, no expanded surveillance, and an ordinary criminal trial. That is a deliberate contrast with the American response to 2001, and Norwegians know it.</p></div>
+    <div class="ev"><div class="yr">2022–</div><div class="ti">Europe's gas station</div><p class="tx">Russia's invasion of Ukraine turns Norway into the EU's largest single gas supplier, covering over 30% of EU+UK consumption. Windfall revenues are enormous and slightly uncomfortable: Norway is getting rich off a war it is helping the victim survive.</p></div>
+  </div>
+</div></section>
