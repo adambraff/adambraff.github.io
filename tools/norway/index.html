@@ -5,303 +5,491 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Norway, by the numbers</title>
 <meta name="description" content="A data-forward field guide to Norway: history, economy, culture, Oslo, Bergen, and the fjords.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0c1116; --bg2:#121a22; --card:#161f29; --line:#233140;
-  --tx:#e8eef4; --tx2:#9fb0c0; --tx3:#6d8095;
-  --c1:#4ea3d8;  /* fjord blue */
-  --c2:#e5544b;  /* flag red */
-  --c3:#f0b429;  /* amber */
-  --c4:#63c5a4;  /* teal */
-  --c5:#a98bd8;  /* violet */
-  --c6:#8794a3;  /* grey */
-  --max:1180px;
+  --bg:#0a0e13; --card:#0e141b; --line:#1c2733; --line2:#22303f;
+  --tx:#f4f7fa; --tx2:#a9b8c6; --tx3:#6d8095; --tx4:#4a5b6b;
+  --plate:#f4f7fa; --pink:#0a0e13; --pink2:#5a6a7a; --pline:#d4dde5;
+  --blue:#4ea3d8; --red:#e5544b; --red2:#c8392f; --amber:#f0b429;
+  --rail:212px; --wrap:1080px; --pad:48px;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --disp:Archivo,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{
-  margin:0;background:var(--bg);color:var(--tx);
-  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
-  -webkit-text-size-adjust:100%;
-}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.6 var(--sans);-webkit-text-size-adjust:100%;
+  display:grid;grid-template-columns:var(--rail) 1fr;align-items:start}
 img{max-width:100%;display:block}
-a{color:var(--c1)}
+a{color:var(--blue)} a:hover{color:#7cc0ea}
 
-/* ---------- NAV ---------- */
-#nav{
-  position:sticky;top:0;z-index:50;background:rgba(12,17,22,.92);
-  backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
-}
-#nav .inner{max-width:var(--max);margin:0 auto;display:flex;align-items:center;gap:14px;padding:0 14px}
-#nav .brand{font-weight:700;font-size:14px;letter-spacing:.04em;white-space:nowrap;padding:12px 0;color:var(--tx)}
-#nav .brand span{color:var(--c2)}
-#navlinks{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+/* ---------- RAIL ---------- */
+#rail{position:sticky;top:0;height:100vh;background:#0d1219;border-right:1px solid var(--line);z-index:40}
+.railin{height:100%;display:flex;flex-direction:column;padding:20px 0 20px}
+.railbrand{display:block;padding:0 18px 16px;margin-bottom:14px;border-bottom:1px solid var(--line)}
+.marksvg{height:22px;width:auto;opacity:.9}
+.railtitle{padding:0 18px 16px}
+.railtitle b{display:block;font:800 17px/1.1 var(--disp);letter-spacing:.04em;color:var(--tx)}
+.railtitle b span{color:var(--red)}
+.railtitle em{display:block;font:400 11px/1.4 var(--sans);font-style:normal;color:var(--tx4);margin-top:4px}
+#navlinks{display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:none}
 #navlinks::-webkit-scrollbar{display:none}
-#navlinks a{
-  color:var(--tx3);text-decoration:none;font-size:13px;padding:14px 10px;white-space:nowrap;
-  border-bottom:2px solid transparent;transition:color .15s
-}
-#navlinks a:hover{color:var(--tx)}
-#navlinks a.on{color:var(--tx);border-bottom-color:var(--c2)}
+#navlinks a{display:flex;align-items:center;gap:11px;padding:8px 18px;text-decoration:none;
+  font:500 12.5px/1.25 var(--sans);color:var(--tx3);border-left:3px solid transparent;transition:color .15s,background .15s}
+#navlinks a i{font:600 9.5px/1 ui-monospace,Menlo,monospace;font-style:normal;color:#33465a;width:15px;flex:none}
+#navlinks a:hover{color:var(--tx2)}
+#navlinks a.on{color:var(--tx);background:#131c26;border-left-color:var(--red)}
+#navlinks a.on i{color:var(--red)}
+.railread{margin:16px 18px 0;padding-top:14px;border-top:1px solid var(--line)}
+.railread .rl{font:500 10px/1.3 var(--sans);letter-spacing:.12em;color:var(--tx4);margin-bottom:7px}
+.rbar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:6px}
+.rbar i{display:block;height:4px;width:0;background:var(--blue);transition:width .12s linear}
+.rpct{font:400 11px/1.3 var(--sans);color:var(--tx4)}
+#saveoff{margin:16px 18px 0;padding:10px;background:#131c26;border:1px solid #2a3a4a;border-radius:7px;
+  color:var(--tx2);font:600 11.5px/1 var(--sans);cursor:pointer;min-height:40px;transition:all .18s}
+#saveoff:hover{background:#1a2734;border-color:var(--blue);color:var(--tx)}
+#saveoff[disabled]{opacity:.6;cursor:default}
+.railnote{margin:7px 18px 0;font:400 10.5px/1.4 var(--sans);color:var(--tx4);text-align:center}
+.railback{margin:auto 18px 0;display:block;padding:15px 0 0;border-top:1px solid var(--line);
+  font:600 10.5px/1 var(--sans);letter-spacing:.12em;color:var(--tx4);text-decoration:none}
+.railback:hover{color:var(--blue)}
 
-/* ---------- LAYOUT ---------- */
-.wrap{max-width:var(--max);margin:0 auto;padding:0 18px}
-section{padding:56px 0 8px;scroll-margin-top:58px}
-h1{font-size:clamp(34px,7vw,62px);line-height:1.02;margin:0 0 14px;letter-spacing:-.02em}
-h2{font-size:clamp(24px,4.2vw,34px);margin:0 0 6px;letter-spacing:-.015em}
-h3{font-size:17px;margin:28px 0 10px;color:var(--tx)}
-h4{font-size:14px;margin:0 0 6px;letter-spacing:.02em}
-.kicker{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--c2);font-weight:700;margin-bottom:8px}
-.lede{color:var(--tx2);font-size:17px;max-width:62ch;margin:0 0 6px}
-p{max-width:66ch;color:var(--tx2)}
-.small{font-size:13px;color:var(--tx3)}
-hr{border:0;border-top:1px solid var(--line);margin:44px 0 0}
+/* ---------- MAIN ---------- */
+main{min-width:0}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 var(--pad)}
+section{scroll-margin-top:0}
+p{color:var(--tx2);max-width:66ch;text-wrap:pretty}
+h1{font:800 clamp(40px,6vw,74px)/.96 var(--disp);letter-spacing:-.032em;margin:0 0 16px;color:var(--tx)}
+h2{font:800 clamp(30px,3.6vw,44px)/1.05 var(--disp);letter-spacing:-.026em;margin:0;color:#fff}
+h3{font:700 22px/1.28 var(--disp);letter-spacing:-.015em;color:var(--tx);margin:38px 0 12px}
+h4{font:700 16px/1.3 var(--disp);color:var(--tx);margin:0 0 7px}
+.lede{font:400 17px/1.62 var(--sans);color:#c3d0dc;max-width:58ch;margin:0}
+.small{font:400 13px/1.55 var(--sans);color:var(--tx3)}
+hr{display:none}
 
 /* ---------- HERO ---------- */
-#hero{
-  padding:64px 0 40px;
-  background:radial-gradient(120% 80% at 20% 0%,#16283a 0%,var(--bg) 62%);
-  border-bottom:1px solid var(--line);
-}
+#hero{position:relative;min-height:min(640px,86vh);display:flex;align-items:flex-end;
+  background:#101822;overflow:hidden;border-bottom:1px solid var(--line)}
+#hero .heroph{position:absolute;inset:0;margin:0}
+#hero .heroph img{width:100%;height:100%;object-fit:cover;opacity:.5}
+#hero .scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,14,19,.3) 0%,rgba(10,14,19,.55) 42%,var(--bg) 100%)}
+#hero .wrap{position:relative;z-index:2;padding-top:70px;padding-bottom:34px}
+#hero .lede{color:#c8d5e1;max-width:62ch;font-size:18px}
 .heroflag{display:flex;gap:6px;margin-bottom:22px}
 .heroflag i{display:block;height:5px;border-radius:3px}
-.heroflag i:nth-child(1){width:56px;background:var(--c2)}
+.heroflag i:nth-child(1){width:56px;background:var(--red)}
 .heroflag i:nth-child(2){width:22px;background:#fff}
 .heroflag i:nth-child(3){width:34px;background:#2c4a8a}
-.herostats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:30px}
-.herostats div{background:var(--bg2);padding:14px 16px}
-.herostats b{display:block;font-size:22px;line-height:1.15;color:var(--tx);font-variant-numeric:tabular-nums}
-.herostats span{font-size:11.5px;color:var(--tx3);letter-spacing:.03em}
+.herostats{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;background:var(--line);
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.herostats div{background:#0e141b;padding:15px 18px}
+.herostats b{display:block;font:700 clamp(18px,1.7vw,24px)/1.1 var(--disp);color:var(--tx);font-variant-numeric:tabular-nums}
+.herostats span{font:400 11.5px/1.35 var(--sans);letter-spacing:.004em;color:var(--tx3)}
+#hero .herostats{margin:32px calc(-1*var(--pad)) 0;border-bottom:0}
 
-/* ---------- CARDS ---------- */
-.grid{display:grid;gap:14px}
-.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
-.g3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
-.g4{grid-template-columns:repeat(auto-fit,minmax(168px,1fr))}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
-.card p{margin:6px 0 0;font-size:14.5px}
-.card h4{color:var(--tx)}
-.tag{display:inline-block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--c3);font-weight:700;margin-bottom:6px}
+/* ---------- SECTION OPENERS ---------- */
+.opener{position:relative;min-height:420px;display:flex;align-items:center;background:#0c1219;overflow:hidden}
+.opener>.ophoto{position:absolute;inset:0;margin:0}
+.opener>.ophoto img{width:100%;height:100%;object-fit:cover;opacity:.6}
+.opener .scrim{position:absolute;inset:0;
+  background:linear-gradient(102deg,rgba(10,14,19,.94) 0%,rgba(10,14,19,.66) 46%,rgba(10,14,19,.14) 100%)}
+.openerin{position:relative;z-index:2;max-width:var(--wrap);width:100%;margin:0 auto;padding:44px var(--pad)}
+.openerin .inner{max-width:62%}
+.secno{font:800 96px/.8 var(--disp);letter-spacing:-.05em;color:var(--red2);margin-bottom:18px}
+.opener h2{margin-bottom:14px}
+.opener .lede{color:#c3d0dc}
+.ocredit{position:absolute;right:0;bottom:0;z-index:3;background:rgba(10,14,19,.72);backdrop-filter:blur(6px);
+  padding:7px 13px;font:400 11px/1.4 var(--sans);color:#8ea0b0;max-width:60%}
+.ocredit a{color:#8ea0b0}
+section>.wrap:first-of-type{padding-top:38px}
+section>.wrap{padding-bottom:44px}
 
-/* stat tiles */
-.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-.stat b{display:block;font-size:26px;line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-.stat span{display:block;font-size:12px;color:var(--tx3);margin-top:4px}
-.stat em{font-style:normal;color:var(--tx2);font-size:12.5px;display:block;margin-top:7px;line-height:1.45}
+/* ---------- CHART PLATES ---------- */
+figure.ch{margin:34px calc(-1*var(--pad));background:var(--plate);border-top:3px solid var(--red2);
+  padding:26px var(--pad) 24px;color:var(--pink)}
+.chtitle{font:700 26px/1.2 var(--disp);letter-spacing:-.018em;color:var(--pink);margin-bottom:4px}
+.chsub{font:400 14px/1.5 var(--sans);color:var(--pink2);margin-bottom:18px;max-width:74ch}
+figure.ch figcaption{margin-top:16px;padding-top:13px;border-top:1px solid var(--pline);
+  font:400 13.5px/1.6 var(--sans);color:var(--pink2);max-width:82ch}
+figure.ch figcaption b{color:var(--pink)}
+figure.ch svg{display:block;width:100%;height:auto;overflow:visible}
+figure.ch .legend{display:flex;flex-wrap:wrap;gap:16px;margin:14px 0 0;font:500 12.5px/1 var(--sans);color:var(--pink2)}
+figure.ch .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+figure.ch .legend b{color:var(--pink)!important}
+.axis{stroke:#b6c2cd}
+.gridl{stroke:#dde4ea;stroke-dasharray:2 4}
+figure.ch text{font-family:var(--sans);fill:var(--pink2)}
+figure.ch text.val{fill:var(--pink);font-variant-numeric:tabular-nums;font-weight:700}
+figure.ch text.lab{fill:#47576a;font-weight:500}
+figure.ch rect,figure.ch circle{transition:opacity .12s}
+figure.ch svg.hot rect:not(.nohit),figure.ch svg.hot circle:not(.nohit){opacity:.42}
+figure.ch svg.hot .hot{opacity:1}
+.grid:has(> figure.ch){display:block}
+.grid:has(> figure.ch) figure.ch{margin-top:26px}
 
-/* contrarian callout */
-.flag{
-  border-left:3px solid var(--c2);background:linear-gradient(90deg,rgba(229,84,75,.09),transparent 70%);
-  padding:12px 16px;border-radius:0 10px 10px 0;margin:18px 0
-}
-.flag h4{color:var(--c2);font-size:12px;letter-spacing:.12em;text-transform:uppercase}
-.flag p{margin:0;color:var(--tx);font-size:14.5px}
-
-/* ---------- CHART SHELL ---------- */
-figure.ch{margin:22px 0 0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 16px 12px}
-figure.ch figcaption{font-size:12.5px;color:var(--tx3);margin-top:10px;line-height:1.5}
-.chtitle{font-size:14px;font-weight:600;margin-bottom:2px}
-.chsub{font-size:12px;color:var(--tx3);margin-bottom:12px}
-.legend{display:flex;flex-wrap:wrap;gap:12px;margin:10px 0 0;font-size:12px;color:var(--tx2)}
-.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:middle}
-svg{display:block;width:100%;height:auto;overflow:visible}
-.axis{stroke:var(--line)}
-.gridl{stroke:var(--line);stroke-dasharray:2 4}
-text{font:11px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:var(--tx3)}
-text.val{fill:var(--tx);font-variant-numeric:tabular-nums;font-weight:600}
-text.lab{fill:var(--tx2)}
+/* ---------- CARDS / STATS ---------- */
+.grid{display:grid;gap:16px;margin-top:8px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(176px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:17px 19px}
+.card p{margin:0;font:400 14.5px/1.62 var(--sans)}
+.card h4+p{margin-top:0}
+.tag{display:inline-block;font:600 11px/1 var(--sans);letter-spacing:.02em;color:var(--amber);margin-bottom:9px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:15px 17px}
+.stat b{display:block;font:700 27px/1.08 var(--disp);font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:var(--tx)}
+.stat span{display:block;font:400 12px/1.42 var(--sans);letter-spacing:.004em;color:var(--tx3);margin-top:6px}
+.stat em{font-style:normal;color:var(--tx2);font:400 12.5px/1.5 var(--sans);display:block;margin-top:9px}
+.flag{border-left:3px solid var(--red);background:linear-gradient(90deg,rgba(229,84,75,.10),transparent 70%);
+  padding:15px 19px;border-radius:0 10px 10px 0;margin:24px 0}
+.flag h4{color:#fff}
+.flag p{margin:0;color:#dbe4ec;font:400 15px/1.65 var(--sans);max-width:70ch}
 
 /* ---------- TIMELINE ---------- */
-.tl{position:relative;margin:24px 0 0;padding-left:26px}
-.tl:before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:linear-gradient(var(--c1),var(--c5),var(--c2))}
-.tl .ev{position:relative;padding:0 0 22px}
-.tl .ev:before{content:"";position:absolute;left:-24px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--bg);border:2px solid var(--c1)}
-.tl .ev.hi:before{border-color:var(--c2);background:var(--c2)}
-.tl .yr{font-size:12px;letter-spacing:.08em;color:var(--c3);font-weight:700;font-variant-numeric:tabular-nums}
-.tl .ti{font-size:15.5px;font-weight:600;color:var(--tx);margin:2px 0 3px}
-.tl .tx{font-size:14px;color:var(--tx2);margin:0;max-width:62ch}
+.tl{position:relative;margin:26px 0 0;padding-left:30px}
+.tl:before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;
+  background:linear-gradient(var(--blue),#a98bd8,var(--red))}
+.tl .ev{position:relative;padding:0 0 26px}
+.tl .ev:before{content:"";position:absolute;left:-27px;top:7px;width:11px;height:11px;border-radius:50%;
+  background:var(--bg);border:2px solid var(--blue)}
+.tl .ev.hi:before{border-color:var(--red);background:var(--red)}
+.tl .yr{font:700 12px/1 var(--sans);letter-spacing:.08em;color:var(--amber);font-variant-numeric:tabular-nums}
+.tl .ti{font:700 17px/1.3 var(--disp);color:var(--tx);margin:5px 0 5px}
+.tl .tx{margin:0;font:400 15px/1.66 var(--sans);color:var(--tx2);max-width:64ch}
 
 /* ---------- TABLES ---------- */
-.tbl{width:100%;border-collapse:collapse;font-size:14px;margin-top:14px}
-.tbl th{text-align:left;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--tx3);border-bottom:1px solid var(--line);padding:8px 10px 8px 0;font-weight:700}
-.tbl td{border-bottom:1px solid var(--line);padding:9px 10px 9px 0;color:var(--tx2);vertical-align:top}
+.tbl{width:100%;border-collapse:collapse;font:400 14.5px/1.55 var(--sans);margin-top:16px}
+.tbl th{text-align:left;font:700 13.5px/1.35 var(--sans);letter-spacing:0;
+  color:var(--tx);border-bottom:2px solid var(--blue);padding:8px 12px 9px 0}
+.tbl td{border-bottom:1px solid var(--line);padding:11px 12px 11px 0;color:var(--tx2);vertical-align:top}
 .tbl td b{color:var(--tx);font-weight:600}
 .tbl td.n{text-align:right;font-variant-numeric:tabular-nums;color:var(--tx);white-space:nowrap}
+.tbl tr:hover td{background:rgba(78,163,216,.05)}
 .scroller{overflow-x:auto;-webkit-overflow-scrolling:touch}
 
-/* ---------- FIGURES / PHOTOS ---------- */
-figure.ph{margin:20px 0 0;border-radius:12px;overflow:hidden;background:var(--bg2);border:1px solid var(--line)}
-figure.ph img{width:100%;height:100%;object-fit:cover;aspect-ratio:16/9;background:var(--bg2)}
-figure.ph figcaption{font-size:12px;color:var(--tx3);padding:9px 13px;line-height:1.5}
+/* ---------- PHOTOS ---------- */
+figure.ph{margin:26px calc(-1*var(--pad)) 0;background:#0e141b;overflow:hidden;position:relative}
+figure.ph img{width:100%;height:auto;max-height:520px;object-fit:cover;background:#0e141b;aspect-ratio:21/9}
+figure.ph figcaption{font:400 11.5px/1.5 var(--sans);color:var(--tx3);padding:9px var(--pad) 0}
 figure.ph figcaption a{color:var(--tx3)}
-figure.ph.tall img{aspect-ratio:4/5}
-.phgrid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin-top:20px}
+.phgrid{display:grid;gap:2px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  margin:26px calc(-1*var(--pad)) 0}
 .phgrid figure.ph{margin:0}
+.phgrid figure.ph img{aspect-ratio:4/3;max-height:none}
+.phgrid:has(> figure:only-child) figure.ph img{aspect-ratio:21/9;max-height:460px}
+.phgrid:has(> figure:only-child) figure.ph figcaption{padding-left:var(--pad)}
+.phgrid figure.ph figcaption{padding:9px 14px 12px}
 
 /* ---------- PHRASES ---------- */
-.ph-row{display:grid;grid-template-columns:minmax(90px,1fr) minmax(90px,1.1fr) minmax(110px,1.2fr);gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;align-items:baseline}
+.ph-row{display:grid;grid-template-columns:minmax(96px,1fr) minmax(96px,1.1fr) minmax(120px,1.3fr);gap:12px;
+  padding:11px 0;border-bottom:1px solid var(--line);font:400 14.5px/1.5 var(--sans);align-items:baseline}
 .ph-row b{color:var(--tx)}
-.ph-row i{color:var(--c3);font-style:normal;font-size:13px}
+.ph-row i{color:var(--amber);font-style:normal;font-size:13.5px}
 .ph-row span{color:var(--tx2);font-size:13.5px}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.pill{display:inline-block;font:500 12.5px/1 var(--sans);padding:8px 12px;border:1px solid var(--line2);
+  border-radius:20px;color:var(--tx2);background:#0e141b;text-decoration:none;transition:all .18s ease}
+a.pill:hover{color:var(--tx);border-color:var(--blue);background:#101a24}
 
-/* ---------- MISC ---------- */
-.pill{display:inline-block;font-size:11.5px;padding:3px 9px;border:1px solid var(--line);border-radius:20px;color:var(--tx2);margin:0 6px 6px 0;background:var(--bg2)}
-footer{margin-top:60px;border-top:1px solid var(--line);padding:26px 0 60px;color:var(--tx3);font-size:13px}
-.uncertain{border-bottom:1px dotted var(--tx3);cursor:help}
+/* inline source references */
+a.src{color:inherit;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:2px;
+  text-decoration-color:rgba(78,163,216,.5);transition:color .15s ease,text-decoration-color .15s ease}
+a.src:hover{color:var(--blue);text-decoration-color:var(--blue)}
+figure.ch a.src{text-decoration-color:rgba(31,95,143,.45)}
+figure.ch a.src:hover{color:#1f5f8f;text-decoration-color:#1f5f8f}
+
+/* sources accordion */
+details.srcs{margin-top:22px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+details.srcs summary{cursor:pointer;list-style:none;padding:16px 0;display:flex;align-items:center;gap:10px;
+  font:700 15px/1.2 var(--disp);color:var(--tx);letter-spacing:-.01em}
+details.srcs summary::-webkit-details-marker{display:none}
+details.srcs summary:before{content:"+";font:400 17px/1 var(--sans);color:var(--blue);width:12px}
+details.srcs[open] summary:before{content:"–"}
+details.srcs summary:hover{color:var(--blue)}
+.srcbody{display:grid;gap:22px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));padding:2px 0 26px}
+.srcbody h5{font:700 11.5px/1.3 var(--sans);letter-spacing:.06em;color:var(--tx3);margin:0 0 9px}
+.srcbody ul{margin:0;padding:0;list-style:none;display:grid;gap:7px}
+.srcbody li{font:400 13.5px/1.45 var(--sans)}
+.srcbody a{color:var(--tx2);text-decoration:none;border-bottom:1px solid transparent}
+.srcbody a:hover{color:var(--blue);border-bottom-color:var(--blue)}
+footer{border-top:1px solid var(--line);padding:32px 0 70px;color:var(--tx3);font:400 13.5px/1.65 var(--sans);margin-top:20px}
+.uncertain{border-bottom:0}
+
+/* ---------- EXPLAINERS ---------- */
+.term{cursor:help;color:#cfdae5;box-shadow:inset 0 -1px 0 var(--blue)}
+.gloss{cursor:help;color:#cfdae5;border-bottom:1.5px dotted var(--blue)}
+.term:focus,.gloss:focus{outline:2px solid rgba(78,163,216,.45);outline-offset:2px;border-radius:2px}
+#nrwcard{position:fixed;z-index:998;width:326px;background:#131c26;border:1px solid #2a3a4a;border-radius:11px;
+  box-shadow:0 18px 44px rgba(0,0,0,.62);overflow:hidden;opacity:0;visibility:hidden;transition:opacity .16s ease;font-family:var(--sans)}
+#nrwtip{position:fixed;z-index:999;pointer-events:none;opacity:0;transition:opacity .1s ease;background:#0a0e13;
+  color:#f4f7fa;font:600 12.5px/1.35 var(--sans);padding:7px 10px;border-radius:6px;
+  box-shadow:0 8px 24px rgba(0,0,0,.5);border:1px solid #2a3a4a;white-space:nowrap}
+#nrwtip em{display:block;font-style:normal;font-weight:500;color:#8ea0b0;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px}
+
+/* ---------- RESPONSIVE ---------- */
+@media(max-width:1000px){
+  body{display:block}
+  #rail{position:sticky;top:0;height:auto;border-right:0;border-bottom:1px solid var(--line);
+    background:rgba(13,18,25,.95);backdrop-filter:blur(12px)}
+  .railin{flex-direction:row;align-items:center;gap:14px;padding:0 14px;height:auto}
+  .railbrand{padding:10px 14px 10px 0;margin:0;border-bottom:0;border-right:1px solid var(--line);flex:none}
+  .marksvg{height:18px}
+  .railtitle{padding:0;flex:none}
+  .railtitle em,.railread,#saveoff,.railnote{display:none}
+  #navlinks{flex-direction:row;overflow-x:auto;flex:1}
+  #navlinks a{border-left:0;border-bottom:2px solid transparent;padding:14px 10px;white-space:nowrap}
+  #navlinks a i{display:none}
+  #navlinks a.on{background:none;border-left:0;border-bottom-color:var(--red)}
+  .railback{margin:0;padding:0;border-top:0;flex:none;white-space:nowrap}
+  .opener{min-height:330px}
+  .secno{font-size:68px}
+  .openerin .inner{max-width:100%}
+  :root{--pad:22px}
+  #hero{min-height:auto}
+  .herostats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  #hero .wrap{padding-top:44px}
+}
 @media(max-width:560px){
-  .ph-row{grid-template-columns:1fr 1fr;row-gap:2px}
+  .ph-row{grid-template-columns:1fr 1fr;row-gap:3px}
   .ph-row span{grid-column:1/-1}
-  section{padding:44px 0 6px}
+  .chtitle{font-size:21px}
+  #nrwcard{width:min(326px,calc(100vw - 24px))}
+}
+@media print{
+  #rail,#saveoff,#nrwcard,#nrwtip{display:none!important}
+  body{display:block;background:#fff;color:#000}
 }
 </style>
 </head>
 <body>
 
-<nav id="nav"><div class="inner">
-  <div class="brand">NORGE<span>.</span></div>
-  <div id="navlinks">
-    <a href="#hero">Top</a>
-    <a href="#history">History</a>
-    <a href="#peoples">Peoples</a>
-    <a href="#economy">Economy</a>
-    <a href="#culture">Culture</a>
-    <a href="#sport">Sport</a>
-    <a href="#oslo">Oslo</a>
-    <a href="#bergen">Bergen</a>
-    <a href="#fjords">Fjords</a>
-    <a href="#language">Language</a>
-    <a href="#different">Differences</a>
-  </div>
-</div></nav>
+<aside id="rail"><div class="railin">
+  <a class="railbrand" href="https://braff.co/" aria-label="Braff &amp; Co."><svg class="marksvg" preserveAspectRatio="xMinYMid meet" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 3097.7198697068407 674.2671009771988" width="3097.7198697068407" height="674.2671009771988"><g transform="scale(4.88599348534202) translate(10, 10)"><defs id="SvgjsDefs3418"></defs><g id="SvgjsG3419" featureKey="root" fill="#fff"></g><g id="SvgjsG3420" featureKey="container1" fill="#fff" transform="matrix(2.25,0,0,2.25,0,3)"><circle cx="25" cy="25" r="25"></circle></g><g id="SvgjsG3421" featureKey="symbol1" fill="#000000" transform="matrix(1.3476656769629345,0,0,1.3476656769629345,-13.308513185327243,-13.15338821503451)"><g xmlns="http://www.w3.org/2000/svg" transform="translate(0,-952.36218)"><path style="text-indent:0;text-transform:none;direction:ltr;block-progression:tb;baseline-shift:baseline;color:;enable-background:accumulate;" d="m 55.538322,990.35099 a 2.0550817,2.0550817 0 0 0 -1.6268,1.4554 l -7.192,22.43241 -5.651,-13.3568 a 2.0550817,2.0550817 0 0 0 -3.6816,-0.2575 l -4.3666,7.62 -5.4797,0 a 2.0550817,2.0550817 0 1 0 0,4.1098 l 6.6784,0 a 2.0550817,2.0550817 0 0 0 1.798,-1.0274 l 2.9111,-5.0514 6.1646,14.7266 a 2.0550817,2.0550817 0 0 0 3.8529,-0.1699 l 6.9352,-21.74751 5.5653,16.78151 a 2.0550817,2.0550817 0 0 0 3.7672,0.3425 l 3.9386,-6.8496 6.1646,0 a 2.0550817,2.0550817 0 1 0 0,-4.1098 l -7.3633,0 a 2.0550817,2.0550817 0 0 0 -1.798,1.0275 l -2.2261,3.9385 -6.0791,-18.49381 a 2.0550817,2.0550817 0 0 0 -2.3117,-1.37 z" fill="#7a7a7a" fill-opacity="1" stroke="none" marker="none" visibility="visible" display="inline" overflow="visible"></path></g></g><g id="SvgjsG3422" featureKey="text1" fill="#fff" transform="matrix(5.2574670024427235,0,0,5.2574670024427235,126.16529314752002,-39.840784776479616)"><path d="M9.38 16.42 c0.86 0.56 1.44 1.5 1.44 2.84 l0 1 c0 2.52 -1.36 3.74 -4.12 3.74 l-4.1 0 l-1 0 c-0.2 0 -0.3 -0.1 -0.3 -0.3 l0 -13.4 c0 -0.2 0.1 -0.3 0.3 -0.3 l1.68 0 l3.34 0 c2.52 0 3.66 1.1 3.66 3.8 c0 1.16 -0.34 2.02 -0.9 2.62 z M8 13.8 c0 -1.52 -0.34 -1.74 -1.38 -1.74 l-3.04 0 l0 3.6 l3.04 0 c1.04 0 1.38 -0.32 1.38 -1.86 z M8.54 20.259999999999998 l0 -1 c0 -1.38 -0.56 -1.74 -1.84 -1.74 l-3.12 0 l0 4.42 l3.12 0 c1.28 0 1.84 -0.3 1.84 -1.68 z M18.5155 15.88 c-0.12 0.2 -0.3 0.26 -0.5 0.2 c-0.3 -0.1 -0.66 -0.16 -1.04 -0.16 l-0.26 0 c-1.04 0 -1.74 0.5 -1.98 0.9 l0 6.88 c0 0.2 -0.1 0.3 -0.3 0.3 l-1.62 0 c-0.2 0 -0.3 -0.1 -0.3 -0.3 l0 -9.4 c0 -0.2 0.1 -0.3 0.3 -0.3 l1.62 0 c0.2 0 0.3 0.1 0.3 0.3 l0 0.96 c0.56 -0.88 1.56 -1.34 2.8 -1.34 c0.6 0 1.06 0.1 1.46 0.28 c0.2 0.12 0.26 0.3 0.14 0.54 z M28.251 23.82 c0.02 0.08 0.04 0.18 -0.06 0.18 l-1.84 0 c-0.22 0 -0.36 -0.2 -0.36 -0.48 l0 -0.68 c-0.46 0.7 -1.12 1.26 -2.14 1.26 l-0.62 0 c-1.86 0 -3.22 -1.12 -3.22 -3.12 s1.1 -2.9 3.18 -2.9 l2.8 0 l0 -0.82 c0 -1.06 -0.38 -1.34 -1.42 -1.34 l-0.54 0 c-1.02 0 -1.78 0.26 -2.2 0.44 c-0.32 0.12 -0.54 0.12 -0.66 -0.16 l-0.42 -0.98 c-0.08 -0.2 -0.1 -0.36 0.1 -0.48 c0.84 -0.52 2.08 -0.82 3.18 -0.82 l0.54 0 c2.48 0 3.64 1.1 3.64 3.44 l0 6.16 c0 0.1 0.02 0.22 0.04 0.3 z M24.291000000000004 22.1 c1.08 0 1.46 -0.44 1.7 -0.96 l0 -1.32 l-2.76 0 c-0.6 0 -1.02 0.26 -1.02 1.14 c0 0.84 0.42 1.14 1.02 1.14 l1.06 0 z M35.5865 9.48 c0.2 0 0.3 0.1 0.3 0.3 l0 1.46 c0 0.2 -0.1 0.3 -0.3 0.3 l-1.22 0 c-0.64 0 -1.02 0.4 -1.02 1.28 l0 1.18 l2.04 0 c0.2 0 0.3 0.1 0.3 0.3 l0 1.4 c0 0.2 -0.1 0.3 -0.3 0.3 l-2.04 0 l0 7.7 c0 0.2 -0.1 0.3 -0.3 0.3 l-1.62 0 c-0.2 0 -0.3 -0.1 -0.3 -0.3 l0 -7.7 l-1.06 0 c-0.2 0 -0.3 -0.1 -0.3 -0.3 l0 -1.4 c0 -0.2 0.1 -0.3 0.3 -0.3 l1.06 0 l0 -1.16 c0 -2.24 1.14 -3.36 3.24 -3.36 l1.22 0 z M42.602000000000004 9.48 c0.2 0 0.3 0.1 0.3 0.3 l0 1.46 c0 0.2 -0.1 0.3 -0.3 0.3 l-1.22 0 c-0.64 0 -1.02 0.4 -1.02 1.28 l0 1.18 l2.04 0 c0.2 0 0.3 0.1 0.3 0.3 l0 1.4 c0 0.2 -0.1 0.3 -0.3 0.3 l-2.04 0 l0 7.7 c0 0.2 -0.1 0.3 -0.3 0.3 l-1.62 0 c-0.2 0 -0.3 -0.1 -0.3 -0.3 l0 -7.7 l-1.06 0 c-0.2 0 -0.3 -0.1 -0.3 -0.3 l0 -1.4 c0 -0.2 0.1 -0.3 0.3 -0.3 l1.06 0 l0 -1.16 c0 -2.24 1.14 -3.36 3.24 -3.36 l1.22 0 z  M62.33300000000001 23.64 c0.18 0.16 0.08 0.36 -0.18 0.36 l-1.74 0 c-0.16 0 -0.24 -0.06 -0.36 -0.16 l-0.76 -0.66 c-0.68 0.74 -1.74 1.12 -3.02 1.12 l-2.9 0 c-2.3 0 -3.88 -1.2 -3.88 -3.68 l0 -1.18 c0 -1.02 0.24 -2.08 1.88 -2.82 l0.24 -0.12 l-0.36 -0.32 c-0.94 -0.84 -0.96 -1.56 -0.96 -2.64 l0 -0.42 c0 -1.78 0.88 -3.22 3.66 -3.22 l1.48 0 c2.78 0 3.68 1.5 3.68 3.22 l0 1.56 l-2.28 0 l0 -1.56 c0 -0.9 -0.42 -1.22 -1.4 -1.22 l-1.48 0 c-1 0 -1.38 0.32 -1.38 1.22 l0 0.42 c0 0.9 -0.02 1.26 0.92 2.12 l4.38 3.96 l0 -2.56 c0 -0.24 0.14 -0.38 0.4 -0.38 l2.8 0 c0.26 0 0.4 0.14 0.4 0.38 l0 1.18 c0 0.26 -0.14 0.4 -0.4 0.4 l-0.92 0 l0 1.98 c0 0.36 -0.02 0.68 -0.08 0.98 z M56.09300000000001 22.3 c0.82 0 1.3 -0.14 1.56 -0.54 l-4.36 -3.8 l-0.8 0.38 c-0.58 0.26 -0.72 0.66 -0.72 1.22 l0 1.06 c0 1.3 0.44 1.68 1.78 1.68 l2.54 0 z  M79.04400000000001 19.740000000000002 c0.26 0 0.4 0.14 0.38 0.38 c-0.12 2.52 -1.44 3.98 -4 3.98 l-1.78 0 c-2.7 0 -4.02 -1.62 -4.02 -4.16 l0 -5.88 c0 -2.54 1.32 -4.16 4.02 -4.16 l1.78 0 c2.56 0 3.88 1.46 4 3.96 c0.02 0.26 -0.12 0.4 -0.38 0.4 l-1.5 0 c-0.24 0 -0.38 -0.14 -0.4 -0.4 c-0.06 -1.42 -0.6 -1.9 -1.72 -1.9 l-1.78 0 c-1.22 0 -1.74 0.56 -1.74 2.1 l0 5.88 c0 1.56 0.52 2.1 1.74 2.1 l1.78 0 c1.12 0 1.66 -0.46 1.72 -1.92 c0.02 -0.24 0.16 -0.38 0.4 -0.38 l1.5 0 z M85.55950000000001 13.92 c2.2 0 3.52 1.48 3.52 3.62 l0 2.98 c0 2.12 -1.32 3.58 -3.52 3.58 l-1.02 0 c-2.2 0 -3.52 -1.46 -3.52 -3.58 l0 -2.98 c0 -2.14 1.32 -3.62 3.52 -3.62 l1.02 0 z M86.85950000000001 20.759999999999998 l0 -3.5 c0 -0.96 -0.52 -1.34 -1.3 -1.34 l-1.02 0 c-0.78 0 -1.3 0.38 -1.3 1.34 l0 3.5 c0 0.92 0.52 1.34 1.3 1.34 l1.02 0 c0.78 0 1.3 -0.42 1.3 -1.34 z M90.27500000000002 21.64 c0 -0.2 0.1 -0.3 0.3 -0.3 l2.06 0 c0.2 0 0.3 0.1 0.3 0.3 l0 2.06 c0 0.2 -0.1 0.3 -0.3 0.3 l-2.06 0 c-0.2 0 -0.3 -0.1 -0.3 -0.3 l0 -2.06 z"></path></g><g id="SvgjsG3423" featureKey="text3" fill="#fff" transform="matrix(2.25,0,0,2.25,374,108)"><path d=""></path></g></g></svg></a>
+  <div class="railtitle"><b>NORGE<span>.</span></b><em>25 charts · 26 photographs</em></div>
+  <nav id="navlinks" aria-label="Sections">
+    <a href="#hero"><i>—</i>Top</a>
+    <a href="#history"><i>01</i>History</a>
+    <a href="#peoples"><i>02</i>Peoples</a>
+    <a href="#economy"><i>03</i>Economy</a>
+    <a href="#culture"><i>04</i>Culture</a>
+    <a href="#sport"><i>05</i>Sport</a>
+    <a href="#oslo"><i>06</i>Oslo</a>
+    <a href="#bergen"><i>07</i>Bergen</a>
+    <a href="#fjords"><i>08</i>Fjords</a>
+    <a href="#language"><i>09</i>Language</a>
+    <a href="#different"><i>10</i>Differences</a>
+  </nav>
+  <div class="railread"><div class="rl">Read</div><div class="rbar"><i id="rprog"></i></div><div class="rpct" id="rpct">0% · 34 min</div></div>
+  <button id="saveoff" type="button">↓ Save for offline</button>
+  <div class="railnote">Works on the train with no signal</div>
+  <a class="railback" href="https://braff.co/">← All tools</a>
+</div></aside>
+<main>
 
 <!-- ============ HERO ============ -->
-<header id="hero"><div class="wrap">
+<header id="hero">
+  <figure class="heroph" data-wiki="Lofoten" data-nocap="1"><img alt=""></figure>
+  <div class="scrim"></div>
+  <div class="wrap">
   <div class="heroflag"><i></i><i></i><i></i></div>
   <h1>Norway,<br>by the numbers.</h1>
-  <p class="lede">A country of 5.6 million that owns roughly 1.5% of every listed company on earth, runs on 88% hydropower, and pays for it by selling other people the fossil fuels it won't burn itself. Here is what's actually going on.</p>
+  <p class="lede">A country of 5.6 million owns roughly 1.5% of every listed company on earth, runs on 88% hydropower, and pays for it by selling other people the fossil fuels it won't burn itself.</p>
   <div class="herostats">
-    <div><b>5.63M</b><span>POPULATION, Q1 2026</span></div>
-    <div><b>1.48</b><span>BIRTHS PER WOMAN, 2025</span></div>
-    <div><b>385,207</b><span>KM² INCL. SVALBARD</span></div>
-    <div><b>NOK 21.3T</b><span>SOVEREIGN FUND, END-2025</span></div>
-    <div><b>~$364k</b><span>FUND VALUE PER CITIZEN</span></div>
-    <div><b>96%</b><span>NEW CARS ELECTRIC, 2025</span></div>
-    <div><b>447</b><span>WINTER OLYMPIC MEDALS</span></div>
+    <div><b>5.63M</b><span>Population, Q1 2026</span></div>
+    <div><b>1.48</b><span>Births per woman, 2025</span></div>
+    <div><b>385,207</b><span>km² incl. Svalbard</span></div>
+    <div><b>NOK 21.3T</b><span>Sovereign fund, end-2025</span></div>
+    <div><b>$364k</b><span>Fund value per citizen</span></div>
+    <div><b>96%</b><span>New cars electric, 2025</span></div>
+    <div><b>447</b><span>Winter Olympic medals</span></div>
   </div>
-  <p class="small" style="margin-top:18px">Built as pre-trip reading. Figures are dated because they move. Dotted underlines mark numbers I'd want to re-check before quoting at dinner.</p>
-</div></header>
+  </div>
+</header>
 
 <!-- ============ HISTORY ============ -->
-<section id="history"><div class="wrap">
-  <div class="kicker">One</div>
-  <h2>A short, contested history</h2>
-  <p class="lede">Norway spent about 400 years as a Danish province, 91 as a junior partner to Sweden, and has been fully independent since 1905—younger than the Brooklyn Bridge. Almost everything you associate with "Norwegian national identity" was invented in the 19th century by people trying to prove it existed.</p>
+<section id="history">
+<div class="opener">
+  <figure class="ophoto" data-wiki="Oseberg ship" data-credit="1"><img alt=""></figure>
+  <div class="scrim"></div>
+  <div class="openerin"><div class="inner">
+    <div class="secno">01</div>
+    <h2>A short, contested history</h2>
+    <p class="lede">Norway spent about 400 years as a Danish province and 91 as a junior partner to Sweden. It has been fully independent since 1905, which makes it younger than the Brooklyn Bridge. Almost everything you associate with Norwegian national identity was invented in the 19th century by people trying to prove it existed.</p>
+  </div></div>
+  <div class="ocredit"></div>
+</div>
+<div class="wrap">
 
   <div class="phgrid">
-    <figure class="ph" data-wiki="Oseberg ship"><img alt="Oseberg ship"><figcaption></figcaption></figure>
     <figure class="ph" data-wiki="Roald Amundsen"><img alt="Roald Amundsen"><figcaption></figcaption></figure>
   </div>
 
   <div class="tl">
-    <div class="ev"><div class="yr">c. 9500 BC</div><div class="ti">The ice leaves, people arrive</div><p class="tx">Hunter-gatherers reach an ice-free coast within a few centuries of deglaciation, from two directions: up the Atlantic coast (the Fosna culture) and around the top from the northeast (Komsa). Ancient DNA shows both Western and Eastern Hunter-Gatherer ancestry meeting here early—Scandinavia was a genetic collision zone from the start.</p></div>
-    <div class="ev"><div class="yr">c. 4000 BC</div><div class="ti">Farming arrives, mostly in the south</div><p class="tx">Anatolian-descended farmers spread up through Denmark. Norway's geography means agriculture never fully displaces hunting and fishing—a pattern that holds for the next 6,000 years.</p></div>
+    <div class="ev"><div class="yr">c. 9500 BC</div><div class="ti">The ice leaves, people arrive</div><p class="tx">Hunter-gatherers reach an ice-free coast within a few centuries of deglaciation, from two directions: up the Atlantic coast (the Fosna culture) and around the top from the northeast (Komsa). Ancient DNA shows Western and Eastern Hunter-Gatherer ancestry meeting here early. Scandinavia was a genetic collision zone from the start.</p></div>
+    <div class="ev"><div class="yr">c. 4000 BC</div><div class="ti">Farming arrives, mostly in the south</div><p class="tx">Anatolian-descended farmers spread up through Denmark. Norway's geography means agriculture never fully displaces hunting and fishing. That pattern holds for the next 6,000 years.</p></div>
     <div class="ev hi"><div class="yr">c. 2800 BC</div><div class="ti">The steppe replacement</div><p class="tx">Corded Ware / Yamnaya-descended herders sweep into Scandinavia from the Pontic steppe, bringing Indo-European language and horses. The genetic turnover in Scandinavia is among the most complete anywhere in Europe. Modern Norwegian ancestry is overwhelmingly this layer.</p></div>
     <div class="ev"><div class="yr">793</div><div class="ti">Lindisfarne</div><p class="tx">The raid on the Northumbrian monastery is the conventional start of the Viking Age, mostly because a literate monk wrote it down. Norse traders had been moving through the North Sea for generations.</p></div>
-    <div class="ev"><div class="yr">c. 872–930</div><div class="ti">Harald Fairhair "unifies" Norway</div><p class="tx">The founding myth: Harald vows not to cut his hair until he rules all Norway, wins at Hafrsfjord, gets a haircut. Historians are sceptical—the sagas were written 300+ years later by Icelanders with motives, and real unification took until roughly 1130. Treat it as national mythology with a kernel of truth.</p></div>
-    <div class="ev"><div class="yr">c. 985–1000</div><div class="ti">Iceland, Greenland, Vinland</div><p class="tx">Erik the Red settles Greenland; his son Leif reaches North America around 1000. The Norse site at L'Anse aux Meadows in Newfoundland is dated by tree rings to <b>exactly AD 1021</b>—471 years before Columbus, and the only confirmed pre-Columbian European settlement in the Americas.</p></div>
+    <div class="ev"><div class="yr">c. 872–930</div><div class="ti">Harald Fairhair "unifies" Norway</div><p class="tx">The founding myth: Harald vows not to cut his hair until he rules all Norway, wins at Hafrsfjord, gets a haircut. Historians are sceptical. The sagas were written 300 years later by Icelanders with motives, and real unification took until roughly 1130. Treat it as national mythology with a kernel of truth.</p></div>
+    <div class="ev"><div class="yr">c. 985–1000</div><div class="ti">Iceland, Greenland, Vinland</div><p class="tx">Erik the Red settles Greenland; his son Leif reaches North America around 1000. The Norse site at L'Anse aux Meadows in Newfoundland is dated by tree rings to <b>exactly AD 1021</b>, 471 years before Columbus. It is the only confirmed pre-Columbian European settlement in the Americas.</p></div>
     <div class="ev"><div class="yr">1030</div><div class="ti">Stiklestad and the invention of St. Olav</div><p class="tx">Olav Haraldsson loses the battle and his life, then wins the argument posthumously: declared a saint within a year, he becomes Norway's eternal king and the engine of Christianization. Nidaros (Trondheim) becomes a major pilgrimage destination.</p></div>
-    <div class="ev"><div class="yr">1066</div><div class="ti">Stamford Bridge ends the Viking Age</div><p class="tx">Harald Hardrada—Norwegian king, former commander of the Byzantine emperor's Varangian Guard, the most well-travelled man of his century—is killed invading England. Three weeks later Harold Godwinson loses to William at Hastings. Norway's medieval high-water mark passes.</p></div>
+    <div class="ev"><div class="yr">1066</div><div class="ti">Stamford Bridge ends the Viking Age</div><p class="tx">Harald Hardrada is killed invading England. He was Norwegian king, former commander of the Byzantine emperor's Varangian Guard, and the most well-travelled man of his century. Three weeks later Harold Godwinson loses to William at Hastings, and Norway's medieval high-water mark passes.</p></div>
     <div class="ev"><div class="yr">1262</div><div class="ti">Peak Norway</div><p class="tx">The realm covers Iceland, Greenland, the Faroes, Orkney, Shetland, the Hebrides and the Isle of Man. This is the largest Norway ever gets. It is downhill for the next 550 years.</p></div>
     <div class="ev hi"><div class="yr">1349</div><div class="ti">The Black Death, and why Norway lost 460 years</div><p class="tx">Plague arrives at Bergen on an English ship and kills an estimated <b>60–65% of the population</b>. Norway's thin aristocracy is effectively wiped out along with its administrative class and written language. The country never recovers institutional independence on its own terms. This single event does more to explain the next four centuries than any king.</p></div>
     <div class="ev"><div class="yr">1397</div><div class="ti">Kalmar Union</div><p class="tx">Denmark, Sweden and Norway unite under one crown. Norway is the weakest leg and stays in after Sweden leaves.</p></div>
     <div class="ev"><div class="yr">1537–1814</div><div class="ti">The "400-year night"</div><p class="tx">Reformation imposed from Copenhagen; Norway is downgraded to a Danish province. Written Norwegian disappears and Danish becomes the language of church, law and letters. Greenland, Iceland and the Faroes are transferred to Danish administration. The phrase "400-year night" is Ibsen's, and it stuck.</p></div>
-    <div class="ev hi"><div class="yr">1814</div><div class="ti">The busiest year in Norwegian history</div><p class="tx">January: Denmark backs Napoleon, loses, and cedes Norway to Sweden at the Treaty of Kiel. April–May: Norwegians ignore this, convene at Eidsvoll and write a constitution—signed <b>17 May</b>, still the national day, and still one of the oldest constitutions in force anywhere. Summer: Sweden invades and wins in about two weeks. November: Norway enters a personal union with Sweden but <em>keeps its constitution and parliament</em>. A defeat that functioned as a founding.</p></div>
-    <div class="ev"><div class="yr">1825–1925</div><div class="ti">A third of the country leaves</div><p class="tx">Roughly <b>800,000</b> Norwegians emigrate, overwhelmingly to Minnesota, Wisconsin, the Dakotas and Iowa. Per capita, only Ireland sent a larger share of its population to America. About <b>3.9 million</b> Americans still claim Norwegian ancestry—a figure often quoted as 4.5 million from the 2000 Census but revised down in later American Community Survey estimates. Either way it is comparable to Norway's entire present population.</p></div>
+    <div class="ev hi"><div class="yr">1814</div><div class="ti">The busiest year in Norwegian history</div><p class="tx">January: Denmark backs Napoleon, loses, and cedes Norway to Sweden at the Treaty of Kiel. April: Norwegians ignore this, convene at Eidsvoll and sign a constitution on <b>17 May</b>, still the national day and still one of the oldest constitutions in force anywhere. Summer: Sweden invades and wins in about two weeks. November: Norway enters a personal union with Sweden but <em>keeps its constitution and parliament</em>. A defeat that functioned as a founding.</p></div>
+    <div class="ev"><div class="yr">1825–1925</div><div class="ti">A third of the country leaves</div><p class="tx">Roughly <b>800,000</b> Norwegians emigrate, overwhelmingly to Minnesota, Wisconsin, the Dakotas and Iowa. Per capita, only Ireland sent a larger share of its population to America. About <b>3.9 million</b> Americans still claim Norwegian ancestry on recent American Community Survey estimates, revised down from the 4.5 million of the 2000 Census. Either figure is comparable to Norway's entire present population.</p></div>
     <div class="ev hi"><div class="yr">1905</div><div class="ti">Independence, by referendum, 99.95% to 0.05%</div><p class="tx">The union with Sweden dissolves peacefully. The confirming referendum runs <b>368,208 to 184</b>. Norwegians then vote 79% to be a monarchy rather than a republic and import a Danish prince, who takes the deliberately archaic name Haakon VII. His son Olav and grandson Harald V follow. Harald V, the current king, is the grandson of a man elected to the job.</p></div>
-    <div class="ev"><div class="yr">1911</div><div class="ti">Amundsen reaches the South Pole</div><p class="tx">14 December, five weeks ahead of Scott, using dogs and skis while the British hauled sledges by hand. Polar exploration becomes central to Norwegian self-image—see also Nansen (Nobel Peace Prize 1922) and Heyerdahl's Kon-Tiki raft, 1947.</p></div>
-    <div class="ev hi"><div class="yr">1940–45</div><div class="ti">Occupation</div><p class="tx">Germany invades 9 April 1940. In Oslofjord the 19th-century fortress at Oscarsborg sinks the brand-new cruiser <em>Blücher</em> with obsolete guns and torpedoes, delaying the assault long enough for the king, government and gold reserve to escape north and then to London. Vidkun Quisling's name enters English as a common noun. Norwegian saboteurs destroy the heavy-water plant at Vemork in February 1943. Of 772 Jews deported, <b>34 survived</b>. Retreating Germans burn Finnmark to the ground in 1944. Norway's merchant fleet—around 1,000 ships under Nortraship—is one of the Allies' most valuable assets and takes heavy losses.</p></div>
+    <div class="ev"><div class="yr">1911</div><div class="ti">Amundsen reaches the South Pole</div><p class="tx">14 December, five weeks ahead of Scott, using dogs and skis while the British hauled sledges by hand. Polar exploration becomes central to Norwegian self-image. See also Nansen (Nobel Peace Prize 1922) and Heyerdahl's Kon-Tiki raft in 1947.</p></div>
+    <div class="ev hi"><div class="yr">1940–45</div><div class="ti">Occupation</div><p class="tx">Germany invades 9 April 1940. In Oslofjord the 19th-century fortress at Oscarsborg sinks the brand-new cruiser <em>Blücher</em> with obsolete guns and torpedoes, delaying the assault long enough for the king, government and gold reserve to escape north and then to London. Vidkun Quisling's name enters English as a common noun. Norwegian saboteurs destroy the heavy-water plant at Vemork in February 1943. Of 772 Jews deported, <b>34 survived</b>. Retreating Germans burn Finnmark to the ground in 1944. Norway's merchant fleet, around 1,000 ships under Nortraship, is one of the Allies' most valuable assets and takes heavy losses.</p></div>
     <div class="ev"><div class="yr">1949</div><div class="ti">NATO founding member</div><p class="tx">Neutrality died on 9 April 1940 and has never come back. Norway shares a 196 km Arctic land border with Russia.</p></div>
-    <div class="ev hi"><div class="yr">1969</div><div class="ti">Ekofisk</div><p class="tx">Phillips Petroleum, drilling its last contractual well before giving up, hits oil on 23 December. Production starts 1971. Critically, Norway already had strong institutions, a competent bureaucracy and an established social contract <em>before</em> the money arrived—which is the standard explanation for why it avoided the resource curse that flattened comparable discoveries elsewhere.</p></div>
-    <div class="ev"><div class="yr">1972 & 1994</div><div class="ti">Norway says no to Europe. Twice.</div><p class="tx">EEC membership rejected 53.5–46.5 in 1972; EU membership rejected 52.2–47.8 in 1994. Both times the cities voted yes and the countryside, fishermen and farmers voted no. Norway joined the EEA anyway, so it adopts most EU rules with no vote on them—a trade-off Norwegians periodically re-litigate and then decline to change.</p></div>
-    <div class="ev"><div class="yr">1996</div><div class="ti">First deposit into the oil fund</div><p class="tx">The Government Pension Fund Global receives its first transfer. The point was explicitly to keep petroleum money <em>out</em> of the domestic economy and to smooth spending across generations. Thirty years later it is the largest sovereign wealth fund in the world.</p></div>
-    <div class="ev hi"><div class="yr">2011</div><div class="ti">22 July</div><p class="tx">A far-right terrorist bombs the government quarter in Oslo and shoots dead 69 people, most of them teenagers, at a Labour Party youth camp on Utøya. 77 dead in total. The national response—no emergency powers, no expanded surveillance, an ordinary criminal trial—is a real and deliberate contrast with the American response to 2001, and Norwegians know it.</p></div>
+    <div class="ev hi"><div class="yr">1969</div><div class="ti">Ekofisk</div><p class="tx">Phillips Petroleum, drilling its last contractual well before giving up, hits oil on 23 December. Production starts 1971. Norway already had strong institutions, a competent bureaucracy and an established social contract before the money arrived. That is the standard explanation for why it avoided the resource curse that flattened comparable discoveries elsewhere.</p></div>
+    <div class="ev"><div class="yr">1972 & 1994</div><div class="ti">Norway says no to Europe. Twice.</div><p class="tx">EEC membership rejected 53.5–46.5 in 1972; EU membership rejected 52.2–47.8 in 1994. Both times the cities voted yes and the countryside, fishermen and farmers voted no. Norway joined the EEA anyway, so it adopts most EU rules with no vote on them. Norwegians re-litigate the trade-off periodically and then decline to change it.</p></div>
+    <div class="ev"><div class="yr">1996</div><div class="ti">First deposit into the oil fund</div><p class="tx">The Government Pension Fund Global receives its first transfer. The stated point was to keep petroleum money <em>out</em> of the domestic economy and smooth spending across generations.</p></div>
+    <div class="ev hi"><div class="yr">2011</div><div class="ti">22 July</div><p class="tx">A far-right terrorist bombs the government quarter in Oslo and shoots dead 69 people, most of them teenagers, at a Labour Party youth camp on Utøya. 77 dead in total. The national response was no emergency powers, no expanded surveillance, and an ordinary criminal trial. That is a deliberate contrast with the American response to 2001, and Norwegians know it.</p></div>
     <div class="ev"><div class="yr">2022–</div><div class="ti">Europe's gas station</div><p class="tx">Russia's invasion of Ukraine turns Norway into the EU's largest single gas supplier, covering over 30% of EU+UK consumption. Windfall revenues are enormous and slightly uncomfortable: Norway is getting rich off a war it is helping the victim survive.</p></div>
   </div>
 </div></section>
 
-<hr>
 
 <!-- ============ PEOPLES ============ -->
-<section id="peoples"><div class="wrap">
-  <div class="kicker">Two</div>
-  <h2>Who is actually here</h2>
-  <p class="lede">Norway is not, and has never been, ethnically simple. It has an indigenous people with their own parliament, two recognized national minorities you've never heard of, and an immigrant share that would surprise most Americans.</p>
+<section id="peoples">
+<div class="opener">
+  <figure class="ophoto" data-wiki="Sámi people" data-credit="1"><img alt=""></figure>
+  <div class="scrim"></div>
+  <div class="openerin"><div class="inner">
+    <div class="secno">02</div>
+    <h2>Who is actually here</h2>
+    <p class="lede">Just over one Norwegian resident in five has an immigrant background. The country also has an indigenous people with its own parliament and two recognized national minorities most visitors have never heard of. For a nation that spent the 19th century exporting a third of its population, the reversal is the single largest social change of the past fifty years.</p>
+  </div></div>
+  <div class="ocredit"></div>
+</div>
+<div class="wrap">
 
-  <div class="grid g3" style="margin-top:22px">
-    <div class="stat"><b>~50–65k</b><span>SÁMI IN NORWAY (ESTIMATE)</span><em>No official count—Norway doesn't register ethnicity. The Sámi electoral roll has about 23,000 registered voters.</em></div>
-    <div class="stat"><b>~16%</b><span>IMMIGRANT-BACKGROUND SHARE</span><em>Immigrants plus Norwegian-born to two immigrant parents. Foreign citizens alone: 638,000, or 11.3% (2026).</em></div>
-    <div class="stat"><b>~34%</b><span>OSLO IMMIGRANT BACKGROUND</span><em>The capital is far more diverse than the country. Top origins nationally: Poland, Lithuania, Ukraine, Sweden, Syria, Somalia.</em></div>
+  <div class="grid g4" style="margin-top:22px">
+    <div class="stat"><b>21.7%</b><span>Immigrant background, 2026</span><em>987,120 immigrants (17.5%) plus 238,507 Norwegian-born to two immigrant parents (4.2%).</em></div>
+    <div class="stat"><b>22,324</b><span>Net migration, 2025</span><em>Down from 57,939 at the 2022 Ukrainian peak.</em></div>
+    <div class="stat"><b>50–65k</b><span>Sámi in Norway</span><em>An estimate. Norway does not register ethnicity, so there is no official count. The Sámi electoral roll has about 23,000 registered voters.</em></div>
+    <div class="stat"><b>1.48</b><span>Births per woman, 2025</span><em>Well below replacement. Net migration, not births, is what keeps the population growing.</em></div>
   </div>
-
-  <figure class="ph" data-wiki="Sámi people"><img alt="Sámi people"><figcaption></figcaption></figure>
-
-  <h3>The Sámi</h3>
-  <p>Indigenous to northern Scandinavia, speaking Uralic languages related to Finnish and Estonian rather than to Norwegian. Ten Sámi languages survive; several have fewer than 500 speakers. Their arrival predates Norse settlement of the north, though the exact chronology is debated.</p>
-  <p>The uncomfortable part: from roughly 1850 to 1980 Norway pursued <em>fornorsking</em>—forced Norwegianization. Sámi children were punished for speaking their language in school, land purchase required Norwegian-speaking, and skulls were collected for race science. The 1979–81 hunger strikes against the Alta dam were the turning point. The Sámi Parliament opened in 1989. A Truth and Reconciliation Commission reported in June 2023 and its findings were harsher than most Norwegians expected.</p>
-
-  <div class="flag"><h4>Worth knowing</h4><p>Norway's Sámi policy is genuinely better than the American equivalent on most measures, and Norwegians will tell you so. They are also, as of 2023, in the middle of discovering that their own record is worse than the national self-image allowed. The Fosen wind-farm case—where the Supreme Court ruled turbines violated Sámi reindeer-herding rights in 2021 and the turbines kept spinning for two more years—is the live example.</p></div>
 
   <figure class="ch">
     <div class="chtitle">Population of Norway</div>
     <div class="chsub">1800 to 2026. The country has grown 6.4-fold in 226 years.</div>
     <div id="ch-pop"></div>
-    <figcaption>Source: Statistics Norway. Growth since 2000 is majority immigration-driven: the fertility rate is 1.48, well below replacement.</figcaption>
+    <figcaption>Source: Statistics Norway.</figcaption>
   </figure>
+
+  <h3>The Sámi</h3>
+  <p>Indigenous to northern Scandinavia, the Sámi speak Uralic languages related to Finnish and Estonian rather than to Norwegian. Ten Sámi languages survive and several have fewer than 500 speakers. Their presence in the north predates Norse settlement, though the exact chronology is debated.</p>
+  <p>From roughly 1850 to 1980 Norway pursued <em>fornorsking</em>, forced Norwegianization. Sámi children were punished for speaking their language at school, buying land required speaking Norwegian, and skulls were collected for race science. The 1979–81 hunger strikes against the Alta dam were the turning point. The Sámi Parliament opened in 1989. A Truth and Reconciliation Commission reported in June 2023 and its findings were harsher than most Norwegians expected.</p>
+
+  <div class="flag"><p><b>Norway's Sámi record is better than the American equivalent on most measures, and worse than Norwegians thought.</b> They will tell you the first part. The 2023 commission established the second. The live case is Fosen: the Supreme Court ruled in 2021 that wind turbines violated Sámi reindeer-herding rights, and the turbines kept spinning for two more years.</p></div>
+
+  <h3>Two minorities you won't have heard of</h3>
+  <div class="grid g2" style="margin-top:14px">
+    <div class="card"><h4>Kven: Finnish-speaking settlers of the far north</h4><p>Migrated from northern Finland and Sweden from the 1500s onward, and concentrated today in Troms and Finnmark. Recognized as a national minority in 1998; Kven recognized as a language in 2005.</p></div>
+    <div class="card"><h4>Romani / Tater: travellers, present since the 1500s</h4><p>Norway subjected them to forced sterilization and child removal well into the 20th century, and formally apologized in 1998. Most visitors never encounter this history and most Norwegians would rather not discuss it.</p></div>
+  </div>
 
   <figure class="ch">
     <div class="chtitle">Emigration to North America, by decade</div>
-    <div class="chsub">Number of emigrants. The 1880s were the peak.</div>
+    <div class="chsub">Thousands of emigrants. The 1880s were the peak.</div>
     <div id="ch-emig"></div>
-    <figcaption>In the 1880s Norway lost about 167,000 people to America out of a population of roughly two million: something like 8% of the country in ten years. Clean per-decade figures after 1900 are not readily published, so the chart stops there; the 1825–1925 total is about 800,000. Source: SSB.</figcaption>
+    <figcaption>In the 1880s Norway lost about 167,000 people to America out of a population of roughly two million, something like 8% of the country in ten years. Clean per-decade figures after 1900 are not readily published, so the chart stops there. The 1825–1925 total is about 800,000. Source: SSB.</figcaption>
   </figure>
+
+  <p>Then it ran in reverse. Norway was a country of emigrants until the 1960s and has been a country of immigrants since about 1970, and the crossover was fast enough that people who remember the first Pakistani labour migrants arriving are still working.</p>
 
   <figure class="ch">
     <div class="chtitle">Immigrant background, share of population</div>
     <div class="chsub">Immigrants plus Norwegian-born to two immigrant parents</div>
     <div id="ch-immig"></div>
-    <figcaption>From 1.5% to roughly 19% in five decades—one of the faster demographic transformations in Europe, and the engine of most Norwegian political argument since 2000. Source: SSB.</figcaption>
+    <figcaption>1.5% to 21.7% in five decades. Source: SSB.</figcaption>
   </figure>
 
-<h3>Two minorities you won't have heard of</h3>
-  <div class="grid g2" style="margin-top:14px">
-    <div class="card"><span class="tag">Kven</span><h4>Finnish-speaking settlers of the far north</h4><p>Migrated from northern Finland and Sweden from the 1500s onward. Recognized as a national minority in 1998; Kven recognized as a language in 2005. Concentrated in Troms and Finnmark.</p></div>
-    <div class="card"><span class="tag">Romani / Tater</span><h4>Travellers, present since the 1500s</h4><p>Subjected to forced sterilization and child removal well into the 20th century under policies Norway formally apologized for in 1998. A history most visitors never encounter and most Norwegians would rather not discuss.</p></div>
-  </div>
+  <h3>Where they come from</h3>
+  <p>The top of the list is not what an American would guess. It is Poland, and it has been since the 2004 EU enlargement opened Norwegian construction sites to EEA labour.</p>
+
+  <figure class="ch">
+    <div class="chtitle">Top countries of origin</div>
+    <div class="chsub">Thousands of immigrants resident in Norway, 1 January 2026</div>
+    <div id="ch-origin"></div>
+    <figcaption>Source: Statistics Norway. Note the shape of this list: two EEA labour-migration countries at the top, then Syria, then a mix of 1970s–80s labour migration (Pakistan, Turkey), 1980s–90s refugee cohorts (Vietnam, Iran, Iraq, Somalia), and marriage migration (Thailand, the Philippines).</figcaption>
+  </figure>
+
+  <p><b>The Polish wave has stopped.</b> Poland's resident population in Norway grew by 360 people in 2025, the smallest increase since 2003. Nobody is sure yet how much of that is Poles going home to a much richer Poland and how much is Norwegian construction slowing down, but the era of open-ended eastward recruitment is over.</p>
+
+  <p><b>Ukraine went from nowhere to second place in four years.</b> 85,461 Ukrainians were resident in Norway on 1 January 2026, against a few thousand before February 2022. About 92,000 have arrived since the invasion and roughly 87,400 hold collective protection. The annual increase is collapsing on purpose: 30,300 in 2022, 28,800 in 2023, 14,100 in 2024, 5,800 in 2025. On 27 September 2024 Norway stopped granting automatic collective protection to Ukrainians from six western regions it judged safe, including Lviv and Volyn, roughly 10% of that year's arrivals. The stated reason was municipal housing capacity and a wish to stop taking a larger per-capita share than its Nordic neighbours.</p>
+
+  <figure class="ch">
+    <div class="chtitle">Net migration to Norway</div>
+    <div class="chsub">Immigration minus emigration, thousands, by year</div>
+    <div id="ch-netmig"></div>
+    <figcaption>The 2022–23 spike is Ukraine and almost nothing else. 2020 is covid. Source: SSB.</figcaption>
+  </figure>
+
+  <h3>Where they settle</h3>
+  <p>Immigrants are not distributed the way the Oslo-centric story implies. The national average is 17.5%. The municipalities with the highest immigrant shares in Norway are small fishing towns on the coast and in the far north: <b>Træna at 32%, Gamvik at 31%, Frøya and Båtsfjord at 30%</b>. Those are filleting lines and salmon pens, staffed largely by Poles, Lithuanians and Latvians, in places whose Norwegian-born population has been leaving for two generations. The fish industry is the least discussed and most consequential immigration story in the country.</p>
+
+  <p>Around Oslo the pattern is suburban rather than central. <b>Drammen sits at 24%</b>, Lier at 22%, and Lørenskog has recently passed both Drammen and Oslo itself. Inside Oslo the range across districts is extreme: <b>Stovner is the highest at about 43%</b>, against roughly 16% in the wealthiest western districts, tracking the same east–west line as the life-expectancy gap in the Oslo section below.</p>
+
+  <p><b>Recent refugees went where the state sent them.</b> Norway settles people with protection status through a quota system negotiated with municipalities, and it has deliberately used small inland and western kommuner. In the first half of 2025 the counties taking the most were Trøndelag (726), Vestland (671) and Rogaland (633); by municipality it was Oslo (426), Trondheim (217) and Bergen (217). The government has singled out Hjartdal, Gjemnes, Seljord, Fyresdal, Bokn and Rollag for taking large numbers relative to their size. If you go through a village of 900 people in Telemark and hear Ukrainian in the shop, that is policy working as designed.</p>
+
+  <h3>Why they came</h3>
+  <div class="scroller"><table class="tbl">
+    <tr><th>First-time non-Nordic immigrants, 2025</th><th style="text-align:right">People</th><th style="text-align:right">vs 2024</th></tr>
+    <tr><td><b>Refugee or protection</b></td><td class="n">13,870</td><td class="n">−39.2%</td></tr>
+    <tr><td><b>Family reunification</b></td><td class="n">12,980</td><td class="n">+7.2%</td></tr>
+    <tr><td><b>Work</b></td><td class="n">10,544</td><td class="n">−22.4%</td></tr>
+    <tr><td><b>Education</b></td><td class="n">2,881</td><td class="n">−5.3%</td></tr>
+    <tr><td><b>Total</b></td><td class="n">40,967</td><td class="n">−21.3%</td></tr>
+  </table></div>
+  <p class="small" style="margin-top:10px">Source: SSB. Labour immigration in 2025 was the lowest in twenty years. Across the whole period since 1990, family reunification (404,375) and work (397,835) have been almost exactly equal as drivers, which is not the impression the political debate gives.</p>
+
+  <h3>How it is going</h3>
+  <p>The integration record splits hard by origin group, and Norwegian statistics are unusually willing to publish it.</p>
+
+  <figure class="ch">
+    <div class="chtitle">Employment rate, ages 20–66</div>
+    <div class="chsub">Fourth quarter 2025. Reference bars in grey, origin groups in blue and red. Bar axis starts at 40%.</div>
+    <div id="ch-empimm"></div>
+    <figcaption>Immigrants overall sit 12 percentage points below the non-immigrant population, at 67.5% against 79.5%. That average hides a 35-point spread. Filipino and Swedish immigrants out-work native Norwegians; Ukrainians and Syrians are barely at half. Time since arrival explains much of it, since the Ukrainian cohort is three years old and the Filipino one is thirty, but not all of it. Source: SSB.</figcaption>
+  </figure>
+
+  <div class="flag"><p><b>Immigration is the only reason Norway is still growing.</b> The fertility rate is 1.48 and has been below replacement since 1975. Net migration has supplied the majority of population growth for most of this century, and in a strong year like 2010 it was about two-thirds of it. Whatever position you hold on the politics, the demographic arithmetic is not in dispute: on births alone the country shrinks.</p></div>
 </div></section>
 
-<hr>
 
 <!-- ============ ECONOMY ============ -->
-<section id="economy"><div class="wrap">
-  <div class="kicker">Three</div>
-  <h2>The economy, honestly</h2>
-  <p class="lede">Norway's GDP per capita is about $106,000—fifth in the world. Its productivity per hour looks superhuman. Both numbers are distorted by a petroleum sector that employs relatively few people and produces enormous value, and the interesting question is what's underneath.</p>
+<section id="economy">
+<div class="opener">
+  <figure class="ophoto" data-wiki="Troll A platform" data-credit="1"><img alt=""></figure>
+  <div class="scrim"></div>
+  <div class="openerin"><div class="inner">
+    <div class="secno">03</div>
+    <h2>The economy, and what the oil hides</h2>
+    <p class="lede">Norway's GDP per capita is about The economy, and what the oil hides06,000, fifth in the world, and its productivity per hour looks superhuman. Both numbers are distorted by a petroleum sector that produces enormous value while employing few people.</p>
+  </div></div>
+  <div class="ocredit"></div>
+</div>
+<div class="wrap">
 
   <div class="grid g4" style="margin-top:24px">
-    <div class="stat"><b>$106k</b><span>GDP PER CAPITA, NOMINAL 2026</span></div>
-    <div class="stat"><b>~78%</b><span>OF GDP IS "MAINLAND"</span></div>
-    <div class="stat"><b>4.7%</b><span>UNEMPLOYMENT, MAR 2026</span></div>
-    <div class="stat"><b>~1,400</b><span>HOURS WORKED / YEAR</span></div>
+    <div class="stat"><b>$106k</b><span>GDP per capita, nominal 2026</span></div>
+    <div class="stat"><b>78%</b><span>Of GDP is "mainland"</span></div>
+    <div class="stat"><b>4.7%</b><span>Unemployment, March 2026</span></div>
+    <div class="stat"><b>1,400</b><span>Hours worked per year</span></div>
   </div>
 
-  <figure class="ph" data-wiki="Troll A platform"><img alt="Troll A platform"><figcaption></figcaption></figure>
-
   <h3>The fund</h3>
-  <p>Formally the Government Pension Fund Global, universally called the oil fund. It held <b>NOK 21,268 billion</b> at the end of 2025—roughly $2 trillion, about $364,000 per Norwegian citizen. It is the largest single owner of equities on the planet, holding on average <b>1.5% of every listed company in the world</b>.</p>
+  <p>Formally the Government Pension Fund Global, universally called the oil fund. It held <b>NOK 21,268 billion</b> at the end of 2025, roughly $2 trillion, or about $364,000 per Norwegian citizen. It is the largest single owner of equities on the planet, holding on average <b>1.5% of every listed company in the world</b>.</p>
 
   <figure class="ch">
     <div class="chtitle">Fund value, year-end</div>
-    <div class="chsub">NOK billion. The 2022 flat spot is a −14.1% return year offset by inflows.</div>
+    <div class="chsub">NOK trillion. The 2022 flat spot is a −14.1% return year offset by inflows.</div>
     <div id="ch-fund"></div>
     <figcaption>Source: Norges Bank Investment Management. Annualized return since 1998: 6.64%.</figcaption>
   </figure>
@@ -310,1001 +498,3 @@ footer{margin-top:60px;border-top:1px solid var(--line);padding:26px 0 60px;colo
     <div class="chtitle">Annual return</div>
     <div class="chsub">Per cent, 2021–2025</div>
     <div id="ch-ret"></div>
-    <figcaption>2025 by asset class: equities +19.3%, fixed income +5.4%, real estate +4.4%. The fund underperformed its own benchmark by 0.28pp in 2025—it is, deliberately, close to an index fund.</figcaption>
-  </figure>
-
-  <div class="grid g2" style="margin-top:20px">
-    <div class="card"><span class="tag">Allocation, end 2025</span><h4>71.3% equities · 26.5% fixed income</h4><p>Plus 1.7% unlisted real estate and 0.4% unlisted renewable infrastructure. No domestic Norwegian equities—the whole design is to hold the money <em>outside</em> the Norwegian economy.</p></div>
-    <div class="card"><span class="tag">The fiscal rule</span><h4>Spend 3%, keep the rest forever</h4><p><em>Handlingsregelen</em>: government may spend only the fund's expected real return, guided at 3% (2.7% in normal times). Actual structural deficit spending was 2.7% of the fund in 2025 and 2.8% in 2026. The rule has held for 25 years. That discipline, rather than the petroleum itself, is the Norwegian achievement.</p></div>
-  </div>
-
-  <div class="flag"><h4>The paradox nobody in Oslo enjoys discussing</h4><p>Norway runs its domestic economy on essentially carbon-free electricity, has pushed EVs to 96% of new car sales, and markets itself as a climate leader. It funds all of this by exporting the fossil fuels that constitute roughly <b>57% of its goods export earnings</b> for other countries to burn. Both facts are true simultaneously. Bring it up carefully.</p></div>
-
-  <figure class="ch">
-    <div class="chtitle">What Norway sells</div>
-    <div class="chsub">Share of goods exports by category, 2025</div>
-    <div id="ch-exp"></div>
-    <figcaption>Total goods exports NOK 1,778.8bn against imports of NOK 1,117.9bn—a trade surplus of NOK 661bn. Source: SSB / UN Comtrade.</figcaption>
-  </figure>
-
-  <div class="grid g2">
-    <figure class="ch" style="margin-top:14px">
-      <div class="chtitle">Who buys it</div>
-      <div class="chsub">Exports by destination, NOK billion, 2025</div>
-      <div id="ch-dest"></div>
-      <figcaption>The UK and Germany are Norway's gas customers. Source: SSB.</figcaption>
-    </figure>
-    <figure class="ch" style="margin-top:14px">
-      <div class="chtitle">Who sells to it</div>
-      <div class="chsub">Imports by source, NOK billion, 2025</div>
-      <div id="ch-src"></div>
-      <figcaption>China overtook Germany and Sweden as the top import source. Source: SSB.</figcaption>
-    </figure>
-  </div>
-
-  <h3>Power</h3>
-  <p>157.2 TWh generated in 2024, of which <b>88% hydro</b> and <b>11% wind</b>. Norwegian reservoirs hold <b>87 TWh</b> of storable energy—roughly half of all reservoir storage capacity in Europe, which makes Norway the continent's battery and explains why Norwegian electricity prices became a domestic political crisis once interconnectors to Germany and the UK opened.</p>
-
-  <figure class="ch">
-    <div class="chtitle">Electricity generation mix</div>
-    <div class="chsub">Per cent of production, 2024</div>
-    <div id="ch-power"></div>
-    <figcaption>Source: Energifakta Norge. Norway has the highest renewable share of any European power system.</figcaption>
-  </figure>
-
-  <h3>Fish</h3>
-  <p>Seafood exports hit a record <b>NOK 181.5 billion</b> in 2025, of which salmon was NOK 124.7 billion on 1.41 million tonnes. Salmon is Norway's second industry after petroleum and its most successful piece of pure marketing: farmed Atlantic salmon was engineered into a global staple, and Norwegian trade bodies famously introduced raw salmon to Japanese sushi in the 1980s, a use it had never previously had.</p>
-  <div class="scroller"><table class="tbl">
-    <tr><th>Top seafood markets, 2025</th><th style="text-align:right">NOK bn</th><th style="text-align:right">Change</th></tr>
-    <tr><td><b>Poland</b> <span class="small">(processing hub, re-exported)</span></td><td class="n">19.1</td><td class="n">+6%</td></tr>
-    <tr><td><b>United States</b></td><td class="n">15.8</td><td class="n">+19%</td></tr>
-    <tr><td><b>China</b></td><td class="n">12.3</td><td class="n">+31%</td></tr>
-    <tr><td><b>Denmark</b></td><td class="n">10.9</td><td class="n">−20%</td></tr>
-    <tr><td><b>Netherlands</b></td><td class="n">10.8</td><td class="n">−3%</td></tr>
-  </table></div>
-
-  <h3>What it costs you</h3>
-  <p>Norway is expensive in a way that is difficult to prepare for emotionally. Alcohol is the shock: spirits and wine are sold only through <em>Vinmonopolet</em>, the state monopoly, which closes early and doesn't open Sundays. Beer is available in supermarkets but not after 20:00 on weekdays or 18:00 on Saturdays.</p>
-  <div class="grid g4" style="margin-top:16px">
-    <div class="stat"><b>NOK 110</b><span>PINT OF DRAUGHT BEER, OSLO</span><em>≈ $11. Range 77–130.</em></div>
-    <div class="stat"><b>NOK 1,000</b><span>3-COURSE DINNER FOR TWO</span><em>Mid-range. ≈ $95.</em></div>
-    <div class="stat"><b>NOK 47</b><span>CAPPUCCINO</span><em>≈ $4.50—closer to US prices than you'd fear.</em></div>
-    <div class="stat"><b>25%</b><span>VAT</span><em>15% on food. Included in listed prices, always.</em></div>
-  </div>
-  <p class="small" style="margin-top:12px">Prices: Oslo, July 2026. Tipping is genuinely optional—rounding up or 5–10% for good restaurant service is generous, and nobody expects anything at a bar or café.</p>
-
-  <h3>Tax</h3>
-  <div class="scroller"><table class="tbl">
-    <tr><th>2026 rates</th><th style="text-align:right">Rate</th></tr>
-    <tr><td>Top marginal rate on salary</td><td class="n">47.4%</td></tr>
-    <tr><td>…including employer's national insurance</td><td class="n">53.9%</td></tr>
-    <tr><td>Dividends / withdrawals</td><td class="n">51.5%</td></tr>
-    <tr><td>Wealth tax above NOK 1.9M net</td><td class="n">1.0%</td></tr>
-    <tr><td>Wealth tax above NOK 21.5M net</td><td class="n">1.1%</td></tr>
-    <tr><td>VAT (standard / food)</td><td class="n">25% / 15%</td></tr>
-  </table></div>
-
-  <div class="flag"><h4>The wealth tax natural experiment</h4><p>After Norway raised the top wealth-tax rate in 2022, roughly <b>300 wealthy Norwegians relocated to Switzerland</b>, including Kjell Inge Røkke, one of the country's richest men. The predicted revenue collapse did not happen: wealth tax receipts rose from <b>NOK 27bn in 2022 to NOK 34bn in 2025</b>. About 720,000 Norwegians—one in eight—pay it. Both sides of the argument claim this data, which is usually the sign of an honest natural experiment with a small effect size.</p></div>
-
-  <div class="flag"><h4>Is Norway rich because of oil, or was it rich already?</h4><p>The standard story is that oil made Norway. The revisionist case: Norway had near-universal literacy, a merchant marine that was among the world's largest, hydropower-based industry and functioning democratic institutions decades before Ekofisk. Oil arrived in 1969 at a country that was already comfortably Western European, and it amplified rather than created the wealth. My read: the revisionists are ~70% right on the growth story and ~100% right on the institutions story—the reason Norway isn't Venezuela is that the bureaucracy predated the barrel.</p></div>
-
-  <figure class="ch">
-    <div class="chtitle">Productivity vs hours worked</div>
-    <div class="chsub">GDP per hour worked (USD) against annual hours per worker</div>
-    <div id="ch-prod"></div>
-    <figcaption>Norway produces far more per hour and works far fewer hours. Caveat that matters: the $134/hour figure is inflated by offshore petroleum, which is enormously capital-intensive and employs few people. Mainland Norwegian productivity is much closer to German. Figures approximate and recent-vintage rather than single-year matched.</figcaption>
-  </figure>
-</div></section>
-
-<hr>
-
-<!-- ============ CULTURE ============ -->
-<section id="culture"><div class="wrap">
-  <div class="kicker">Four</div>
-  <h2>Art, letters, and one very strange decade of music</h2>
-  <p class="lede">Four Nobel Prizes in Literature from a country the size of Minnesota. The second-most-performed playwright in the world. And, in the early 1990s, a genuinely violent subculture that is now a heritage export.</p>
-
-  <div class="phgrid">
-    <figure class="ph" data-wiki="The Scream"><img alt="Munch, The Scream"><figcaption></figcaption></figure>
-    <figure class="ph" data-wiki="Vigeland installation"><img alt="Vigeland Park, Oslo"><figcaption></figcaption></figure>
-  </div>
-
-  <h3>Writers</h3>
-  <div class="grid g2" style="margin-top:14px">
-    <div class="card"><span class="tag">1828–1906</span><h4>Henrik Ibsen</h4><p>Invented modern drama in a small, provincial country and then largely left it—27 years abroad in Italy and Germany. <em>A Doll's House</em> (1879), <em>Ghosts</em> (1881), <em>Hedda Gabler</em> (1890), <em>Peer Gynt</em> (1867). Commonly described as the world's most-performed playwright after Shakespeare; the claim is widely repeated and hard to verify rigorously, so treat it as directionally true. The Ibsen Museum is at his last apartment near the Palace in Oslo.</p></div>
-    <div class="card"><span class="tag">Nobel 1903</span><h4>Bjørnstjerne Bjørnson</h4><p>Wrote the national anthem, agitated for independence, won the second-ever literature Nobel. Now much less read than Ibsen, which he would have hated.</p></div>
-    <div class="card"><span class="tag">Nobel 1920</span><h4>Knut Hamsun</h4><p><em>Hunger</em> (1890) is one of the founding texts of modernist fiction—Kafka, Hemingway and Isaac Bashevis Singer all credited him. He was also a committed Nazi sympathizer who sent his Nobel medal to Goebbels and wrote a warm obituary for Hitler in 1945. Norway convicted him, fined him into ruin, and has spent 80 years failing to resolve how to handle him. The 2009 anniversary was officially marked and deeply awkward. It is a live argument, not a settled one.</p></div>
-    <div class="card"><span class="tag">Nobel 1928</span><h4>Sigrid Undset</h4><p><em>Kristin Lavransdatter</em>, a three-volume medieval epic that is far better than that description suggests. She fled the Nazis to Brooklyn.</p></div>
-    <div class="card"><span class="tag">Nobel 2023</span><h4>Jon Fosse</h4><p>Writes in Nynorsk, minimalist, extremely repetitive, unexpectedly hypnotic. <em>Septology</em> is the entry point if you have the patience; his plays are staged constantly in Europe. Norway's fourth literature Nobel.</p></div>
-    <div class="card"><span class="tag">Contemporary</span><h4>Knausgård & Nesbø</h4><p>Karl Ove Knausgård's six-volume <em>My Struggle</em> sold on a scale that in Norwegian terms is roughly one copy per nine citizens, and detonated several family relationships. Jo Nesbø's Harry Hole novels are the commercial engine of Nordic noir. Between them they are the reason anyone under 50 outside Norway reads Norwegian fiction.</p></div>
-  </div>
-
-  <h3>Art you'll actually stand in front of</h3>
-  <div class="grid g2" style="margin-top:14px">
-    <div class="card"><span class="tag">1863–1944</span><h4>Edvard Munch</h4><p><em>The Scream</em> exists in <b>four</b> versions plus a lithograph: two paintings (1893, 1910), a pastel (1893) and the 1895 pastel that sold for <b>$119.9 million</b> in 2012. Oslo's National Museum has one; MUNCH—the 13-storey leaning tower on the waterfront that opened in 2021—has others, along with roughly half of everything he ever made, which he left to the city in his will. The 1994 and 2004 thefts both ended with recovery.</p></div>
-    <div class="card"><span class="tag">1869–1943</span><h4>Gustav Vigeland</h4><p>Cut a deal with Oslo: the city gives him a studio and a salary, he gives the city everything he makes. The result is Vigeland Park—<b>212 sculptures</b>, all nude, all his, culminating in a 14-metre granite monolith of 121 intertwined bodies that took three carvers 14 years. Free, always open, unnervingly good. The tiny bronze <em>Sinnataggen</em> ("the angry boy") is the most photographed object in Norway.</p></div>
-    <div class="card"><span class="tag">1869–1935</span><h4>Harald Sohlberg</h4><p><em>Winter Night in the Mountains</em> was voted Norway's national painting. Cold blue Rondane peaks under starlight; it explains more about the Norwegian relationship to landscape than any essay.</p></div>
-    <div class="card"><span class="tag">1130–1350</span><h4>Stave churches</h4><p><b>28 survive</b> of an estimated 1,000+. Timber-framed, dragon-headed, covered in carving that is visibly still half-pagan. Urnes on the Sognefjord is a UNESCO site and the oldest. Borgund is the best-preserved. Fantoft in Bergen is a 1997 reconstruction, because the original was burned down in 1992—see below.</p></div>
-  </div>
-
-  <div class="phgrid">
-    <figure class="ph" data-wiki="Henrik Ibsen"><img alt="Henrik Ibsen"><figcaption></figcaption></figure>
-    <figure class="ph" data-wiki="Urnes Stave Church"><img alt="Urnes Stave Church"><figcaption></figcaption></figure>
-  </div>
-
-  <h3>Music</h3>
-  <div class="grid g2" style="margin-top:14px">
-    <div class="card"><span class="tag">1843–1907</span><h4>Edvard Grieg</h4><p>Bergen's favourite son and the man who made Norwegian folk melody legible to European concert halls. The <em>Peer Gynt</em> suites (1875) are so embedded in advertising and cartoons that you will recognize them involuntarily. His villa, Troldhaugen, is 8 km outside Bergen and has a purpose-built recital hall with the fjord behind the pianist. Worth the trip; ~85% confident it's the best single cultural half-day in Bergen.</p></div>
-    <div class="card"><span class="tag">1985–</span><h4>Pop for export</h4><p>a-ha's "Take On Me" hit #1 in the US in October 1985 and its rotoscoped video is one of the most-watched music videos ever made. Since then: Röyksopp, Kings of Convenience, Annie, Sondre Lerche, Todd Terje, Kygo, Alan Walker, Sigrid, Aurora. Disproportionate output for 5.6 million people—Norway punches far above weight in melodic electronic music specifically.</p></div>
-    <div class="card"><span class="tag">Eurovision</span><h4>Three wins, eleven last places</h4><p>Norway holds 12 last places and 4 nul-points scores (tied with Austria), and also won in 1985, 1995 and 2009—the last with Alexander Rybak's "Fairytale", which took a record margin. A nation with no shame about this whatsoever.</p></div>
-    <div class="card"><span class="tag">1765</span><h4>Bergen Philharmonic</h4><p>Traces its founding to 1765, making it one of the oldest orchestras in the world—older than the Vienna Philharmonic by 77 years. Grieg was its artistic director.</p></div>
-  </div>
-
-  <div class="flag" style="margin-top:24px"><h4>The black metal decade</h4><p>Between 1992 and 1996 a scene of perhaps a few dozen young men in Oslo and Bergen produced music of real originality and committed a string of actual crimes: <b>roughly 50 arson attacks on Norwegian churches</b>, including the 12th-century-style Fantoft stave church outside Bergen on 6 June 1992. Mayhem's vocalist died by suicide in 1991; its guitarist Euronymous was murdered in August 1993 by Varg Vikernes of Burzum, who served 15 years of a 21-year sentence. The bands—Mayhem, Darkthrone, Emperor, Immortal, Burzum—are now studied, reissued, and quietly treated as a cultural export. Norway's official tourism material will point you to Fantoft without mentioning why it's a reconstruction. Ask a Bergener over 45 and you'll get a story.</p></div>
-
-  <div class="phgrid">
-    <figure class="ph" data-wiki="Edvard Grieg"><img alt="Edvard Grieg"><figcaption></figcaption></figure>
-    <figure class="ph" data-wiki="Hardanger fiddle"><img alt="Hardanger fiddle"><figcaption></figcaption></figure>
-  </div>
-
-  <h3>Film and the invention of slow TV</h3>
-  <p>Joachim Trier's <em>The Worst Person in the World</em> (2021) got two Oscar nominations and is the best recent portrait of Oslo on film. <em>Skam</em>, an NRK teen web series, was remade in seven countries. And in November 2009 NRK broadcast the entire seven-hour Bergen railway journey in real time, unedited, with no narration. <b>1.2 million Norwegians watched</b>—over a fifth of the population. They followed it with 134 hours of a coastal ferry, a night of firewood burning, and 18 hours of salmon swimming upstream. Slow TV is a genuine Norwegian invention and tells you something real about the national temperament.</p>
-</div></section>
-
-<hr>
-
-<!-- ============ SPORT ============ -->
-<section id="sport"><div class="wrap">
-  <div class="kicker">Five</div>
-  <h2>Why 5.6 million people win the Winter Olympics</h2>
-  <p class="lede">Norway leads the all-time Winter Olympic medal table outright with <b>447 medals</b>, ahead of the United States on 363. At Milan-Cortina in February 2026 it finished first again, with 18 golds and 41 medals in total. Per capita it isn't close to close.</p>
-
-  <figure class="ch">
-    <div class="chtitle">All-time Winter Olympic medals</div>
-    <div class="chsub">Total medals through Beijing 2022. Milan-Cortina 2026 not included.</div>
-    <div id="ch-oly"></div>
-    <figcaption>Norway has led the all-time table since 1998. Source: IOC. Historic nations (USSR, East/West Germany) counted separately from successors.</figcaption>
-  </figure>
-
-  <figure class="ch">
-    <div class="chtitle">The same table, per million people</div>
-    <div class="chsub">Total Winter Olympic medals ÷ current population, millions</div>
-    <div id="ch-olypc"></div>
-    <figcaption>This is the chart that ends the argument. The US figure is 0.98 medals per million.</figcaption>
-  </figure><figure class="ch">
-    <div class="chtitle">Milan-Cortina 2026, final medal table</div>
-    <div class="chsub">Gold, silver and bronze. Top ten nations.</div>
-    <div id="ch-oly26"></div>
-    <div class="legend"><span><i style="background:#f0b429"></i>Gold</span><span><i style="background:#8794a3"></i>Silver</span><span><i style="background:#b07d4a"></i>Bronze</span></div>
-    <figcaption>Norway took 18 golds and 41 medals, finishing first on both counts. Italy, hosting, came fourth on golds and third on total medals.</figcaption>
-  </figure>
-
-
-  <div class="phgrid">
-    <figure class="ph" data-wiki="Holmenkollbakken"><img alt="Holmenkollbakken"><figcaption></figcaption></figure>
-    <figure class="ph" data-wiki="Magnus Carlsen"><img alt="Magnus Carlsen"><figcaption></figcaption></figure>
-  </div>
-
-  <h3>How they do it</h3>
-  <div class="grid g2" style="margin-top:14px">
-    <div class="card"><span class="tag">The rule</span><h4>No published results before age 13</h4><p>Norwegian youth sport bans official rankings, scores and championship tables for children under 13. The stated goal is retention rather than early identification—keep everyone playing rather than sorting winners early. Norway ends up with the deepest talent pool per capita in the world in its sports. Whether the rule causes the outcome or just coexists with it is genuinely uncertain, but it's the explanation Norwegians give and it is at least plausible.</p></div>
-    <div class="card"><span class="tag">The money</span><h4>Gambling monopoly funds the pyramid</h4><p>Norsk Tipping, the state betting monopoly, channels profits directly into sport and volunteer clubs. Olympiatoppen coordinates elite performance across sports centrally. Combined with near-universal childhood skiing, that's the machine.</p></div>
-    <div class="card"><span class="tag">Ole Einar Bjørndalen</span><h4>13 Olympic medals, 8 gold</h4><p>Biathlon. Competed at six Winter Games. Known domestically as "the Cannibal".</p></div>
-    <div class="card"><span class="tag">Marit Bjørgen</span><h4>15 Olympic medals, 8 gold</h4><p>Cross-country. The most decorated Winter Olympian of all time, male or female. Won four medals at 37, five months after having a baby.</p></div>
-  </div>
-
-  <div class="flag"><h4>The asthma question</h4><p>An unusually large share of elite Norwegian endurance skiers use asthma medication—reported at up to 70% of the Norwegian squad at some World Championships, against roughly 10% of the general population. Norway's explanation is that hard breathing in extremely cold, dry air genuinely causes exercise-induced bronchoconstriction. Rivals, particularly in Sweden and Central Europe, have suggested it's a performance loophole with a prescription attached. Separately, Therese Johaug—the dominant female distance skier of her era—served an 18-month ban—raised from 13 months on appeal to the Court of Arbitration for Sport, which cost her the 2018 Olympics—after testing positive for clenbuterol in 2016, which she attributed to a lip cream prescribed by the team doctor for sunburn; the team doctor resigned. Nothing here has been proven to be doping. It is also the single most reliable way to annoy a Norwegian at a bar.</p></div>
-
-  <h3>Outside the snow</h3>
-  <div class="grid g3" style="margin-top:14px">
-    <div class="card"><span class="tag">Chess</span><h4>Magnus Carlsen</h4><p>Peak rating <b>2882</b>, the highest in history. World Champion 2013–2023, then voluntarily gave up the classical title in 2023 saying he wasn't motivated to defend it. Chess is a mainstream spectator sport in Norway partly because of him; NRK has broadcast tournaments live.</p></div>
-    <div class="card"><span class="tag">Athletics</span><h4>Warholm & Ingebrigtsen</h4><p>Karsten Warholm's 400m hurdles world record of <b>45.94</b> at Tokyo 2021 is one of the great performances in track history—he destroyed a 29-year-old record twice in a summer. Jakob Ingebrigtsen is the finest middle-distance runner of his generation; the family's story took a dark public turn with the criminal case against his father.</p></div>
-    <div class="card"><span class="tag">Football</span><h4>Haaland, Ødegaard, Hegerberg</h4><p>Three weeks before this was written, Norway's men reached a World Cup quarter-final for the first time in their history. They beat Brazil 2–1 in the round of 16 on 5 July 2026, Haaland scoring both, then lost to England in the quarter-final. For a country whose men's team had been a punchline for thirty years this is a genuinely new situation, and it will still be the main topic of conversation when you arrive. The women, by contrast, won the <b>1995 World Cup</b> and 2000 Olympic gold, and Ada Hegerberg won the first women's Ballon d'Or in 2018—then boycotted the national team for five years over the federation's treatment of women's football.</p></div>
-  </div>
-  <p class="small" style="margin-top:12px">Career club-goal totals for active players move weekly and are left out here deliberately. Everything else in this section was checked against sources in July 2026.</p>
-</div></section>
-
-<hr>
-
-<!-- ============ OSLO ============ -->
-<section id="oslo"><div class="wrap">
-  <div class="kicker">Six</div>
-  <h2>Oslo</h2>
-  <p class="lede">A capital of about 730,000 in a municipality that is two-thirds protected forest and water. You can take the metro to a trailhead. That is the single most important fact about the city.</p>
-
-  <div class="phgrid">
-    <figure class="ph" data-wiki="Bjørvika"><img alt="Bjørvika, Oslo"><figcaption></figcaption></figure>
-    <figure class="ph" data-wiki="Munch Museum"><img alt="MUNCH museum"><figcaption></figcaption></figure>
-  </div>
-
-  <div class="grid g4" style="margin-top:20px">
-    <div class="stat"><b>729,799</b><span>MUNICIPAL POPULATION, 2026</span></div>
-    <div class="stat"><b>~1.55M</b><span>GREATER OSLO REGION</span></div>
-    <div class="stat"><b>2/3</b><span>OF MUNICIPALITY PROTECTED</span></div>
-    <div class="stat"><b>35%</b><span>IMMIGRANT BACKGROUND</span></div>
-  </div>
-
-  <p style="margin-top:18px">Oslo celebrated its millennium in 2000 on archaeological evidence of settlement around AD 1000, though the sagas credit Harald Hardrada with founding it around 1048. Destroyed by fire in 1624, rebuilt by Christian IV of Denmark under his own name—Christiania—a few hundred metres west of the original site. It went back to Oslo on 1 January 1925. Every "old town" instinct you have is wrong here: Oslo's historic core is early-1600s Danish grid, and the medieval city is a ruin field east of the station that most visitors never see.</p>
-
-  <div class="flag"><h4>The east–west divide is enormous and visible</h4><p>Oslo has one of the sharpest intra-city socioeconomic gradients in Western Europe, running along the Akerselva river. Life expectancy differs by <b>7.6 years</b> between the best and worst districts on the most recent published district-level figures—comparable to the gap between Norway and countries far poorer. Income gaps are larger still. Norwegians are aware of it, and "east side / west side" is a real social category, not just geography.</p></div>
-
-  <figure class="ch">
-    <div class="chtitle">Life expectancy by Oslo district</div>
-    <div class="chsub">Men, average 2011–2015, years. West side in blue, east and inner city in red. Bar axis starts at 72 years.</div>
-    <div id="ch-lifeexp"></div>
-    <figcaption>A 7.6-year spread across a city you can cross by bicycle in 40 minutes. The gap has been narrowing—it was 10.7 years in 2000–2003—but district-level life expectancy has not been republished since about 2015, so these are the most recent figures available rather than current ones. Source: SSB, via Tidsskriftet Michael.</figcaption>
-  </figure>
-
-<h3>Neighbourhoods</h3>
-  <div class="grid g2" style="margin-top:14px">
-    <div class="card"><h4>Bjørvika & the Barcode</h4><p>The waterfront rebuild: Opera House (2008), Deichman library (2020), MUNCH (2021), and a row of narrow high-rises nicknamed the Barcode. Nationally divisive—a lot of Norwegians think it's Dubai-on-the-fjord. Walk on the Opera roof anyway; it's the best free thing in the city.</p></div>
-    <div class="card"><h4>Grünerløkka</h4><p>Former working-class industrial district along the Akerselva, now the obvious hipster quarter: coffee, vintage, microbreweries, Mathallen food hall. Walk the river north from here through old mill buildings and waterfalls all the way to Maridalen.</p></div>
-    <div class="card"><h4>Frogner & Majorstuen</h4><p>West side. Embassies, 19th-century apartment blocks, expensive. Vigeland Park is here, as is the Frogner bathing scene in summer.</p></div>
-    <div class="card"><h4>Grønland & Tøyen</h4><p>The most diverse part of Norway—Somali, Pakistani, Turkish, Eritrean. Best cheap food in the city by a distance. The Munch Museum used to be at Tøyen and the neighbourhood is still arguing about losing it.</p></div>
-    <div class="card"><h4>Bygdøy</h4><p>Peninsula of museums reachable by ferry in summer: Fram (Amundsen's polar ship, in the building, intact), Kon-Tiki, the Norwegian Maritime Museum and the open-air Folkemuseum with a relocated stave church.</p></div>
-    <div class="card"><h4>Aker Brygge & Tjuvholmen</h4><p>Converted shipyard, now the tourist-facing waterfront with the Astrup Fearnley (Renzo Piano) at the end. Expensive drinks, good people-watching, decent modern art.</p></div>
-  </div>
-
-  <div class="phgrid">
-    <figure class="ph" data-wiki="Akershus Fortress"><img alt="Akershus Fortress"><figcaption></figcaption></figure>
-    <figure class="ph" data-wiki="Grünerløkka"><img alt="Grünerløkka"><figcaption></figcaption></figure>
-    <figure class="ph" data-wiki="Fram (ship)"><img alt="Fram (ship)"><figcaption></figcaption></figure>
-  </div>
-
-  <h3>What to actually see</h3>
-  <div class="scroller"><table class="tbl">
-    <tr><th>Site</th><th>Why</th><th style="text-align:right">Note</th></tr>
-    <tr><td><b>Vigeland Park</b></td><td>212 sculptures, open air, no ticket</td><td class="n">Free, 24h</td></tr>
-    <tr><td><b>MUNCH</b></td><td>13 floors, opened 2021, the Munch bequest</td><td class="n">Bjørvika</td></tr>
-    <tr><td><b>National Museum</b></td><td>Opened 2022, largest art museum in the Nordics; a <em>Scream</em></td><td class="n">Near City Hall</td></tr>
-    <tr><td><b>Opera House roof</b></td><td>Walk up the marble to the fjord view</td><td class="n">Free</td></tr>
-    <tr><td><b>Fram Museum</b></td><td>The actual polar ship, indoors, walk the decks</td><td class="n">Bygdøy</td></tr>
-    <tr><td><b>Holmenkollen</b></td><td>Ski jump, ski museum, city view; metro line 1</td><td class="n">30 min</td></tr>
-    <tr><td><b>Akershus Fortress</b></td><td>Medieval castle, never taken by siege</td><td class="n">Waterfront</td></tr>
-    <tr><td><b>Viking Ship Museum</b></td><td>Closed since 2021. Reopening as the Museum of the Viking Age</td><td class="n">Nov 2027</td></tr>
-  </table></div>
-  <p class="small" style="margin-top:10px">The Viking ships—Oseberg, Gokstad, Tune—are the single best Viking artefacts in existence and they are behind a construction fence. The current announced reopening is <b>November 2027</b>, so it will be shut for this trip. The date has already slipped repeatedly and Norwegian press reported a funding shortfall of around NOK 200 million in 2026, so treat even 2027 as provisional.</p>
-
-  <h3>Getting around</h3>
-  <p>One integrated Ruter ticket covers metro, tram, bus and the local ferries to the Oslofjord islands. The T-bane's five lines all pass through a common tunnel downtown, so almost any train works for city-centre hops. Line 1 to Frognerseteren ends in the forest at 470 m with a toboggan run back down in winter. In summer, the island ferries from Vippetangen to Hovedøya and Langøyene are effectively public transport to a beach.</p>
-</div></section>
-
-<hr>
-
-<!-- ============ BERGEN ============ -->
-<section id="bergen"><div class="wrap">
-  <div class="kicker">Seven</div>
-  <h2>Bergen</h2>
-  <p class="lede">Norway's capital until the 1300s, its largest city until the 1800s, and for four centuries a German-run company town. It also rains an almost unbelievable amount.</p>
-
-  <figure class="ph" data-wiki="Bryggen"><img alt="Bryggen, Bergen"><figcaption></figcaption></figure>
-
-  <div class="grid g4" style="margin-top:20px">
-    <div class="stat"><b>295,426</b><span>POPULATION, 2026</span></div>
-    <div class="stat"><b>1070</b><span>FOUNDED BY OLAV KYRRE</span></div>
-    <div class="stat"><b>2,496mm</b><span>RAIN PER YEAR</span></div>
-    <div class="stat"><b>85</b><span>RECORD CONSECUTIVE RAINY DAYS</span></div>
-  </div>
-
-  <figure class="ph" data-wiki="Stockfish"><img alt="Stockfish"><figcaption></figcaption></figure>
-
-  <h3>The stockfish machine</h3>
-  <p>Bergen's entire existence rests on one product. Cod caught in Lofoten, 1,200 km north, was air-dried on wooden racks into <em>tørrfisk</em>—stockfish—which keeps for years without salt or smoke and is nearly pure protein. Catholic Europe needed fish for roughly 150 fast days a year. Bergen was the transhipment point.</p>
-  <p>From about 1350 the Hanseatic League ran a <em>Kontor</em> at Bryggen: a walled, self-governing German merchant enclave with its own law, its own courts, and a workforce of unmarried German men forbidden to marry Norwegians. It lasted, in declining form, until 1754. The wooden warehouses on the harbour front are UNESCO-listed and have burned down and been rebuilt on the same medieval foundations more times than anyone enjoys counting—the 1702 fire destroyed about 90% of it.</p>
-
-  <figure class="ch">
-    <div class="chtitle">How wet is Bergen, really</div>
-    <div class="chsub">Annual precipitation, mm</div>
-    <div id="ch-rain"></div>
-    <figcaption>Bergen gets more than twice Seattle's rainfall and nearly four times London's. It records precipitation of at least 1 mm on about <b>201 days</b> a year. In 2006–07 it rained for <b>85 consecutive days</b>, a national record that made the news for three months. Buy the raincoat; umbrellas lose to the wind.</figcaption>
-  </figure>
-
-  <figure class="ch">
-    <div class="chtitle">Monthly rainfall, Bergen vs Oslo</div>
-    <div class="chsub">Millimetres, 1991–2020 normals</div>
-    <div id="ch-monthrain"></div>
-    <figcaption>Bergen's driest month (May, 109 mm) is wetter than Oslo's wettest (August, 103 mm). The autumn is brutal: November and December average 275 and 290 mm. If you have a choice, go in May or June. Source: Norwegian Meteorological Institute.</figcaption>
-  </figure>
-
-<div class="phgrid">
-    <figure class="ph" data-wiki="Fløibanen"><img alt="Fløibanen"><figcaption></figcaption></figure>
-    <figure class="ph" data-wiki="Troldhaugen"><img alt="Troldhaugen"><figcaption></figcaption></figure>
-  </div>
-
-  <h3>What to do</h3>
-  <div class="grid g2" style="margin-top:14px">
-    <div class="card"><h4>Fløibanen up Fløyen</h4><p>Funicular since 1918, 8 minutes from the centre to 320 m and the postcard view. Walk down through the woods in about 45 minutes. Ulriken, at 643 m, is the higher and better hike; a cable car goes up.</p></div>
-    <div class="card"><h4>Bryggen and the Hanseatic Museum</h4><p>Wander the wooden alleys behind the facade—leaning, tarred, structurally alarming. The museum reconstructs how the German merchants actually lived, which was badly.</p></div>
-    <div class="card"><h4>Troldhaugen</h4><p>Grieg's villa above a lake outside town, with his composing hut on the water and a modern recital hall. Lunchtime piano concerts most summer days. The best cultural half-day in Bergen.</p></div>
-    <div class="card"><h4>KODE</h4><p>Four museum buildings on the central lake, including one of the largest Munch collections outside Oslo and the definitive Nikolai Astrup holdings—Astrup painted Jølster's midsummer bonfires and is the great underrated Norwegian painter.</p></div>
-    <div class="card"><h4>Fantoft stave church</h4><p>A 12th-century church moved here in 1883 and burned to the ground by black-metal arsonists on 6 June 1992. Reconstructed by 1997. What you're looking at is a replica of a relocated original, which is a very Norwegian layering.</p></div>
-    <div class="card"><h4>Håkonshallen & the Rosenkrantz Tower</h4><p>Genuine 13th-century royal hall at the harbour mouth, damaged when a German munitions ship exploded in 1944 and restored afterwards.</p></div>
-  </div>
-
-  <div class="flag"><h4>Cruise ships</h4><p>Bergen took <b>346 cruise calls and about 680,000 cruise passengers</b> in 2025, into a compact historic centre, and locals have had enough. The council adopted a cap of four ships and 8,000 passengers per day back in 2022, but reporting in 2026 suggests it operates as a guideline more than a hard limit. If you can, be at Bryggen before 09:00 or after 17:00—the difference between those hours and midday in July is the difference between a medieval harbour and a queue.</p></div>
-
-  <p><b>On the rivalry:</b> Bergensers consider Oslo a jumped-up administrative town that stole the capital, and will tell you Bergen is "the real Norway" within about ten minutes. The dialect is genuinely distinct—a French-style uvular R, and uniquely among Norwegian dialects it lost the feminine grammatical gender entirely, most likely from centuries of contact with Low German merchants.</p>
-</div></section>
-
-<hr>
-
-<!-- ============ FJORDS ============ -->
-<section id="fjords"><div class="wrap">
-  <div class="kicker">Eight</div>
-  <h2>The fjords and the railway</h2>
-  <p class="lede">A fjord is a glacial valley that the sea moved into. Glaciers cut below sea level because ice doesn't care about sea level, which is why Sognefjord is 1,308 m deep inside and only about 100 m deep at its mouth—the terminal sill where the glacier ran out of power.</p>
-
-  <figure class="ph" data-wiki="Nærøyfjord"><img alt="Nærøyfjord"><figcaption></figcaption></figure>
-
-  <div class="grid g4" style="margin-top:20px">
-    <div class="stat"><b>205 km</b><span>SOGNEFJORD LENGTH</span></div>
-    <div class="stat"><b>1,308 m</b><span>SOGNEFJORD MAX DEPTH</span></div>
-    <div class="stat"><b>250 m</b><span>NÆRØYFJORD AT ITS NARROWEST</span></div>
-    <div class="stat"><b>~1,190</b><span>FJORDS, INCL. SVALBARD</span></div>
-  </div>
-
-  <figure class="ch">
-    <div class="chtitle">Why a fjord is deeper inland than at its mouth</div>
-    <div class="chsub">Schematic cross-section of the Sognefjord, head on the left, open sea on the right</div>
-    <svg viewBox="0 0 680 230" role="img" aria-label="Fjord cross-section showing a deep inner basin and a shallow terminal sill at the mouth">
-      <defs>
-        <linearGradient id="fw" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#4ea3d8" stop-opacity=".55"/>
-          <stop offset="100%" stop-color="#1d4a68" stop-opacity=".85"/>
-        </linearGradient>
-      </defs>
-      <path d="M0 230 L0 44 L48 14 L118 62 L124 132 L205 186 L330 197 L432 186 L500 150 L560 114 L602 131 L662 150 L680 153 L680 230 Z" fill="#2a3947"/>
-      <path d="M118 62 L680 62 L680 153 L662 150 L602 131 L560 114 L500 150 L432 186 L330 197 L205 186 L124 132 Z" fill="url(#fw)"/>
-      <line x1="0" y1="62" x2="680" y2="62" stroke="#9fb0c0" stroke-dasharray="3 4" stroke-width="1"/>
-      <text x="4" y="56" font-size="10.5" fill="#9fb0c0">sea level</text>
-      <line x1="320" y1="62" x2="320" y2="196" stroke="#e8eef4" stroke-width="1"/>
-      <circle cx="320" cy="62" r="2.5" fill="#e8eef4"/><circle cx="320" cy="196" r="2.5" fill="#e8eef4"/>
-      <text x="328" y="128" font-size="12" fill="#e8eef4" font-weight="600">1,308 m</text>
-      <text x="328" y="143" font-size="10.5" fill="#9fb0c0">deepest point</text>
-      <line x1="560" y1="62" x2="560" y2="113" stroke="#f0b429" stroke-width="1"/>
-      <circle cx="560" cy="62" r="2.5" fill="#f0b429"/><circle cx="560" cy="113" r="2.5" fill="#f0b429"/>
-      <text x="568" y="92" font-size="12" fill="#f0b429" font-weight="600">~100 m</text>
-      <text x="568" y="106" font-size="10.5" fill="#9fb0c0">terminal sill</text>
-      <text x="12" y="215" font-size="11" fill="#6d8095">FJORD HEAD</text>
-      <text x="668" y="215" font-size="11" fill="#6d8095" text-anchor="end">OPEN SEA</text>
-      <path d="M300 26 L420 26" stroke="#63c5a4" stroke-width="1.5"/>
-      <path d="M414 21 L421 26 L414 31 Z" fill="#63c5a4"/>
-      <text x="296" y="22" font-size="10.5" fill="#63c5a4" text-anchor="end">ice flowed this way</text>
-    </svg>
-    <figcaption>A glacier grinding downhill has enormous erosive force in its middle reaches and very little where it thins out and melts. So it cuts a deep trough inland and dumps its rubble at the snout, leaving a shallow bar of moraine—the terminal sill—across the mouth. When the ice left and sea level rose, the sea flooded the trough. That's why the Sognefjord is 1,308 m deep 100 km inland and barely 100 m deep where it meets the ocean, and it's the reason fjord water is layered, calm and often startlingly dark.</figcaption>
-  </figure>
-
-<h3>Bergensbanen</h3>
-  <p>Opened in 1909 after 15 years of construction, the Oslo–Bergen line runs <b>371 km</b> in about <b>6h45m</b> and crosses the Hardangervidda plateau above the treeline. The high point is <b>Finse at 1,222 m</b>, the highest station on the Norwegian network—the line itself peaks slightly higher, at 1,237 m inside the Finse tunnel, with no road access at all—you arrive by train, ski or bicycle. In 1979 the Hoth ice-planet exteriors for <em>The Empire Strikes Back</em> were shot on the Hardangerjøkulen glacier above the station.</p>
-  <p>It is, straightforwardly, one of the great train journeys on earth, and the reason NRK filmed all seven hours of it unedited in 2009.</p>
-
-  <div class="grid g2" style="margin-top:16px">
-    <div class="card"><span class="tag">Flåmsbana</span><h4>20 km, 866 m, 1:18</h4><p>Branch line from Myrdal on the Bergen railway down to Flåm on the Aurlandsfjord. Its maximum gradient of 5.5% (1:18) makes it among the steepest standard-gauge adhesion railways in the world, though the average over the line is a gentler 1:24—no rack, just friction and five separate braking systems. Twenty minutes of waterfall and vertical rock. It carried about 960,000 passengers in 2024 and is unapologetically a tourist ride.</p></div>
-    <div class="card"><span class="tag">Norway in a Nutshell</span><h4>The packaged version</h4><p>Oslo → Myrdal by rail → Flåmsbana down to Flåm → boat through the Nærøyfjord to Gudvangen → bus over the Stalheimskleiva switchbacks to Voss → train to Bergen. It's a booking convenience rather than a tour: every leg is a scheduled public service you can buy separately, usually cheaper. Doable in one long day; better across two with a night in Flåm or Aurland.</p></div>
-  </div>
-
-  <div class="phgrid">
-    <figure class="ph" data-wiki="Sognefjord"><img alt="Sognefjord"><figcaption></figcaption></figure>
-    <figure class="ph" data-wiki="Trolltunga"><img alt="Trolltunga"><figcaption></figcaption></figure>
-  </div>
-
-  <h3>Which fjord</h3>
-  <div class="scroller"><table class="tbl">
-    <tr><th>Fjord</th><th>Character</th><th style="text-align:right">Stats</th></tr>
-    <tr><td><b>Sognefjord</b><br><span class="small">The King of the Fjords</span></td><td>Longest and deepest in Norway, second longest in the world. Branches into the Nærøyfjord and Aurlandsfjord. Flåm, Balestrand, Undredal (18 residents, 500 goats, a stave church seating 40).</td><td class="n">205 km<br>1,308 m</td></tr>
-    <tr><td><b>Nærøyfjord</b><br><span class="small">UNESCO, 2005</span></td><td>The narrow, cinematic one—250 m across at the tightest point with 1,400 m walls. This is the boat leg of Norway in a Nutshell and it earns the hype.</td><td class="n">18 km</td></tr>
-    <tr><td><b>Hardangerfjord</b><br><span class="small">The orchard fjord</span></td><td>Gentler, farmed, fruit trees on the slopes. Blossom season roughly mid-May. Vøringsfossen (182 m) and Trolltunga are here. Closest major fjord to Bergen.</td><td class="n">179 km<br>855 m</td></tr>
-    <tr><td><b>Geirangerfjord</b><br><span class="small">UNESCO, 2005</span></td><td>The most photographed—Seven Sisters waterfall, abandoned cliffside farms. Also the most crowded, and a long way north of the Bergen corridor.</td><td class="n">15 km</td></tr>
-  </table></div>
-
-  <div class="flag"><h4>Trolltunga: read this before you commit</h4><p>The rock ledge everyone photographs is a <b>10–12 hours</b> of walking on the classic route from Skjeggedal: 27 km round trip, 800 m of ascent. Since 2016 most people take the shuttle bus up to Mågelitopp, which cuts it to about 20 km, 320–450 m of ascent and 7–10 hours, at 1,180 m where weather turns fast. It is not a viewpoint you drive to. Norwegian rescue services logged around 40 callouts in the 2016 season, falling to 21 the following year once a staffed guard post was added, mostly for people who set off at 2pm in trainers because the photo looked easy. Season is roughly mid-June to mid-September without a guide. If you're not up for it, Preikestolen near Stavanger is 4 hours round trip and nearly as good.</p></div>
-
-  <div class="phgrid">
-    <figure class="ph" data-wiki="Flåm Line"><img alt="Flåm Line"><figcaption></figcaption></figure>
-    <figure class="ph" data-wiki="Bergen Line"><img alt="Bergen Line"><figcaption></figcaption></figure>
-  </div>
-
-  <h3>Electric fjords</h3>
-  <p>Norway has electrified an extraordinary share of its domestic ferry fleet, and the UNESCO World Heritage fjords now carry a hard rule: since <b>1 January 2026</b>, vessels under 10,000 gross tonnes must be zero-emission to enter the Nærøyfjord, Aurlandsfjord, Geirangerfjord, Sunnylvsfjord or Tafjord. Larger cruise ships won a deferral to 2032 after industry lobbying, with biogas permitted as an interim fuel. The practical effect is that the boat through the Nærøyfjord is likely to be silent, which changes the experience completely: you hear the waterfalls.</p>
-
-  <h3>When to go</h3>
-  <figure class="ch">
-    <div class="chtitle">Daylight in Oslo, by month</div>
-    <div class="chsub">Approximate hours between sunrise and sunset, mid-month</div>
-    <div id="ch-light"></div>
-    <figcaption>Oslo sits at 59.9°N—north of Anchorage. Around 21 June there are about 18h50m between sunrise and sunset and it never gets properly dark; around 21 December, under 6 hours. Bergen is marginally more extreme. Figures approximate.</figcaption>
-  </figure>
-  <figure class="ch">
-    <div class="chtitle">Average daily high temperature</div>
-    <div class="chsub">°C, 1991–2020 normals</div>
-    <div id="ch-temp"></div>
-    <figcaption>Bergen is milder in winter and cooler in summer than Oslo—the Atlantic moderates everything. Oslo's continental swing is about 22°C between January and July; Bergen's is 15°C. Neither is warm. Source: Norwegian Meteorological Institute.</figcaption>
-  </figure>
-
-  <p><b>June to early September</b> for the fjords: everything is open, the boats run, the light is absurd. <b>Late May</b> for Hardanger blossom and fewer people. <b>Mid-July to mid-August</b> is peak crowding and peak price, and is also when Norwegians themselves take their holiday, so cities empty out. <b>Winter</b> is a different, sparser country—beautiful, dark by mid-afternoon, and many fjord services simply don't run.</p>
-</div></section>
-
-<hr>
-
-<!-- ============ LANGUAGE ============ -->
-<section id="language"><div class="wrap">
-  <div class="kicker">Nine</div>
-  <h2>The language situation is genuinely odd</h2>
-  <p class="lede">Norwegian has two official written standards and no official spoken one. There is no Norwegian equivalent of Received Pronunciation or broadcast General American—everyone speaks their own dialect, everywhere, including on the national news.</p>
-
-  <div class="grid g2" style="margin-top:20px">
-    <div class="card"><span class="tag">88.9% of pupils, 2025</span><h4>Bokmål—"book tongue"</h4><p>Descended from written Danish, gradually Norwegianized after 1814. The language of Oslo, of most books and newspapers, and of everything you'll encounter as a visitor.</p></div>
-    <div class="card"><span class="tag">11.1% of pupils, 2025</span><h4>Nynorsk—"new Norwegian"</h4><p>Constructed in the 1850s by Ivar Aasen, a self-taught linguist who walked around western Norway collecting rural dialects and synthesized from them a written standard that owed nothing to Danish. Strongest in the western fjord counties. Jon Fosse writes in it. An astonishing thing for one person to have pulled off.</p></div>
-  </div>
-  <p style="margin-top:16px">Every municipality declares which form it uses; the state must answer you in the one you write in. The <em>språkstrid</em>—the language conflict—was a genuinely bitter 20th-century political fight and is now a low simmer. Just over 11% of pupils using a written standard almost no foreigner has heard of is, in its way, a monument to Norwegian stubbornness.</p>
-
-  <h3>Things that will confuse you</h3>
-  <div class="grid g3" style="margin-top:14px">
-    <div class="card"><h4>Pitch accent</h4><p>Norwegian has two tonal patterns that distinguish otherwise identical words—<em>bønder</em> (farmers) vs <em>bønner</em> (beans). It's what gives spoken Norwegian its singsong quality to English ears.</p></div>
-    <div class="card"><h4>The article is on the end</h4><p>"A house" is <em>et hus</em>; "the house" is <em>huset</em>. Definiteness is a suffix, which is why place names end in -en and -et so often.</p></div>
-    <div class="card"><h4>sj / skj / kj</h4><p><em>Skjære</em> starts like English "sh". <em>Kjøtt</em> starts with a sound English doesn't have—roughly the "h" in "huge", pushed forward. Younger Norwegians are merging the two, to older Norwegians' visible pain.</p></div>
-  </div>
-
-  <h3>Useful words</h3>
-  <div style="margin-top:14px">
-    <div class="ph-row"><b>Hei</b><i>hay</i><span>Hi. Works in every situation, all day.</span></div>
-    <div class="ph-row"><b>Takk</b><i>tahk</i><span>Thanks. <em>Tusen takk</em> = a thousand thanks.</span></div>
-    <div class="ph-row"><b>Ha det</b><i>ha deh</i><span>Bye.</span></div>
-    <div class="ph-row"><b>Unnskyld</b><i>UNN-shil</i><span>Excuse me / sorry.</span></div>
-    <div class="ph-row"><b>Skål</b><i>skoal</i><span>Cheers. Eye contact is expected.</span></div>
-    <div class="ph-row"><b>Én til, takk</b><i>ayn till tahk</i><span>One more, please.</span></div>
-    <div class="ph-row"><b>Hvor er toalettet?</b><i>voor air too-a-LET-teh</i><span>Where's the toilet?</span></div>
-    <div class="ph-row"><b>Regningen, takk</b><i>RYE-ning-en tahk</i><span>The bill, please.</span></div>
-    <div class="ph-row"><b>Ingen fare</b><i>ING-en FAH-reh</i><span>No worries. Extremely common.</span></div>
-    <div class="ph-row"><b>Vær så god</b><i>vær sho goo</i><span>Here you go / you're welcome / please help yourself.</span></div>
-  </div>
-
-  <h3>Words that don't translate</h3>
-  <div class="grid g2" style="margin-top:14px">
-    <div class="card"><h4>Koselig</h4><p>Usually glossed as "cosy", which undersells it. It's the quality of warmth, low light, good company and being pleasantly enclosed against the outside. A room can be koselig; so can an evening, or a person. The nearest cousin is Danish <em>hygge</em>, and Norwegians resent that hygge got the international marketing deal.</p></div>
-    <div class="card"><h4>Friluftsliv</h4><p>Literally "free-air life". Not hiking as recreation but outdoor living as a moral default—the assumption that being outside is what a person does, in any weather. Coined by Ibsen in 1859. Paired with <em>ut på tur, aldri sur</em>: "out on a trip, never sour."</p></div>
-    <div class="card"><h4>Dugnad</h4><p>Collective unpaid work for the common good—the whole apartment building shows up on a Saturday to clean the yard, and not showing up is noticed. Voted the Norwegian national word in 2004. The closest American equivalent is a barn raising, which tells you how far back you have to reach.</p></div>
-    <div class="card"><h4>Janteloven</h4><p>The Law of Jante, invented satirically by the Dano-Norwegian novelist Aksel Sandemose in 1933: ten rules amounting to "you are not to think you are anything special." Norwegians cite it constantly, half as self-criticism and half as a boast. It genuinely does dampen displays of wealth—you will see very few flashy cars, and the ones you see will be Teslas.</p></div>
-    <div class="card"><h4>Utepils</h4><p>"Outdoor lager." The first beer drunk outside in spring, and by extension the entire national mood on the first warm day, when every terrace fills within twenty minutes of the sun appearing.</p></div>
-    <div class="card"><h4>Matpakke & russ</h4><p><em>Matpakke</em>: the packed open sandwich lunch, in paper, that a startling share of adults still eat at work. <em>Russ</em>: graduating high-schoolers who spend May in coloured overalls in a state of organized public chaos, culminating on 17 May. If you're there in May you will not be able to miss them.</p></div>
-  </div>
-
-  <p style="margin-top:18px"><b>Do you need any of this?</b> No. Norway ranks 5th in the world on the EF English Proficiency Index (score 613, 2025 edition), and under-60s are effectively fluent. Attempting Norwegian is read as charming rather than necessary. Attempting it badly is read as very charming.</p>
-</div></section>
-
-<hr>
-
-<!-- ============ DIFFERENCES ============ -->
-<section id="different"><div class="wrap">
-  <div class="kicker">Ten</div>
-  <h2>What'll feel different</h2>
-  <p class="lede">Mostly small things, compounding. A few genuinely large ones.</p>
-
-  <div class="grid g3" style="margin-top:22px">
-    <div class="stat"><b>72%</b><span>SAY MOST PEOPLE CAN BE TRUSTED</span><em>Against 37% in the US, on the same survey wave. This one number explains a lot of the rest: unlocked bikes, unattended prams outside cafés, self-service honesty boxes on farm roads.</em></div>
-    <div class="stat"><b>2%</b><span>OF PAYMENTS IN CASH</span><em>Norges Bank, spring 2025. Among the most cashless societies on earth. Bring a card; you may never see a krone note. Vipps is the domestic Venmo and it's everywhere.</em></div>
-    <div class="stat"><b>20%</b><span>RECONVICTED WITHIN 2 YEARS</span><em>The US comparison is 43% reincarcerated and 68% rearrested within three years, so the windows differ and the gap is real but not as clean as it is usually quoted. Halden prison has no bars on the windows. Norway treats prison as removal of liberty and nothing further, and measures the result.</em></div>
-  </div>
-
-  <div class="grid g2" style="margin-top:18px">
-    <div class="card"><span class="tag">Counterintuitive</span><h4>Norway is heavily armed and almost nobody is shot</h4><p>Norway has one of the higher civilian gun ownership rates in Europe—28.8 firearms per 100 people, ahead of most of the continent—driven by a hunting culture in which roughly one in ten adults holds a hunting licence. The homicide rate is <b>0.73 per 100,000</b>, against <b>5.76</b> in the United States: a factor of about eight. Handguns are tightly restricted and police normally patrol unarmed. If you believe gun ownership alone determines homicide, Norway is the counterexample; if you believe handgun availability and inequality do most of the work, Norway is the confirmation.</p></div>
-    <div class="card"><span class="tag">Right to roam</span><h4>Allemannsretten</h4><p>Codified in the Outdoor Recreation Act of 1957 but far older in custom: you may walk, ski, cycle, ride, swim and camp on any uncultivated land in Norway regardless of who owns it. Pitch a tent at least 150 m from an occupied house, stay no more than two nights in one spot without asking, take your rubbish, light no fires in forest between 15 April and 15 September. Private beaches and "no trespassing" signs are, in the American sense, essentially not a thing.</p></div>
-    <div class="card"><span class="tag">Social</span><h4>Silence is not hostility</h4><p>Nobody will make small talk with you on public transport, in a lift, or at a checkout. Norwegians leave a seat gap at bus stops and will genuinely wait for the next bus rather than crowd. This reads as coldness to Americans and is not—it's a norm of not imposing. The same person will talk to you for an hour on a mountain trail, where the rules invert completely.</p></div>
-    <div class="card"><span class="tag">Social</span><h4>And then the alcohol</h4><p>Norway drinks less per capita than most of Europe but concentrates it: a Friday and Saturday night pattern of heavy drinking that Southern Europeans find bewildering. The reserved stranger from Tuesday is a different person at 01:00 on Saturday. Alcohol is expensive and state-controlled precisely because of this, and pre-drinking at home (<em>vorspiel</em>) before going out is near-universal.</p></div>
-    <div class="card"><span class="tag">Work</span><h4>Flat to the point of disorientation</h4><p>Everyone is on first-name terms, including with the chief executive and, largely, with the prime minister. Titles are barely used. Meetings end on time. Offices empty at 16:00, and taking your five statutory weeks of holiday is expected, not negotiated. Parental leave is 49 weeks at full pay or 59 at 80%, of which <b>15 weeks are reserved for the father</b> and lost to the family if he doesn't take them—a policy design that changed male behaviour fast.</p></div>
-    <div class="card"><span class="tag">Practical</span><h4>Sundays are closed</h4><p>Most shops are shut on Sunday by law, with exemptions for small convenience stores and petrol stations. Restaurants and museums are open. Plan Saturday accordingly. Also: shoes come off inside homes, without exception; and the cabin (<em>hytte</em>) is a near-universal institution, with <b>452,150</b> of them in 2026 for 2.65 million households, or one cabin per six.</p></div>
-  </div>
-
-  <div class="flag"><h4>The thing that will actually surprise you</h4><p>Norway is not egalitarian in the sense of having little wealth. It has a lot of wealth and a lot of wealthy people. What it has is a strong norm against <em>displaying</em> it, plus a tax system that makes wealth publicly visible—every Norwegian's income and net worth has historically been searchable in a public register. The combination produces a country of quiet rich people who dress like they're about to go hiking, because frequently they are.</p></div>
-
-  <figure class="ch">
-    <div class="chtitle">"Most people can be trusted"</div>
-    <div class="chsub">Share agreeing, World Values Survey / European Values Study, 2017–2022 wave</div>
-    <div id="ch-trust"></div>
-    <figcaption>The Nordic cluster sits roughly twice as high as the US and nearly three times as high as France and Italy. This is the single most useful number for predicting what daily life feels like.</figcaption>
-  </figure>
-
-  <figure class="ch">
-    <div class="chtitle">Guns and homicide are not the same axis</div>
-    <div class="chsub">Civilian firearms per 100 residents against intentional homicides per 100,000</div>
-    <div id="ch-gunhom"></div>
-    <figcaption>Norway, Finland and Switzerland are all heavily armed by European standards and all have homicide rates below 1 per 100,000. The United States is an outlier on both axes at once. Firearms data: Small Arms Survey 2017, the most recent global count. Homicide: UNODC, mostly 2023.</figcaption>
-  </figure>
-
-  <figure class="ch">
-    <div class="chtitle">World Happiness Report 2026</div>
-    <div class="chsub">Score out of 10, top six plus the United States. Bar axis starts at 6.5.</div>
-    <div id="ch-happy"></div>
-    <figcaption>Norway places 6th at 7.242. The US is 23rd at 6.816. Note that Finland has now won this thing so many times that Norwegians have stopped pretending to care.</figcaption>
-  </figure>
-
-<h3>Religion, on paper and in practice</h3>
-  <p>About 61% of Norwegians remain members of the Church of Norway, which was the state church until a formal separation completed in 2017. Actual weekly attendance is in the low single digits; the Church publishes total annual attendances rather than a weekly rate, and the total is heavily skewed by Christmas Eve. Membership is largely inherited and functions as a civic default for baptisms, confirmations, weddings and funerals rather than as a statement of belief. Norway is among the most secular societies in the world by behaviour and among the more nominally Lutheran by paperwork.</p>
-
-  <h3>A short list of things to just know</h3>
-  <div style="margin-top:12px">
-    <span class="pill">Tap water is excellent everywhere</span>
-    <span class="pill">Tipping optional, 5–10% is generous</span>
-    <span class="pill">Card everywhere, cash almost nowhere</span>
-    <span class="pill">Queue by taking a number ticket</span>
-    <span class="pill">Shoes off indoors</span>
-    <span class="pill">Jaywalking is not done</span>
-    <span class="pill">Return bottles for the pant deposit</span>
-    <span class="pill">Toll roads bill the rental automatically</span>
-    <span class="pill">Ferries are part of the road network</span>
-    <span class="pill">17 May is a very big deal</span>
-    <span class="pill">Don't say "Sweden is basically the same"</span>
-  </div>
-</div></section>
-
-<footer><div class="wrap">
-  <p style="max-width:70ch">Compiled and fact-checked July 2026 for a trip to Oslo, Bergen and the fjords. Twenty-two charts, twenty-six photographs. Economic figures are sourced from Statistics Norway, Norges Bank Investment Management, the Norwegian Seafood Council, the Norwegian Tax Administration and Energifakta Norge, and are dated in place. Historical, cultural, sporting and city material was fact-checked against current sources in July 2026, which corrected a dozen figures from the first draft: the Black Death mortality (60–65%, not 50–60%), Americans of Norwegian descent (3.9 million on recent ACS estimates, not the 4.5 million from the 2000 Census), Harald V's descent from Haakon VII (grandson, not great-grandson), Bergen's annual rainfall (2,496 mm, not 2,250), Hardangerfjord's depth (855 m, not 800), and the Nynorsk and Bokmål school shares, among others. Climate normals are 1991–2020 from the Norwegian Meteorological Institute. Comparative social data comes from the World Values Survey, the Small Arms Survey, UNODC and the World Happiness Report 2026. Two things remain genuinely uncertain and are flagged where they appear: Oslo's district-level life expectancy has not been republished since about 2015, and the Museum of the Viking Age reopening date has already slipped more than once. Photographs are loaded live from Wikipedia and are licensed under Creative Commons or in the public domain; credit appears in each caption.</p>
-  <p class="small" style="margin-top:14px">Ha en fin tur.</p>
-</div></footer>
-
-<script>
-/* ============================================================
-   Tiny SVG chart kit. No dependencies.
-   ============================================================ */
-const NS='http://www.w3.org/2000/svg';
-const PAL=['#4ea3d8','#e5544b','#f0b429','#63c5a4','#a98bd8','#8794a3'];
-function el(n,a){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);return e;}
-function svg(w,h){const s=el('svg',{viewBox:`0 0 ${w} ${h}`,role:'img'});return s;}
-function txt(s,x,y,t,cls,anchor,size){
-  const e=el('text',{x:x,y:y,'text-anchor':anchor||'start'});
-  if(cls)e.setAttribute('class',cls);
-  if(size)e.setAttribute('font-size',size);
-  e.textContent=t;s.appendChild(e);return e;
-}
-function fmt(n){return n.toLocaleString('en-US');}
-
-/* ---- horizontal bars ---- */
-function hbar(id,data,opt){
-  opt=opt||{};
-  const host=document.getElementById(id); if(!host)return;
-  const W=680, rowH=opt.rowH||30, padL=opt.padL||128, padR=76, top=6;
-  const H=top+data.length*rowH+8;
-  const s=svg(W,H);
-  const max=Math.max(...data.map(d=>d.v));
-  const base=opt.min||0;
-  const bw=W-padL-padR;
-  data.forEach((d,i)=>{
-    const y=top+i*rowH;
-    const w=Math.max(2,((d.v-base)/(max-base))*bw);
-    const c=d.c||opt.color||PAL[0];
-    s.appendChild(el('rect',{x:padL,y:y+5,width:w,height:rowH-14,rx:3,fill:c,opacity:d.dim?0.45:1}));
-    txt(s,padL-9,y+rowH/2+1,d.k,'lab','end',12);
-    const lv=(typeof d.v==='number')?(opt.dec!==undefined?d.v.toFixed(opt.dec):fmt(d.v)):d.v;
-    txt(s,padL+w+8,y+rowH/2+1,(opt.pre||'')+lv+(opt.suf||''),'val','start',12);
-  });
-  host.appendChild(s);
-}
-
-/* ---- vertical bars (supports negatives) ---- */
-function vbar(id,data,opt){
-  opt=opt||{};
-  const host=document.getElementById(id); if(!host)return;
-  const W=680,H=opt.h||230, padB=opt.padB||30, padT=24, padL=8, padR=8;
-  const s=svg(W,H);
-  const vals=data.map(d=>d.v);
-  const max=Math.max(...vals,0), min=Math.min(...vals,0);
-  const span=(max-min)||1;
-  const plotH=H-padB-padT;
-  const zeroY=padT+ (max/span)*plotH;
-  const n=data.length, gap=12;
-  const bw=(W-padL-padR-gap*(n-1))/n;
-  s.appendChild(el('line',{x1:padL,x2:W-padR,y1:zeroY,y2:zeroY,class:'axis'}));
-  data.forEach((d,i)=>{
-    const x=padL+i*(bw+gap);
-    const h=Math.abs(d.v/span)*plotH;
-    const y=d.v>=0? zeroY-h : zeroY;
-    const c=d.c || (d.v<0? PAL[1]:(opt.color||PAL[0]));
-    s.appendChild(el('rect',{x:x,y:y,width:bw,height:Math.max(2,h),rx:3,fill:c}));
-    txt(s,x+bw/2, d.v>=0? y-7 : y+h+15, (opt.pre||'')+d.v+(opt.suf||''),'val','middle',12);
-    txt(s,x+bw/2,H-8,d.k,'lab','middle',12);
-  });
-  host.appendChild(s);
-}
-
-/* ---- area/line ---- */
-function line(id,data,opt){
-  opt=opt||{};
-  const host=document.getElementById(id); if(!host)return;
-  const W=680,H=opt.h||240,padL=6,padR=6,padT=30,padB=28;
-  const s=svg(W,H);
-  const max=Math.max(...data.map(d=>d.v))*1.1, min=0;
-  const px=i=>padL+(i/(data.length-1))*(W-padL-padR);
-  const py=v=>padT+(1-(v-min)/(max-min))*(H-padT-padB);
-  [0.25,0.5,0.75,1].forEach(f=>{
-    const y=py(max*f);
-    s.appendChild(el('line',{x1:padL,x2:W-padR,y1:y,y2:y,class:'gridl'}));
-  });
-  let dPath='',aPath='';
-  data.forEach((d,i)=>{
-    const x=px(i),y=py(d.v);
-    dPath+=(i?'L':'M')+x+' '+y+' ';
-  });
-  aPath=dPath+`L${px(data.length-1)} ${H-padB} L${px(0)} ${H-padB} Z`;
-  const grad=el('linearGradient',{id:id+'-g',x1:0,y1:0,x2:0,y2:1});
-  grad.appendChild(el('stop',{offset:'0%','stop-color':PAL[0],'stop-opacity':.42}));
-  grad.appendChild(el('stop',{offset:'100%','stop-color':PAL[0],'stop-opacity':0}));
-  const defs=el('defs',{});defs.appendChild(grad);s.appendChild(defs);
-  s.appendChild(el('path',{d:aPath,fill:`url(#${id}-g)`}));
-  s.appendChild(el('path',{d:dPath,fill:'none',stroke:PAL[0],'stroke-width':2.5,'stroke-linejoin':'round'}));
-  data.forEach((d,i)=>{
-    const x=px(i),y=py(d.v);
-    s.appendChild(el('circle',{cx:x,cy:y,r:4,fill:'#0c1116',stroke:PAL[0],'stroke-width':2.5}));
-    txt(s,x,y-13,fmt(d.v),'val', i===0?'start':(i===data.length-1?'end':'middle'),12);
-    txt(s,x,H-8,d.k,'lab', i===0?'start':(i===data.length-1?'end':'middle'),12);
-  });
-  host.appendChild(s);
-}
-
-/* ---- stacked share bar + legend ---- */
-function share(id,data){
-  const host=document.getElementById(id); if(!host)return;
-  const W=680,H=42;
-  const s=svg(W,H);
-  let x=0; const tot=data.reduce((a,b)=>a+b.v,0);
-  data.forEach((d,i)=>{
-    const w=(d.v/tot)*W;
-    s.appendChild(el('rect',{x:x,y:0,width:Math.max(1,w-1.5),height:22,rx:3,fill:d.c||PAL[i%PAL.length]}));
-    if(w>52) txt(s,x+w/2,37,d.v.toFixed(1)+'%','val','middle',12);
-    x+=w;
-  });
-  host.appendChild(s);
-  const lg=document.createElement('div');lg.className='legend';
-  data.forEach((d,i)=>{
-    const sp=document.createElement('span');
-    sp.innerHTML=`<i style="background:${d.c||PAL[i%PAL.length]}"></i>${d.k} <b style="color:var(--tx)">${d.v}%</b>`;
-    lg.appendChild(sp);
-  });
-  host.appendChild(lg);
-}
-
-/* ---- multi-series line, real numeric x ---- */
-function mline(id,series,opt){
-  opt=opt||{};
-  const host=document.getElementById(id); if(!host)return;
-  const W=680,H=opt.h||250,padL=opt.padL||44,padR=14,padT=18,padB=30;
-  const s=svg(W,H);
-  const all=series.flatMap(sr=>sr.data);
-  const x0=Math.min(...all.map(d=>d.x)), x1=Math.max(...all.map(d=>d.x));
-  const y0=opt.min!==undefined?opt.min:0;
-  const y1=Math.max(...all.map(d=>d.v))*(opt.headroom||1.08);
-  const px=v=>padL+((v-x0)/(x1-x0))*(W-padL-padR);
-  const py=v=>padT+(1-(v-y0)/(y1-y0))*(H-padT-padB);
-  (opt.yTicks||[]).forEach(t=>{
-    const y=py(t);
-    s.appendChild(el('line',{x1:padL,x2:W-padR,y1:y,y2:y,class:'gridl'}));
-    txt(s,padL-8,y+4,(opt.pre||'')+t+(opt.suf||''),'lab','end',11);
-  });
-  if(y0<0){const z=py(0);s.appendChild(el('line',{x1:padL,x2:W-padR,y1:z,y2:z,class:'axis'}));}
-  series.forEach((sr,si)=>{
-    const c=sr.color||PAL[si%PAL.length];
-    let d='';
-    sr.data.forEach((pt,i)=>{d+=(i?'L':'M')+px(pt.x)+' '+py(pt.v)+' ';});
-    s.appendChild(el('path',{d:d,fill:'none',stroke:c,'stroke-width':2.5,'stroke-linejoin':'round','stroke-linecap':'round'}));
-    sr.data.forEach(pt=>s.appendChild(el('circle',{cx:px(pt.x),cy:py(pt.v),r:3.2,fill:'#0c1116',stroke:c,'stroke-width':2})));
-  });
-  (opt.xLabels||[]).forEach(l=>txt(s,px(l.x),H-9,l.t,'lab','middle',11));
-  host.appendChild(s);
-  if(series.length>1){
-    const lg=document.createElement('div');lg.className='legend';
-    series.forEach((sr,si)=>{
-      const sp=document.createElement('span');
-      sp.innerHTML=`<i style="background:${sr.color||PAL[si%PAL.length]}"></i>${sr.name}`;
-      lg.appendChild(sp);
-    });
-    host.appendChild(lg);
-  }
-}
-
-/* ---- stacked horizontal bars ---- */
-function stackbar(id,rows,cols,opt){
-  opt=opt||{};
-  const host=document.getElementById(id); if(!host)return;
-  const rowH=26,padL=104,padR=52,top=4,W=680;
-  const H=top+rows.length*rowH+6;
-  const s=svg(W,H);
-  const max=Math.max(...rows.map(r=>r.v.reduce((a,b)=>a+b,0)));
-  const bw=W-padL-padR;
-  rows.forEach((r,i)=>{
-    const y=top+i*rowH; let x=padL;
-    r.v.forEach((v,j)=>{
-      const w=(v/max)*bw;
-      s.appendChild(el('rect',{x:x,y:y+4,width:Math.max(1,w-1),height:rowH-12,rx:2,fill:cols[j]}));
-      if(w>20) txt(s,x+w/2,y+rowH/2+1,v,'val','middle',11);
-      x+=w;
-    });
-    txt(s,padL-9,y+rowH/2+1,r.k,'lab','end',12);
-    txt(s,x+8,y+rowH/2+1,r.v.reduce((a,b)=>a+b,0),'val','start',12);
-  });
-  host.appendChild(s);
-}
-
-/* ---- generic labelled scatter ---- */
-function scatter2(id,data,opt){
-  const host=document.getElementById(id); if(!host)return;
-  const W=680,H=opt.h||310,padL=52,padR=22,padT=20,padB=48;
-  const s=svg(W,H);
-  const px=v=>padL+((v-opt.x0)/(opt.x1-opt.x0))*(W-padL-padR);
-  const py=v=>padT+(1-(v-opt.y0)/(opt.y1-opt.y0))*(H-padT-padB);
-  opt.yTicks.forEach(t=>{
-    const y=py(t);
-    s.appendChild(el('line',{x1:padL,x2:W-padR,y1:y,y2:y,class:'gridl'}));
-    txt(s,padL-8,y+4,t,'lab','end',11);
-  });
-  opt.xTicks.forEach(t=>txt(s,px(t),H-padB+17,t,'lab','middle',11));
-  s.appendChild(el('line',{x1:padL,x2:padL,y1:padT,y2:H-padB,class:'axis'}));
-  s.appendChild(el('line',{x1:padL,x2:W-padR,y1:H-padB,y2:H-padB,class:'axis'}));
-  txt(s,(padL+W-padR)/2,H-8,opt.xTitle,'lab','middle',11.5);
-  const yt=txt(s,0,0,opt.yTitle,'lab','middle',11.5);
-  yt.setAttribute('transform',`translate(14,${(padT+H-padB)/2}) rotate(-90)`);
-  data.forEach(d=>{
-    const c=d.hi?PAL[1]:PAL[0];
-    s.appendChild(el('circle',{cx:px(d.x),cy:py(d.y),r:d.hi?8:6,fill:c,opacity:.92}));
-    txt(s,px(d.x)+(d.dx||0),py(d.y)+(d.dy||-13),d.k,'val',d.an||'middle',12);
-  });
-  host.appendChild(s);
-}
-
-/* ---- scatter for productivity ---- */
-function scatter(id,data){
-  const host=document.getElementById(id); if(!host)return;
-  const W=680,H=300,padL=48,padR=20,padT=22,padB=46;
-  const s=svg(W,H);
-  const xs=data.map(d=>d.x),ys=data.map(d=>d.y);
-  const x0=Math.min(...xs)-150,x1=Math.max(...xs)+150;
-  const y0=Math.min(...ys)-18,y1=Math.max(...ys)+18;
-  const px=v=>padL+((v-x0)/(x1-x0))*(W-padL-padR);
-  const py=v=>padT+(1-(v-y0)/(y1-y0))*(H-padT-padB);
-  [0,.25,.5,.75,1].forEach(f=>{
-    const y=padT+f*(H-padT-padB);
-    s.appendChild(el('line',{x1:padL,x2:W-padR,y1:y,y2:y,class:'gridl'}));
-  });
-  s.appendChild(el('line',{x1:padL,x2:padL,y1:padT,y2:H-padB,class:'axis'}));
-  s.appendChild(el('line',{x1:padL,x2:W-padR,y1:H-padB,y2:H-padB,class:'axis'}));
-  [1300,1500,1700,1900,2100].forEach(v=>{ if(v>=x0&&v<=x1) txt(s,px(v),H-padB+17,fmt(v),'lab','middle',11); });
-  [80,100,120,140].forEach(v=>{ if(v>=y0&&v<=y1) txt(s,padL-8,py(v)+4,'$'+v,'lab','end',11); });
-  txt(s,(padL+W-padR)/2,H-8,'Annual hours worked per worker','lab','middle',11.5);
-  data.forEach((d,i)=>{
-    const c=d.k==='Norway'?PAL[1]:PAL[0];
-    s.appendChild(el('circle',{cx:px(d.x),cy:py(d.y),r:d.k==='Norway'?8:6,fill:c,opacity:.92}));
-    txt(s,px(d.x),py(d.y)-14,d.k,'val','middle',12);
-  });
-  host.appendChild(s);
-}
-
-/* ============================================================
-   DATA
-   ============================================================ */
-line('ch-fund',[
-  {k:'2021',v:12340},{k:'2022',v:12429},{k:'2023',v:15757},{k:'2024',v:19742},{k:'2025',v:21268}
-],{h:250});
-
-vbar('ch-ret',[
-  {k:'2021',v:14.5},{k:'2022',v:-14.1},{k:'2023',v:16.1},{k:'2024',v:13.1},{k:'2025',v:15.1}
-],{suf:'%',h:268,padB:46});
-
-share('ch-exp',[
-  {k:'Oil & gas',v:62.2,c:PAL[5]},
-  {k:'Fish',v:9.7,c:PAL[0]},
-  {k:'Electrical machinery',v:4.1,c:PAL[3]},
-  {k:'Machinery',v:3.7,c:PAL[2]},
-  {k:'Aluminium',v:3.2,c:PAL[4]},
-  {k:'Everything else',v:17.1,c:'#2a3947'}
-]);
-
-hbar('ch-dest',[
-  {k:'United Kingdom',v:317},{k:'Germany',v:310},{k:'Netherlands',v:173},
-  {k:'Denmark',v:101},{k:'Belgium',v:90}
-],{color:PAL[0],rowH:29,padL:112});
-
-hbar('ch-src',[
-  {k:'China',v:133},{k:'Germany',v:131},{k:'Sweden',v:111},
-  {k:'United States',v:79},{k:'Italy',v:38}
-],{color:PAL[3],rowH:29,padL:112});
-
-share('ch-power',[
-  {k:'Hydropower',v:88,c:PAL[0]},
-  {k:'Wind',v:11,c:PAL[3]},
-  {k:'Thermal & solar',v:1,c:PAL[5]}
-]);
-
-hbar('ch-oly',[
-  {k:'Norway',v:447,c:PAL[1]},
-  {k:'United States',v:363},
-  {k:'Germany',v:294},
-  {k:'Austria',v:268},
-  {k:'Canada',v:242},
-  {k:'Sweden',v:194},
-  {k:'Soviet Union',v:194},
-  {k:'Switzerland',v:190},
-  {k:'Finland',v:181},
-  {k:'Italy',v:171},
-  {k:'Netherlands',v:167}
-],{color:PAL[5],rowH:27,padL:116});
-
-stackbar('ch-oly26',[
-  {k:'Norway',v:[18,12,11]},
-  {k:'United States',v:[12,12,9]},
-  {k:'Italy',v:[10,6,14]},
-  {k:'Netherlands',v:[10,7,3]},
-  {k:'Germany',v:[8,10,8]},
-  {k:'France',v:[8,9,6]},
-  {k:'Sweden',v:[8,6,4]},
-  {k:'Switzerland',v:[6,9,8]},
-  {k:'Japan',v:[5,7,12]},
-  {k:'Austria',v:[5,8,5]}
-],['#f0b429','#8794a3','#b07d4a']);
-
-hbar('ch-olypc',[
-  {k:'Norway',v:79.3,c:PAL[1]},
-  {k:'Finland',v:32.2},
-  {k:'Austria',v:29.3},
-  {k:'Switzerland',v:21.5},
-  {k:'Sweden',v:18.3},
-  {k:'Netherlands',v:9.3},
-  {k:'Canada',v:5.8},
-  {k:'Germany',v:3.5},
-  {k:'Italy',v:2.9},
-  {k:'United States',v:1.1}
-],{color:PAL[5],rowH:27,padL:116});
-
-hbar('ch-rain',[
-  {k:'Bergen',v:2496,c:PAL[1]},
-  {k:'Miami',v:1712},
-  {k:'Seattle',v:1000},
-  {k:'Oslo',v:834},
-  {k:'London',v:615}
-],{color:PAL[0],rowH:31,padL:88,suf:' mm'});
-
-line('ch-light',[
-  {k:'Jan',v:6.7},{k:'Feb',v:9.0},{k:'Mar',v:11.6},{k:'Apr',v:14.5},
-  {k:'May',v:17.1},{k:'Jun',v:18.8},{k:'Jul',v:18.0},{k:'Aug',v:15.7},
-  {k:'Sep',v:12.7},{k:'Oct',v:10.0},{k:'Nov',v:7.4},{k:'Dec',v:6.0}
-],{h:240});
-
-/* --- demography --- */
-mline('ch-pop',[{name:'Population',color:PAL[0],data:[
-  {x:1800,v:0.884},{x:1850,v:1.490},{x:1900,v:2.243},{x:1950,v:3.280},
-  {x:1975,v:4.01},{x:2000,v:4.49},{x:2010,v:4.89},{x:2020,v:5.38},{x:2026,v:5.634}]}],
- {h:240,yTicks:[1,2,3,4,5,6],suf:'M',xLabels:[
-  {x:1800,t:'1800'},{x:1850,t:'1850'},{x:1900,t:'1900'},{x:1950,t:'1950'},{x:2000,t:'2000'},{x:2026,t:'2026'}]});
-
-vbar('ch-emig',[
-  {k:'1860s',v:52243},{k:'1870s',v:73949},{k:'1880s',v:167176},{k:'1890s',v:99407}
-],{h:230,color:PAL[4]});
-
-vbar('ch-immig',[
-  {k:'1970',v:1.5},{k:'1990',v:4.0},{k:'2010',v:11.4},{k:'2022',v:18.9}
-],{h:230,suf:'%',color:PAL[3]});
-
-/* --- Oslo life expectancy, axis starts at 72 --- */
-hbar('ch-lifeexp',[
-  {k:'Vestre Aker',v:82.4},
-  {k:'Ullern',v:82.0},
-  {k:'Nordre Aker',v:81.8},
-  {k:'Frogner',v:81.4},
-  {k:'Søndre Nordstrand',v:80.1,c:PAL[1]},
-  {k:'Stovner',v:79.6,c:PAL[1]},
-  {k:'Alna',v:78.7,c:PAL[1]},
-  {k:'Grorud',v:77.4,c:PAL[1]},
-  {k:'Gamle Oslo',v:76.2,c:PAL[1]},
-  {k:'Sagene',v:74.8,c:PAL[1]}
-],{color:PAL[0],rowH:27,padL:132,min:72,dec:1,suf:' yrs'});
-
-/* --- climate --- */
-const MON=[{x:1,t:'J'},{x:2,t:'F'},{x:3,t:'M'},{x:4,t:'A'},{x:5,t:'M'},{x:6,t:'J'},
-           {x:7,t:'J'},{x:8,t:'A'},{x:9,t:'S'},{x:10,t:'O'},{x:11,t:'N'},{x:12,t:'D'}];
-const mm=a=>a.map((v,i)=>({x:i+1,v:v}));
-mline('ch-monthrain',[
-  {name:'Bergen',color:PAL[1],data:mm([256,210,202,141,109,132,158,208,248,268,275,290])},
-  {name:'Oslo',color:PAL[0],data:mm([57,44,41,48,60,80,87,103,82,93,85,54])}
-],{h:250,yTicks:[0,100,200,300],suf:' mm',xLabels:MON});
-
-mline('ch-temp',[
-  {name:'Oslo',color:PAL[2],data:mm([0.1,1.1,5.3,11.0,16.7,20.4,22.7,21.3,16.4,9.6,4.4,0.9])},
-  {name:'Bergen',color:PAL[0],data:mm([4.7,4.9,6.9,11.1,15.0,17.7,19.6,19.4,16.1,11.7,7.6,5.3])}
-],{h:250,min:-2,yTicks:[0,5,10,15,20],suf:'°C',xLabels:MON});
-
-/* --- society --- */
-hbar('ch-trust',[
-  {k:'Denmark',v:74},{k:'Norway',v:72,c:PAL[1]},{k:'Sweden',v:63},
-  {k:'United Kingdom',v:43},{k:'Germany',v:42},{k:'United States',v:37},
-  {k:'Italy',v:27},{k:'France',v:26}
-],{color:PAL[0],rowH:28,padL:124,suf:'%'});
-
-scatter2('ch-gunhom',[
-  {k:'United States',x:120.5,y:5.76,hi:true,dx:-14,dy:4,an:'end'},
-  {k:'Finland',x:32.4,y:0.98,dx:12,dy:4,an:'start'},
-  {k:'Norway',x:28.8,y:0.73,hi:true,dy:24},
-  {k:'Switzerland',x:27.6,y:0.60,dx:14,dy:2,an:'start'},
-  {k:'Sweden',x:23.1,y:1.15,dy:-14},
-  {k:'Germany',x:19.6,y:0.91,dx:-13,dy:5,an:'end'},
-  {k:'United Kingdom',x:5.1,y:1.15,dy:-14}
-],{x0:0,x1:132,y0:0,y1:6.6,xTicks:[0,25,50,75,100,125],yTicks:[0,1,2,3,4,5,6],
-   xTitle:'Civilian firearms per 100 residents',yTitle:'Homicides per 100,000'});
-
-hbar('ch-happy',[
-  {k:'Finland',v:7.764},{k:'Iceland',v:7.540},{k:'Denmark',v:7.539},
-  {k:'Costa Rica',v:7.439},{k:'Sweden',v:7.255},{k:'Norway',v:7.242,c:PAL[1]},
-  {k:'United States',v:6.816,c:PAL[5]}
-],{color:PAL[0],rowH:28,padL:112,min:6.5,dec:3});
-
-scatter('ch-prod',[
-  {k:'Norway',x:1400,y:134},
-  {k:'Germany',x:1330,y:98},
-  {k:'United States',x:1805,y:97}
-]);
-
-/* ============================================================
-   PHOTOS—pulled live from Wikipedia's REST API (CORS-enabled).
-   Degrades silently if offline.
-   ============================================================ */
-/* Lazy-loaded, concurrency-capped, retries on rate limiting.
-   25 simultaneous requests gets you a 429; three at a time does not. */
-let phActive=0; const phPending=[]; const phSeen=new WeakSet();
-
-function phLoad(fig,attempt){
-  attempt=attempt||0;
-  const title=fig.dataset.wiki;
-  return fetch('https://en.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(title))
-    .then(r=>{
-      if(r.status===429&&attempt<3)
-        return new Promise(z=>setTimeout(z,700*(attempt+1))).then(()=>phLoad(fig,attempt+1));
-      if(!r.ok) throw new Error('http '+r.status);
-      return r.json().then(j=>{
-        const src=(j.thumbnail&&j.thumbnail.source)||(j.originalimage&&j.originalimage.source);
-        if(!src) throw new Error('no image');
-        const img=fig.querySelector('img');
-        img.onerror=()=>{fig.style.display='none';};
-        img.src=src.replace(/\/\d+px-/,'/900px-');
-        const cap=(j.description? j.description.charAt(0).toUpperCase()+j.description.slice(1)+'. ':'');
-        fig.querySelector('figcaption').innerHTML=cap+
-          '<a href="'+j.content_urls.desktop.page+'" target="_blank" rel="noopener">'+j.title+'—via Wikipedia</a>';
-      });
-    })
-    .catch(()=>{fig.style.display='none';});
-}
-function phPump(){
-  while(phActive<2 && phPending.length){
-    const f=phPending.shift(); phActive++;
-    phLoad(f).then(()=>{phActive--;phPump();});
-  }
-}
-const phObs=new IntersectionObserver((es,o)=>{
-  es.forEach(e=>{
-    if(e.isIntersecting && !phSeen.has(e.target)){
-      phSeen.add(e.target); o.unobserve(e.target);
-      phPending.push(e.target); phPump();
-    }
-  });
-},{rootMargin:'700px 0px'});
-document.querySelectorAll('figure.ph[data-wiki]').forEach(f=>phObs.observe(f));
-
-/* ============================================================
-   NAV scroll-spy
-   ============================================================ */
-const links=[...document.querySelectorAll('#navlinks a')];
-const secs=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
-const io=new IntersectionObserver(es=>{
-  es.forEach(e=>{
-    if(e.isIntersecting){
-      const id='#'+e.target.id;
-      links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')===id));
-      /* scroll the nav strip only—never the page */
-      const on=document.querySelector('#navlinks a.on');
-      const bar=document.getElementById('navlinks');
-      if(on&&bar){
-        const target=on.offsetLeft-(bar.clientWidth-on.offsetWidth)/2;
-        bar.scrollTo({left:Math.max(0,target),behavior:'smooth'});
-      }
-    }
-  });
-},{rootMargin:'-25% 0px -70% 0px'});
-secs.forEach(s=>io.observe(s));
-</script>
-</body>
-</html>
