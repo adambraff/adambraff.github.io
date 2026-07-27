@@ -232,17 +232,25 @@ footer{border-top:1px solid var(--line);padding:32px 0 70px;color:var(--tx3);fon
 @media(max-width:1000px){
   body{display:block}
   #rail{position:sticky;top:0;height:auto;border-right:0;border-bottom:1px solid var(--line);
-    background:rgba(13,18,25,.95);backdrop-filter:blur(12px)}
-  .railin{flex-direction:row;align-items:center;gap:14px;padding:0 14px;height:auto}
-  .railbrand{padding:10px 14px 10px 0;margin:0;border-bottom:0;border-right:1px solid var(--line);flex:none}
-  .marksvg{height:18px}
+    background:rgba(13,18,25,.97);backdrop-filter:blur(12px)}
+  /* two rows: identity on top, its own scrollable nav strip underneath */
+  .railin{flex-direction:row;flex-wrap:wrap;align-items:center;gap:0 12px;padding:0 14px;height:auto}
+  .railbrand{padding:9px 12px 9px 0;margin:0;border-bottom:0;border-right:1px solid var(--line);flex:none}
+  .marksvg{height:17px}
   .railtitle{padding:0;flex:none}
   .railtitle em,.railread,#saveoff,.railnote{display:none}
-  #navlinks{flex-direction:row;overflow-x:auto;flex:1}
-  #navlinks a{border-left:0;border-bottom:2px solid transparent;padding:14px 10px;white-space:nowrap}
+  #navlinks{order:9;flex-direction:row;overflow-x:auto;-webkit-overflow-scrolling:touch;
+    flex:0 0 100%;width:100%;margin:0 -14px;padding:0 14px;
+    border-top:1px solid var(--line);scroll-snap-type:x proximity;
+    -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent);
+    mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent)}
+  #navlinks a{border-left:0;border-bottom:2px solid transparent;padding:11px 11px 9px;white-space:nowrap;
+    font-size:13px;scroll-snap-align:start}
   #navlinks a i{display:none}
-  #navlinks a.on{background:none;border-left:0;border-bottom-color:var(--red)}
-  .railback{margin:0;padding:0;border-top:0;flex:none;white-space:nowrap}
+  #navlinks a.on{background:none;border-left:0;border-bottom-color:var(--red);color:var(--tx)}
+  .railback{margin:0 0 0 auto;padding:0;border-top:0;flex:none;white-space:nowrap}
+  /* anchors land below the sticky two-row header, not underneath it */
+  #hero,section[id]{scroll-margin-top:86px}
   .opener{min-height:330px}
   .secno{font-size:68px}
   .openerin .inner{max-width:100%}
@@ -284,7 +292,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 70px;color:var(--tx3);fon
   <div class="railread"><div class="rl">Read</div><div class="rbar"><i id="rprog"></i></div><div class="rpct" id="rpct">0%, 34 min</div></div>
   <button id="saveoff" type="button">↓ Save for offline</button>
   <div class="railnote"></div>
-  <a class="railback" href="https://braff.co/">← All tools</a>
+  <a class="railback" href="https://adambraff.github.io/">All tools</a>
 </div></aside>
 <main>
 
@@ -296,15 +304,6 @@ footer{border-top:1px solid var(--line);padding:32px 0 70px;color:var(--tx3);fon
   <div class="heroflag"><i></i><i></i><i></i></div>
   <h1>Norway,<br>by the numbers.</h1>
   <p class="lede">A country of 5.6 million owns roughly 1.5% of every listed company on earth, runs on 88% hydropower, and pays for it by selling other people the fossil fuels it won’t burn itself.</p>
-  <div class="herostats">
-    <div><b>5.63M</b><span>Population, Q1 2026</span></div>
-    <div><b>1.48</b><span>Births per woman, 2025</span></div>
-    <div><b>385,207</b><span>km² incl. Svalbard</span></div>
-    <div><b>NOK 21.3T</b><span>Sovereign fund, end-2025</span></div>
-    <div><b>$364k</b><span>Fund value per citizen</span></div>
-    <div><b>96%</b><span>New cars electric, 2025</span></div>
-    <div><b>447</b><span>Winter Olympic medals</span></div>
-  </div>
   </div>
 </header>
 
@@ -1811,6 +1810,26 @@ secs.forEach(s=>io.observe(s));
   window.addEventListener('resize',upd);
   upd();
 })();
+
+/* ============================================================
+   Mobile nav strip: keep the active link inside the viewport.
+   ============================================================ */
+(function(){
+  const nav=document.getElementById('navlinks');
+  if(!nav) return;
+  let last=null;
+  const sync=()=>{
+    if(window.innerWidth>1000) return;
+    const on=nav.querySelector('a.on');
+    if(!on||on===last) return;
+    last=on;
+    const want=on.offsetLeft-(nav.clientWidth-on.offsetWidth)/2;
+    nav.scrollTo({left:Math.max(0,want),behavior:'smooth'});
+  };
+  window.addEventListener('scroll',sync,{passive:true});
+  sync();
+})();
+
 
 /* ============================================================
    Save for offline. Registers a service worker scoped to this
