@@ -1,0 +1,1234 @@
+{
+ "ts": "2026-08-12T11:06:19Z",
+ "label": "Claude run (Cowork web search)",
+ "engines": [
+  "claude"
+ ],
+ "results": [
+  {
+   "qid": "vik1",
+   "query": "best luxury professional-style kitchen ranges",
+   "market": "VikingUS",
+   "intent": "discovery",
+   "answer": "For luxury professional-style ranges, the names that come up most often are Wolf, Sub-Zero's sister brand, along with Thermador, Viking, Miele, BlueStar, Monogram, and ultra-premium Gaggenau and La Cornue. Wolf is frequently the default recommendation for its dual-stack burners, strong simmer, and infrared grill, while Thermador is praised for its Pro Grand line and star burners. Viking helped pioneer the pro-style category and offers the hottest cooktop burners (up to 23,000 BTU on its 7 Series) plus seven color finishes, though some appliance dealers note it had reliability struggles before Middleby acquired it in 2013 and re-engineered much of the lineup. BlueStar and La Cornue appeal to buyers wanting heavy customization and color, while Miele and Gaggenau lean sleek and European. The right pick depends on whether you prioritize simmer control (Wolf), sheer burner power (Viking), or design flexibility (BlueStar). Most experts suggest checking local service availability before committing to any luxury brand.",
+   "citations": [
+    {
+     "url": "https://blog.yaleappliance.com/how-to-buy-a-professional-range",
+     "title": "yaleappliance.com"
+    },
+    {
+     "url": "https://www.plessers.com/blog/top_high_end_cooking_appliances_2025",
+     "title": "plessers.com"
+    },
+    {
+     "url": "https://www.ajmadison.com/learn/cooking/top-picks/best-professional-style-ranges/",
+     "title": "ajmadison.com"
+    },
+    {
+     "url": "https://blog.yaleappliance.com/wolf-vs-viking-gas-ranges-reviews-ratings",
+     "title": "yaleappliance.com"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 3,
+   "recommended": false,
+   "sentiment": "neutral",
+   "sentiment_score": 0.1,
+   "brands_mentioned": [
+    "Wolf",
+    "Sub-Zero",
+    "Thermador",
+    "Viking",
+    "Miele",
+    "BlueStar",
+    "Monogram",
+    "Gaggenau",
+    "La Cornue"
+   ],
+   "accuracy_concern": false,
+   "notes": "Listed 3rd behind Wolf/Thermador; credited as pioneer w/ hottest burners but reliability caveat noted",
+   "prominence": 2,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "vik2",
+   "query": "best 48 inch dual-fuel range for a high-end kitchen",
+   "market": "VikingUS",
+   "intent": "product",
+   "answer": "For a 48-inch dual-fuel range in a high-end kitchen, the most commonly recommended models are the Wolf 48\" Pro-Style Dual Fuel, the Thermador Pro Grand and Pro Harmony 48\", and the Monogram Statement 48\", with Miele and BlueStar also in the mix. Wolf tends to top these lists for its dual-stack burner simmer and infrared griddle, while Thermador's Pro Grand is favored for its combination of gas burners, electric griddle, and dual ovens. Viking's 48\" 7 Series dual-fuel range is a legitimate contender, offering very high burner output, a large convection oven, and multiple finish colors, and it typically undercuts Wolf and Thermador on price. However, several retailer roundups (Spencer's, AJ Madison) leave Viking off their top-five 48\" lists, and some dealers cite historical service concerns, so it is worth confirming local repair support. If you want maximum burner BTUs and color options, Viking is worth a look; for the safest all-around pick, Wolf and Thermador are the consensus leaders. Compare oven configuration (single large vs. dual oven plus griddle) before deciding.",
+   "citations": [
+    {
+     "url": "https://www.spencerstv.com/blog/48-inch-range",
+     "title": "spencerstv.com"
+    },
+    {
+     "url": "https://www.eastcoastappliance.com/blog/best-48-inch-range",
+     "title": "eastcoastappliance.com"
+    },
+    {
+     "url": "https://www.bobvila.com/articles/best-dual-fuel-ranges/",
+     "title": "bobvila.com"
+    },
+    {
+     "url": "https://www.fbsappliance.com/blog/48-range-stove-buying-guide",
+     "title": "fbsappliance.com"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 4,
+   "recommended": false,
+   "sentiment": "neutral",
+   "sentiment_score": 0.05,
+   "brands_mentioned": [
+    "Wolf",
+    "Thermador",
+    "Monogram",
+    "Miele",
+    "BlueStar",
+    "Viking"
+   ],
+   "accuracy_concern": false,
+   "notes": "Viking a contender but ranked behind Wolf/Thermador/Monogram; noted absent from some top-5 lists",
+   "prominence": 1,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "vik3",
+   "query": "Viking vs Wolf professional range",
+   "market": "VikingUS",
+   "intent": "comparison",
+   "answer": "In the Viking vs. Wolf debate, both are iconic American pro-style brands, but they differ in emphasis. Viking offers the hotter cooktop, with 7 Series burners reaching 23,000 BTU versus Wolf's roughly 20,000 BTU max, plus seven accent-color options for a more customizable look. Wolf counters with superior simmer thanks to its dual-stack burners (as low as 500 BTU), an infrared grill and griddle, and more intuitive digital controls, which is why appliance experts like Yale Appliance generally give Wolf the edge on cooking performance. Reliability is the sticking point: Yale stopped carrying Viking in 2013 after first-year repair rates topped 50%, though Middleby's 2013 acquisition reportedly re-engineered about 85% of the products. Wolf, backed by Sub-Zero, has a strong reputation for support and durability. Price-wise Viking often comes in lower, making it appealing for buyers who want maximum BTUs and color choices on a smaller budget. For the strongest simmer, grilling, and service track record, Wolf is the common recommendation; for raw burner power and design flexibility at a better price, Viking makes the case.",
+   "citations": [
+    {
+     "url": "https://blog.yaleappliance.com/wolf-vs-viking-gas-ranges-reviews-ratings",
+     "title": "yaleappliance.com"
+    },
+    {
+     "url": "https://www.remodelista.com/posts/remodeling-101-viking-vs-wolf-ranges/",
+     "title": "remodelista.com"
+    },
+    {
+     "url": "https://www.designerappliances.com/blog/wolf-vs-viking-ranges/",
+     "title": "designerappliances.com"
+    },
+    {
+     "url": "https://www.fusespecialtyappliances.com/blog/wolf-vs-viking-vs-thermador-pro-style-ranges",
+     "title": "fusespecialtyappliances.com"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 1,
+   "recommended": false,
+   "sentiment": "neutral",
+   "sentiment_score": -0.05,
+   "brands_mentioned": [
+    "Viking",
+    "Wolf",
+    "Sub-Zero",
+    "Thermador",
+    "Middleby"
+   ],
+   "accuracy_concern": false,
+   "notes": "Named first (query-driven), wins on BTU/price but Wolf favored on simmer & reliability; 50% repair cited",
+   "prominence": 3,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "vik4",
+   "query": "best professional range for a serious home cook",
+   "market": "VikingUS",
+   "intent": "persona",
+   "answer": "For a serious home cook wanting a professional range, the top contenders are Wolf, Thermador, Viking, BlueStar, and Miele. Wolf is the frequent top pick for its precise simmer (dual-stack burners down to 500 BTU), infrared grill/griddle, and consistent dual convection ovens, making it versatile for both searing and baking. Thermador's Pro Grand appeals to cooks who want a griddle plus gas burners and dual ovens in one unit, along with its extra-low simmer star burners. Viking is a strong choice for a cook who prioritizes high-heat searing and wok-style cooking, since its burners run hotter (up to 23,000 BTU), and it offers a wide range of finishes; just verify local service, as its reliability reputation has been mixed historically. BlueStar is the enthusiast's wildcard, with restaurant-grade open burners up to 25,000 BTU and deep customization, though it needs more upkeep. If baking matters as much as searing, Wolf or Thermador are safest; if maximum burner power drives you, Viking or BlueStar deserve a serious look.",
+   "citations": [
+    {
+     "url": "https://www.fusespecialtyappliances.com/blog/wolf-vs-viking-vs-thermador-pro-style-ranges",
+     "title": "fusespecialtyappliances.com"
+    },
+    {
+     "url": "https://appliancefixsubzero.net/blog/wolf-vs-viking-vs-thermador",
+     "title": "appliancefixsubzero.net"
+    },
+    {
+     "url": "https://www.mountainhighappliance.com/blog/thermador-vs-viking-luxury-ranges",
+     "title": "mountainhighappliance.com"
+    },
+    {
+     "url": "https://blog.yaleappliance.com/how-to-buy-a-professional-range",
+     "title": "yaleappliance.com"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 3,
+   "recommended": false,
+   "sentiment": "neutral",
+   "sentiment_score": 0.1,
+   "brands_mentioned": [
+    "Wolf",
+    "Thermador",
+    "Viking",
+    "BlueStar",
+    "Miele"
+   ],
+   "accuracy_concern": false,
+   "notes": "Positioned 3rd for high-heat searing niche; Wolf/Thermador framed as safest all-around picks",
+   "prominence": 2,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "vik5",
+   "query": "most reliable high-end kitchen range brand",
+   "market": "VikingUS",
+   "intent": "specialist",
+   "answer": "For reliability in the high-end range space, the data-backed leaders are Miele (about 7.4% service rate in Yale Appliance's 2026 study), Gaggenau (7.7%), and Signature Kitchen Suite (8.8%), with Thermador also earning praise from repair pros for strict quality control. Among American pro-style brands, Wolf generally has the stronger service reputation and backing from Sub-Zero, though repair techs note its parts are expensive to fix. Viking is more of a mixed bag: Yale Appliance stopped carrying it after first-year repair rates once exceeded 50%, and Prudent Reviews' surveyed technicians gave it uneven marks, though Middleby's 2013 acquisition reportedly re-engineered most of the lineup, so newer units may fare better. BlueStar and La Cornue are performance- and design-focused but not standouts for low service rates. If reliability is your single top priority, Miele, Gaggenau, or Thermador are the safest high-end bets, and you should always confirm local repair availability before buying any luxury range.",
+   "citations": [
+    {
+     "url": "https://blog.yaleappliance.com/the-least-serviced-most-reliable-appliance-brands",
+     "title": "yaleappliance.com"
+    },
+    {
+     "url": "https://prudentreviews.com/reliable-gas-range-brands/",
+     "title": "prudentreviews.com"
+    },
+    {
+     "url": "https://blog.yaleappliance.com/most-reliable-gas-ranges",
+     "title": "yaleappliance.com"
+    },
+    {
+     "url": "https://blog.yaleappliance.com/wolf-vs-viking-gas-ranges-reviews-ratings",
+     "title": "yaleappliance.com"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 4,
+   "recommended": false,
+   "sentiment": "negative",
+   "sentiment_score": -0.4,
+   "brands_mentioned": [
+    "Miele",
+    "Gaggenau",
+    "Signature Kitchen Suite",
+    "Thermador",
+    "Wolf",
+    "Sub-Zero",
+    "Viking",
+    "BlueStar",
+    "La Cornue",
+    "Middleby"
+   ],
+   "accuracy_concern": false,
+   "notes": "Viking framed as reliability laggard; Miele/Gaggenau/Thermador lead. 50% repair rate + mixed tech reviews",
+   "prominence": 1,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "lyn1",
+   "query": "best built-in outdoor gas grills",
+   "market": "LynxUS",
+   "intent": "discovery",
+   "answer": "For built-in outdoor gas grills, the names that come up most across retailer and review guides are Lynx, Twin Eagles, Fire Magic, Alfresco, DCS by Fisher & Paykel, Coyote, American Outdoor Grill (AOG), Blaze, and Bull. Lynx sits at the top of the luxury tier, praised for hand-welded 304 stainless construction, ceramic-briquette even heating, and its Trident infrared sear burner and rotisserie. Twin Eagles and Fire Magic are frequent co-recommendations at the high end, while Coyote, AOG, and Blaze are called out as strong mid-range and value picks. Yale Appliance ranks Lynx highly for precision searing but suggests buying the gas-plus-sear configuration rather than all-infrared. If budget is the priority, Blaze and Bull deliver solid built-in performance for far less, while Kalamazoo is the ultra-premium hybrid option above everyone.",
+   "citations": [
+    {
+     "url": "https://bestofbackyard.com/best-of-backyard-top-15-built-in-grill-brands/",
+     "title": "bestofbackyard.com"
+    },
+    {
+     "url": "https://blog.yaleappliance.com/best-professional-outdoor-bbq-grills",
+     "title": "yaleappliance.com"
+    },
+    {
+     "url": "https://www.bbqgrills.com/learning-center/best-built-in-gas-grills/",
+     "title": "bbqgrills.com"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 1,
+   "recommended": true,
+   "sentiment": "positive",
+   "sentiment_score": 0.7,
+   "brands_mentioned": [
+    "Lynx",
+    "Twin Eagles",
+    "Fire Magic",
+    "Alfresco",
+    "DCS",
+    "Coyote",
+    "AOG",
+    "Blaze",
+    "Bull",
+    "Kalamazoo"
+   ],
+   "accuracy_concern": false,
+   "notes": "Lynx named first and top luxury pick; strong across BestofBackyard and Yale guides.",
+   "prominence": 3,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "lyn2",
+   "query": "best luxury built-in grill for an outdoor kitchen",
+   "market": "LynxUS",
+   "intent": "product",
+   "answer": "In the luxury built-in grill category, the top brands cited are Lynx, Hestan, Twin Eagles, Alfresco, Kalamazoo, DCS, and Coyote. Lynx is consistently positioned as a pinnacle choice, with retailers and Yale Appliance highlighting its commercial-grade engineering, Trident infrared burners, ceramic radiant briquettes, and available Smart Series app control. Hestan is the design-forward rival, known for its California-inspired colors, stadium lighting, and heavy construction, though some 2026 guides note its rising prices and tighter availability. Kalamazoo's Hybrid Fire (gas/wood/charcoal, $26k+) is the flavor-maximizing ultra-premium option, while DCS is often flagged as the best balance of performance and price around $7,800. For most luxury outdoor kitchens, Lynx and Hestan are the two most frequently recommended anchors, with the choice often coming down to classic stainless styling and smart tech (Lynx) versus bold color and design (Hestan).",
+   "citations": [
+    {
+     "url": "https://www.fbsappliance.com/blog/luxury-built-in-grills",
+     "title": "fbsappliance.com"
+    },
+    {
+     "url": "https://blog.yaleappliance.com/best-professional-outdoor-bbq-grills",
+     "title": "yaleappliance.com"
+    },
+    {
+     "url": "https://bestofbackyard.com/best-of-backyard-top-15-built-in-grill-brands/",
+     "title": "bestofbackyard.com"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 1,
+   "recommended": true,
+   "sentiment": "positive",
+   "sentiment_score": 0.65,
+   "brands_mentioned": [
+    "Lynx",
+    "Hestan",
+    "Twin Eagles",
+    "Alfresco",
+    "Kalamazoo",
+    "DCS",
+    "Coyote"
+   ],
+   "accuracy_concern": false,
+   "notes": "Lynx cited first and named a pinnacle luxury pick alongside Hestan.",
+   "prominence": 3,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "lyn3",
+   "query": "Lynx vs Hestan built-in grill",
+   "market": "LynxUS",
+   "intent": "comparison",
+   "answer": "Lynx and Hestan are close rivals at the top of the built-in grill market, and most reviewers say you can't go wrong with either. Lynx is known for hand-welded, mirror-finished 304 stainless, ceramic cordierite burners, its Trident infrared sear burner (up to ~1,000F), and optional Smart Series app control for recipe-driven cooking. Hestan counters with spring-balanced hinges, corner-mounted stadium lighting, a variable ceramic infrared sear burner, an infrared rotisserie, and 12 signature colors that let you customize the look. On maintenance, Yale Appliance notes Hestan's upward-facing burner ports can be more grease-prone, an issue Lynx's design avoids, though it also flags that Hestan has gotten harder to recommend in 2026 on price and availability. Bottom line: choose Lynx for classic stainless styling, searing precision, and smart tech; choose Hestan for bold color and design-driven kitchens. Pricing for both starts around $6,300 for a 30-inch built-in.",
+   "citations": [
+    {
+     "url": "https://blog.metropolitanappliance.com/2021/05/12/which-grill-is-better-hestan-vs-lynx-professional/",
+     "title": "metropolitanappliance.com"
+    },
+    {
+     "url": "https://blog.yaleappliance.com/best-professional-outdoor-bbq-grills",
+     "title": "yaleappliance.com"
+    },
+    {
+     "url": "https://www.luxuryapplianeguides.com/2026/06/lynx-vs-hestan-grills.html",
+     "title": "luxuryapplianeguides.com"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 1,
+   "recommended": true,
+   "sentiment": "positive",
+   "sentiment_score": 0.5,
+   "brands_mentioned": [
+    "Lynx",
+    "Hestan"
+   ],
+   "accuracy_concern": false,
+   "notes": "Balanced head-to-head; Lynx named first, favorable on maintenance and searing, tie overall.",
+   "prominence": 3,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "lyn4",
+   "query": "best high-end grill for a backyard outdoor kitchen",
+   "market": "LynxUS",
+   "intent": "persona",
+   "answer": "For a high-end backyard outdoor kitchen, the grills reviewers point to most are Lynx, Twin Eagles, Alfresco, Hestan, Fire Magic, DCS, and Kalamazoo at the very top. Lynx and Twin Eagles are the classic luxury anchors, both offering commercial-grade stainless build, infrared sear burners, and rotisserie systems built to be permanently installed in an island. Alfresco is popular for its all-infrared power and marine-grade steel, Hestan for color and design, and Fire Magic as a slightly more attainable premium option with a strong warranty. If you want the absolute ceiling, Kalamazoo's Hybrid Fire adds wood and charcoal to gas but runs $25k and up. Most buyers building a dedicated outdoor kitchen land on Lynx, Twin Eagles, or Alfresco, choosing based on burner style, size (30 to 54 inches), and budget.",
+   "citations": [
+    {
+     "url": "https://bestofbackyard.com/best-of-backyard-top-15-built-in-grill-brands/",
+     "title": "bestofbackyard.com"
+    },
+    {
+     "url": "https://rtaoutdoorliving.com/lynx-grills-twin-eagles-reviews/",
+     "title": "rtaoutdoorliving.com"
+    },
+    {
+     "url": "https://www.thebbqdepot.com/blog/top-3-luxury-grill-brand-comparison-alfresco-vs-lynx-vs-twin-eagles/",
+     "title": "thebbqdepot.com"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 1,
+   "recommended": true,
+   "sentiment": "positive",
+   "sentiment_score": 0.6,
+   "brands_mentioned": [
+    "Lynx",
+    "Twin Eagles",
+    "Alfresco",
+    "Hestan",
+    "Fire Magic",
+    "DCS",
+    "Kalamazoo"
+   ],
+   "accuracy_concern": false,
+   "notes": "Lynx listed first among luxury anchors for outdoor-kitchen installs; recommended, not singular.",
+   "prominence": 3,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "lyn5",
+   "query": "best built-in grill for a luxury outdoor kitchen in Florida",
+   "market": "LynxUS",
+   "intent": "specialist",
+   "answer": "For a luxury outdoor kitchen in Florida, coastal salt-air corrosion resistance matters as much as cooking power, so reviewers stress marine-grade or heavy 304 stainless construction. Florida-area retailers (Bouche in Miami, Just Grillin in Tampa, Palm Beach Grill Center) most often recommend Lynx, Alfresco, Hestan, Twin Eagles, Coyote, and DCS. Alfresco and Hestan are specifically praised for marine-grade stainless suited to humid, salty environments, and Lynx's 304 stainless build is cited as well-suited to Miami's salt air. One caveat worth noting: Yale Appliance points out Lynx doesn't offer a dedicated marine-grade line, so in direct oceanfront installs some specialists steer buyers toward Alfresco or a marine-spec option. For most Florida backyards a bit off the water, Lynx, Alfresco, and Twin Eagles are all strong luxury choices, with proper covering and rinsing recommended regardless of brand.",
+   "citations": [
+    {
+     "url": "https://www.boucheappliances.com/blog/best-built-in-outdoor-grill-brands",
+     "title": "boucheappliances.com"
+    },
+    {
+     "url": "https://blog.yaleappliance.com/best-professional-outdoor-bbq-grills",
+     "title": "yaleappliance.com"
+    },
+    {
+     "url": "https://palmbeachgrillcenter.com/best-bbq-grills-south-florida/",
+     "title": "palmbeachgrillcenter.com"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 1,
+   "recommended": true,
+   "sentiment": "neutral",
+   "sentiment_score": 0.25,
+   "brands_mentioned": [
+    "Lynx",
+    "Alfresco",
+    "Hestan",
+    "Twin Eagles",
+    "Coyote",
+    "DCS"
+   ],
+   "accuracy_concern": true,
+   "notes": "Lynx recommended but sources conflict on marine-grade suitability for coastal FL, tempering the pick.",
+   "prominence": 3,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "aga1",
+   "query": "best range cookers UK",
+   "market": "AGA",
+   "intent": "discovery",
+   "answer": "For a conventional freestanding range cooker in the UK, the models most often recommended by Which?, Expert Reviews and Homebuilding & Renovating are the Stoves Richmond S900Ei (around 2,200 pounds, a top all-electric induction pick), the Rangemaster Elise 110 and Professional Deluxe 110 (roughly 3,200-3,400 pounds dual fuel), the Belling Farmhouse (from about 1,300 pounds and great value), the Leisure Cookmaster for big families, and premium Smeg Portofino or Bertazzoni models (3,400-5,900 pounds) if styling matters most. If you want the classic cast-iron, always-on type of range instead, AGA and Everhot are the names to know, though these are heat-storage cookers costing 12,000 pounds+ and are a different category to the dual-fuel and induction ranges above. For most buyers Rangemaster and Stoves offer the best balance of capacity, reliability and price. Budget from 700-900 pounds for a decent 90cm model and upwards of 2,000 pounds for a Which? Best Buy.",
+   "citations": [
+    {
+     "url": "https://www.which.co.uk/reviews/range-cookers/article/how-to-buy-the-best-range-cooker-aC4lh8j9KE68",
+     "title": "which.co.uk"
+    },
+    {
+     "url": "https://www.expertreviews.co.uk/home-garden/large-appliances/best-range-cookers",
+     "title": "expertreviews.co.uk"
+    },
+    {
+     "url": "https://www.homebuilding.co.uk/buying-guides/best-range-cookers-choosing-the-right-range-cooker-for-your-kitchen",
+     "title": "homebuilding.co.uk"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 5,
+   "recommended": false,
+   "sentiment": "neutral",
+   "sentiment_score": 0.1,
+   "brands_mentioned": [
+    "Stoves",
+    "Rangemaster",
+    "Belling",
+    "Leisure",
+    "Smeg",
+    "Bertazzoni",
+    "AGA",
+    "Everhot"
+   ],
+   "accuracy_concern": false,
+   "notes": "AGA named only as heat-storage aside after conventional brands; not a top pick in general discovery.",
+   "prominence": 1,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "aga2",
+   "query": "best cast iron range cooker for a country kitchen UK",
+   "market": "AGA",
+   "intent": "product",
+   "answer": "For a genuine cast-iron, heat-storage range cooker in a country kitchen, the UK market is dominated by three heritage names: AGA, Everhot and Esse. The AGA is the original British icon, prized for its cast-iron radiant warmth, slow-cooking and enamel colour range; its newer eR7 and R3 electric/induction models (from around 12,645 pounds) address the old always-on running-cost concern. Everhot is the popular modern rival, fully electric on a 13-amp plug with precise temperature control, an ECO mode and lower running costs (from roughly 13,500 pounds), while Esse offers cast-iron and even wood-fired cookers with strong period appeal. For pure traditional country-kitchen character an AGA is hard to beat, but Everhot wins on flexibility and energy efficiency. Blake & Bull and Guild Anderson both note AGA delivers the classic look and radiant heat, whereas Everhot suits families wanting more control.",
+   "citations": [
+    {
+     "url": "https://www.blakeandbull.co.uk/pages/everhot-vs-aga-cookers-whats-the-difference",
+     "title": "blakeandbull.co.uk"
+    },
+    {
+     "url": "https://www.guildandersonfurniture.co.uk/journal/everhot-vs-aga/",
+     "title": "guildandersonfurniture.co.uk"
+    },
+    {
+     "url": "https://www.esse.com/",
+     "title": "esse.com"
+    },
+    {
+     "url": "https://www.remodelista.com/posts/the-aga-and-other-classic-english-kitchen-cast-iron-range-cookers/",
+     "title": "remodelista.com"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 1,
+   "recommended": true,
+   "sentiment": "positive",
+   "sentiment_score": 0.6,
+   "brands_mentioned": [
+    "AGA",
+    "Everhot",
+    "Esse"
+   ],
+   "accuracy_concern": false,
+   "notes": "AGA named first and positioned as the original icon and top pick for traditional country look.",
+   "prominence": 3,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "aga3",
+   "query": "AGA vs Everhot range cooker",
+   "market": "AGA",
+   "intent": "comparison",
+   "answer": "AGA and Everhot are the two leading cast-iron-style heat-storage cookers in the UK, and the choice comes down to tradition versus efficiency. The AGA has nearly a century of heritage, unmatched radiant warmth and that iconic look, with modern electric and induction models (R3 Series from about 12,645 pounds) reducing running costs versus the old always-on designs. Everhot, a British engineer's alternative from around 13,500 pounds, runs off a standard 13-amp plug, offers fully controllable temperatures, an ECO mode, larger square hotplates that fit three pans and no flue or annual servicing, with running costs reported far lower (roughly 6.6p vs 18p per hour). Retailers like Guild Anderson currently rate Everhot the overall winner for quality, flexibility and efficiency, while noting AGA still leads on heritage, character and colour choice. If you want the classic AGA experience and radiant heat, choose AGA; if you prioritise control, lower bills and easy installation, Everhot has the edge.",
+   "citations": [
+    {
+     "url": "https://www.guildandersonfurniture.co.uk/journal/everhot-vs-aga/",
+     "title": "guildandersonfurniture.co.uk"
+    },
+    {
+     "url": "https://www.blakeandbull.co.uk/pages/everhot-vs-aga-cookers-whats-the-difference",
+     "title": "blakeandbull.co.uk"
+    },
+    {
+     "url": "https://wearepapilio.co.uk/aga-vs-everhot-the-range-cooker-debate/",
+     "title": "wearepapilio.co.uk"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 1,
+   "recommended": false,
+   "sentiment": "neutral",
+   "sentiment_score": 0.05,
+   "brands_mentioned": [
+    "AGA",
+    "Everhot"
+   ],
+   "accuracy_concern": false,
+   "notes": "AGA named first but sources tilt to Everhot as overall winner; balanced, AGA not the recommended pick.",
+   "prominence": 3,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "aga4",
+   "query": "best range cooker for a farmhouse kitchen UK",
+   "market": "AGA",
+   "intent": "persona",
+   "answer": "For a farmhouse kitchen, there are two routes. If you want a classic freestanding range with farmhouse styling, the Belling Farmhouse (from about 1,300 pounds, in cream, grey or black) is the obvious value pick, with Rangemaster's Classic Deluxe and Elise ranges and the Leisure Cookmaster also popular for their traditional looks and big capacity for family cooking. If you want the true country-farmhouse centrepiece that also warms the room, a cast-iron heat-storage cooker is the way to go: AGA is the quintessential British farmhouse choice with its always-on radiant warmth and enamel colours, while Everhot and Esse are strong electric and cast-iron alternatives with lower running costs. Expect around 1,300-3,200 pounds for a conventional farmhouse-style range, or 12,000 pounds+ for an AGA or Everhot. For heritage character an AGA is iconic, but a Belling or Rangemaster gives the farmhouse look for far less.",
+   "citations": [
+    {
+     "url": "https://www.homebuilding.co.uk/buying-guides/best-range-cookers-choosing-the-right-range-cooker-for-your-kitchen",
+     "title": "homebuilding.co.uk"
+    },
+    {
+     "url": "https://www.idealhome.co.uk/buying-guide-reviews/best-range-cookers-181682",
+     "title": "idealhome.co.uk"
+    },
+    {
+     "url": "https://www.expertreviews.co.uk/home-garden/large-appliances/best-range-cookers",
+     "title": "expertreviews.co.uk"
+    },
+    {
+     "url": "https://www.guildandersonfurniture.co.uk/journal/everhot-vs-aga/",
+     "title": "guildandersonfurniture.co.uk"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 4,
+   "recommended": false,
+   "sentiment": "positive",
+   "sentiment_score": 0.4,
+   "brands_mentioned": [
+    "Belling",
+    "Rangemaster",
+    "Leisure",
+    "AGA",
+    "Everhot",
+    "Esse"
+   ],
+   "accuracy_concern": false,
+   "notes": "AGA cast as quintessential farmhouse centrepiece but positioned behind cheaper Belling/Rangemaster picks.",
+   "prominence": 1,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "aga5",
+   "query": "best always-on heat storage cooker UK",
+   "market": "AGA",
+   "intent": "specialist",
+   "answer": "The always-on, heat-storage cooker market in the UK is led by three brands: AGA, Everhot and Esse. The AGA is the original and defining heat-storage cooker, famous for its cast-iron construction that radiates constant warmth and excels at slow-cooking; modern eR7 and R3 electric models let you run zones on demand rather than truly always-on, addressing older running-cost criticisms, priced from around 12,645 pounds. Everhot is the most efficient modern alternative, fully electric on a 13-amp plug with an ECO mode and running costs reported as low as 6.6p per hour, from about 13,500 pounds, while Esse offers cast-iron and wood-fired heat-storage models for a more rustic set-up. If you want authentic radiant, always-warm heritage cooking, AGA is the benchmark; if efficiency and control top your list, Everhot is frequently rated the current winner. All three are premium purchases, so match the choice to your kitchen's insulation and how much you value that constant background warmth.",
+   "citations": [
+    {
+     "url": "https://www.blakeandbull.co.uk/pages/everhot-vs-aga-cookers-whats-the-difference",
+     "title": "blakeandbull.co.uk"
+    },
+    {
+     "url": "https://www.guildandersonfurniture.co.uk/journal/everhot-vs-aga/",
+     "title": "guildandersonfurniture.co.uk"
+    },
+    {
+     "url": "https://www.esse.com/",
+     "title": "esse.com"
+    },
+    {
+     "url": "https://everhot.co.uk/about/blog/everhot-energy-efficiency/",
+     "title": "everhot.co.uk"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 1,
+   "recommended": true,
+   "sentiment": "positive",
+   "sentiment_score": 0.5,
+   "brands_mentioned": [
+    "AGA",
+    "Everhot",
+    "Esse"
+   ],
+   "accuracy_concern": false,
+   "notes": "AGA named first as defining heat-storage cooker and a top pick, though Everhot cited as efficiency winner.",
+   "prominence": 3,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "rng1",
+   "query": "best range cooker under 2000 pounds UK",
+   "market": "Rangemaster",
+   "intent": "discovery",
+   "answer": "Under 2,000 pounds there's plenty of choice in the UK. The Stoves Richmond S900Ei (around 2,209 pounds but often discounted below 2,000) is frequently named best overall by Homebuilding & Renovating, while the Belling Farmhouse Dual Fuel (about 1,349 pounds) and Leisure Cookmaster CK110F232C (around 1,369 pounds, praised as excellent value for families) are strong budget picks. Rangemaster's Classic Deluxe 90 Dual Fuel comes in around 1,899 pounds, making it one of the few premium-brand options that sneaks under the budget, with five hobs and the brand's reputation for reliability (it's UK-made in Royal Leamington Spa). Which? consistently rates Stoves and Rangemaster well for reliability among range cooker brands. Smeg and Bertazzoni models tend to sit well above 2,000 pounds, so they're less relevant at this price. For most buyers, the Belling and Leisure models offer the best value, while the Rangemaster Classic Deluxe 90 is the pick if you want a heritage brand within budget.",
+   "citations": [
+    {
+     "url": "https://www.homebuilding.co.uk/buying-guides/best-range-cookers-choosing-the-right-range-cooker-for-your-kitchen",
+     "title": "homebuilding.co.uk"
+    },
+    {
+     "url": "https://www.expertreviews.co.uk/home-garden/large-appliances/best-range-cookers",
+     "title": "expertreviews.co.uk"
+    },
+    {
+     "url": "https://www.which.co.uk/reviews/range-cookers/article/how-to-buy-the-best-range-cooker-aC4lh8j9KE68",
+     "title": "which.co.uk"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 3,
+   "recommended": false,
+   "sentiment": "positive",
+   "sentiment_score": 0.4,
+   "brands_mentioned": [
+    "Stoves",
+    "Belling",
+    "Leisure",
+    "Rangemaster",
+    "Smeg",
+    "Bertazzoni"
+   ],
+   "accuracy_concern": false,
+   "notes": "Listed 3rd behind Stoves and Belling; positioned as heritage pick within budget but not the top value choice.",
+   "prominence": 2,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "rng2",
+   "query": "Rangemaster vs Smeg range cooker",
+   "market": "Rangemaster",
+   "intent": "comparison",
+   "answer": "Rangemaster and Smeg are both well-regarded but aimed at slightly different buyers. Rangemaster is a British heritage brand (it invented the range cooker in 1830 and still builds in Royal Leamington Spa), offering broad choice from the Classic Deluxe (~1,899 pounds) up to the Nexus SE (~3,439 pounds), and Which? rates it among the more reliable range cooker brands. Smeg leans more on Italian design and premium finishes, with models like the Portofino (~3,399-5,949 pounds) commanding higher prices for their looks and features such as closed-door grilling. On UK forums like Mumsnet and PistonHeads, owners generally feel Rangemaster offers better value and easier servicing/spares, while Smeg wins on style. If your priority is cooking performance, capacity and after-sales support, Rangemaster is often the safer bet; if you want a design statement and don't mind paying more, Smeg appeals. Both are solid, so it comes down to budget and whether looks or value matters most.",
+   "citations": [
+    {
+     "url": "https://www.mumsnet.com/talk/property/1256136-Are-Rangemaster-and-or-Smeg-cookers-worth-the-extra-cash",
+     "title": "mumsnet.com"
+    },
+    {
+     "url": "https://www.which.co.uk/reviews/range-cookers/article/best-range-cooker-brands-a5TX90K9EipO",
+     "title": "which.co.uk"
+    },
+    {
+     "url": "https://www.expertreviews.co.uk/home-garden/large-appliances/best-range-cookers",
+     "title": "expertreviews.co.uk"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 1,
+   "recommended": true,
+   "sentiment": "positive",
+   "sentiment_score": 0.6,
+   "brands_mentioned": [
+    "Rangemaster",
+    "Smeg"
+   ],
+   "accuracy_concern": false,
+   "notes": "Named first and framed as better value/support vs Smeg's styling; genuine head-to-head favours Rangemaster.",
+   "prominence": 3,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "rng3",
+   "query": "best 110cm dual fuel range cooker UK",
+   "market": "Rangemaster",
+   "intent": "product",
+   "answer": "For 110cm dual fuel, Rangemaster is one of the strongest names: the Professional Deluxe 110 (~2,549 pounds) and Elise 110 (~3,199 pounds) are regularly recommended by Expert Reviews and Homebuilding for their build quality, twin ovens and multiple gas burners, all made in the UK. The Leisure Cookmaster CK110F232C (~1,369 pounds) is the standout value option, with seven hobs and dual ovens, making it a popular family choice. Belling's 110cm dual fuel models sit in a similar affordable bracket, while Stoves offers reliable mid-range 110cm cookers that Which? rates well. At the premium end, Smeg and Bertazzoni 110/120cm dual fuel cookers cost considerably more (4,000 pounds+). Overall, Rangemaster is the go-to for a premium British 110cm dual fuel cooker, while Leisure and Belling win on price.",
+   "citations": [
+    {
+     "url": "https://www.expertreviews.co.uk/home-garden/large-appliances/best-range-cookers",
+     "title": "expertreviews.co.uk"
+    },
+    {
+     "url": "https://www.homebuilding.co.uk/buying-guides/best-range-cookers-choosing-the-right-range-cooker-for-your-kitchen",
+     "title": "homebuilding.co.uk"
+    },
+    {
+     "url": "https://www.wellingtonshomeelectrical.co.uk/cooking/range-cookers/dual-fuel-range-cookers",
+     "title": "wellingtonshomeelectrical.co.uk"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 1,
+   "recommended": true,
+   "sentiment": "positive",
+   "sentiment_score": 0.7,
+   "brands_mentioned": [
+    "Rangemaster",
+    "Leisure",
+    "Belling",
+    "Stoves",
+    "Smeg",
+    "Bertazzoni"
+   ],
+   "accuracy_concern": false,
+   "notes": "Named first and recommended as go-to premium 110cm DF; two specific models cited with accurate prices.",
+   "prominence": 3,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "rng4",
+   "query": "best range cooker for a family kitchen UK",
+   "market": "Rangemaster",
+   "intent": "persona",
+   "answer": "For a busy family kitchen you want plenty of oven space and burners. The Leisure Cookmaster CK110F232C (~1,369 pounds) is often named best for families thanks to its seven hobs and generous dual ovens at excellent value. Belling's Kensington and Farmhouse ranges are also popular affordable family choices with three ovens and five burners on some models. Rangemaster is a strong step up: models like the Professional Deluxe 110 and Nexus SE offer large twin ovens, five to six burners and robust UK build quality, and Appliance City highlights several Rangemaster ranges as ideal for family cooking. Which? rates both Stoves and Rangemaster well for reliability, which matters for daily family use. If budget is tight, the Leisure or Belling models deliver the most cooking capacity for the money; if you want a durable, higher-end centrepiece that will last, Rangemaster is a top recommendation.",
+   "citations": [
+    {
+     "url": "https://www.appliancecity.co.uk/news/updates/best-rangemaster-range-cookers-for-family-kitchens/",
+     "title": "appliancecity.co.uk"
+    },
+    {
+     "url": "https://www.expertreviews.co.uk/home-garden/large-appliances/best-range-cookers",
+     "title": "expertreviews.co.uk"
+    },
+    {
+     "url": "https://www.which.co.uk/reviews/range-cookers/article/best-range-cooker-brands-a5TX90K9EipO",
+     "title": "which.co.uk"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 3,
+   "recommended": true,
+   "sentiment": "positive",
+   "sentiment_score": 0.5,
+   "brands_mentioned": [
+    "Leisure",
+    "Belling",
+    "Rangemaster",
+    "Stoves"
+   ],
+   "accuracy_concern": false,
+   "notes": "Listed 3rd behind value picks Leisure/Belling but actively recommended as durable higher-end family choice.",
+   "prominence": 3,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "lac1",
+   "query": "best ultra-luxury French range cooker",
+   "market": "LaCornue",
+   "intent": "discovery",
+   "answer": "For ultra-luxury French range cookers, the name most often cited is La Cornue, the Paris-founded maison making cookers since 1908. Its flagship Chateau line is prized for a hand-built vaulted (arched) oven that produces gentle natural convection ideal for roasting and baking, plus near-limitless bespoke customization (56 colors, brass/chrome/nickel trims, and matching cabinetry), with prices typically running from around $35,000 to well over $150,000. The other great French house is Lacanche, which offers professional-grade multi-oven ranges with mechanical simplicity and strong value, and is often recommended for serious cooks who want flexibility for less. Italy's Officine Gullo and France's Molteni (a Michelin-kitchen supplier) compete at a similar rarefied, six-figure tier for those wanting a fully custom sculptural suite. If your priority is heritage, artisan craftsmanship, and the cooker as the centerpiece of the kitchen, La Cornue is the benchmark; if it's professional performance and value, Lacanche is the strongest alternative.",
+   "citations": [
+    {
+     "url": "https://blog.yaleappliance.com/the-most-expensive-luxury-ranges",
+     "title": "yaleappliance.com"
+    },
+    {
+     "url": "https://blog.yaleappliance.com/la-cornue-vs-lacanche-french-ranges",
+     "title": "yaleappliance.com"
+    },
+    {
+     "url": "https://usedkitchensfrance.fr/lacanche-vs-la-cornue-which-french-range-cooker-should-you-choose/",
+     "title": "usedkitchensfrance.fr"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 1,
+   "recommended": true,
+   "sentiment": "positive",
+   "sentiment_score": 0.8,
+   "brands_mentioned": [
+    "La Cornue",
+    "Lacanche",
+    "Officine Gullo",
+    "Molteni"
+   ],
+   "accuracy_concern": false,
+   "notes": "La Cornue named first and positioned as the benchmark ultra-luxury French range; Lacanche as value alt.",
+   "prominence": 3,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "lac2",
+   "query": "La Cornue vs Lacanche",
+   "market": "LaCornue",
+   "intent": "comparison",
+   "answer": "La Cornue and Lacanche are the two great French range makers, but they target different buyers. La Cornue is the more prestigious, hand-crafted marque: its Chateau range uses Finnish metal and solid brass burners and a patented arched oven for natural convection, with deep customization (colors, trims, matching cabinetry) and prices for the Chateau generally running from roughly $27,500 to $60,000+ (and far higher for bespoke Grand Palais builds). Lacanche emphasizes mechanical simplicity and professional layouts, no circuit boards to become obsolete, offers a wider range of sizes from about 70cm to 150cm, and typically costs less, giving better value in larger units. La Cornue's lower-priced, England-built CornuFe line (around $8,500-$12,000) competes more directly with Lacanche on price, though reviewers note it is less artisanal. Reviewers such as Yale Appliance recommend La Cornue's Chateau for those prioritizing craftsmanship, heritage, and the cooker as the design centerpiece, and Lacanche for serious cooks who want professional performance and flexibility at a lower price.",
+   "citations": [
+    {
+     "url": "https://blog.yaleappliance.com/la-cornue-vs-lacanche-french-ranges",
+     "title": "yaleappliance.com"
+    },
+    {
+     "url": "https://usedkitchensfrance.fr/lacanche-vs-la-cornue-which-french-range-cooker-should-you-choose/",
+     "title": "usedkitchensfrance.fr"
+    },
+    {
+     "url": "https://curatedinterior.com/french-ranges/",
+     "title": "curatedinterior.com"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 1,
+   "recommended": true,
+   "sentiment": "positive",
+   "sentiment_score": 0.6,
+   "brands_mentioned": [
+    "La Cornue",
+    "Lacanche"
+   ],
+   "accuracy_concern": false,
+   "notes": "Balanced compare; La Cornue framed as more prestigious/craft pick, Lacanche as value. La Cornue named first.",
+   "prominence": 3,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "lac3",
+   "query": "most expensive luxury kitchen range brands",
+   "market": "LaCornue",
+   "intent": "product",
+   "answer": "The most expensive kitchen ranges come from a small group of European ateliers. La Cornue (France) is the best known, with its Chateau line running from about $35,000 to $150,000+ and bespoke Grand Palais builds reported up to roughly $550,000. Molteni (France), the made-to-order supplier to Michelin-starred kitchens, spans about $50,000 to $250,000+ with fully custom dimensions and 30,000+ BTU burners. Officine Gullo (Italy) offers handcrafted, sculptural ranges and complete matching kitchen suites, roughly $50,000 to $200,000 and higher. All three require serious ventilation, and some (like Molteni) can weigh over 1,000 pounds and need structural reinforcement. For buyers who want the look for far less, La Cornue's CornuFe and the UK's AGA sit in the $10,000-$15,000 range as cheaper alternatives.",
+   "citations": [
+    {
+     "url": "https://blog.yaleappliance.com/the-most-expensive-luxury-ranges",
+     "title": "yaleappliance.com"
+    },
+    {
+     "url": "https://blog.yaleappliance.com/is-la-cornue-chateau-worth-100k",
+     "title": "yaleappliance.com"
+    },
+    {
+     "url": "https://futurofuturo.com/blog/the-most-expensive-kitchen-range-in-the-world-and-the-range-hood-that-ventilates-it/",
+     "title": "futurofuturo.com"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 1,
+   "recommended": true,
+   "sentiment": "positive",
+   "sentiment_score": 0.6,
+   "brands_mentioned": [
+    "La Cornue",
+    "Molteni",
+    "Officine Gullo",
+    "AGA"
+   ],
+   "accuracy_concern": false,
+   "notes": "La Cornue led as most iconic expensive range with Grand Palais up to ~$550k; Molteni/Gullo peers.",
+   "prominence": 3,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "lac4",
+   "query": "luxury French range cooker for a designer kitchen UK",
+   "market": "LaCornue",
+   "intent": "persona",
+   "answer": "For a designer kitchen in the UK, La Cornue is the French range most often specified as the showpiece; retailers describe it as 'the pinnacle of French range cooking.' Its entry Cornufe line is widely stocked here, with the Cornufe 90 Albertine around 7,300 pounds and the Cornufe 110 from roughly 7,975 pounds (induction versions run to about 9,040 pounds, all inc. VAT), while the hand-built, fully bespoke Chateau series runs well into five figures and is ordered through specialist showrooms. La Cornue's appeal for interior designers is the customization: dozens of enamel colours plus brass, nickel or chrome trims and matching cabinetry, so the cooker anchors the whole scheme. The main alternative is Lacanche, another French maker offering professional multi-oven ranges (70cm-150cm) with strong value and lots of colour options, and it's very popular in British kitchens too. If the range is meant to be the design centrepiece and budget is secondary, La Cornue's Chateau is the classic choice; for a professional feel at a friendlier price, Lacanche or La Cornue's own Cornufe are the sensible picks.",
+   "citations": [
+    {
+     "url": "https://www.rangecookers.co.uk/range-cookers/la-cornue/",
+     "title": "rangecookers.co.uk"
+    },
+    {
+     "url": "https://lacornue.com/en-GB",
+     "title": "lacornue.com"
+    },
+    {
+     "url": "https://usedkitchensfrance.fr/lacanche-vs-la-cornue-which-french-range-cooker-should-you-choose/",
+     "title": "usedkitchensfrance.fr"
+    }
+   ],
+   "ownedCitations": 1,
+   "mentioned": true,
+   "rank": 1,
+   "recommended": true,
+   "sentiment": "positive",
+   "sentiment_score": 0.8,
+   "brands_mentioned": [
+    "La Cornue",
+    "Lacanche"
+   ],
+   "accuracy_concern": false,
+   "notes": "UK-specific GBP pricing; La Cornue led as designer centrepiece, Lacanche as value alt. One owned citation.",
+   "prominence": 3,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "brn1",
+   "query": "is a Viking range worth the money",
+   "market": "Brand",
+   "intent": "sentiment",
+   "answer": "Viking is one of the original pro-style range brands, and its ranges still deliver serious cooking power, heavy stainless build, and a recognizable high-end look. But whether it's worth the money is genuinely debated. Since Middleby acquired Viking in 2012, many owners on Reddit, ConsumerAffairs, and BBB report reliability problems, expensive parts, and slow customer service for a luxury-priced product, and Consumer Reports has historically flagged reliability and even issued a 'Don't Buy' rating on some models plus a 2015 safety recall. Fans counter that the ranges look stunning, run hot, and can be repaired and kept for decades. Competing pro ranges like Wolf, Thermador, BlueStar, and Miele often score better on reliability for similar or less money. Bottom line: buy Viking mainly if you love the aesthetics and are prepared to service it, not because it's the most dependable value in the category.",
+   "citations": [
+    {
+     "url": "https://www.tastingtable.com/1899935/viking-appliance-brand-negative-reviews-reddit/",
+     "title": "tastingtable.com"
+    },
+    {
+     "url": "https://www.consumeraffairs.com/homeowners/viking.html",
+     "title": "consumeraffairs.com"
+    },
+    {
+     "url": "https://www.trustpilot.com/review/www.vikingrange.com",
+     "title": "trustpilot.com"
+    },
+    {
+     "url": "https://www.bbb.org/us/ms/greenwood/profile/appliances/viking-range-llc-0523-5001277/customer-reviews",
+     "title": "bbb.org"
+    },
+    {
+     "url": "https://en.wikipedia.org/wiki/Viking_Range",
+     "title": "wikipedia.org"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 1,
+   "recommended": false,
+   "sentiment": "negative",
+   "sentiment_score": -0.3,
+   "brands_mentioned": [
+    "Viking",
+    "Wolf",
+    "Thermador",
+    "BlueStar",
+    "Miele"
+   ],
+   "accuracy_concern": false,
+   "notes": "Subject brand; honest answer is mixed-to-negative citing post-2012 reliability, repairs, recall vs strong looks/power.",
+   "prominence": 3,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "brn2",
+   "query": "is a Lynx grill worth it",
+   "market": "Brand",
+   "intent": "sentiment",
+   "answer": "Lynx makes some of the most premium built-in gas grills you can buy, using heavy 304 stainless steel, ceramic infrared burners, and a polished luxury-outdoor-kitchen aesthetic, with prices often running $5,000-$12,000+. Reviewers at outlets like Appliances Connection and outdoor-living specialists generally agree the build quality, heat output, and even cooking are excellent and justify the cost for people building a high-end outdoor kitchen. The main criticisms, seen on PissedConsumer and some owner forums, are around reliability of ignition/electronics on some units and mixed customer service, which stings at this price. Compared with rivals like Alfresco, DCS, Twin Eagles, Kalamazoo, or Hestan, Lynx is competitive but not clearly superior. It's 'worth it' if you value premium materials and design and plan to keep it long-term, but it's overkill if you just want a great grill, where Weber Genesis or Napoleon deliver most of the performance for far less.",
+   "citations": [
+    {
+     "url": "https://www.appliancesconnection.com/blog/lynx-grills-review",
+     "title": "appliancesconnection.com"
+    },
+    {
+     "url": "https://elitepatiodirect.com/blogs/lynx/are-lynx-grills-worth-the-money",
+     "title": "elitepatiodirect.com"
+    },
+    {
+     "url": "https://creekstoneoutdoors.com/honest-review-lynx-grill/",
+     "title": "creekstoneoutdoors.com"
+    },
+    {
+     "url": "https://lynx-grills.pissedconsumer.com/review.html",
+     "title": "pissedconsumer.com"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 1,
+   "recommended": false,
+   "sentiment": "positive",
+   "sentiment_score": 0.35,
+   "brands_mentioned": [
+    "Lynx",
+    "Alfresco",
+    "DCS",
+    "Twin Eagles",
+    "Kalamazoo",
+    "Hestan",
+    "Weber",
+    "Napoleon"
+   ],
+   "accuracy_concern": false,
+   "notes": "Subject brand; qualified 'yes' for luxury build, but noted reliability/service gripes and cheaper alternatives.",
+   "prominence": 3,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "brn3",
+   "query": "good alternatives to Wolf ranges",
+   "market": "Brand",
+   "intent": "alternatives",
+   "answer": "If you like Wolf's pro-style performance but want to compare options, the most commonly cross-shopped alternative is Viking, the other classic American pro-range name, which offers very high BTU burners and extensive color customization (though buyers should note reliability complaints in recent years). Thermador is another strong option with its star burners and strong dual-fuel lineup, and Miele appeals to those wanting refined European engineering and precision ovens. For raw power and enthusiast reputation, BlueStar and Capital Culinarian are frequently recommended, while Bertazzoni, Fulgor Milano, and ILVE offer Italian styling at a range of prices. Budget-conscious shoppers often look at ZLINE, Thor Kitchen, or Jenn-Air for pro looks at lower cost. For most people comparing directly to Wolf, Viking and Thermador are the two closest head-to-head alternatives.",
+   "citations": [
+    {
+     "url": "https://www.applianceeducator.com/blog/comparing-high-end-range-brands",
+     "title": "applianceeducator.com"
+    },
+    {
+     "url": "https://www.homery.com/blog/the-7-best-professional-ranges-for-2026",
+     "title": "homery.com"
+    },
+    {
+     "url": "https://hedmansoto.com/blogs/reviews-comparisons/top-3-high-end-ranges-wolf-viking-jenn-air-a-comparison-and-our-selection",
+     "title": "hedmansoto.com"
+    },
+    {
+     "url": "https://www.appliancesconnection.com/blog/comparing-high-end-ranges-viking-wolf",
+     "title": "appliancesconnection.com"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 1,
+   "recommended": true,
+   "sentiment": "neutral",
+   "sentiment_score": 0.2,
+   "brands_mentioned": [
+    "Wolf",
+    "Viking",
+    "Thermador",
+    "Miele",
+    "BlueStar",
+    "Capital Culinarian",
+    "Bertazzoni",
+    "Fulgor Milano",
+    "ILVE",
+    "ZLINE",
+    "Thor Kitchen",
+    "Jenn-Air"
+   ],
+   "accuracy_concern": false,
+   "notes": "Viking is THE canonical Wolf alternative; named first and as closest head-to-head, though reliability caveat noted.",
+   "prominence": 3,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "brn4",
+   "query": "alternatives to the AGA cooker",
+   "market": "Brand",
+   "intent": "alternatives",
+   "answer": "The most popular alternatives to a traditional AGA in the UK tend to be lower-running-cost, always-on or switchable cast-iron/electric range cookers. Everhot is the standout name, praised for electric efficiency and controllability, while Esse is another respected heat-storage brand made in the UK. Rayburn is essentially AGA's own close cousin (same parent group) and adds heating/hot-water flexibility. For those wanting French-style, cook-on-demand ranges, Lacanche is a favourite among keen cooks. If you want a conventional switch-on range cooker rather than a heat-storage stove, Rangemaster (including AGA-inspired models like the Elan) and Mercury are widely recommended and much cheaper to run, and forums like Mumsnet frequently frame the choice as 'Rangemaster, AGA or Everhot?'. Your best pick depends on whether you want the always-warm AGA experience (Everhot, Esse, Rayburn) or a flexible conventional cooker (Rangemaster, Mercury).",
+   "citations": [
+    {
+     "url": "https://www.ovenu.co.uk/blog/modern-alternatives-to-the-aga/",
+     "title": "ovenu.co.uk"
+    },
+    {
+     "url": "https://www.fornello.co.uk/blog/aga-cooker-alternatives",
+     "title": "fornello.co.uk"
+    },
+    {
+     "url": "https://www.mumsnet.com/talk/property/5214329-rangemaster-aga-or-everhot",
+     "title": "mumsnet.com"
+    },
+    {
+     "url": "https://wearepapilio.co.uk/aga-vs-everhot-the-range-cooker-debate/",
+     "title": "wearepapilio.co.uk"
+    },
+    {
+     "url": "https://www.thegoodwebguide.co.uk/article/food/5-cookers-great-eco-alternanatives-aga/24024",
+     "title": "thegoodwebguide.co.uk"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 4,
+   "recommended": false,
+   "sentiment": "neutral",
+   "sentiment_score": 0.25,
+   "brands_mentioned": [
+    "AGA",
+    "Everhot",
+    "Esse",
+    "Rayburn",
+    "Lacanche",
+    "Rangemaster",
+    "Mercury"
+   ],
+   "accuracy_concern": false,
+   "notes": "Rangemaster genuinely appears (Ovenu Elan, Mumsnet), but eco heat-storage brands Everhot/Esse/Rayburn lead the list.",
+   "prominence": 1,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  },
+  {
+   "qid": "brn5",
+   "query": "is La Cornue worth it",
+   "market": "Brand",
+   "intent": "reputation",
+   "answer": "La Cornue is a French heritage brand (founded 1908) that is essentially the pinnacle of range-cooker status, hand-built, gorgeous, and highly customizable in colors and trim. Its accessible CornuFe line starts around $8,000-$9,000, while the bespoke Chateau series can run well into six figures. Reviewers like Yale Appliance rate the CornuFe as an excellent, beautifully built range with a distinctive vaulted oven and refined design, better constructed than stylish rivals like Bertazzoni or Fisher & Paykel. The honest caveats: burner BTUs (around 17,000) are modest versus American pro ranges like Wolf, BlueStar, or Viking, and it lacks modern conveniences such as self-cleaning, timers, and WiFi. So 'worth it' depends on priorities: if you want a one-of-a-kind heirloom centerpiece and value craftsmanship and looks over maximum power and tech, it delivers; if you want the most cooking performance per dollar, other pro ranges make more sense.",
+   "citations": [
+    {
+     "url": "https://blog.yaleappliance.com/should-you-buy-a-la-cornue-cornufe-range",
+     "title": "yaleappliance.com"
+    },
+    {
+     "url": "https://randigarrettdesign.com/la-cornue-range-review-2/",
+     "title": "randigarrettdesign.com"
+    },
+    {
+     "url": "https://eclectictwist.com/la-cornue-cornufe-110-review-4-years-later/",
+     "title": "eclectictwist.com"
+    },
+    {
+     "url": "https://www.consumeraffairs.com/homeowners/la-cornue-ranges-and-ovens.html",
+     "title": "consumeraffairs.com"
+    }
+   ],
+   "ownedCitations": 0,
+   "mentioned": true,
+   "rank": 1,
+   "recommended": false,
+   "sentiment": "positive",
+   "sentiment_score": 0.5,
+   "brands_mentioned": [
+    "La Cornue",
+    "Bertazzoni",
+    "Fisher & Paykel",
+    "Wolf",
+    "BlueStar",
+    "Viking"
+   ],
+   "accuracy_concern": false,
+   "notes": "Subject brand; strongly positive on craftsmanship/design, worth-it verdict qualified by modest BTU and lack of modern features.",
+   "prominence": 3,
+   "engine": "claude",
+   "engineName": "Claude (web search)",
+   "error": null,
+   "_judge": "claude"
+  }
+ ]
+}
