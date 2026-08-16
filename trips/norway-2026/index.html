@@ -758,7 +758,7 @@ osloPlaces.forEach(p => {
 });
 
 // ===== MAP: BERGEN =====
-const mapBergen = L.map('map-bergen', { zoomControl: true, attributionControl: false, scrollWheelZoom: true }).fitBounds([[60.372, 5.310],[60.400, 5.356]]);
+const mapBergen = L.map('map-bergen', { zoomControl: true, attributionControl: false, scrollWheelZoom: true }).fitBounds([[60.371, 5.307],[60.406, 5.383]]);
 L.tileLayer(tileUrl, tileOpts).addTo(mapBergen);
 
 const bergenPlaces = [
@@ -777,6 +777,9 @@ const bergenPlaces = [
   {ll:[60.3780,5.3400], color:'#2563eb', name:'Ulriken Cable Car', desc:'643m — base station', size:9},
   {ll:[60.3765,5.3540], color:'#059669', name:'Ulriken summit', desc:'Cable-car top (643m) — Vidden hike start', size:7},
   {ll:[60.3979,5.3480], color:'#059669', name:'Fløyen summit', desc:'Funicular top (400m) — Vidden hike end', size:7},
+  {ll:[60.3838,5.3738], color:'#9ca3af', name:'Hauggjelsvarden', desc:'673m — the trail\'s easternmost point', size:6},
+  {ll:[60.4022,5.3450], color:'#9ca3af', name:'Rundemanen', desc:'568m — on the Vidden trail', size:6},
+  {ll:[60.3948,5.3418], color:'#9ca3af', name:'Blåmanen', desc:'551m — on the Vidden trail', size:6},
   {ll:[60.3900,5.3327], color:'#6b7280', name:'Bergen stasjon', desc:'Train station', size:8},
   {ll:[60.2934,5.2181], color:'#6b7280', name:'Bergen Airport (BGO)', desc:'Flesland — to London', size:8},
   {ll:[60.5926,5.3636], color:'#7c3aed', name:'Hillesvåg Ullvarefabrikk', desc:'Wool factory tour (Thu 10am) — Hjelmås, ~40 min N', size:8},
@@ -786,9 +789,9 @@ bergenPlaces.forEach(p => {
   addLabel(mapBergen, p.ll[0], p.ll[1], p.name, {size:11,dx:12,dy:12});
 });
 
-// Vidden trail path — Ulriken summit → Fløyen summit across the plateau
-L.polyline([[60.3765,5.3540],[60.3830,5.3545],[60.3900,5.3520],[60.3950,5.3495],[60.3979,5.3480]], {color:'#059669',weight:4,dashArray:'10,7',opacity:0.9}).addTo(mapBergen);
-addLabel(mapBergen, 60.3895, 5.3560, 'Vidden trail', {size:11,color:'#059669',dx:6,dy:-2});
+// Vidden trail path — Ulriken summit → Fløyen summit across the plateau (eastern arc)
+L.polyline([[60.3765,5.3540],[60.3750,5.3600],[60.3780,5.3670],[60.3838,5.3738],[60.3902,5.3776],[60.3962,5.3735],[60.4006,5.3660],[60.4035,5.3560],[60.4022,5.3450],[60.3948,5.3418],[60.3958,5.3465],[60.3979,5.3480]], {color:'#059669',weight:4,dashArray:'10,7',opacity:0.9}).addTo(mapBergen);
+addLabel(mapBergen, 60.3915, 5.3735, 'Vidden trail', {size:11,color:'#059669',dx:6,dy:-2});
 
 // Fix maps inside collapsed day cards — Leaflet can't render in display:none containers
 // So we invalidateSize + re-center when a card opens
@@ -821,7 +824,7 @@ function checkPw() {
       mapOslo.invalidateSize();
       mapOslo.setView([59.915, 10.73], 13);
       mapBergen.invalidateSize();
-      mapBergen.fitBounds([[60.372, 5.310],[60.400, 5.356]]);
+      mapBergen.fitBounds([[60.371, 5.307],[60.406, 5.383]]);
     }, 100);
   } else {
     document.getElementById('pwError').style.display = 'block';
