@@ -390,9 +390,11 @@
     <div class="day-body">
       <table class="activity-table">
         <tr><th>Time</th><th>Activity</th><th>Notes</th></tr>
-        <tr><td class="time">Morning</td><td class="act">Vigeland Sculpture Park</td><td class="notes">World's largest sculpture park by a single artist. 200+ sculptures. Free, outdoor, ~1 hr. In Frogner Park on the west side.</td></tr>
-        <tr><td class="time">Late AM</td><td class="act">Bygdøy peninsula</td><td class="notes">Short bus or ferry from the center. Kon-Tiki Museum, Fram Polar Ship Museum, or the beaches.</td></tr>
-        <tr><td class="time">Lunch</td><td class="act">Café on Bygdøy or back near Aker Brygge</td><td class="notes">Casual bite.</td></tr>
+        <tr><td class="time">Morning</td><td class="act">Tram 12 → Vigeland Park</td><td class="notes">Walk to the Aker Brygge tram stop by the hotel; tram 12 runs direct to Vigelandsparken (~15 min). It's a Ruter line, so a day ticket covers trams, buses and most ferries all day.</td></tr>
+        <tr><td class="time">Morning</td><td class="act">Vigeland Sculpture Park</td><td class="notes">World's largest sculpture park by a single artist. 200+ sculptures. Free, outdoor, ~1 hr. Frogner Park, west side.</td></tr>
+        <tr><td class="time">Late AM</td><td class="act">Bygdøy ferry — the boat trip</td><td class="notes">Tram 12 back toward the centre to Aker Brygge / Rådhusplassen, then the Bygdøy ferry from Rådhusbrygge 3 (by City Hall) — a scenic ~15-min fjord hop across to the peninsula. Seasonal (summer); may be a separate fare from your Ruter ticket, so check at the pier. Year-round fallback: bus 30 to Bygdøy.</td></tr>
+        <tr><td class="time">Midday</td><td class="act">Bygdøy peninsula</td><td class="notes">Kon-Tiki Museum, Fram Polar Ship Museum, or the beaches. Casual lunch at a café out here.</td></tr>
+        <tr><td class="time">Afternoon</td><td class="act">Ferry back to City Hall → hotel</td><td class="notes">Ferry from Bygdøy (Dronningen or Bygdøynes pier) back to Rådhusbrygge, then a ~10-min waterfront walk to The Thief. (Bus 30 if the ferry's done for the day.)</td></tr>
         <tr><td class="time">5:00 PM</td><td class="act">Sauna + fjord swim at the hotel (requested)</td><td class="notes">Requested 5pm with The Thief — awaiting confirmation. Before the 8pm dinner. Bring swimwear.</td></tr>
         <tr><td class="time">8:00 PM</td><td class="act">Solsiden BOOKED</td><td class="notes">Table for 5, 20:00–23:00, inside. Seafood on the harbor at Søndre Akershus Kai, below Akershus Fortress. Card guarantee: 500 NOK pp no-show fee; free cancellation up to 24 hrs before. Contact: post@solsiden.no / +47 22 33 36 30. Last Oslo night — pack this evening; early train at 8:25am tomorrow.</td></tr>
       </table>
@@ -447,7 +449,6 @@
         <tr><td class="time">1:52 PM</td><td class="act">Train Voss → Bergen BOOKED</td><td class="notes">Vy F4 to Bergen, 13:52–15:00. Plus Refundable, Car 1 Seats 38–42 (4 adult + 1 student). 1 hr buffer at Voss. Ref: 46P-FEF-PCY (NOK 2,055).</td></tr>
         <tr><td class="time">3:00 PM</td><td class="act">Arrive Bergen, check in</td><td class="notes">Opus XVI, Vågsalmenningen 16, near Bryggen. 3 nights.</td></tr>
         <tr><td class="time">Afternoon</td><td class="act">Walk Bryggen (UNESCO)</td><td class="notes">UNESCO Hanseatic wharf. Self-guided. 10-min walk from the hotel.</td></tr>
-        <tr><td class="time">Afternoon</td><td class="act">Buy hiking boots (Xhibition mall)</td><td class="notes">Not traveling with boots — buy a pair before Friday's Ulriken hike. Sport 1 or Stormberg at Xhibition, Torgallmenningen (city centre). Fallback: Thursday.</td></tr>
         <tr><td class="time">Snack</td><td class="act">Våg Bakeri</td><td class="notes">Bakery.</td></tr>
         <tr><td class="time">Dinner</td><td class="act">Hoggorm (walk-in)</td><td class="notes">Pizza. Plan: walk in on arrival night — no reservation needed. First of three Bergen dinners (Bark booked for Fri).</td></tr>
       </table>
@@ -458,6 +459,9 @@
   <div class="map-container">
     <h3>Bergen Highlights (Days 5–7)</h3>
     <div class="map-wrapper" id="map-bergen"></div>
+    <div style="padding:10px 20px 14px;font-size:0.82em;color:#555;">
+      <span><span style="display:inline-block;width:24px;height:3px;background:#059669;vertical-align:middle;margin-right:6px;border-top:2px dashed #059669;"></span>Vidden trail (Ulriken → Fløyen, ~13 km, Fri hike)</span>
+    </div>
   </div>
 
   <!-- Day 6 - BERGEN: WOOL + KAYAK -->
@@ -616,7 +620,6 @@
       <ul>
         <li style="color:#dc2626;"><strong>Cancel KLM by Aug 25</strong> (booking XK4XDR) — refund NOK 19,525; hold as Norwegian backup until then. Hard cutoff: before 10:45am Aug 29.</li>
         <li><strong>Sauna + fjord swim</strong> at The Thief (Mon 5pm, Aug 24) — requested, awaiting confirmation</li>
-        <li><strong>Hiking boots</strong> — in Bergen before Fri's hike (Sport 1 / Stormberg, Xhibition mall)</li>
         <li><strong>Car / transfer to wool factory</strong> (Thu, Hjelmås ~40 min each way)</li>
       </ul>
     </div>
@@ -742,10 +745,11 @@ const osloPlaces = [
   {ll:[59.9060,10.7540], color:'#2563eb', name:'MUNCH Museum', desc:'The Scream + 26k works', size:10},
   {ll:[59.9210,10.7530], color:'#f59e0b', name:'Mathallen', desc:'Food hall — open Sun (gourmet for OEB)', size:9},
   {ll:[59.9220,10.7580], color:'#7c3aed', name:'Grünerløkka', desc:'Neighborhood', size:8},
-  {ll:[59.9040,10.6830], color:'#059669', name:'Bygdøy', desc:'Beaches + museums', size:8},
+  {ll:[59.9040,10.6830], color:'#059669', name:'Bygdøy', desc:'Beaches + museums (ferry from City Hall)', size:8},
   {ll:[59.9425,10.7035], color:'#7c3aed', name:"OEB's house", desc:'Dinner Sun — Haakon den godes vei 6A, Vinderen', size:9},
   {ll:[59.9059,10.7370], color:'#dc2626', name:'Solsiden', desc:'Mon dinner BOOKED 8pm — seafood, Søndre Akershus Kai', size:9},
   {ll:[59.9096,10.7283], color:'#dc2626', name:'Stranden 30', desc:'Sat arrival dinner BOOKED 8pm — Aker Brygge', size:9},
+  {ll:[59.9114,10.7330], color:'#0891b2', name:'Rådhusbrygge (ferry pier)', desc:'Bygdøy ferry — by City Hall', size:8},
   {ll:[60.1939,11.1004], color:'#6b7280', name:'Oslo Airport (OSL)', desc:'Gardermoen — arrival', size:8},
 ];
 osloPlaces.forEach(p => {
@@ -754,7 +758,7 @@ osloPlaces.forEach(p => {
 });
 
 // ===== MAP: BERGEN =====
-const mapBergen = L.map('map-bergen', { zoomControl: true, attributionControl: false, scrollWheelZoom: true }).setView([60.393, 5.33], 14);
+const mapBergen = L.map('map-bergen', { zoomControl: true, attributionControl: false, scrollWheelZoom: true }).fitBounds([[60.372, 5.310],[60.400, 5.356]]);
 L.tileLayer(tileUrl, tileOpts).addTo(mapBergen);
 
 const bergenPlaces = [
@@ -770,7 +774,9 @@ const bergenPlaces = [
   {ll:[60.3890,5.3320], color:'#7c3aed', name:'Pingvinen', desc:'Gastropub', size:8},
   {ll:[60.3912,5.3265], color:'#f59e0b', name:'Lysverket', desc:'1 Michelin star, KODE museum', size:8},
   {ll:[60.3945,5.3310], color:'#f59e0b', name:'Gaptrast', desc:'1 Michelin star', size:8},
-  {ll:[60.3780,5.3400], color:'#2563eb', name:'Ulriken Cable Car', desc:'643m', size:9},
+  {ll:[60.3780,5.3400], color:'#2563eb', name:'Ulriken Cable Car', desc:'643m — base station', size:9},
+  {ll:[60.3765,5.3540], color:'#059669', name:'Ulriken summit', desc:'Cable-car top (643m) — Vidden hike start', size:7},
+  {ll:[60.3979,5.3480], color:'#059669', name:'Fløyen summit', desc:'Funicular top (400m) — Vidden hike end', size:7},
   {ll:[60.3900,5.3327], color:'#6b7280', name:'Bergen stasjon', desc:'Train station', size:8},
   {ll:[60.2934,5.2181], color:'#6b7280', name:'Bergen Airport (BGO)', desc:'Flesland — to London', size:8},
   {ll:[60.5926,5.3636], color:'#7c3aed', name:'Hillesvåg Ullvarefabrikk', desc:'Wool factory tour (Thu 10am) — Hjelmås, ~40 min N', size:8},
@@ -779,6 +785,10 @@ bergenPlaces.forEach(p => {
   L.marker(p.ll, {icon:makeIcon(p.color,p.size)}).bindPopup('<strong>'+p.name+'</strong><br>'+p.desc).addTo(mapBergen);
   addLabel(mapBergen, p.ll[0], p.ll[1], p.name, {size:11,dx:12,dy:12});
 });
+
+// Vidden trail path — Ulriken summit → Fløyen summit across the plateau
+L.polyline([[60.3765,5.3540],[60.3830,5.3545],[60.3900,5.3520],[60.3950,5.3495],[60.3979,5.3480]], {color:'#059669',weight:4,dashArray:'10,7',opacity:0.9}).addTo(mapBergen);
+addLabel(mapBergen, 60.3895, 5.3560, 'Vidden trail', {size:11,color:'#059669',dx:6,dy:-2});
 
 // Fix maps inside collapsed day cards — Leaflet can't render in display:none containers
 // So we invalidateSize + re-center when a card opens
@@ -811,7 +821,7 @@ function checkPw() {
       mapOslo.invalidateSize();
       mapOslo.setView([59.915, 10.73], 13);
       mapBergen.invalidateSize();
-      mapBergen.setView([60.393, 5.33], 14);
+      mapBergen.fitBounds([[60.372, 5.310],[60.400, 5.356]]);
     }, 100);
   } else {
     document.getElementById('pwError').style.display = 'block';
