@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Norway + London Trip: Survey Debrief</title>
+<style>
+  :root{
+    color-scheme: light;
+    --surface-1:#fcfcfb; --page:#f9f9f7;
+    --text-primary:#0b0b0b; --text-secondary:#52514e; --text-muted:#898781;
+    --grid:#e1e0d9; --baseline:#c3c2b7; --border:rgba(11,11,11,0.10);
+    --card:#ffffff;
+    --leg-air:#2a78d6; --leg-goth:#eb6834; --leg-oslo:#1baf7a;
+    --leg-flam:#4a3aa7; --leg-bergen:#e87ba4; --leg-london:#e34948;
+    --seq-blue:#2a78d6; --seq-blue-track:#cde2fb;
+    --div-blue:#2a78d6; --div-red:#e34948; --div-mid:#f0efec;
+    --good:#0ca30c;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:where(:not([data-theme="light"])){
+      color-scheme: dark;
+      --surface-1:#1a1a19; --page:#0d0d0d;
+      --text-primary:#ffffff; --text-secondary:#c3c2b7; --text-muted:#898781;
+      --grid:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,0.10);
+      --card:#232322;
+      --leg-air:#3987e5; --leg-goth:#d95926; --leg-oslo:#199e70;
+      --leg-flam:#9085e9; --leg-bergen:#d55181; --leg-london:#e66767;
+      --seq-blue:#3987e5; --seq-blue-track:#184f95;
+      --div-blue:#3987e5; --div-red:#e66767; --div-mid:#383835;
+      --good:#0ca30c;
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --surface-1:#1a1a19; --page:#0d0d0d;
+    --text-primary:#ffffff; --text-secondary:#c3c2b7; --text-muted:#898781;
+    --grid:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,0.10);
+    --card:#232322;
+    --leg-air:#3987e5; --leg-goth:#d95926; --leg-oslo:#199e70;
+    --leg-flam:#9085e9; --leg-bergen:#d55181; --leg-london:#e66767;
+    --seq-blue:#3987e5; --seq-blue-track:#184f95;
+    --div-blue:#3987e5; --div-red:#e66767; --div-mid:#383835;
+    --good:#0ca30c;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--page);color:var(--text-primary);
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;}
+  .wrap{max-width:980px;margin:0 auto;padding:32px 20px 80px;}
+  h1{font-size:26px;margin:0 0 4px;letter-spacing:-0.01em;}
+  .subtitle{color:var(--text-secondary);font-size:15px;margin:0 0 28px;}
+  h2{font-size:18px;margin:0 0 4px;}
+  .section-sub{color:var(--text-secondary);font-size:13.5px;margin:0 0 16px;}
+  section{margin-bottom:40px;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;
+    padding:20px 22px;}
+  p{line-height:1.55;font-size:14.5px;color:var(--text-primary);}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:36px;}
+  .kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+  .kpi .label{font-size:12px;color:var(--text-secondary);margin-bottom:6px;}
+  .kpi .value{font-size:22px;font-weight:600;}
+  .kpi .note{font-size:12px;color:var(--text-muted);margin-top:4px;}
+
+  /* bar rows */
+  .barlist{display:flex;flex-direction:column;gap:4px;}
+  .barrow{display:grid;grid-template-columns:270px 1fr 46px;align-items:center;gap:10px;min-height:22px;padding:1px 0;}
+  .barrow .rlabel{font-size:11.5px;line-height:1.25;color:var(--text-primary);
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .barrow .rlabel .leg{color:var(--text-muted);font-size:11px;}
+  .track{position:relative;height:16px;background:transparent;}
+  .track .grid-line{position:absolute;top:-4px;bottom:-4px;width:1px;background:var(--grid);}
+  .fillbar{position:absolute;left:0;top:0;height:16px;border-radius:4px;}
+  .barrow .rval{font-size:12px;color:var(--text-secondary);text-align:right;font-variant-numeric:tabular-nums;}
+  .axis-labels{display:grid;grid-template-columns:270px 1fr 46px;gap:10px;margin-top:2px;margin-bottom:8px;}
+  .axis-labels .ticks{position:relative;height:14px;}
+  .axis-labels .tick{position:absolute;top:0;font-size:10.5px;color:var(--text-muted);transform:translateX(-50%);}
+
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:14px;font-size:12px;color:var(--text-secondary);}
+  .legend .sw{display:inline-flex;align-items:center;gap:6px;}
+  .legend .dot{width:9px;height:9px;border-radius:2px;display:inline-block;}
+
+  /* strip / dumbbell chart */
+  .striprow{display:grid;grid-template-columns:270px 1fr;align-items:center;gap:10px;min-height:32px;padding:2px 0;}
+  .striprow .rlabel{font-size:11.5px;line-height:1.25;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .stripfield{position:relative;height:20px;}
+  .stripfield .mid-line{position:absolute;left:50%;top:-6px;bottom:-6px;width:1px;background:var(--baseline);}
+  .stripfield .range-line{position:absolute;top:50%;height:2px;background:var(--text-muted);opacity:.4;transform:translateY(-50%);border-radius:2px;}
+  .stripfield .dot{position:absolute;top:50%;width:9px;height:9px;border-radius:50%;transform:translate(-50%,-50%);border:2px solid var(--surface-1);}
+  .strip-axis{display:grid;grid-template-columns:270px 1fr;gap:10px;margin-top:2px;}
+  .strip-axis .ticks{position:relative;height:14px;}
+  .strip-axis .tick{position:absolute;top:0;font-size:10.5px;color:var(--text-muted);transform:translateX(-50%);}
+
+  blockquote{margin:0 0 10px;padding:8px 0 8px 14px;border-left:3px solid var(--grid);
+    font-size:14px;color:var(--text-primary);font-style:italic;}
+  blockquote cite{display:block;font-style:normal;font-size:11.5px;color:var(--text-muted);margin-top:3px;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  @media (max-width:640px){
+    .two-col{grid-template-columns:1fr;}
+    .barrow, .axis-labels{grid-template-columns:120px 1fr 40px;}
+    .strip-axis, .striprow{grid-template-columns:120px 1fr;}
+  }
+  .footnote{font-size:12px;color:var(--text-muted);margin-top:6px;}
+
+  /* heatmap tables */
+  .heatmap-wrap{overflow-x:auto;}
+  table.heatmap{border-collapse:separate;border-spacing:2px;font-size:12px;width:100%;}
+  table.heatmap th{font-weight:500;color:var(--text-secondary);text-align:center;padding:4px 6px;font-size:11px;}
+  table.heatmap th.rowhead{text-align:left;color:var(--text-primary);font-weight:500;white-space:nowrap;}
+  table.heatmap td{text-align:center;padding:8px 6px;border-radius:6px;font-variant-numeric:tabular-nums;min-width:56px;}
+  table.heatmap td.rowhead{text-align:left;white-space:nowrap;color:var(--text-primary);background:transparent;padding-right:14px;}
+  table.heatmap td.diag{color:var(--text-muted);background:var(--surface-1);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Norway + London, August 2026: the debrief</h1>
+
+  <section>
+    <h2>How each leg landed</h2>
+    <p class="section-sub">Average rating across every stop in that leg, all respondents pooled.</p>
+    <div class="card">
+      <div class="barlist" id="legChart"></div>
+      <div class="axis-labels" id="legAxis"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Every stop, ranked</h2>
+    <p class="section-sub">All 39 rated experiences, highest average to lowest. Color marks the leg of the trip.</p>
+    <div class="legend" id="legLegend"></div>
+    <div class="card">
+      <div class="barlist" id="fullChart"></div>
+      <div class="axis-labels" id="fullAxis"></div>
+    </div>
+    <p class="footnote">Stops marked with an asterisk got only 2–3 responses. Not everyone experienced them, so read those means as anecdotes, not consensus.</p>
+  </section>
+
+  <div class="two-col">
+    <section>
+      <h2>Grading on a curve</h2>
+      <p class="section-sub">Each respondent’s average rating across everything they rated.</p>
+      <div class="card">
+        <div class="barlist" id="respChart"></div>
+        <div class="axis-labels" id="respAxis"></div>
+      </div>
+    </section>
+    <section>
+      <h2 style="visibility:hidden">spacer</h2>
+      <p class="section-sub">&nbsp;</p>
+      <div class="card">
+        <p id="respNote"></p>
+      </div>
+    </section>
+  </div>
+
+  <section>
+    <h2>Disagreement, adjusted for rater bias</h2>
+    <p class="section-sub">Each stop’s ratings, re-centered on each respondent’s own average, so a generally harsher rater doesn’t read as “this was bad.” Dots right of the line scored above that person’s own baseline; dots left of it scored below.</p>
+    <div class="card">
+      <div id="stripChart"></div>
+      <div class="strip-axis" id="stripAxis"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>What predicts a high score</h2>
+    <p class="section-sub">Every stop falls into one of five types: active/outdoor, food, culture, shopping, or hotel/transit. Each cell is that respondent’s average for the type, re-centered on their own overall average. Blue means above their personal baseline, red means below.</p>
+    <div class="card">
+      <div class="heatmap-wrap" id="typeHeatmap"></div>
+    </div>
+    <p class="footnote" id="typeNote"></p>
+  </section>
+
+  <section>
+    <h2>Whose taste tracks whose</h2>
+    <p class="section-sub">Correlation between each pair of respondents’ ratings, using every stop both of them rated. 1.00 would mean identical rankings; 0 would mean no relationship.</p>
+    <div class="card">
+      <div class="heatmap-wrap" id="corrHeatmap"></div>
+    </div>
+    <p class="footnote" id="corrNote"></p>
+  </section>
+
+  <section>
+    <h2>What people actually said</h2>
+    <div class="two-col">
+      <div class="card">
+        <h2 style="font-size:14px;margin-bottom:10px;">Favorite thing about the trip</h2>
+        <div id="favQuotes"></div>
+      </div>
+      <div class="card">
+        <h2 style="font-size:14px;margin-bottom:10px;">One thing to change</h2>
+        <div id="changeQuotes"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Takeaways</h2>
+    <div class="card">
+      <p><strong>Outdoor and active is the only category everyone agrees on.</strong> All five respondents rate it 0.9 to 1.4 points above their own personal average, the sole category where that holds for every rater. Every “favorite thing” answer named an activity, not a meal, museum, or hotel: the Vidden hike, kayaking, biking, the train and boat legs, the sauna-to-fjord jump. The five highest-scoring stops on the whole trip are either physical activities or the meal right after one.</p>
+      <p><strong>Gothenburg was a forced audible, and it still underperformed.</strong> Air France canceled the CDG-to-Oslo flight, an air traffic controllers’ strike was on, and the fix was flying into Sweden, spending the night, and training up to Oslo the next morning. Given that, 6.1 as the leg average isn’t a surprise. Both the hotel and that train are in the bottom five stops of the entire trip. A real contingency plan for the next flight cancellation beats booking whatever’s closest that day.</p>
+      <p><strong>Two stops split the group for real, not because of a tough grader.</strong> The H&amp;M/Cos emergency shopping run and the Bryggen gelato stop show genuine disagreement even after adjusting for who tends to rate everything low or high: two people rated the shopping detour a 9, two rated it a 2 or 3. That’s a taste split worth planning around.</p>
+      <p><strong>One respondent rates about two points lower than everyone else, on everything.</strong> That is a scale difference, not a satisfaction problem. Their free-text answer was positive, naming the post-hike food and drinks at Fløyen as their favorite part of the trip.</p>
+      <p><strong>Food value at nice-but-not-Michelin restaurants in Norway got called out directly.</strong> One respondent’s suggested fix for the next non-foodie-capital country: go more casual.</p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+const DATA = {"items": [{"name": "Delta One lounge, JFK", "leg": "Air travel & lounges", "n": 4, "mean": 7.25, "std": 3.59, "adj_mean": -0.16, "adj_std": 2.2, "raw": [8.0, 10.0, null, 9.0, 2.0], "adj_raw": [0.47, 1.27, null, 1.03, -3.42]}, {"name": "Air France lounge, CDG", "leg": "Air travel & lounges", "n": 4, "mean": 4.75, "std": 1.26, "adj_mean": -2.66, "adj_std": 0.93, "raw": [6.0, 5.0, null, 5.0, 3.0], "adj_raw": [-1.53, -3.73, null, -2.97, -2.42]}, {"name": "Hyatt Place Hotel, Gothenburg (incl. breakfast)", "leg": "Gothenburg", "n": 5, "mean": 5.8, "std": 0.84, "adj_mean": -1.65, "adj_std": 0.91, "raw": [6.0, 7.0, 6.0, 5.0, 5.0], "adj_raw": [-1.53, -1.73, -1.6, -2.97, -0.42]}, {"name": "Vy train, Gothenburg to Oslo", "leg": "Gothenburg", "n": 5, "mean": 6.4, "std": 1.95, "adj_mean": -1.05, "adj_std": 1.0, "raw": [7.0, 7.0, 7.0, 8.0, 3.0], "adj_raw": [-0.53, -1.73, -0.6, 0.03, -2.42]}, {"name": "About Contrasts (arrival lunch, Oslo)", "leg": "Oslo", "n": 5, "mean": 5.8, "std": 1.64, "adj_mean": -1.65, "adj_std": 0.93, "raw": [7.0, 6.0, 6.0, 7.0, 3.0], "adj_raw": [-0.53, -2.73, -1.6, -0.97, -2.42]}, {"name": "Biking around Oslo", "leg": "Oslo", "n": 3, "mean": 7.33, "std": 1.15, "adj_mean": 0.49, "adj_std": 0.09, "raw": [8.0, null, 8.0, null, 6.0], "adj_raw": [0.47, null, 0.4, null, 0.58]}, {"name": "MUNCH Museum", "leg": "Oslo", "n": 5, "mean": 7.2, "std": 1.3, "adj_mean": -0.25, "adj_std": 0.86, "raw": [7.0, 9.0, 6.0, 8.0, 6.0], "adj_raw": [-0.53, 0.27, -1.6, 0.03, 0.58]}, {"name": "Stranden 30 (outdoor dinner)", "leg": "Oslo", "n": 4, "mean": 6.25, "std": 2.22, "adj_mean": -1.16, "adj_std": 1.24, "raw": [8.0, 7.0, null, 7.0, 3.0], "adj_raw": [0.47, -1.73, null, -0.97, -2.42]}, {"name": "Emergency clothes shopping at H&M and Cos", "leg": "Oslo", "n": 5, "mean": 5.6, "std": 3.29, "adj_mean": -1.85, "adj_std": 2.41, "raw": [5.0, 9.0, 3.0, 9.0, 2.0], "adj_raw": [-2.53, 0.27, -4.6, 1.03, -3.42]}, {"name": "Bygdøy ferry and museums", "leg": "Oslo", "n": 5, "mean": 7.6, "std": 1.52, "adj_mean": 0.15, "adj_std": 0.9, "raw": [7.0, 10.0, 8.0, 7.0, 6.0], "adj_raw": [-0.53, 1.27, 0.4, -0.97, 0.58]}, {"name": "Bygdøy Vertshus (outdoor lunch)", "leg": "Oslo", "n": 5, "mean": 8.0, "std": 2.0, "adj_mean": 0.55, "adj_std": 0.98, "raw": [9.0, 10.0, 7.0, 9.0, 5.0], "adj_raw": [1.47, 1.27, -0.6, 1.03, -0.42]}, {"name": "Sauna and spa at The Thief", "leg": "Oslo", "n": 4, "mean": 8.5, "std": 1.73, "adj_mean": 1.18, "adj_std": 0.96, "raw": [9.0, 9.0, 10.0, null, 6.0], "adj_raw": [1.47, 0.27, 2.4, null, 0.58]}, {"name": "Solsiden (seafood dinner)", "leg": "Oslo", "n": 5, "mean": 7.2, "std": 2.28, "adj_mean": -0.25, "adj_std": 1.21, "raw": [6.0, 10.0, 8.0, 8.0, 4.0], "adj_raw": [-1.53, 1.27, 0.4, 0.03, -1.42]}, {"name": "The Thief (incl. restaurant)", "leg": "Oslo", "n": 5, "mean": 7.6, "std": 1.14, "adj_mean": 0.15, "adj_std": 0.43, "raw": [7.0, 9.0, 8.0, 8.0, 6.0], "adj_raw": [-0.53, 0.27, 0.4, 0.03, 0.58]}, {"name": "Oslo to Myrdal to Flåm railway", "leg": "Flåm/Aurland", "n": 5, "mean": 8.4, "std": 1.14, "adj_mean": 0.95, "adj_std": 0.51, "raw": [8.0, 10.0, 8.0, 9.0, 7.0], "adj_raw": [0.47, 1.27, 0.4, 1.03, 1.58]}, {"name": "29|2 Aurland (incl. restaurant and environs)", "leg": "Flåm/Aurland", "n": 5, "mean": 8.2, "std": 1.48, "adj_mean": 0.75, "adj_std": 1.04, "raw": [8.0, 8.0, 9.0, 10.0, 6.0], "adj_raw": [0.47, -0.73, 1.4, 2.03, 0.58]}, {"name": "Fjord cruise and other transit from Aurland to Bergen", "leg": "Flåm/Aurland", "n": 5, "mean": 8.0, "std": 1.87, "adj_mean": 0.55, "adj_std": 0.81, "raw": [9.0, 10.0, 8.0, 8.0, 5.0], "adj_raw": [1.47, 1.27, 0.4, 0.03, -0.42]}, {"name": "Hoggorm pizza", "leg": "Bergen", "n": 5, "mean": 7.0, "std": 1.22, "adj_mean": -0.45, "adj_std": 0.29, "raw": [7.0, 8.0, 7.0, 8.0, 5.0], "adj_raw": [-0.53, -0.73, -0.6, 0.03, -0.42]}, {"name": "Vafleriet (gelato in Bryggen)", "leg": "Bergen", "n": 5, "mean": 5.6, "std": 2.7, "adj_mean": -1.85, "adj_std": 1.95, "raw": [6.0, 10.0, 5.0, 4.0, 3.0], "adj_raw": [-1.53, 1.27, -2.6, -3.97, -2.42]}, {"name": "Sports bars in Bergen", "leg": "Bergen", "n": 3, "mean": 5.0, "std": 1.0, "adj_mean": -1.85, "adj_std": 1.57, "raw": [4.0, null, 6.0, null, 5.0], "adj_raw": [-3.53, null, -1.6, null, -0.42]}, {"name": "Hillesvåg wool factory tour", "leg": "Bergen", "n": 5, "mean": 7.2, "std": 2.39, "adj_mean": -0.25, "adj_std": 1.34, "raw": [7.0, 10.0, 6.0, 9.0, 4.0], "adj_raw": [-0.53, 1.27, -1.6, 1.03, -1.42]}, {"name": "Pinocchio (improvised lunch)", "leg": "Bergen", "n": 4, "mean": 8.25, "std": 1.26, "adj_mean": 0.84, "adj_std": 0.71, "raw": [8.0, 10.0, null, 8.0, 7.0], "adj_raw": [0.47, 1.27, null, 0.03, 1.58]}, {"name": "Fjord Expedition kayaking", "leg": "Bergen", "n": 4, "mean": 9.0, "std": 2.0, "adj_mean": 1.87, "adj_std": 0.88, "raw": [10.0, null, 10.0, 10.0, 6.0], "adj_raw": [2.47, null, 2.4, 2.03, 0.58]}, {"name": "Fjellskål (seafood dinner)", "leg": "Bergen", "n": 4, "mean": 6.75, "std": 1.5, "adj_mean": -0.66, "adj_std": 1.01, "raw": [8.0, 8.0, null, 6.0, 5.0], "adj_raw": [0.47, -0.73, null, -1.97, -0.42]}, {"name": "Vidden trail hike", "leg": "Bergen", "n": 4, "mean": 9.0, "std": 0.82, "adj_mean": 1.87, "adj_std": 0.74, "raw": [9.0, null, 10.0, 9.0, 8.0], "adj_raw": [1.47, null, 2.4, 1.03, 2.58]}, {"name": "Fløyen funicular upper station (and goats and restaurant)", "leg": "Bergen", "n": 5, "mean": 9.2, "std": 1.1, "adj_mean": 1.75, "adj_std": 0.91, "raw": [10.0, 10.0, 8.0, 10.0, 8.0], "adj_raw": [2.47, 1.27, 0.4, 2.03, 2.58]}, {"name": "Bark (burger dinner)", "leg": "Bergen", "n": 4, "mean": 7.25, "std": 1.5, "adj_mean": -0.16, "adj_std": 0.52, "raw": [8.0, 8.0, null, 8.0, 5.0], "adj_raw": [0.47, -0.73, null, 0.03, -0.42]}, {"name": "Opus XVI hotel (incl. restaurant and bar)", "leg": "Bergen", "n": 5, "mean": 7.2, "std": 0.84, "adj_mean": -0.25, "adj_std": 0.7, "raw": [7.0, 8.0, 8.0, 7.0, 6.0], "adj_raw": [-0.53, -0.73, 0.4, -0.97, 0.58]}, {"name": "Simpson's in the Strand (arrival brunch in London)", "leg": "London", "n": 5, "mean": 8.2, "std": 0.84, "adj_mean": 0.75, "adj_std": 1.16, "raw": [7.0, 9.0, 8.0, 9.0, 8.0], "adj_raw": [-0.53, 0.27, 0.4, 1.03, 2.58]}, {"name": "Tottenham Hotspur Stadium experience (incl. shop and club)", "leg": "London", "n": 3, "mean": 8.33, "std": 1.15, "adj_mean": 1.49, "adj_std": 0.09, "raw": [9.0, null, 9.0, null, 7.0], "adj_raw": [1.47, null, 1.4, null, 1.58]}, {"name": "Ambassadors Clubhouse (Indian dinner)", "leg": "London", "n": 2, "mean": 10.0, "std": 0.0, "adj_mean": 1.65, "adj_std": 0.54, "raw": [null, 10.0, null, 10.0, null], "adj_raw": [null, 1.27, null, 2.03, null]}, {"name": "Abigail's Party", "leg": "London", "n": 2, "mean": 7.5, "std": 2.12, "adj_mean": -0.85, "adj_std": 2.66, "raw": [null, 6.0, null, 9.0, null], "adj_raw": [null, -2.73, null, 1.03, null]}, {"name": "Late night activities in London", "leg": "London", "n": 2, "mean": 8.0, "std": 1.41, "adj_mean": 1.49, "adj_std": 0.13, "raw": [null, null, 9.0, null, 7.0], "adj_raw": [null, null, 1.4, null, 1.58]}, {"name": "Tate Modern museum", "leg": "London", "n": 3, "mean": 7.0, "std": 1.0, "adj_mean": -1.08, "adj_std": 1.46, "raw": [7.0, 6.0, null, 8.0, null], "adj_raw": [-0.53, -2.73, null, 0.03, null]}, {"name": "Shopping in Soho", "leg": "London", "n": 5, "mean": 8.0, "std": 1.0, "adj_mean": 0.55, "adj_std": 0.91, "raw": [7.0, 9.0, 9.0, 8.0, 7.0], "adj_raw": [-0.53, 0.27, 1.4, 0.03, 1.58]}, {"name": "Fortnum & Mason", "leg": "London", "n": 5, "mean": 7.4, "std": 1.52, "adj_mean": -0.05, "adj_std": 0.94, "raw": [7.0, 10.0, 7.0, 7.0, 6.0], "adj_raw": [-0.53, 1.27, -0.6, -0.97, 0.58]}, {"name": "Brat (dinner in Shoreditch)", "leg": "London", "n": 5, "mean": 9.6, "std": 0.55, "adj_mean": 2.15, "adj_std": 0.94, "raw": [10.0, 10.0, 9.0, 10.0, 9.0], "adj_raw": [2.47, 1.27, 1.4, 2.03, 3.58]}, {"name": "Rosewood Hotel (incl. restaurants)", "leg": "London", "n": 5, "mean": 7.4, "std": 2.19, "adj_mean": -0.05, "adj_std": 1.02, "raw": [8.0, 10.0, 7.0, 8.0, 4.0], "adj_raw": [0.47, 1.27, -0.6, 0.03, -1.42]}, {"name": "Centurion Lounge, Heathrow Terminal 3", "leg": "Air travel & lounges", "n": 5, "mean": 7.6, "std": 1.52, "adj_mean": 0.15, "adj_std": 1.44, "raw": [7.0, 10.0, 8.0, 6.0, 7.0], "adj_raw": [-0.53, 1.27, 0.4, -1.97, 1.58]}], "legs": [{"leg": "Air travel & lounges", "mean": 6.62, "n": 13}, {"leg": "Gothenburg", "mean": 6.1, "n": 10}, {"leg": "Oslo", "mean": 7.09, "n": 46}, {"leg": "Flåm/Aurland", "mean": 8.2, "n": 15}, {"leg": "Bergen", "mean": 7.44, "n": 48}, {"leg": "London", "mean": 8.11, "n": 37}], "respondents": [{"label": "Respondent 1", "mean": 7.53}, {"label": "Respondent 2", "mean": 8.73}, {"label": "Respondent 3", "mean": 7.6}, {"label": "Respondent 4", "mean": 7.97}, {"label": "Respondent 5", "mean": 5.42}], "favorites": [{"n": 1, "text": "Spending time with the fam and doing the outdoor activities"}, {"n": 2, "text": "Sightseeing on boats and trains"}, {"n": 3, "text": "Initially I was concerned that we wouldn’t see the best views Norway has to offer since we planned on staying in cities. However, our stop in Flåm, our various train rides, and our adventure day on Vidden scratched that itch, and I would actually like to revoke my prior complaint. I was able to enjoy Norways beauty, and we did a good job planning this trip through an adventurous lens. Good job parents !!\n\nBut to pick favorites, it has to be Vidden hike, with jumping in the fjord from the sauna as a close second.\n\nAlso, our seats at Spurs were great (although the players weren't), and I had lots of fun going out in London those two nights."}, {"n": 4, "text": "The outdoors activities"}, {"n": 5, "text": "Restorative post-hike food and drinks at Fløyen upper station"}], "changes": [{"n": 1, "text": "Food at the high end (below Michelin) is such a bad value in Norway that we should probably aim for more casual places the next time we visit a non-foodie country"}, {"n": 2, "text": "Travel logistics"}, {"n": 3, "text": "I wish we went to more lounges."}, {"n": 5, "text": "More time in Oslo relative to Bergen (we probably planned correctly)"}], "type_categories": ["Active/outdoor", "Food & dining", "Culture/sightseeing", "Shopping", "Hotel/lounge/transit"], "type_adj": {"Respondent 1": {"Active/outdoor": 1.31, "Food & dining": 0.11, "Culture/sightseeing": -0.03, "Shopping": -1.19, "Hotel/lounge/transit": -0.16}, "Respondent 2": {"Active/outdoor": 0.94, "Food & dining": 0.11, "Culture/sightseeing": -0.98, "Shopping": 0.61, "Hotel/lounge/transit": -0.18}, "Respondent 3": {"Active/outdoor": 1.4, "Food & dining": -0.46, "Culture/sightseeing": -0.6, "Shopping": -1.27, "Hotel/lounge/transit": 0.07}, "Respondent 4": {"Active/outdoor": 1.03, "Food & dining": -0.14, "Culture/sightseeing": 0.53, "Shopping": 0.03, "Hotel/lounge/transit": -0.43}, "Respondent 5": {"Active/outdoor": 1.25, "Food & dining": -0.23, "Culture/sightseeing": 0.25, "Shopping": -0.42, "Hotel/lounge/transit": -0.51}}, "type_n": {"Respondent 1": {"Active/outdoor": 6, "Food & dining": 11, "Culture/sightseeing": 4, "Shopping": 3, "Hotel/lounge/transit": 11}, "Respondent 2": {"Active/outdoor": 3, "Food & dining": 12, "Culture/sightseeing": 4, "Shopping": 3, "Hotel/lounge/transit": 11}, "Respondent 3": {"Active/outdoor": 6, "Food & dining": 7, "Culture/sightseeing": 3, "Shopping": 3, "Hotel/lounge/transit": 9}, "Respondent 4": {"Active/outdoor": 4, "Food & dining": 12, "Culture/sightseeing": 4, "Shopping": 3, "Hotel/lounge/transit": 11}, "Respondent 5": {"Active/outdoor": 6, "Food & dining": 11, "Culture/sightseeing": 3, "Shopping": 3, "Hotel/lounge/transit": 11}}, "resp_corr": {"Respondent 1": {"Respondent 1": 1.0, "Respondent 2": 0.32, "Respondent 3": 0.7, "Respondent 4": 0.59, "Respondent 5": 0.49}, "Respondent 2": {"Respondent 1": 0.32, "Respondent 2": 1.0, "Respondent 3": 0.16, "Respondent 4": 0.31, "Respondent 5": 0.38}, "Respondent 3": {"Respondent 1": 0.7, "Respondent 2": 0.16, "Respondent 3": 1.0, "Respondent 4": 0.42, "Respondent 5": 0.73}, "Respondent 4": {"Respondent 1": 0.59, "Respondent 2": 0.31, "Respondent 3": 0.42, "Respondent 4": 1.0, "Respondent 5": 0.37}, "Respondent 5": {"Respondent 1": 0.49, "Respondent 2": 0.38, "Respondent 3": 0.73, "Respondent 4": 0.37, "Respondent 5": 1.0}}, "resp_labels": ["Respondent 1", "Respondent 2", "Respondent 3", "Respondent 4", "Respondent 5"]};
+
+const LEG_COLOR = {
+  'Air travel & lounges': 'var(--leg-air)',
+  'Gothenburg': 'var(--leg-goth)',
+  'Oslo': 'var(--leg-oslo)',
+  'Flåm/Aurland': 'var(--leg-flam)',
+  'Bergen': 'var(--leg-bergen)',
+  'London': 'var(--leg-london)',
+};
+const LEG_ORDER = ['Air travel & lounges','Gothenburg','Oslo','Flåm/Aurland','Bergen','London'];
+
+function el(tag, cls, html){ const e=document.createElement(tag); if(cls) e.className=cls; if(html!==undefined) e.innerHTML=html; return e; }
+
+// ---------- generic 0-10 bar chart ----------
+function buildBarChart(containerId, axisId, rows, opts){
+  const container = document.getElementById(containerId);
+  const axis = document.getElementById(axisId);
+  const max = opts.max || 10;
+  rows.forEach(r=>{
+    const row = el('div','barrow');
+    const label = el('div','rlabel');
+    label.title = r.label;
+    label.innerHTML = r.label + (r.sub ? ' <span class="leg">'+r.sub+'</span>' : '');
+    const track = el('div','track');
+    [0,2,4,6,8,10].forEach(g=>{
+      if(g===0) return;
+      const gl = el('div','grid-line'); gl.style.left=(g/max*100)+'%'; track.appendChild(gl);
+    });
+    const bar = el('div','fillbar');
+    bar.style.width = Math.max(1,(r.value/max*100))+'%';
+    bar.style.background = r.color;
+    track.appendChild(bar);
+    row.appendChild(label);
+    row.appendChild(track);
+    row.appendChild(el('div','rval', r.value.toFixed(1) + (r.flag? ' *':'')));
+    container.appendChild(row);
+  });
+  axis.appendChild(el('div',''));
+  const tickWrap = el('div','ticks');
+  [0,2,4,6,8,10].forEach(g=>{
+    const t = el('div','tick', g); t.style.left=(g/max*100)+'%'; tickWrap.appendChild(t);
+  });
+  axis.appendChild(tickWrap);
+  axis.appendChild(el('div',''));
+}
+
+function buildLegChart(){
+  const rows = DATA.legs.slice().sort((a,b)=>b.mean-a.mean).map(l=>({
+    label: l.leg, value: l.mean, color: LEG_COLOR[l.leg]
+  }));
+  buildBarChart('legChart','legAxis', rows, {max:10});
+}
+
+function buildLegend(){
+  const wrap = document.getElementById('legLegend');
+  LEG_ORDER.forEach(leg=>{
+    const s = el('span','sw');
+    const d = el('span','dot'); d.style.background = LEG_COLOR[leg];
+    s.appendChild(d);
+    s.appendChild(document.createTextNode(leg));
+    wrap.appendChild(s);
+  });
+}
+
+function buildFullChart(){
+  const rows = DATA.items.slice().sort((a,b)=>b.mean-a.mean).map(it=>({
+    label: it.name, value: it.mean, color: LEG_COLOR[it.leg], flag: it.n<4
+  }));
+  buildBarChart('fullChart','fullAxis', rows, {max:10});
+}
+
+function buildRespChart(){
+  const rows = DATA.respondents.map(r=>({label:r.label, value:r.mean, color:'var(--seq-blue)'}));
+  buildBarChart('respChart','respAxis', rows, {max:10});
+  const lo = Math.min(...DATA.respondents.map(r=>r.mean));
+  const hi = Math.max(...DATA.respondents.map(r=>r.mean));
+  document.getElementById('respNote').innerHTML =
+    'Averages range from <strong>'+lo.toFixed(1)+'</strong> to <strong>'+hi.toFixed(1)+'</strong> across the five respondents. '+
+    'That’s a personal rating scale, not a satisfaction gap: the lowest-average respondent’s free-text answer was still positive. '+
+    'The next two charts adjust for it by re-centering every score on each person’s own average.';
+}
+
+// ---------- strip / dumbbell chart for polarization ----------
+function buildStripChart(){
+  const container = document.getElementById('stripChart');
+  const axis = document.getElementById('stripAxis');
+  const RANGE = 3.5; // -3.5 .. +3.5
+
+  const ranked = DATA.items.filter(it=>it.n>=4).slice().sort((a,b)=>b.adj_std-a.adj_std).slice(0,8);
+  ranked.forEach(it=>{
+    const row = el('div','striprow');
+    const label = el('div','rlabel'); label.title = it.name; label.textContent = it.name;
+    const field = el('div','stripfield');
+    field.appendChild(el('div','mid-line'));
+    const vals = it.adj_raw.filter(v=>v!==null);
+    const toPct = v => Math.max(0,Math.min(100, (v+RANGE)/(2*RANGE)*100));
+    const lo = Math.min(...vals), hi = Math.max(...vals);
+    const rangeLine = el('div','range-line');
+    rangeLine.style.left = toPct(lo)+'%';
+    rangeLine.style.width = (toPct(hi)-toPct(lo))+'%';
+    field.appendChild(rangeLine);
+    vals.forEach(v=>{
+      const dot = el('div','dot');
+      dot.style.left = toPct(v)+'%';
+      dot.style.background = v>=0 ? 'var(--div-blue)' : 'var(--div-red)';
+      dot.title = (v>=0?'+':'')+v.toFixed(1)+' vs. own average';
+      field.appendChild(dot);
+    });
+    row.appendChild(label);
+    row.appendChild(field);
+    container.appendChild(row);
+  });
+
+  axis.appendChild(el('div',''));
+  const tickWrap = el('div','ticks');
+  [-3,-1.5,0,1.5,3].forEach(g=>{
+    const t = el('div','tick', (g>0?'+':'')+g); t.style.left=((g+RANGE)/(2*RANGE)*100)+'%'; tickWrap.appendChild(t);
+  });
+  axis.appendChild(tickWrap);
+}
+
+// ---------- diverging heatmap helper ----------
+function tint(colorVar, pct){ return 'color-mix(in srgb, '+colorVar+' '+pct.toFixed(0)+'%, var(--card))'; }
+
+function buildTypeHeatmap(){
+  const cats = DATA.type_categories;
+  const resps = DATA.resp_labels;
+  const MAXABS = 1.5;
+  const table = el('table','heatmap');
+  const thead = el('thead');
+  const hr = el('tr');
+  hr.appendChild(el('th',''));
+  cats.forEach(c=>hr.appendChild(el('th','', c)));
+  thead.appendChild(hr);
+  table.appendChild(thead);
+  const tbody = el('tbody');
+  const unanimous = {};
+  cats.forEach(c=>{
+    const vals = resps.map(r=>DATA.type_adj[r][c]).filter(v=>v!==null && v!==undefined);
+    const allPos = vals.every(v=>v>0), allNeg = vals.every(v=>v<0);
+    unanimous[c] = allPos ? 'positive' : (allNeg ? 'negative' : null);
+  });
+  resps.forEach(r=>{
+    const row = el('tr');
+    row.appendChild(el('td','rowhead', r));
+    cats.forEach(c=>{
+      const v = DATA.type_adj[r][c];
+      const td = el('td');
+      if(v===null || v===undefined){ td.className='diag'; td.textContent='—'; }
+      else{
+        const pct = Math.min(1, Math.abs(v)/MAXABS)*55;
+        td.style.background = tint(v>=0 ? 'var(--div-blue)' : 'var(--div-red)', pct);
+        td.textContent = (v>0?'+':'')+v.toFixed(1);
+      }
+      row.appendChild(td);
+    });
+    tbody.appendChild(row);
+  });
+  table.appendChild(tbody);
+  document.getElementById('typeHeatmap').appendChild(table);
+
+  const positives = cats.filter(c=>unanimous[c]==='positive');
+  const negatives = cats.filter(c=>unanimous[c]==='negative');
+  let note = '';
+  if(positives.length) note += positives.join(', ') + (positives.length>1 ? ' score above personal baseline for all five respondents. ' : ' scores above personal baseline for all five respondents. ');
+  if(negatives.length) note += negatives.join(', ') + (negatives.length>1 ? ' score below personal baseline for all five. ' : ' scores below personal baseline for all five. ');
+  if(!note) note = 'No category gets the same sign from all five respondents.';
+  document.getElementById('typeNote').textContent = note.trim();
+}
+
+function buildCorrHeatmap(){
+  const resps = DATA.resp_labels;
+  const MAXABS = 1.0;
+  const table = el('table','heatmap');
+  const thead = el('thead');
+  const hr = el('tr');
+  hr.appendChild(el('th',''));
+  resps.forEach(r=>hr.appendChild(el('th','', r.replace('Respondent ','R'))));
+  thead.appendChild(hr);
+  table.appendChild(thead);
+  const tbody = el('tbody');
+  resps.forEach(a=>{
+    const row = el('tr');
+    row.appendChild(el('td','rowhead', a));
+    resps.forEach(b=>{
+      const v = DATA.resp_corr[a][b];
+      const td = el('td');
+      if(a===b){ td.className='diag'; td.textContent = v.toFixed(2); }
+      else{
+        const pct = Math.min(1, Math.abs(v)/MAXABS)*55;
+        td.style.background = tint(v>=0 ? 'var(--div-blue)' : 'var(--div-red)', pct);
+        td.textContent = v.toFixed(2);
+      }
+      row.appendChild(td);
+    });
+    tbody.appendChild(row);
+  });
+  table.appendChild(tbody);
+  document.getElementById('corrHeatmap').appendChild(table);
+
+  // find strongest and weakest off-diagonal pairs, and each respondent's avg corr with others
+  let best = null, worst = null;
+  const avgWithOthers = {};
+  resps.forEach(a=>{
+    let sum=0, n=0;
+    resps.forEach(b=>{
+      if(a===b) return;
+      const v = DATA.resp_corr[a][b];
+      sum += v; n++;
+      if(a < b){
+        if(!best || v>best.v) best = {a,b,v};
+        if(!worst || v<worst.v) worst = {a,b,v};
+      }
+    });
+    avgWithOthers[a] = sum/n;
+  });
+  const outlier = resps.slice().sort((x,y)=>avgWithOthers[x]-avgWithOthers[y])[0];
+  const noteEl = document.getElementById('corrNote');
+  noteEl.textContent = best.a+' and '+best.b+' track each other most closely ('+best.v.toFixed(2)+'). '+
+    outlier+' correlates weakest with the rest of the group (average '+avgWithOthers[outlier].toFixed(2)+'), regardless of how generous their own scores run.';
+}
+
+function buildQuotes(){
+  const favWrap = document.getElementById('favQuotes');
+  const chWrap = document.getElementById('changeQuotes');
+  DATA.favorites.forEach(f=>{
+    const short = f.text.length > 320 ? f.text.slice(0,317)+'…' : f.text;
+    favWrap.appendChild(el('blockquote','', '“'+short.replace(/\n+/g,' ')+'”<cite>Respondent '+f.n+'</cite>'));
+  });
+  DATA.changes.forEach(c=>{
+    chWrap.appendChild(el('blockquote','', '“'+c.text+'”<cite>Respondent '+c.n+'</cite>'));
+  });
+}
+
+buildLegChart();
+buildLegend();
+buildFullChart();
+buildRespChart();
+buildStripChart();
+buildTypeHeatmap();
+buildCorrHeatmap();
+buildQuotes();
+</script>
+</body>
+</html>
