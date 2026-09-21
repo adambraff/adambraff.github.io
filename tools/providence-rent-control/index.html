@@ -292,13 +292,17 @@ details.tblview th:first-child, details.tblview td:first-child { text-align: lef
   <h1>The Seen and the Unseen:<br>Rent Control in Providence</h1>
 </header>
 
+<div class="wrap" style="max-width:720px;">
+  <p style="font-style:italic; font-size:16.5px; line-height:1.6; color:var(--ink-2); border-bottom:1px solid var(--baseline); padding:26px 0 22px; margin:0 0 6px;">Editor’s note, September 21, 2026: David Morales won the Democratic primary on September 9, beating Mayor Brett Smiley by just over 1,700 votes, 53 to 46 percent, with 23 percent of registered voters participating. In a city where 55 percent of voters are registered Democrats, he will likely be the next mayor, implementing his vision of rent control after he takes office on January 4, 2027. The author was interviewed on this topic for <a href="https://www.wsj.com/politics/elections/the-democratic-socialist-primary-fight-hits-americas-smallest-state-faf31341">the Wall Street Journal’s coverage of the race</a>; it did not seem to sway the electorate.</p>
+</div>
+
 <!-- ================= CHAPTER 0: THE SETUP ================= -->
 <section class="chapter">
   <div class="wrap">
     <h2>Elections have consequences</h2>
-    <p class="lede">In April 2026, the Providence City Council passed a rent stabilization ordinance by a vote of 9 to 6. Mayor Brett Smiley vetoed it three days later. The override fell short in May. That would normally be the end of the story, except that David Morales, the state representative who championed the ordinance louder than anyone, is now running for mayor on a promise to bring it back and sign it. Polls have found 72 to 74 percent of residents support capping rent increases, so this is not a fringe position. It may simply be the policy of the next administration.</p>
-    <p>This essay takes the ordinance seriously and asks the question its supporters and opponents mostly talk past: <em>what do people actually do once the cap is in place?</em> Not what should happen, or what the press release says will happen, but what each person in the housing market, tenant, landlord, would-be landlord, would-be tenant, lender, developer, does when their incentives shift. Economists call these the margins of adjustment.</p>
-    <p>Everything below is built on the real terms of the 2026 ordinance and actual market facts: 59 percent of Providence households rent, rents are up about 40 percent since 2020 against 15 percent income growth, and a two-bedroom now runs $2,200 to $2,600 depending on whose survey you read. The people are invented, but their situations are drawn from the actual structure of the city's housing stock: old triple-deckers, small landlords, not nearly enough new construction.</p>
+    <p class="lede">In April 2026, the Providence City Council passed a rent stabilization ordinance by a vote of 9 to 6. Mayor Brett Smiley vetoed it three days later. The override fell short in May. That would normally be the end of the story, except that David Morales, the state representative who championed the ordinance louder than anyone, is now running for mayor on a promise to bring it back and sign it. Polls have found 72 to 74 percent of residents support capping rent increases.</p>
+    <p>This essay asks the question supporters and opponents mostly talk past: <em>what do people actually do once the cap is in place?</em> Economists call the answers the margins of adjustment.</p>
+    <p>Everything below is built on the real terms of the 2026 ordinance and actual market facts: 59 percent of Providence households rent, rents are up about 40 percent since 2020 against 15 percent income growth, and a two-bedroom now runs $2,200 to $2,600 depending on whose survey you read. The people are invented, but their situations are drawn from the actual structure of the city’s housing stock: old triple-deckers, small landlords, not nearly enough new construction.</p>
 
     <h3>The actual terms</h3>
     <p>Most rent control arguments are about rent control in the abstract. The Providence ordinance is a specific machine with specific parts, and the parts matter. Here is what the version passed in April does. Terms marked with an asterisk come from the introduced text and Council summaries; the final amended ordinance contains further machinery (a fair-return standard, rehabilitation provisions) that press coverage did not detail and this essay does not model.</p>
@@ -308,7 +312,7 @@ details.tblview th:first-child, details.tblview td:first-child { text-align: lef
       <div class="ordcard"><div class="t">A 4 percent annual cap, flat</div><div class="d">Rent increases capped at 4 percent a year. Not linked to inflation: if CPI runs 6 percent, the cap is still 4.</div></div>
       <div class="ordcard"><div class="t">Vacancy control: one 4% bump at turnover*</div><div class="d">When a tenant leaves, the landlord may raise rent 4 percent once for the next tenant. The rent history follows the unit, not the tenant. California and Oregon let rents reset between tenancies; Providence would not. St. Paul tried this and repealed it within 14 months.</div></div>
       <div class="ordcard"><div class="t">Base rent: a 180-day lookback*</div><div class="d">The controlled base is the rent charged 180 days <em>before</em> the ordinance takes effect, to prevent last-minute spikes. It also converts every act of past generosity into a permanent ceiling. More on Walt later.</div></div>
-      <div class="ordcard"><div class="t">Exempt: owner-occupied buildings of 1&ndash;4 units</div><div class="d">Exempt if the owner lives on site, plus one additional building of the owner's choosing. The March amendments widened this from three units to four; in a city of triple-deckers it is the largest single carve-out, and a covered building becomes an exempt one the day an owner moves in.</div></div>
+      <div class="ordcard"><div class="t">Exempt: owner-occupied buildings of 1&ndash;4 units</div><div class="d">Exempt if the owner lives on site, plus one additional building of the owner’s choosing. The March amendments widened this from three units to four; in a city of triple-deckers it is the largest single carve-out, and a covered building becomes an exempt one the day an owner moves in.</div></div>
       <div class="ordcard"><div class="t">Exempt: new construction, 10 or 20 years</div><div class="d">Buildings constructed after the ordinance is law are exempt for 10 years, or 20 if built with prevailing wages and apprenticeship programs. Recently built existing buildings carry a 5-year exemption. Dorms, regulated affordable housing, and future college student housing districts are excluded entirely.</div></div>
       <div class="ordcard"><div class="t">Enforcement: a Rent Board and $250/day fines*</div><div class="d">A five-member Rent Board hears petitions and complaints. Landlords can petition for larger increases after major capital improvements; property tax increases above 5 percent pass through by formula. Estimated administration: about $576,000 per year.</div></div>
     </div>
@@ -316,7 +320,7 @@ details.tblview th:first-child, details.tblview td:first-child { text-align: lef
   <div class="wrap">
     <div class="viz checker" id="checker">
       <div class="viz-title">Is this unit covered? Try it.</div>
-      <div class="viz-sub">Toggle a hypothetical Providence unit's attributes and see which side of the line it lands on. Notice how many of these levers the owner controls.</div>
+      <div class="viz-sub">Toggle a hypothetical Providence unit’s attributes and see which side of the line it lands on. Notice how many of these levers the owner controls.</div>
       <div class="q"><div class="ql">How many units in the building?</div><div class="chips" data-q="units"><button class="chip" data-v="1">1</button><button class="chip on" data-v="4">2&ndash;4</button><button class="chip" data-v="12">5+</button></div></div>
       <div class="q"><div class="ql">Does the owner live in the building?</div><div class="chips" data-q="owner"><button class="chip" data-v="yes">Yes</button><button class="chip on" data-v="no">No</button></div></div>
       <div class="q"><div class="ql">Who owns it?</div><div class="chips" data-q="entity"><button class="chip on" data-v="person">A person</button><button class="chip" data-v="llc">An LLC / corporation</button></div></div>
@@ -325,7 +329,6 @@ details.tblview th:first-child, details.tblview td:first-child { text-align: lef
       <div class="verdict covered" id="checkerVerdict"></div>
       <div class="viz-foot">Simplified reading of the amended ordinance as reported at passage in April 2026 (owner-occupied 1&ndash;4 unit exemption plus one additional building; 10/20-year new-construction exemptions). Simplified; not legal advice.</div>
     </div>
-    <p>Several of the stories below turn on exactly these lines.</p>
   </div>
 </section>
 
@@ -333,18 +336,18 @@ details.tblview th:first-child, details.tblview td:first-child { text-align: lef
 <section class="chapter">
   <div class="wrap">
     <h2>How many units would the cap actually cover?</h2>
-    <p class="lede">Nobody knows precisely, including the city. Testifying in February, Providence's CFO estimated that fewer than 44 percent of apartments would be rent-controlled, and that was before subtracting the new-construction exemption, which the city cannot compute because it only started tracking new construction three years ago. Here is the arithmetic from public data, with the uncertainty left visible.</p>
+    <p class="lede">Nobody knows precisely, including the city. Testifying in February, Providence’s CFO estimated that fewer than 44 percent of apartments would be rent-controlled, and that was before subtracting the new-construction exemption, which the city cannot compute because it only started tracking new construction three years ago. Here is the arithmetic from public data.</p>
   </div>
   <div class="wrap-wide">
     <div class="viz">
       <div class="viz-title">From 81,000 housing units to a covered core</div>
-      <div class="viz-sub">A waterfall to scale: the first bar is the city's full housing stock, each gray bar removes a category, and the final bar is what the cap would govern. Measured rows are marked; the exemption rows are the author's ranges.</div>
+      <div class="viz-sub">A waterfall to scale: the first bar is the city’s full housing stock, each gray bar removes a category, and the final bar is what the cap would govern. Measured rows are marked; the exemption rows are the author’s ranges.</div>
       <div id="coverageWaterfall"></div>
-      <div class="viz-foot">Measured: ACS (81,131 housing units; 73,854 occupied) and HousingWorks RI (59% renter share), plus an allowance for vacant units on the rental market. Author's ranges: owner-occupied 1&ndash;4 unit buildings hold a large share of rentals in a triple-decker city (the Council's own earlier estimate was 16,000+ exempt units under the narrower 1&ndash;3 version); the deed-restricted range uses the state's low-and-moderate-income inventory, widened because buildings containing any affordable unit are wholly exempt; recent-construction and dorm ranges are rough. Central estimate: about 18,000 covered units; the assumption ranges span roughly 15,000&ndash;22,000. If a reader has better numbers, the author will happily lose the argument about the exact width of these bars.</div>
+      <div class="viz-foot">Measured: ACS (81,131 housing units; 73,854 occupied) and HousingWorks RI (59% renter share), plus an allowance for vacant units on the rental market. Author’s ranges: owner-occupied 1&ndash;4 unit buildings hold a large share of rentals in a triple-decker city (the Council’s own earlier estimate was 16,000+ exempt units under the narrower 1&ndash;3 version); the deed-restricted range uses the state’s low-and-moderate-income inventory, widened because buildings containing any affordable unit are wholly exempt; recent-construction and dorm ranges are rough. Central estimate: about 18,000 covered units; the assumption ranges span roughly 15,000&ndash;22,000. If a reader has better numbers, the author will happily lose the argument about the exact width of these bars.</div>
     </div>
   </div>
   <div class="wrap">
-    <p>Two consequences follow from the denominator. First, the ordinance is narrower than both its champions and its critics talk as if it were: something like a third to a half of Providence's rental units would face the cap, concentrated in non-owner-occupied multifamily buildings owned by landlords like Gil, and in larger buildings owned by LLCs. Second, the city is legislating blind, and so is this essay: Providence has no rental registry, no tracking of renewal increases, and three years of construction data. Every coverage number you see in this debate, including the one above, is estimated.</p>
+    <p>Two consequences follow from the denominator. First, the ordinance is narrower than both its champions and its critics talk as if it were: something like a third to a half of Providence’s rental units would face the cap, concentrated in non-owner-occupied multifamily buildings owned by landlords like Gil, and in larger buildings owned by LLCs. Second, the city is legislating blind, and so is this essay: Providence has no rental registry, no tracking of renewal increases, and three years of construction data. Every coverage number you see in this debate, including the one above, is estimated.</p>
   </div>
 </section>
 
@@ -357,17 +360,17 @@ details.tblview th:first-child, details.tblview td:first-child { text-align: lef
   </div>
   <div class="wrap-wide">
     <div class="people">
-      <div class="person"><div class="avatar" style="background:var(--s1)">M</div><div class="info"><div class="n">Marisol Peña</div><div class="r">Tenant · 2nd floor of an Elmwood triple-decker</div><div class="d">Medical interpreter, two kids at Roger Williams Middle School. Pays $1,450 for a two-bedroom she's rented since 2021. Market rate for her unit is now about $2,200.</div></div></div>
+      <div class="person"><div class="avatar" style="background:var(--s1)">M</div><div class="info"><div class="n">Marisol Peña</div><div class="r">Tenant · 2nd floor of an Elmwood triple-decker</div><div class="d">Medical interpreter, two kids at Roger Williams Middle School. Pays $1,450 for a two-bedroom she’s rented since 2021. Market rate for her unit is now about $2,200.</div></div></div>
       <div class="person"><div class="avatar" style="background:var(--s7)">G</div><div class="info"><div class="n">Gil Tavares</div><div class="r">Landlord · owns two triple-deckers on the same block</div><div class="d">Retired RIPTA mechanic, 67. Bought the buildings in the 1990s. Six units total, none owner-occupied, so both buildings are covered. The rents are his pension.</div></div></div>
     </div>
   </div>
   <div class="wrap">
-    <p>Under the cap, Marisol's rent can rise at most 4 percent a year no matter what Gil would otherwise charge. When his renewal increases would have run above 4 percent, a wedge opens between what she pays and what she would have paid. That wedge is the point of the policy: a transfer from Gil to Marisol, delivered with none of the overhead of a housing voucher. Note what the wedge is not: it is not the full gap between her rent and the asking rent a newcomer sees, because sitting tenants get a discount everywhere, cap or no cap.</p>
-    <p>Drag the sliders and watch the wedge. Two details the simple story skips: Marisol already pays below asking, as most sitting tenants do, so part of her discount exists with or without the cap; and if the cap shrinks rental supply, the asking rents newcomers face drift higher. Flip on the supply response to see the second one.</p>
+    <p>Under the cap, Marisol’s rent can rise at most 4 percent a year no matter what Gil would otherwise charge. When his renewal increases would have run above 4 percent, a wedge opens between what she pays and what she would have paid. That wedge is the point of the policy: a transfer from Gil to Marisol, delivered with none of the overhead of a housing voucher. The wedge is smaller than the gap between her rent and a newcomer’s asking rent, because sitting tenants get a discount everywhere, cap or no cap.</p>
+    <p>Drag the sliders and watch the wedge. If the cap shrinks rental supply, the asking rents newcomers face drift higher; flip on the supply response to see it.</p>
   </div>
   <div class="wrap-wide">
     <div class="viz">
-      <div class="viz-title">The wedge: Marisol's rent vs. the market, 2026&ndash;2036</div>
+      <div class="viz-title">The wedge: Marisol’s rent vs. the market, 2026&ndash;2036</div>
       <div class="viz-sub">Blue: her rent under the cap. Green dashed: what she would likely pay without the cap (landlords raise sitting tenants less than asking rents). Gray: asking rent for a newcomer. Only the shaded band between green and blue is caused by the policy.</div>
       <div class="controls">
         <div class="ctl"><label>Asking-rent growth (newcomers) &nbsp;<span class="val" id="wedgeGrowthVal">5.5%/yr</span></label><input type="range" id="wedgeGrowth" min="2" max="9" step="0.5" value="5.5"></div>
@@ -378,18 +381,18 @@ details.tblview th:first-child, details.tblview td:first-child { text-align: lef
       </div>
       <div class="chartbox" style="height:320px"><canvas id="wedgeChart"></canvas></div>
       <div class="tiles">
-        <div class="tile blue"><div class="tv" id="tMarisol">$0</div><div class="tl">Marisol's 10-year savings caused by the cap (vs. the no-cap renewal path)</div></div>
-        <div class="tile red"><div class="tv" id="tGil">$0</div><div class="tl">Gil's forgone revenue on this one unit (same number, other side of the ledger)</div></div>
-        <div class="tile plain"><div class="tv" id="tGap">$0</div><div class="tl">Monthly gap in year 10 vs. a newcomer's asking rent (part of this discount she would have had anyway)</div></div>
+        <div class="tile blue"><div class="tv" id="tMarisol">$0</div><div class="tl">Marisol’s 10-year savings caused by the cap (vs. the no-cap renewal path)</div></div>
+        <div class="tile red"><div class="tv" id="tGil">$0</div><div class="tl">Gil’s forgone revenue on this one unit (same number, other side of the ledger)</div></div>
+        <div class="tile plain"><div class="tv" id="tGap">$0</div><div class="tl">Monthly gap in year 10 vs. a newcomer’s asking rent (part of this discount she would have had anyway)</div></div>
       </div>
       <div class="viz-foot">Start: $1,450 current rent / $2,200 asking (Elmwood 2BR, 2026). The capped path grows at min(4%, the renewal rate); the cap only binds when Gil would otherwise raise more than 4%. Her total gap vs. asking rent mixes a pre-existing incumbent discount with the increment the cap causes; the tiles count only the increment. Supply-response uplift phases in linearly to +5.1% by year 10, the citywide asking-rent effect Diamond, McQuade &amp; Qian estimated for San Francisco (AER 2019).</div>
       <details class="tblview"><summary>View as table</summary><div id="wedgeTable"></div></details>
     </div>
   </div>
   <div class="wrap">
-    <p>Two things are simultaneously true. First: Marisol is better off. At the recent pace of Providence rent increases the cap saves her twenty-odd thousand dollars over a decade, counting only what the cap causes, and she is exactly who the ordinance's sponsors have in mind. Council President Rachel Miller's line, that a rent increase is "an eviction notice by another name," describes a real thing that happens to real families. The best research agrees on this point: in San Francisco, covered tenants were about 20 percent more likely to stay at their address.</p>
-    <p>Second: Gil is not a corporation. He's a man holding an asset whose income is capped while his costs (insurance, up 30 percent in three years in coastal New England; taxes; a roof) are not. The transfer doesn't come from "landlords" as a class of abstraction. It comes from Gil's pension, one month at a time. What Gil does about that is Chapter 3.</p>
-    <p>But first: notice the wedge itself creates a new problem. That gap between $1,450 and the market price is now attached to a physical apartment. Whenever it empties, someone gets a prize worth thousands of dollars a year. Who?</p>
+    <p>Two things are simultaneously true. First: Marisol is better off. At the recent pace of Providence rent increases the cap saves her twenty-odd thousand dollars over a decade, counting only what the cap causes, and she is exactly who the ordinance’s sponsors have in mind. Council President Rachel Miller’s line, that a rent increase is “an eviction notice by another name,” describes a real thing that happens to real families. The best research agrees on this point: in San Francisco, covered tenants were about 20 percent more likely to stay at their address.</p>
+    <p>Second: Gil is not a corporation. He’s a man holding an asset whose income is capped while his costs (insurance, up 30 percent in three years in coastal New England; taxes; a roof) are not. The transfer doesn’t come from “landlords” as a class of abstraction. It comes from Gil’s pension, one month at a time. What Gil does about that is Chapter 3.</p>
+    <p>The wedge also creates a new problem. That gap between $1,450 and the market price is now attached to a physical apartment. Whenever it empties, someone gets a prize worth thousands of dollars a year. Who?</p>
   </div>
 </section>
 
@@ -410,7 +413,7 @@ details.tblview th:first-child, details.tblview td:first-child { text-align: lef
   <div class="wrap-wide">
     <div class="viz">
       <div class="viz-title">One vacancy, six applicants: an illustrative allocation model</div>
-      <div class="viz-sub">A 2BR in Gil's building turns over. Under the cap it lists at $1,508 (one 4% bump on $1,450), roughly $750 under market, and the applications pour in. This is a toy model with disclosed coefficients (below), not an estimate from data. Each falling ball is one simulated turnover landing on the applicant who gets the lease; the bars accumulate win rates. Run it under both regimes and compare who wins.</div>
+      <div class="viz-sub">A 2BR in Gil’s building turns over. Under the cap it lists at $1,508 (one 4% bump on $1,450), roughly $750 under market, and the applications pour in. This is a toy model with disclosed coefficients (below), not an estimate from data. Each falling ball is one simulated turnover landing on the applicant who gets the lease; the bars accumulate win rates. Run it under both regimes and compare who wins.</div>
       <div class="controls">
         <div class="toggle-row" id="queueToggle"><button class="on" data-v="market">Market pricing</button><button data-v="capped">Under the cap</button></div>
         <button class="btn primary" id="queueRun">Run 100 turnovers</button>
@@ -425,8 +428,8 @@ details.tblview th:first-child, details.tblview td:first-child { text-align: lef
   </div>
   <div class="wrap">
     <p>Under market pricing, the unit goes to whoever values it most, and the people who value it most are the ones with the fewest alternatives: Tenaya splits the rent with a roommate, Marcus offers prepaid months because his record fails every screen in town. Under the cap, the price is fixed, so the competition moves entirely to paperwork: credit history, income multiple, references. The landlord, who bears all the downside of a bad tenancy at a rent he can never reset (remember: 4 percent at turnover, once), picks the safest file every time, and the safest file is never a thin one.</p>
-    <p>A binding price ceiling does not reduce competition for apartments. It changes what the competition is denominated in, from money, which newcomers can offer, to accumulated paperwork, which they cannot. The marginal renter the policy means to help, the one with a real job and a thin file, is the first one sorted out of the queue.</p>
-    <p>Meanwhile a subtler misallocation compounds. Marisol's neighbors, the Hendersons, raised three kids in their capped three-bedroom. The kids are gone. In a market, the Hendersons would downsize and free the 3BR for a family; under the cap, leaving means surrendering a below-market deal they can never get back, so they stay. Glaeser and Luttmer estimated that about a fifth of New York's controlled apartments are occupied by the "wrong" household in exactly this sense. The cap pays people to sit still, on housing they've outgrown and on jobs they'd otherwise leave: Marisol herself will turn down a better-paying job in Worcester in 2029, because the raise is smaller than the deal she'd forfeit by moving.</p>
+    <p>A ceiling changes the currency of competition from money, which newcomers can offer, to accumulated paperwork, which they cannot.</p>
+    <p>Meanwhile a subtler misallocation compounds. Marisol’s neighbors, the Hendersons, raised three kids in their capped three-bedroom. The kids are gone. In a market, the Hendersons would downsize and free the 3BR for a family; under the cap, leaving means surrendering a below-market deal they can never get back, so they stay. Glaeser and Luttmer estimated that about a fifth of New York’s controlled apartments are occupied by the “wrong” household in exactly this sense. The cap pays people to sit still, on housing they’ve outgrown and on jobs they’d otherwise leave: Marisol herself will turn down a better-paying job in Worcester in 2029, because the raise is smaller than the deal she’d forfeit by moving.</p>
   </div>
 </section>
 
@@ -435,12 +438,12 @@ details.tblview th:first-child, details.tblview td:first-child { text-align: lef
   <div class="wrap">
     <div class="chapnum">Chapter 3 · The Unseen</div>
     <h2>Ten years on one Providence block</h2>
-    <p class="lede">Nobody repeals the housing supply by decree. It leaks away, one private, legal, individually reasonable decision at a time, along margins most people never think to watch. Below is one block in Elmwood with 10 lots. Play the decade under each scenario, or drag the year slider. Click any building for its story.</p>
+    <p class="lede">Nobody repeals the housing supply by decree. It leaks away, one legal, individually reasonable decision at a time, along margins most people never think to watch. Below is one block in Elmwood with 10 lots. Play the decade under each scenario, or drag the year slider. Click any building for its story.</p>
   </div>
   <div class="wrap-wide">
     <div class="viz">
-      <div class="viz-title">Alder Street: 10 properties, 2026 to 2036</div>
-      <div class="viz-sub">Play the same decade twice: once without the ordinance, once with it. Blue means units on the long-term rental market (dark blue capped, light blue exempt); gray means they've left it, or never joined it. The table at the bottom compares the two scenarios at the year shown.</div>
+      <div class="viz-title">Alder Street: 10 properties, 2026&ndash;2036</div>
+      <div class="viz-sub">Play the same decade twice: once without the ordinance, once with it. Blue means units on the long-term rental market (dark blue capped, light blue exempt); gray means they’ve left it, or never joined it. The table at the bottom compares the two scenarios at the year shown.</div>
       <div class="block-top">
         <div class="yearctl">
           <div class="toggle-row" id="blockScenario"><button data-v="market">No rent control</button><button class="on" data-v="cap">Under the cap</button></div>
@@ -465,16 +468,16 @@ details.tblview th:first-child, details.tblview td:first-child { text-align: lef
   </div>
   <div class="wrap" id="marginNarrative">
     <h3>The margins, named</h3>
-    <p><b>1. The maintenance margin.</b> Gil can't raise the rent, but nobody can make him renew the kitchen. A unit is a bundle of rent <em>and</em> upkeep; when the law fixes one, the other adjusts. Massachusetts rent-controlled units were measurably older, shabbier, and less renovated than their neighbors (Sims 2007).</p>
-    <p><b>2. The exit margin: condo conversion.</b> A triple-decker is worth more as three condos sold to owner-occupants than as a capped income stream. In San Francisco, buildings subject to rent control saw a 15 percent decline in rental supply, much of it through exactly this door. Gil sells; three renter households' units become two owner households' homes; the block gets richer and the rental stock gets smaller.</p>
-    <p><b>3. The exemption margin: owner move-in.</b> Eddie owns the two-family at number 20 and lives in Cranston. The day the cap takes effect, the cheapest renovation available to him is a mattress: move into unit 1, and the building is owner-occupied, 1&ndash;4 units, exempt. One rental unit exits the market so that the other can leave the cap. Perfectly legal; the ordinance drew the line, and Eddie walked to it.</p>
-    <p><b>4. The platform margin.</b> Karen inherits her mother's triple-decker at number 22. She can become a regulated landlord with a Rent Board file, or she can furnish two units and list them nightly to tourists and traveling nurses, entirely outside the ordinance. Every unit that shifts to short-term rental is a long-term home that no longer exists.</p>
+    <p><b>1. The maintenance margin.</b> Gil can’t raise the rent, but nobody can make him renew the kitchen. A unit is a bundle of rent <em>and</em> upkeep; when the law fixes one, the other adjusts. Massachusetts rent-controlled units were measurably older, shabbier, and less renovated than their neighbors (Sims 2007).</p>
+    <p><b>2. The exit margin: condo conversion.</b> A triple-decker is worth more as three condos sold to owner-occupants than as a capped income stream. In San Francisco, buildings subject to rent control saw a 15 percent decline in rental supply, much of it through exactly this door. Gil sells; three renter households’ units become two owner households’ homes; the block gets richer and the rental stock gets smaller.</p>
+    <p><b>3. The exemption margin: owner move-in.</b> Eddie owns the two-family at number 20 and lives in Cranston. The day the cap takes effect, the cheapest renovation available to him is a mattress: move into unit 1, and the building is owner-occupied, 1&ndash;4 units, exempt. One rental unit exits the market so that the other can leave the cap.</p>
+    <p><b>4. The platform margin.</b> Karen inherits her mother’s triple-decker at number 22. She can become a regulated landlord with a Rent Board file, or she can furnish two units and list them nightly to tourists and traveling nurses, entirely outside the ordinance.</p>
     <p><b>5. The never-built margin.</b> Dev and Priya had an accepted offer on the gut-job three-family at number 24: renovate, rent two units, live in neither. Under the cap their spreadsheet dies (capped income, uncapped renovation costs, no rent reset, ever), so they walk. The house sells to a flipper who makes condos. Three rental units that would have existed, never do. You will not see this on any eviction docket or Rent Board complaint.</p>
-    <p><b>6. The generosity margin.</b> Walt, at number 18, has charged his longtime tenants $300 under market for years, because they're good tenants and he's a decent man. The 180-day lookback means his kindness is about to become a legal ceiling, permanently. Every landlord in Providence who reads the ordinance learns the same lesson at the same moment: <em>never</em> price below the maximum again, and get your increase in before the base-rent date. Cities that pass rent control reliably see a burst of pre-effective-date hikes, the law's first observable effect arriving before the law does.</p>
-    <p><b>7. The unbundling margin.</b> The 12-unit building on the corner, owned by a Boston LLC, stays rental. But parking is now $150 a month, laundry is app-metered, there's a $95 "amenity and administration fee," and the heat included in the lease becomes tenant-paid utilities at renewal. Rent is capped; the price of renting is not. Regulators everywhere chase this and rarely catch it.</p>
+    <p><b>6. The generosity margin.</b> Walt, at number 18, has charged his longtime tenants $300 under market for years, because they’re good tenants and he’s a decent man. The 180-day lookback means his kindness is about to become a legal ceiling, permanently. Every landlord in Providence who reads the ordinance learns the same lesson at the same moment: <em>never</em> price below the maximum again, and get your increase in before the base-rent date. Cities that pass rent control reliably see a burst of pre-effective-date increases.</p>
+    <p><b>7. The unbundling margin.</b> The 12-unit building on the corner, owned by a Boston LLC, stays rental. But parking is now $150 a month, laundry is app-metered, there’s a $95 “amenity and administration fee,” and the heat included in the lease becomes tenant-paid utilities at renewal. Rent is capped; the price of renting is not.</p>
     <p><b>8. The screening margin.</b> Same building: with a queue at every vacancy and no way to price risk, management tightens to 700+ credit, 3.5&times; income, and documented rental history. Chapter 2, institutionalized.</p>
-    <p><b>9. The spillover margin.</b> Rosa and Manny live in their three-family at number 16, so they're exempt. They didn't ask for pricing power, but as covered units leak out of the market, the demand lands on whatever remains. Exempt-sector rents rise faster than they would have. The cap doesn't lower the market price; by shrinking supply it raises it, about 5 percent in the San Francisco study, which is how tenants as a whole can end up paying <em>more</em> in a city that capped the rent.</p>
-    <p><b>10. The stayers.</b> And in Marisol's building at number 26, the cap does exactly what it promised: she's still there in 2036, kids through school, savings account no longer empty. Any account of the block keeps her on the ledger too. The question this block poses is never whether Marisol gains. It's how many Tenayas, standing outside a smaller housing stock, paid for it.</p>
+    <p><b>9. The spillover margin.</b> Rosa and Manny live in their three-family at number 16, so they’re exempt. They didn’t ask for pricing power, but as covered units leak out of the market, the demand lands on whatever remains. Exempt-sector rents rise faster than they would have. The cap doesn’t lower the market price; by shrinking supply it raises it, about 5 percent in the San Francisco study, which is how tenants as a whole can end up paying <em>more</em> in a city that capped the rent.</p>
+    <p><b>10. The stayers.</b> And in Marisol’s building at number 26, the cap does exactly what it promised: she’s still there in 2036, kids through school, savings account no longer empty. Any account of the block keeps her on the ledger too. The question the block poses is how many Tenayas, standing outside a smaller housing stock, paid for Marisol’s decade.</p>
   </div>
 </section>
 
@@ -487,11 +490,11 @@ details.tblview th:first-child, details.tblview td:first-child { text-align: lef
   </div>
   <div class="wrap-wide">
     <div class="people">
-      <div class="person"><div class="avatar" style="background:var(--s8)">B</div><div class="info"><div class="n">Brightline Development</div><div class="d">A mid-size regional developer weighing a 48-unit project on the corner lot. Their capital doesn't care about Providence; it cares about clearing a 7.5 percent hurdle rate. Pawtucket is a ten-minute drive.</div></div></div>
+      <div class="person"><div class="avatar" style="background:var(--s8)">B</div><div class="info"><div class="n">Brightline Development</div><div class="d">A mid-size regional developer weighing a 48-unit project on the corner lot. Their capital doesn’t care about Providence; it cares about clearing a 7.5 percent hurdle rate. Pawtucket is a ten-minute drive.</div></div></div>
     </div>
     <div class="viz">
-      <div class="viz-title">Brightline's pro forma: does the corner lot pencil?</div>
-      <div class="viz-sub">A simplified underwriting model for the 48-unit project: $21.0M all-in cost ($438k per unit, the going rate for New England new construction), rents start at $2,350/unit, 25-year hold, sale at exit. Defaults are set to the ordinance's actual terms. Move the sliders the way a developer's risk committee would.</div>
+      <div class="viz-title">Brightline’s pro forma: does the corner lot pencil?</div>
+      <div class="viz-sub">A simplified underwriting model for the 48-unit project: $21.0M all-in cost ($438k per unit, the going rate for New England new construction), rents start at $2,350/unit, 25-year hold, sale at exit. Defaults are set to the ordinance’s actual terms. Move the sliders the way a developer’s risk committee would.</div>
       <div class="controls">
         <div class="ctl"><label>New-construction exemption &nbsp;<span class="val" id="pfExemptVal">10 years (ordinance)</span></label><input type="range" id="pfExempt" min="0" max="30" step="1" value="10"></div>
         <div class="ctl"><label>Prevailing wages + apprenticeships: buys the 20-year exemption, raises construction cost about 10%</label><div class="toggle-row" id="pfLabor"><button class="on" data-v="off">Off</button><button data-v="on">On (20-yr exemption)</button></div></div>
@@ -511,19 +514,19 @@ details.tblview th:first-child, details.tblview td:first-child { text-align: lef
         <div class="tile plain"><div class="tv" id="pfDrag">–</div><div class="tl">IRR cost of the cap regime</div></div>
       </div>
       <div class="pverdict go" id="pfVerdict"></div>
-      <div class="viz-foot">Model: NOI = 62% of revenue; rents grow at the market rate during exemption, then at min(market, 4%); exit value = year-25 NOI &divide; 6% cap rate, with covered buildings trading at a wider cap rate (capped income is worth less per dollar). "Repeal risk" is modeled as the exemption ending at year 5, and the expected IRR is computed on probability-weighted cash flows (averaging IRRs directly is a known error). The labor toggle overrides the slider to 20 years and adds a 10% cost premium, a typical prevailing-wage estimate. Every number is adjustable in spirit; the shape of the conclusion is not.</div>
+      <div class="viz-foot">Model: NOI = 62% of revenue; rents grow at the market rate during exemption, then at min(market, 4%); exit value = year-25 NOI &divide; 6% cap rate, with covered buildings trading at a wider cap rate (capped income is worth less per dollar). “Repeal risk” is modeled as the exemption ending at year 5, and the expected IRR is computed on probability-weighted cash flows (averaging IRRs directly is a known error). The labor toggle overrides the slider to 20 years and adds a 10% cost premium, a typical prevailing-wage estimate. Every number is adjustable in spirit; the shape of the conclusion is not.</div>
     </div>
   </div>
   <div class="wrap">
-    <p>Notice three things. First, the asymmetry: at the ordinance's actual terms the cap shaves half a point to a point off the return. That sounds survivable, and for a project that penciled at 9 percent, it is. But development is decided <em>at the margin</em>. The marginal project is the one that penciled at 8.2 against a 7.5 hurdle, and for that one, half a point is the whole ballgame. It dies in a Tuesday investment-committee meeting in Boston, and its 48 units are never missed because they never exist; Cranston and Pawtucket, same workers, same rents, no cap, get the building instead. Second, the labor-linked exemption is a real option with a real price: at a typical prevailing-wage premium, the extra ten years of exemption don't pay for the extra construction cost in this model, so the 20-year track functions more as a labor standard than as developer relief. Third, everything here is one developer's spreadsheet; the model is disclosed so you can disagree with it slider by slider.</p>
-    <p>You don't have to take the model's word for it. St. Paul ran the experiment.</p>
+    <p>Notice three things. First, the asymmetry: at the ordinance’s actual terms the cap shaves half a point to a point off the return. That sounds survivable, and for a project that penciled at 9 percent, it is. But development is decided <em>at the margin</em>. The marginal project is the one that penciled at 8.2 against a 7.5 hurdle, and for that one, half a point is the whole ballgame. It dies in a Tuesday investment-committee meeting in Boston, and its 48 units are never missed because they never exist; Cranston and Pawtucket, same workers, same rents, no cap, get the building instead. Second, the labor-linked exemption is a real option with a real price: at a typical prevailing-wage premium, the extra ten years of exemption don’t pay for the extra construction cost in this model, so the 20-year track functions more as a labor standard than as developer relief. Third, the model is one developer’s spreadsheet, disclosed so you can disagree with it slider by slider.</p>
+    <p>You don’t have to take the model’s word for it. St. Paul ran the experiment.</p>
   </div>
   <div class="wrap-wide">
     <div class="viz">
       <div class="viz-title">St. Paul, Minnesota: multifamily units permitted by year</div>
-      <div class="viz-sub">Voters passed a 3% cap with no new-construction exemption in Nov 2021, the strictest big-city ordinance in America and the closest cousin to Providence's vacancy-control design. The city amended it within 14 months (20-year new-construction exemption, vacancy decontrol) after development stalled.</div>
+      <div class="viz-sub">Voters passed a 3% cap with no new-construction exemption in Nov 2021, the strictest big-city ordinance in America and the closest cousin to Providence’s vacancy-control design. The city amended it within 14 months (20-year new-construction exemption, vacancy decontrol) after development stalled.</div>
       <div class="chartbox" style="height:300px"><canvas id="stpChart"></canvas></div>
-      <div class="viz-foot">Units in permitted multifamily projects, Minneapolis Fed reporting (2026). 2022&ndash;25 also brought the sharpest interest-rate shock in 40 years, which crushed multifamily starts everywhere; St. Paul's collapse was deeper and longer than its twin city's, but this is one confounded natural experiment, not a controlled trial.</div>
+      <div class="viz-foot">Units in permitted multifamily projects, Minneapolis Fed reporting (2026). 2022&ndash;25 also brought the sharpest interest-rate shock in 40 years, which crushed multifamily starts everywhere; St. Paul’s collapse was deeper and longer than its twin city’s, but this is one confounded natural experiment, not a controlled trial.</div>
       <details class="tblview"><summary>View as table</summary><div id="stpTable"></div></details>
     </div>
   </div>
@@ -550,8 +553,8 @@ details.tblview th:first-child, details.tblview td:first-child { text-align: lef
     </div></div>
   </div>
   <div class="wrap">
-    <div class="pullquote">"Rent control appears to help affordability in the short run for current tenants, but in the long run decreases affordability, fuels gentrification, and creates negative externalities on the surrounding neighborhood."<span class="attr">Rebecca Diamond (Stanford), summarizing the literature, 2018, a researcher whose own work documents rent control's benefits to incumbents</span></div>
-    <p>Note what the literature does <em>not</em> say. It does not say rents fall for everyone (they rise for newcomers). It does not say landlords are impoverished as a class (they adapt, exit, or convert). And it does not say incumbent tenants aren't helped (they demonstrably are). The economist's objection to rent control was never "it helps no one." It's that the help is financed by an invisible tax on the city's future tenants. In San Francisco the accounting was almost exactly symmetric: $2.9 billion in gains to covered tenants between 1995 and 2012, and $2.9 billion in costs to the renters who came after them, paid through higher market rents on a smaller stock.</p>
+    <div class="pullquote">“Rent control appears to help affordability in the short run for current tenants, but in the long run decreases affordability, fuels gentrification, and creates negative externalities on the surrounding neighborhood.”<span class="attr">Rebecca Diamond (Stanford), summarizing the literature in 2018; her own work documents rent control’s benefits to incumbents</span></div>
+    <p>Note what the literature does <em>not</em> say. It does not say rents fall for everyone (they rise for newcomers). It does not say landlords are impoverished as a class (they adapt, exit, or convert). And it does not say incumbent tenants aren’t helped (they demonstrably are). The economist’s objection is that the help is financed by an invisible tax on the city’s future tenants. In San Francisco the accounting was almost exactly symmetric: $2.9 billion in gains to covered tenants between 1995 and 2012, and $2.9 billion in costs to the renters who came after them, paid through higher market rents on a smaller stock.</p>
   </div>
   <div class="wrap-wide">
     <div class="viz">
@@ -607,13 +610,13 @@ details.tblview th:first-child, details.tblview td:first-child { text-align: lef
         The itemized efficiency losses, with what dollar anchors exist:
         <ul style="margin:6px 0 0;padding-left:20px;">
           <li><b>Withdrawn and never-built supply</b> (the red triangle): units that exit or never arrive. This is the loss that compounds; it took years to accumulate in San Francisco and St. Paul.</li>
-          <li><b>Misallocation</b> (not in the diagram): the units still supplied go to the wrong households, worth about $400 per covered unit per year in today's dollars (Glaeser &amp; Luttmer), roughly $7M a year on 18,000 units, from day one.</li>
+          <li><b>Misallocation</b> (not in the diagram): the units still supplied go to the wrong households, worth about $400 per covered unit per year in today’s dollars (Glaeser &amp; Luttmer), roughly $7M a year on 18,000 units, from day one.</li>
           <li><b>Queueing and search costs</b> (the orange gap): time, applications, and side payments spent competing for scarce units. Real, and unmeasured anywhere.</li>
           <li><b>Quality depreciation</b>: deferred maintenance is supply withdrawal in slow motion (Sims 2007), so part of the triangle arrives disguised as peeling paint.</li>
         </ul>
         For contrast, the blue rectangle, the transfer to sitting tenants, runs roughly $50&ndash;60M a year at a $250 monthly wedge. Money changing hands, not money destroyed.
       </div>
-      <div class="viz-foot">Author's arithmetic on published estimates; every dollar input is uncertain by a factor of about two. The structure is the point: the transfer is an order of magnitude larger than the near-term deadweight loss, which is why the policy is popular, and the deadweight loss compounds while the transfer doesn't, which is why economists keep objecting anyway. Curves drawn for legibility, not estimated from Providence data.</div>
+      <div class="viz-foot">Author’s arithmetic on published estimates; every dollar input is uncertain by a factor of about two. The structure is the point: the transfer is an order of magnitude larger than the near-term deadweight loss, which is why the policy is popular, and the deadweight loss compounds while the transfer doesn’t, which is why economists keep objecting anyway. Curves drawn for legibility, not estimated from Providence data.</div>
     </div>
     </div>
 </section>
@@ -623,11 +626,11 @@ details.tblview th:first-child, details.tblview td:first-child { text-align: lef
   <div class="wrap">
     <div class="chapnum">Chapter 6 · The Ledger</div>
     <h2>Winners and losers, by year</h2>
-    <p class="lede">Price controls don't create or destroy much value on day one; they reassign it, and the reassignment drifts over time. Green is gains and red is losses, both relative to the no-rent-control status quo. Hover any cell.</p>
+    <p class="lede">Price controls don’t create or destroy much value on day one; they reassign it, and the reassignment drifts over time. Green is gains and red is losses, both relative to the no-rent-control status quo. Hover any cell.</p>
   </div>
   <div class="wrap-wide">
     <div class="viz">
-      <div class="viz-title">Who's up, who's down: the author's scorecard</div>
+      <div class="viz-title">Who’s up, who’s down: the author’s scorecard</div>
       <div class="viz-sub">Directional judgment calls for Providence under the 2026 ordinance terms, calibrated to the research above, not outputs of a model. Every cell is relative to the same decade with no rent control.</div>
       <div class="hm" id="heatmap"></div>
       <div class="legend" style="margin-top:14px">
@@ -647,19 +650,19 @@ details.tblview th:first-child, details.tblview td:first-child { text-align: lef
   <div class="wrap">
     <div class="chapnum">Chapter 7 · Skin in the Game</div>
     <h2>The forecast card</h2>
-    <p class="lede">Anyone can tell a story; the discipline is attaching probabilities you'd be embarrassed to miss. Each outcome below gets two probabilities: one if Providence enacts the ordinance (say, in 2027 under a Morales administration), one under the status quo. The difference between the bars is the policy's fingerprint.</p>
+    <p class="lede">Anyone can tell a story; the discipline is attaching probabilities you’d be embarrassed to miss. Each outcome below gets two probabilities: one if Providence enacts the ordinance (say, in 2027 under a Morales administration), one under the status quo. The difference between the bars is the policy’s fingerprint.</p>
   </div>
   <div class="wrap-wide">
     <div class="viz">
       <div class="viz-title">Each outcome in two worlds: with the ordinance, and without</div>
       <div class="fcast" id="fcast"></div>
-      <div class="viz-foot">Blue bar: probability if the ordinance takes effect with the April 2026 terms. Gray bar: probability under the status quo. The right-hand column is the difference, the part attributable to the policy. Author's subjective probabilities; base rates lean on St. Paul (the nearest design twin), San Francisco, and Cambridge. Score them against reality; that's what they're for. Forecast card v3, July 16, 2026.</div>
+      <div class="viz-foot">Blue bar: probability if the ordinance takes effect with the April 2026 terms. Gray bar: probability under the status quo. Author’s subjective probabilities; base rates lean on St. Paul (the nearest design twin), San Francisco, and Cambridge. Score them against reality; that’s what they’re for. Forecast card v3, July 16, 2026.</div>
     </div>
   </div>
   <div class="wrap">
     <h3>What would change this analysis</h3>
-    <p>The costs above shrink if: the cap rarely binds (market rent growth stays under 4 percent, which is exactly what happened in post-2023 St. Paul, where soft demand, not the ordinance, did the "stabilizing"); the Rent Board runs its pass-throughs generously; or enforcement is light. And the strongest steelman for the ordinance is distributional and temporal: the gains land now, on identifiable struggling households, while the costs land later, diffusely, on people who mostly don't live here yet. A city is allowed to make that trade with open eyes. The argument of this essay is only that the eyes be open: the trade is real, the margins are many, and the bill for Marisol's protection lands on Tenaya.</p>
-    <p>If the goal is more people affordably housed, experience points to a boring answer: legalize more housing (Providence's stock barely grows), subsidize the poorest directly, and let prices keep doing the one job no board can do for them, telling builders where homes are worth building. The 4 percent cap does something different: it makes the existing shortage more comfortable for the people already housed, while slowly shrinking the stock of homes available to everyone who comes after.</p>
+    <p>The costs above shrink if: the cap rarely binds (market rent growth stays under 4 percent, which is exactly what happened in post-2023 St. Paul, where soft demand, not the ordinance, did the “stabilizing”); the Rent Board runs its pass-throughs generously; or enforcement is light. And the strongest steelman for the ordinance is distributional and temporal: the gains land now, on identifiable struggling households, while the costs land later, diffusely, on people who mostly don’t live here yet. A city is allowed to make that trade with open eyes.</p>
+    <p>If the goal is more people affordably housed, experience points to a boring answer: legalize more housing (Providence’s stock barely grows), subsidize the poorest directly, and let prices keep telling builders where homes are worth building. The 4 percent cap does something different: it makes the existing shortage more comfortable for the people already housed, while slowly shrinking the stock of homes available to everyone who comes after.</p>
   </div>
 </section>
 
@@ -668,16 +671,16 @@ details.tblview th:first-child, details.tblview td:first-child { text-align: lef
   <div class="wrap">
     <details>
       <summary>Method</summary>
-      <p>All characters are fictional composites; neighborhoods, prices, and ordinance terms are real. Interactive models are deliberately simple and their assumptions are printed on their faces; The probabilities in the forecast card are the author's subjective estimates, stated so they can be scored against reality.</p>
+      <p>All characters are fictional composites; neighborhoods, prices, and ordinance terms are real. Interactive models are deliberately simple and their assumptions are printed on their faces; The probabilities in the forecast card are the author’s subjective estimates, stated so they can be scored against reality.</p>
       <p>A note on the legal foundation: the ordinance terms here reflect the amended version passed in April 2026 as reported at passage (owner-occupied 1&ndash;4 unit exemption plus a second building; 10-year new-construction exemption, 20 with prevailing wages and apprenticeships; 5-year exemption for recently built existing buildings; college housing district exclusion). Provisions carried over from the introduced text and Council summaries (180-day lookback, vacancy control, Rent Board structure, fines) are marked with an asterisk where they appear; the full amended text contains additional provisions (a fair-return standard, rehabilitation rules) that press coverage did not detail and this essay does not model.</p>
     </details>
     <details>
       <summary>Sources</summary>
       <ul>
-        <li>Ordinance terms and political timeline: Providence City Council rent stabilization ordinance and FAQ (2026); Steve Ahlquist's reporting on the introduced ordinance; Rhode Island Current coverage of the April 2026 passage (9&ndash;6), the Smiley veto, and the failed May 2026 override; HousingWire's national coverage of the 4% cap and its exemptions.</li>
-        <li>Morales's position: candidate platform and forum coverage (Brown Daily Herald, April 2026); his public statements urging override of the veto.</li>
+        <li>Ordinance terms and political timeline: Providence City Council rent stabilization ordinance and FAQ (2026); Steve Ahlquist’s reporting on the introduced ordinance; Rhode Island Current coverage of the April 2026 passage (9&ndash;6), the Smiley veto, and the failed May 2026 override; HousingWire’s national coverage of the 4% cap and its exemptions.</li>
+        <li>Morales’s position: candidate platform and forum coverage (Brown Daily Herald, April 2026); his public statements urging override of the veto.</li>
         <li>Providence market data: HousingWorks RI (59% renter share; about 70,300 households; $2,019 average 2BR); Zumper (June 2026 medians); Council task force (+40% rents vs +15% incomes since 2020; about $2,600 average 2BR; 24,000 eviction filings since March 2020).</li>
-        <li>Research: Diamond, McQuade &amp; Qian (AER 2019; welfare figures via Stanford GSB); Autor, Palmer &amp; Pathak (JPE 2014); Glaeser &amp; Luttmer (AER 2003; $200/unit misallocation estimate from NBER WP 6220); Sims (JUE 2007); Ahern &amp; Giacoletti (NBER WP 30083, 2022); Favilukis, Mabille &amp; Van Nieuwerburgh (ReStud 2023); Kholodilin's literature surveys; Minneapolis Fed on St. Paul permitting (2026).</li>
+        <li>Research: Diamond, McQuade &amp; Qian (AER 2019; welfare figures via Stanford GSB); Autor, Palmer &amp; Pathak (JPE 2014); Glaeser &amp; Luttmer (AER 2003; $200/unit misallocation estimate from NBER WP 6220); Sims (JUE 2007); Ahern &amp; Giacoletti (NBER WP 30083, 2022); Favilukis, Mabille &amp; Van Nieuwerburgh (ReStud 2023); Kholodilin’s literature surveys; Minneapolis Fed on St. Paul permitting (2026).</li>
       <li>As-passed ordinance terms: Boston Globe coverage of the April 2026 vote (1&ndash;4 unit owner-occupied exemption; 10/20-year tiered new-construction exemption; college housing districts) and of the February 2026 coverage estimate (CFO testimony: fewer than 44% of apartments, before the new-construction exemption; city has three years of construction-tracking data); Council press releases on the March amendments.</li>
       <li>Coverage arithmetic: ACS via Census Reporter (81,131 housing units, 73,854 households); HousingWorks RI (59% renter share); state low-and-moderate-income housing inventory (deed-restricted range).</li>
       </ul>
@@ -783,7 +786,7 @@ if (window.Chart) {
           borderWidth:2, pointRadius:0, pointHitRadius:12, tension:0.15 },
         { label:'Her rent without the cap (renewals)', data:d.cf, borderColor:C.s2, backgroundColor:'rgba(0,131,0,0.08)',
           borderWidth:2, borderDash:[6,4], pointRadius:0, pointHitRadius:12, fill:'+1', tension:0.15 },
-        { label:"Marisol's rent (capped 4%)", data:d.ctl, borderColor:C.s1, backgroundColor:'transparent',
+        { label:"Marisol’s rent (capped 4%)", data:d.ctl, borderColor:C.s1, backgroundColor:'transparent',
           borderWidth:2.5, pointRadius:0, pointHitRadius:12, tension:0.15 }
       ]
     };
@@ -1033,7 +1036,7 @@ if (window.Chart) {
     { id:'rosa', name:'16 Alder St', owner:'Rosa & Manny Duarte', units:3,
       tl:[
         [0,'exempt',2,0,'Owner-occupied three-family: exempt. Two rented units, priced fair.'],
-        [4,'exempt',2,0,'<b>Spillover margin.</b> Covered units keep leaking out of the market; every vacancy Rosa lists now draws 30 applications. She raises to full market. Wouldn\u2019t you?']
+        [4,'exempt',2,0,'<b>Spillover margin.</b> Covered units keep leaking out of the market; every vacancy Rosa lists now draws 30 applications. She raises to full market.']
       ],
       tlM:[
         [0,'rental',2,0,'Owner-occupied three-family; two units rented a bit under market, as always.']
@@ -1072,7 +1075,7 @@ if (window.Chart) {
       ],
       tlM:[
         [0,'ghost',0,0,'The gut job. Dev & Priya close in the fall and start renovating.'],
-        [2,'rental',3,0,'All three units rented by 2028. This is the marginal supply arriving on schedule.']
+        [2,'rental',3,0,'All three units rented by 2028.']
       ], margin:'Marginal supply that never arrives, the invisible cost' },
     { id:'marisol', name:'26 Alder St', owner:'(landlord: R. Almeida)', units:3,
       tl:[
@@ -1082,7 +1085,7 @@ if (window.Chart) {
       ],
       tlM:[
         [0,'rental',3,0,'Marisol pays $1,450 against a $2,200 asking market; renewals run about 6% a year.'],
-        [3,'rental',3,0,'2029: the Worcester job pays more than her discount is worth. She takes it; the unit re-lets at market. Mobility cuts both ways.'],
+        [3,'rental',3,0,'2029: the Worcester job pays more than her discount is worth. She takes it; the unit re-lets at market.'],
         [10,'rental',3,0,'2036: three units still rented, to mostly different households than in 2026.']
       ], margin:'Incumbent protection works, and pays people to sit still' },
     { id:'corp', name:'28 Alder St · 12 units (corner)', owner:'Beacon Yield Partners LLC', units:12,
