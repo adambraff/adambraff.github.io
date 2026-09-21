@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>When should the new year begin?</title>
+<meta name="description" content="How seven calendars set the start of the year, and how each lines up with the temperature, rainfall, and harvest of the place it comes from.">
+<style>
+  :root{
+    --bg:#f6f6f3;
+    --surface:#ffffff;
+    --surface-2:#f0efe9;
+    --ink:#16181d;
+    --ink-soft:#4b4f58;
+    --muted:#82868f;
+    --line:#e3e2dd;
+    --accent:#3d3470;
+    --accent-soft:#6a5fb0;
+    --solar:#2a78d6;
+    --lunisolar:#eb6834;
+    --lunar:#1baf7a;
+    --warm:#e34948;
+    --cool:#2a78d6;
+    --shadow: 0 1px 2px rgba(20,20,15,0.04), 0 8px 24px rgba(20,20,15,0.06);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#121316;
+      --surface:#1b1d22;
+      --surface-2:#202329;
+      --ink:#f2f1ee;
+      --ink-soft:#c7c6c0;
+      --muted:#8d8f96;
+      --line:#2c2e33;
+      --accent:#a99cff;
+      --accent-soft:#8f80ea;
+      --solar:#3987e5;
+      --lunisolar:#d95926;
+      --lunar:#199e70;
+      --warm:#e66767;
+      --cool:#3987e5;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121316;
+    --surface:#1b1d22;
+    --surface-2:#202329;
+    --ink:#f2f1ee;
+    --ink-soft:#c7c6c0;
+    --muted:#8d8f96;
+    --line:#2c2e33;
+    --accent:#a99cff;
+    --accent-soft:#8f80ea;
+    --solar:#3987e5;
+    --lunisolar:#d95926;
+    --lunar:#199e70;
+    --warm:#e66767;
+    --cool:#3987e5;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding-inline:20px;
+    padding-block:48px;
+    line-height:1.55;
+  }
+  .wrap{max-width:880px;margin:0 auto;}
+  h1,h2,h3{
+    font-family:'Fraunces', Georgia, serif;
+    font-weight:560;
+    text-wrap:balance;
+    color:var(--ink);
+    margin:0;
+  }
+  .mono{font-family:'IBM Plex Mono', ui-monospace, monospace;}
+  h1{font-size:clamp(2.1rem,5vw,3rem);letter-spacing:-0.01em;}
+  h2{font-size:clamp(1.4rem,3vw,1.85rem);margin-bottom:.3em;}
+  h3{font-size:1.15rem;font-weight:600;margin-bottom:.15em;}
+  p{margin:0 0 1em 0;max-width:65ch;color:var(--ink-soft);}
+  a{color:var(--accent-soft);}
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    text-transform:uppercase;
+    letter-spacing:.11em;
+    font-size:.72rem;
+    color:var(--muted);
+    margin-bottom:.9em;
+    display:block;
+  }
+  header.hero{padding-block:8px 20px;border-bottom:1px solid var(--line);margin-bottom:40px;}
+  header.hero p{max-width:62ch;color:var(--ink-soft);font-size:1.02rem;}
+  header.hero p:last-child{margin-bottom:0;}
+
+  section{margin-bottom:56px;}
+
+  /* ---- wheel ---- */
+  .wheel-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    padding:28px clamp(10px,3vw,32px) 20px;
+  }
+  .wheel-svg-wrap{width:100%;max-width:620px;margin:0 auto;}
+  .wheel-svg-wrap svg{width:100%;height:auto;display:block;}
+  .wheel-caption{font-size:.86rem;color:var(--muted);margin-top:4px;max-width:60ch;}
+  .type-legend{
+    display:flex;flex-wrap:wrap;gap:18px;
+    margin-top:18px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:.85rem;color:var(--ink-soft);
+  }
+  .type-legend .item{display:flex;align-items:center;gap:8px;}
+  .swatch{width:11px;height:11px;border-radius:50%;flex:none;}
+  .swatch.solar{background:var(--solar);}
+  .swatch.lunisolar{background:var(--lunisolar);}
+  .swatch.lunar{background:var(--lunar);}
+  .swatch.ring{background:none;border:2px dashed var(--lunar);width:9px;height:9px;}
+
+  /* ---- index strip ---- */
+  .index-strip{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:12px;overflow:hidden;
+    margin-top:22px;
+  }
+  .index-strip a{
+    background:var(--surface);padding:12px 14px;text-decoration:none;color:var(--ink);
+    display:flex;flex-direction:column;gap:3px;font-size:.85rem;
+  }
+  .index-strip a:hover{background:var(--surface-2);}
+  .index-strip .name{font-weight:600;}
+  .index-strip .date{color:var(--muted);font-size:.78rem;}
+
+  /* ---- cards ---- */
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  @media (max-width:680px){.cards{grid-template-columns:1fr;}}
+  .card{
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;
+    padding:22px 22px 18px;box-shadow:var(--shadow);
+    scroll-margin-top:24px;
+  }
+  .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:4px;}
+  .badge{
+    font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.05em;
+    text-transform:uppercase;padding:3px 8px;border-radius:100px;white-space:nowrap;
+    border:1px solid currentColor;flex:none;margin-top:3px;
+  }
+  .badge.solar{color:var(--solar);}
+  .badge.lunisolar{color:var(--lunisolar);}
+  .badge.lunar{color:var(--lunar);}
+  .card .place{color:var(--muted);font-size:.85rem;margin-bottom:14px;}
+  .card .date-line{
+    font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:var(--ink-soft);
+    margin-bottom:14px;
+  }
+  .card p{font-size:.93rem;}
+  .chart-wrap{margin-top:14px;position:relative;}
+  .chart-wrap svg{width:100%;height:auto;display:block;overflow:visible;}
+  .chart-foot{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);margin-top:2px;}
+  .chart-label{
+    font-family:'IBM Plex Mono',monospace;font-size:.68rem;text-transform:uppercase;
+    letter-spacing:.05em;color:var(--muted);margin-top:16px;margin-bottom:2px;display:block;
+  }
+  .rate-legend{display:flex;gap:14px;font-size:.72rem;color:var(--muted);margin-top:2px;}
+  .rate-legend .item{display:flex;align-items:center;gap:5px;}
+  .rate-legend .sw{width:9px;height:9px;border-radius:2px;}
+  .rate-note{
+    font-size:.82rem;color:var(--ink-soft);background:var(--surface-2);
+    border-radius:8px;padding:9px 12px;margin-top:10px;
+  }
+  .rate-note strong{color:var(--ink);}
+
+  /* ---- tooltip ---- */
+  #tooltip{
+    position:fixed;pointer-events:none;z-index:50;
+    background:var(--ink);color:var(--bg);
+    font-family:'IBM Plex Mono',monospace;font-size:.72rem;line-height:1.5;
+    padding:7px 10px;border-radius:8px;box-shadow:var(--shadow);
+    transform:translate(-50%,-115%);white-space:nowrap;
+    opacity:0;transition:opacity .08s ease;
+  }
+  #tooltip.show{opacity:1;}
+
+  /* ---- table ---- */
+  .table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;}
+  table{border-collapse:collapse;width:100%;min-width:640px;font-size:.86rem;}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);white-space:nowrap;}
+  th{
+    font-family:'IBM Plex Mono',monospace;font-size:.68rem;text-transform:uppercase;
+    letter-spacing:.05em;color:var(--muted);background:var(--surface-2);
+  }
+  td{color:var(--ink-soft);}
+  td.name{color:var(--ink);font-weight:600;font-family:'Fraunces',serif;font-weight:560;white-space:normal;}
+  tr:last-child td{border-bottom:none;}
+  .num{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;}
+
+  details{margin-top:6px;}
+  summary{
+    cursor:pointer;font-size:.85rem;color:var(--accent-soft);font-weight:600;
+    padding:6px 0;
+  }
+  footer{border-top:1px solid var(--line);padding-top:22px;margin-top:8px;}
+  footer p{font-size:.78rem;color:var(--muted);max-width:70ch;}
+  footer a{color:var(--muted);}
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,460;9..144,560;9..144,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <span class="eyebrow">Calendars &middot; climate &middot; agriculture</span>
+    <h1>When should the new year begin?</h1>
+    <p>January&nbsp;1 has no astronomical or agricultural meaning. Julius Caesar set it in 46&nbsp;BCE to match the day incoming Roman consuls took office &mdash; ten days after the solstice, for administrative reasons that had nothing to do with the sky. Pope Gregory XIII's 1582 reform fixed the calendar's drift but never moved the date.</p>
+    <p>Most of the world's other calendars put the new year somewhere else on the circle, and most tie it to something the sky or the harvest actually does. A year has no natural starting line &mdash; only a natural shape, since it repeats. Solar calendars fix the date to a solstice or equinox. Lunisolar calendars run on the moon but insert a leap month so the date never drifts far from a season. Purely lunar calendars use the moon and never correct, so the new year visits every season once every 33 years. Below are seven of them, placed on the year they actually fall in for 2026, next to the temperature record of the place each one comes from.</p>
+  </header>
+
+  <section id="wheel-section">
+    <span class="eyebrow">01 &middot; The comparison</span>
+    <h2>The year, as a circle</h2>
+    <p>Flattened onto a line starting January&nbsp;1, these dates look scattered. Wrapped around the year they actually describe, six of the seven cluster near a solstice, an equinox, or a harvest &mdash; and one, by design, sits nowhere in particular.</p>
+    <div class="wheel-card">
+      <div class="wheel-svg-wrap"><svg id="wheel" viewBox="0 0 640 620"></svg></div>
+      <p class="wheel-caption">Angle = day of year, clockwise from January&nbsp;1 at the top. Short inner ticks mark the equinoxes and solstices (approximate). Rosh Hashanah and Enkutatash fall a day apart in 2026 &mdash; two unrelated calendars, both keyed to the end of a local wet or harvest season &mdash; and their dots are nudged apart here only so both are readable. The thick colored bands are each calendar's true 20-year range, to scale, drawn only where there's a real range to show: Gregorian has none at all (always Jan 1), and the sidereal and fixed-date calendars move by at most a day, too little to plot. Chinese New Year and Rosh Hashanah get the full month-long window their leap-month rule allows &mdash; a 20-year span is long enough to have sampled nearly all of it, since the correction cycle repeats roughly every 19 years. Look closely at the bottom left: Enkutatash's one-day range (Sep 11&ndash;12) sits entirely inside Rosh Hashanah's month-long one, drawn as a thinner arc just inside it &mdash; two unrelated calendars whose possible dates overlap. The Islamic New Year gets no band here; its number is in its caption below, since a 229-day range would swallow the rest of the chart.</p>
+      <div class="type-legend">
+        <div class="item"><span class="swatch solar"></span>Solar &mdash; fixed to a date, an equinox, or a sidereal point</div>
+        <div class="item"><span class="swatch lunisolar"></span>Lunisolar &mdash; lunar months, corrected to track the sun</div>
+        <div class="item"><span class="swatch lunar"></span>Lunar &mdash; lunar months, uncorrected, drifts through all seasons</div>
+      </div>
+    </div>
+
+    <nav class="index-strip" id="index-strip"></nav>
+  </section>
+
+  <section id="cards-section">
+    <span class="eyebrow">02 &middot; Seven calendars</span>
+    <h2>What each new year is actually keyed to</h2>
+    <p>Each panel below pairs two views of the same data: the mean daily temperature range for the city closest to that calendar's origin, and directly beneath it, the month-over-month rate of change &mdash; the temperature curve's own first derivative. The derivative's peak and trough are the curve's two inflection points: the fastest-warming day of the year and the fastest-cooling day. A solstice sits near a temperature extreme, where the derivative crosses zero. An equinox sits near an inflection point almost by definition &mdash; it's where the sun's declination curve is steepest &mdash; and if temperature tracked sunlight with no lag, an equinox-based new year would land exactly on the derivative's peak. It doesn't, because land and air take a few weeks to catch up to the sun; that lag is the gap you'll see below between Nowruz and Tehran's actual fastest-warming day. Hover either chart for exact numbers.</p>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <section id="table-section">
+    <span class="eyebrow">03 &middot; Side by side</span>
+    <h2>The comparison table</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr>
+          <th>Calendar</th><th>System</th><th>New year rule</th><th>2026 date</th><th>Local season</th><th>Agricultural marker</th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="name">Gregorian</td><td>Solar, fixed</td><td>Fixed civil date, no astronomical anchor</td><td class="num">Jan 1</td><td>Deep winter (Rome)</td><td>None &mdash; a bookkeeping date</td></tr>
+          <tr><td class="name">Chinese New Year</td><td>Lunisolar</td><td>2nd new moon after the winter solstice</td><td class="num">Feb 17</td><td>Late winter (Xi'an)</td><td>End of dormancy, start of field prep</td></tr>
+          <tr><td class="name">Rosh Hashanah</td><td>Lunisolar</td><td>Tishrei 1, kept in autumn by leap months</td><td class="num">Sep 11 sunset</td><td>End of dry summer (Jerusalem)</td><td>Close of grain, grape &amp; olive harvest</td></tr>
+          <tr><td class="name">Nowruz</td><td>Solar, equinox</td><td>Exact instant of the March equinox</td><td class="num">Mar 20</td><td>Start of spring (Tehran)</td><td>Start of the planting season</td></tr>
+          <tr><td class="name">Islamic New Year</td><td>Lunar, uncorrected</td><td>New moon; no leap month; drifts ~11 days/yr</td><td class="num">Jun 16</td><td>Any &mdash; Mecca has little seasonality</td><td>None, by design</td></tr>
+          <tr><td class="name">Enkutatash</td><td>Solar, fixed</td><td>Meskerem 1, fixed Gregorian equivalent</td><td class="num">Sep 11</td><td>End of kiremt rains (Addis Ababa)</td><td>Harvest begins; Meskel daisies bloom</td></tr>
+          <tr><td class="name">Baisakhi</td><td>Solar, sidereal</td><td>Mesha Sankranti &mdash; sun's sidereal entry into Aries</td><td class="num">Apr 14</td><td>Pre-monsoon, hot &amp; dry (Amritsar)</td><td>Rabi wheat harvest</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <details id="data-table-details">
+      <summary>Show the underlying monthly temperatures (table view)</summary>
+      <div class="table-scroll" style="margin-top:10px;">
+        <table id="monthly-table"></table>
+      </div>
+    </details>
+
+    <details id="rate-table-details">
+      <summary>Show month-over-month rate of change, &deg;C per month (table view)</summary>
+      <div class="table-scroll" style="margin-top:10px;">
+        <table id="rate-table"></table>
+      </div>
+    </details>
+  </section>
+
+  <footer>
+    <p><strong>Notes &amp; confidence.</strong> Climate figures are long-run monthly averages (highs/lows), not 2026 forecasts. The precession explanation for why Mesha Sankranti now falls weeks after the tropical equinox is my inference from how sidereal and tropical zodiacs are defined, not something a source stated outright &mdash; roughly 85% confident in the mechanism as described. Rosh Hashanah's Gregorian date shifts year to year under the Hebrew lunisolar calendar; 2026's is used throughout. Ethiopian New Year lands Meskerem 1, which is September 12 in the Gregorian year before a Gregorian leap year and September 11 otherwise.</p>
+    <p><strong>Sources:</strong> <a href="https://en.wikipedia.org/wiki/Chinese_New_Year" target="_blank" rel="noopener">Chinese New Year (Wikipedia)</a> &middot; <a href="https://en.wikipedia.org/wiki/Rosh_Hashanah" target="_blank" rel="noopener">Rosh Hashanah (Wikipedia)</a> &middot; <a href="https://www.un.org/en/observances/international-nowruz-day" target="_blank" rel="noopener">Nowruz (United Nations)</a> &middot; <a href="https://www.britannica.com/topic/Islamic-calendar" target="_blank" rel="noopener">Islamic calendar (Britannica)</a> &middot; <a href="https://en.wikipedia.org/wiki/Enkutatash" target="_blank" rel="noopener">Enkutatash (Wikipedia)</a> &middot; <a href="https://en.wikipedia.org/wiki/Mesha_Sankranti" target="_blank" rel="noopener">Mesha Sankranti (Wikipedia)</a> &middot; <a href="https://www.britannica.com/topic/Baisakhi" target="_blank" rel="noopener">Baisakhi (Britannica)</a> &middot; climate normals from <a href="https://en.climate-data.org" target="_blank" rel="noopener">climate-data.org</a> and <a href="https://weatherspark.com" target="_blank" rel="noopener">Weather Spark</a>.</p>
+  </footer>
+
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var CSS_VAR = function(name){
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  };
+
+  // ---------- data ----------
+  var YEAR = 2026;
+  var MONTH_LETTERS = ['J','F','M','A','M','J','J','A','S','O','N','D'];
+  var MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  function dayOfYear(monthIdx, day, year){
+    var d = Date.UTC(year, monthIdx, day);
+    var start = Date.UTC(year, 0, 1);
+    return Math.round((d - start) / 86400000); // 0-based
+  }
+  function yearLength(year){
+    return Math.round((Date.UTC(year, 11, 31) - Date.UTC(year, 0, 1)) / 86400000) + 1;
+  }
+  function angleForDate(monthIdx, day, year){
+    return dayOfYear(monthIdx, day, year) / yearLength(year) * 360;
+  }
+  function fmtDate(monthIdx, day){
+    return MONTH_NAMES[monthIdx].slice(0,3) + ' ' + day;
+  }
+
+  var CAL = [
+    {
+      id:'gregorian', name:'Gregorian New Year', place:'Rome, Italy', type:'solar',
+      month:0, day:1, dateLabel:'January 1, 2026',
+      badge:'Solar &middot; fixed civil date',
+      mech:"Fixed by decree, not by sky. The Roman civil year began January 1 under Julius Caesar's 46 BCE reform, chosen to match the day incoming consuls took office, not a solstice or a harvest. The Gregorian reform of 1582 fixed leap-year drift; it never moved the date.",
+      ag:"Rome in January sits near its coldest point (average high 11.4&deg;C, low 3.5&deg;C) &mdash; deep in the dormant season for Mediterranean agriculture, when vines and olives are pruned rather than harvested. A date that asks nothing of a farmer is exactly the kind that scales to every climate on Earth.",
+      rateNote:"Rome's derivative is essentially flat on January 1 (&minus;0.5&deg;C/month). That's the signature of an extreme, not an inflection point: the date sits near the year's coldest point, not near its fastest-moving one.",
+      temps:[[3.5,11.4],[3.6,12.1],[6.0,15.2],[8.9,18.4],[12.7,22.5],[16.9,27.4],[19.6,30.3],[20.1,30.5],[16.7,25.5],[13.2,21.3],[9.2,16.3],[5.0,12.5]]
+    },
+    {
+      id:'chinese', name:'Chinese New Year', place:"Xi'an, China", type:'lunisolar',
+      month:1, day:17, dateLabel:'February 17, 2026',
+      badge:'Lunisolar',
+      mech:"The second new moon after the winter solstice, always the new moon closest to lichun, the solar term marking early spring. A leap month roughly every three years keeps the date anchored between January 21 and February 20, even though the underlying months are lunar.",
+      ag:"Xi'an, in the Guanzhong basin that fed China's earliest dynasties, is still deep in winter when the new year lands (Feb. average high 9.5&deg;C, low &minus;1.6&deg;C). The festival marks the turn toward spring rather than spring itself &mdash; fields are still bare, but it's the signal to start preparing them.",
+      rateNote:"Xi'an is already warming fast by February 17 (+4.5&deg;C/month). The year's single fastest-warming day comes about four weeks later, in mid-March &mdash; the new year lands on the shoulder of the inflection point, not the peak.",
+      temps:[[-4.1,5.8],[-1.6,9.5],[3.8,15.8],[9.7,22.0],[14.6,26.2],[19.3,30.4],[21.9,31.4],[20.8,29.8],[16.1,24.4],[10.1,19.1],[2.9,12.9],[-2.8,7.3]]
+    },
+    {
+      id:'roshhashanah', name:'Rosh Hashanah', place:'Jerusalem, Israel', type:'lunisolar',
+      month:8, day:12, dateLabel:'Begins sunset Sept 11, 2026',
+      badge:'Lunisolar',
+      mech:"Tishrei 1, kept in early autumn by the same leap-month mechanism as the Chinese calendar, just anchored to a different point in the year. The Torah names Nisan, in spring, as the calendar's first month; the rabbinic new year counts from Tishrei instead.",
+      ag:"Persians and Greeks, tied to spring planting, started their year near the equinox; Semitic-speaking agricultural societies started theirs after the autumn harvest closed the books. Jerusalem's Tishrei lands right at the end of a rainless Mediterranean summer (Sept. average high 30.9&deg;C, no meaningful rain since May), when the grain, grape, and olive harvest is in.",
+      rateNote:"Jerusalem is cooling by mid-September (&minus;2.7&deg;C/month), but not at its fastest &mdash; that comes about nine weeks later, in November. Rosh Hashanah tracks when the harvest is finished, not when the weather is turning quickest.",
+      temps:[[5.1,13.3],[5.6,14.7],[7.5,18.5],[10.4,23.0],[14.0,27.7],[17.0,31.0],[19.2,33.1],[19.9,33.2],[18.5,30.9],[15.7,26.5],[11.0,20.2],[7.0,15.3]]
+    },
+    {
+      id:'nowruz', name:'Nowruz', place:'Tehran, Iran', type:'solar',
+      month:2, day:20, dateLabel:'March 20, 2026',
+      badge:'Solar &middot; equinox',
+      mech:"The most astronomically precise new year here: Nowruz begins at the exact instant of the March equinox, computed each year rather than fixed on a calendar grid. No lunar component, no leap-month patchwork &mdash; the equinox itself is the mechanism.",
+      ag:"Tehran in March is mid-thaw: average highs climb from 5.5&deg;C in January to 14.1&deg;C in March to 27.2&deg;C by May. Nowruz predates Islam in Iran by well over a thousand years and marks the literal astronomical start of spring for a Zoroastrian agrarian calendar &mdash; equal day and night, then the balance tips toward the growing season.",
+      rateNote:"Tehran's fastest-warming day of the year falls in mid-April, about four weeks after Nowruz, and the equinox already sits at 94% of that peak rate (+6.0 vs. +6.4&deg;C/month). Of the seven calendars here, this is the closest an astronomical marker comes to hitting the inflection point itself.",
+      temps:[[-5.3,5.5],[-3.6,7.8],[1.8,14.1],[7.8,20.3],[14.1,27.2],[20.3,33.1],[24.0,35.6],[22.9,34.5],[18.4,30.0],[12.1,22.8],[2.9,12.8],[-2.8,7.4]]
+    },
+    {
+      id:'islamic', name:'Islamic New Year', place:'Mecca, Saudi Arabia', type:'lunar',
+      month:5, day:16, dateLabel:'June 16, 2026 (1448 AH)',
+      badge:'Lunar &middot; uncorrected',
+      mech:"Purely lunar, deliberately uncorrected. Twelve lunar months of 29 or 30 days make a 354-day year, about 11 days short of the solar year, and no leap month is inserted to close the gap. Muharram 1 walks backward through the entire solar calendar roughly once every 33 years.",
+      ag:"The control case: a calendar with no seasonal anchor at all, from a desert trade and pilgrimage hub rather than a farming society. Mecca barely has seasons to track &mdash; every month is hot (Jan. average high 27&deg;C, June 41&deg;C) and rain is negligible year-round &mdash; so there was little agricultural cost to letting the date drift.",
+      rateNote:"Mecca's derivative barely moves all year (+0.7&deg;C/month in June, versus a &plusmn;3.4&deg;C/month range elsewhere on the curve). There's no sharp inflection point here for a calendar to find even if it wanted one &mdash; more evidence this was never built to track the sun.",
+      temps:[[15.8,27.0],[17.3,29.8],[19.0,32.5],[22.2,35.7],[24.8,39.2],[26.0,40.8],[26.8,40.0],[26.9,39.5],[26.0,39.0],[23.4,36.2],[20.1,31.6],[17.3,28.6]]
+    },
+    {
+      id:'enkutatash', name:'Enkutatash', place:'Addis Ababa, Ethiopia', type:'solar',
+      month:8, day:11, dateLabel:'September 11, 2026',
+      badge:'Solar &middot; fixed date',
+      mech:"A solar calendar on the older Alexandrian/Coptic model rather than the Gregorian one: twelve 30-day months plus a short 5- or 6-day 13th month, running about seven to eight years behind the Gregorian count. Meskerem 1, New Year's Day, lands on a fixed Gregorian date.",
+      ag:"Addis Ababa's new year is timed to a real, visible weather event: the tail end of kiremt, the main summer monsoon that runs roughly June through mid-September. Enkutatash lands right as the rains break and Meskel daisies (locally adey abeba) carpet the highlands &mdash; one of the few new years here keyed to rainfall rather than temperature or a solstice.",
+      rateNote:"Addis Ababa's highland elevation keeps its temperature curve nearly flat all year, so its derivative has almost nothing to show. That's a limit of this chart, not of Enkutatash: the real turning point in September is in the rainfall record, not the temperature one.",
+      temps:[[10.0,22.2],[11.1,22.8],[12.2,23.3],[12.8,23.3],[12.8,23.3],[12.2,21.7],[12.2,19.4],[12.2,18.9],[11.7,20.0],[10.6,21.7],[9.4,21.7],[8.9,21.7]]
+    },
+    {
+      id:'baisakhi', name:'Baisakhi', place:'Amritsar, Punjab', type:'solar',
+      month:3, day:14, dateLabel:'April 14, 2026',
+      badge:'Solar &middot; sidereal',
+      mech:"Also solar, but sidereal: fixed to the sun's entry into the constellation Aries (Mesha Sankranti) rather than the tropical equinox. The sidereal and tropical zodiacs have drifted about 24&deg; apart since antiquity, from Earth's roughly 26,000-year axial precession &mdash; why this lands nearly a month after the actual equinox instead of on it.",
+      ag:"April 14 is the Rabi wheat harvest in Punjab, one of the most consequential dates on the agricultural calendar of northern India. Amritsar is already hot and dry by then (average high 34.4&deg;C) &mdash; the pre-monsoon window when a matured winter wheat crop has to come off the field before the summer rains arrive.",
+      rateNote:"Amritsar's fastest-warming day of the year falls in mid-March, about a month before Baisakhi &mdash; by April 14 the rate is still high (+5.7&deg;C/month) but already past its peak (+5.9&deg;C/month), on the way down toward the pre-monsoon plateau.",
+      temps:[[6.0,17.8],[8.4,20.8],[13.0,26.9],[18.5,34.4],[23.5,39.2],[26.4,38.5],[26.1,34.0],[25.4,32.7],[23.3,32.6],[18.1,31.3],[12.6,25.9],[7.5,20.4]]
+    }
+  ];
+
+  CAL.forEach(function(c){ c.angle = angleForDate(c.month, c.day, YEAR); });
+
+  // ---------- 20-year drift ranges ----------
+  // For the bounded lunisolar/solar calendars this is the documented rule-bound range
+  // (a 20-year window comfortably samples it, since the correction cycle repeats every ~19 years).
+  // For the Islamic calendar it's the real, dated 2006 -> 2026 sweep.
+  var DRIFT = {
+    gregorian:    { a: angleForDate(0,1,YEAR),  b: angleForDate(0,1,YEAR),  caption:'no drift — fixed Jan 1' },
+    chinese:      { a: angleForDate(0,21,YEAR), b: angleForDate(1,20,YEAR), caption:'ranges Jan 21–Feb 20' },
+    roshhashanah: { a: angleForDate(8,5,YEAR),  b: angleForDate(9,5,YEAR),  caption:'ranges Sep 5–Oct 5' },
+    nowruz:       { a: angleForDate(2,19,YEAR), b: angleForDate(2,22,YEAR), caption:'Mar 19–22 only' },
+    islamic:      { a: angleForDate(0,31,2006), b: angleForDate(5,16,2026), caption:'drifted 229 days since 2006', sweep:0, large:1, isSweep:true },
+    enkutatash:   { a: angleForDate(8,11,YEAR), b: angleForDate(8,12,YEAR), caption:'Sep 11 or 12 only' },
+    baisakhi:     { a: angleForDate(3,13,YEAR), b: angleForDate(3,14,YEAR), caption:'Apr 13 or 14 only' }
+  };
+
+  // ---------- wheel ----------
+  (function buildWheel(){
+    var svg = document.getElementById('wheel');
+    var cx = 420, cy = 400, R = 180;
+    var LABEL_R = 235;
+    var ARC_R = R + 15;
+    svg.setAttribute('viewBox', '0 0 840 800');
+    var ns = 'http://www.w3.org/2000/svg';
+    function el(tag, attrs){
+      var e = document.createElementNS(ns, tag);
+      for (var k in attrs) e.setAttribute(k, attrs[k]);
+      return e;
+    }
+    function pt(angleDeg, r){
+      var rad = (angleDeg - 90) * Math.PI / 180; // -90 so 0deg = top
+      return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+    }
+
+    // base ring
+    svg.appendChild(el('circle', {cx:cx, cy:cy, r:R, fill:'none', stroke:'var(--line)', 'stroke-width':1.5}));
+
+    // month ticks + labels
+    for (var m = 0; m < 12; m++){
+      var a = angleForDate(m, 1, YEAR);
+      var p1 = pt(a, R - 8), p2 = pt(a, R + 8);
+      svg.appendChild(el('line', {x1:p1.x, y1:p1.y, x2:p2.x, y2:p2.y, stroke:'var(--muted)', 'stroke-width':1}));
+      var mid = angleForDate(m, 15, YEAR);
+      var lp = pt(mid, R + 22);
+      var t = el('text', {x:lp.x, y:lp.y, 'text-anchor':'middle', 'dominant-baseline':'middle', class:'mono'});
+      t.setAttribute('font-size', '12');
+      t.setAttribute('fill', 'var(--muted)');
+      t.textContent = MONTH_LETTERS[m];
+      svg.appendChild(t);
+    }
+
+    // equinox / solstice ticks (approx dates)
+    var markers = [
+      {m:2, d:20}, {m:5, d:21}, {m:8, d:23}, {m:11,d:21}
+    ];
+    markers.forEach(function(mk){
+      var a = angleForDate(mk.m, mk.d, YEAR);
+      var p1 = pt(a, R - 24), p2 = pt(a, R - 8);
+      svg.appendChild(el('line', {x1:p1.x, y1:p1.y, x2:p2.x, y2:p2.y, stroke:'var(--accent-soft)', 'stroke-width':2, 'stroke-linecap':'round'}));
+    });
+
+    // 20-year drift arcs — true angular width, no padding. Islamic gets no arc (see caption for its number).
+    // Rosh Hashanah and Enkutatash get separate radial tracks since their true ranges overlap in angle
+    // (Sep 11–12 sits inside Sep 5–Oct 5) — the nested arcs make that overlap visible.
+    function arcPath(startAngle, endAngle, r, sweepFlag, largeFlag){
+      var p1 = pt(startAngle, r), p2 = pt(endAngle, r);
+      return 'M ' + p1.x + ' ' + p1.y + ' A ' + r + ' ' + r + ' 0 ' + largeFlag + ' ' + sweepFlag + ' ' + p2.x + ' ' + p2.y;
+    }
+    var ARC_TRACK = { enkutatash: ARC_R - 10 };
+    CAL.forEach(function(c){
+      if (c.id === 'islamic') return; // dot only — see its caption for the 229-day figure
+      var dr = DRIFT[c.id];
+      var span = Math.abs(dr.b - dr.a);
+      if (span < 0.05) return; // Gregorian: zero drift, nothing to draw
+      var color = 'var(--' + c.type + ')';
+      var r = ARC_TRACK[c.id] || ARC_R;
+      var path = el('path', {
+        d: arcPath(dr.a, dr.b, r, 1, 0),
+        fill:'none', stroke:color, 'stroke-width': c.id==='enkutatash' ? 4 : 6,
+        'stroke-linecap':'round', opacity:0.55
+      });
+      svg.appendChild(path);
+    });
+
+    // per-calendar dot angle (nudged only where two dates nearly coincide) and label anchor override
+    var dotAngle = {
+      roshhashanah: 264,
+      enkutatash: 235
+    };
+    var anchorOverride = {
+      roshhashanah: 'end',
+      enkutatash: 'end'
+    };
+
+    CAL.forEach(function(c){
+      var angle = (dotAngle[c.id] !== undefined) ? dotAngle[c.id] : c.angle;
+      var dp = pt(angle, R);
+      var color = 'var(--' + c.type + ')';
+
+      // leader line from ring edge to label anchor
+      var lp = pt(angle, LABEL_R - 16);
+      var dpEdge = pt(angle, R + 9);
+      svg.appendChild(el('line', {x1:dpEdge.x, y1:dpEdge.y, x2:lp.x, y2:lp.y, stroke:color, 'stroke-width':1, opacity:0.55}));
+
+      // dot (this year's actual date)
+      svg.appendChild(el('circle', {cx:dp.x, cy:dp.y, r:7, fill:color, stroke:'var(--surface)', 'stroke-width':2}));
+
+      // label
+      var normAngle = ((angle % 360) + 360) % 360;
+      var anchor = anchorOverride[c.id] || ((normAngle > 15 && normAngle < 165) ? 'start' : (normAngle > 195 && normAngle < 345) ? 'end' : 'middle');
+      var tp = pt(angle, LABEL_R);
+      var nameT = el('text', {x:tp.x, y:tp.y - 9, 'text-anchor':anchor});
+      nameT.setAttribute('font-family', "'Fraunces', serif");
+      nameT.setAttribute('font-size', '15');
+      nameT.setAttribute('font-weight', '600');
+      nameT.setAttribute('fill', 'var(--ink)');
+      nameT.textContent = c.name;
+      svg.appendChild(nameT);
+
+      var dateT = el('text', {x:tp.x, y:tp.y + 9, 'text-anchor':anchor, class:'mono'});
+      dateT.setAttribute('font-size', '12');
+      dateT.setAttribute('fill', 'var(--muted)');
+      dateT.textContent = fmtDate(c.month, c.day);
+      svg.appendChild(dateT);
+
+      var capT = el('text', {x:tp.x, y:tp.y + 24, 'text-anchor':anchor, class:'mono'});
+      capT.setAttribute('font-size', '10');
+      capT.setAttribute('fill', color);
+      capT.textContent = DRIFT[c.id].caption;
+      svg.appendChild(capT);
+    });
+
+    // center label
+    var centerT1 = el('text', {x:cx, y:cy-6, 'text-anchor':'middle'});
+    centerT1.setAttribute('font-family', "'Fraunces', serif");
+    centerT1.setAttribute('font-size', '17');
+    centerT1.setAttribute('fill', 'var(--muted)');
+    centerT1.textContent = '2026';
+    svg.appendChild(centerT1);
+    var centerT2 = el('text', {x:cx, y:cy+14, 'text-anchor':'middle', class:'mono'});
+    centerT2.setAttribute('font-size', '11');
+    centerT2.setAttribute('fill', 'var(--muted)');
+    centerT2.textContent = 'one orbit';
+    svg.appendChild(centerT2);
+  })();
+
+  // ---------- index strip ----------
+  (function buildIndex(){
+    var strip = document.getElementById('index-strip');
+    CAL.forEach(function(c){
+      var a = document.createElement('a');
+      a.href = '#card-' + c.id;
+      a.innerHTML = '<span class="name">' + c.name + '</span><span class="date mono">' + fmtDate(c.month,c.day) + '</span>';
+      strip.appendChild(a);
+    });
+  })();
+
+  // ---------- line charts ----------
+  var tooltip = document.getElementById('tooltip');
+
+  function buildLineChart(svg, city){
+    var W = 300, H = 168;
+    var padL = 30, padR = 10, padT = 10, padB = 22;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var ns = 'http://www.w3.org/2000/svg';
+    function el(tag, attrs){
+      var e = document.createElementNS(ns, tag);
+      for (var k in attrs) e.setAttribute(k, attrs[k]);
+      return e;
+    }
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+
+    var vals = city.temps;
+    var allLows = vals.map(function(v){return v[0];});
+    var allHighs = vals.map(function(v){return v[1];});
+    var dataMin = Math.min.apply(null, allLows);
+    var dataMax = Math.max.apply(null, allHighs);
+    var yMin = Math.floor((dataMin - 3) / 5) * 5;
+    var yMax = Math.ceil((dataMax + 3) / 5) * 5;
+
+    function xFor(i){ return padL + (i / 11) * plotW; }
+    function yFor(v){ return padT + plotH - ((v - yMin) / (yMax - yMin)) * plotH; }
+
+    var color = 'var(--' + city.type + ')';
+
+    // gridlines (2, rounded)
+    var gridVals = [yMin, Math.round((yMin+yMax)/2/5)*5, yMax];
+    gridVals.forEach(function(gv){
+      var y = yFor(gv);
+      svg.appendChild(el('line', {x1:padL, y1:y, x2:W-padR, y2:y, stroke:'var(--line)', 'stroke-width':1}));
+      var t = el('text', {x:padL-6, y:y+3, 'text-anchor':'end', class:'mono'});
+      t.setAttribute('font-size','9');
+      t.setAttribute('fill','var(--muted)');
+      t.textContent = gv;
+      svg.appendChild(t);
+    });
+
+    // band path (low..high)
+    var bandPts = [];
+    for (var i=0;i<12;i++) bandPts.push(xFor(i)+','+yFor(vals[i][1]));
+    for (var j=11;j>=0;j--) bandPts.push(xFor(j)+','+yFor(vals[j][0]));
+    svg.appendChild(el('polygon', {points: bandPts.join(' '), fill: color, opacity:0.12, stroke:'none'}));
+
+    // mean line
+    var meanPts = [];
+    for (var k=0;k<12;k++){
+      var mean = (vals[k][0]+vals[k][1])/2;
+      meanPts.push(xFor(k)+','+yFor(mean));
+    }
+    svg.appendChild(el('polyline', {points: meanPts.join(' '), fill:'none', stroke: color, 'stroke-width':2, 'stroke-linejoin':'round', 'stroke-linecap':'round'}));
+
+    // new year marker line + dot
+    var mIdx = city.month;
+    var markX = xFor(mIdx + (city.day-1)/30);
+    svg.appendChild(el('line', {x1:markX, y1:padT, x2:markX, y2:padT+plotH, stroke: color, 'stroke-width':1.3, 'stroke-dasharray':'2 3', opacity:0.8}));
+    var meanAtMark = (vals[mIdx][0]+vals[mIdx][1])/2;
+    svg.appendChild(el('circle', {cx:markX, cy:yFor(meanAtMark), r:4.5, fill:color, stroke:'var(--surface)', 'stroke-width':1.5}));
+
+    // x axis labels
+    for (var x=0;x<12;x++){
+      var t2 = el('text', {x:xFor(x), y:H-6, 'text-anchor':'middle', class:'mono'});
+      t2.setAttribute('font-size','9');
+      t2.setAttribute('fill', x===mIdx ? color : 'var(--muted)');
+      t2.setAttribute('font-weight', x===mIdx ? '700' : '400');
+      t2.textContent = MONTH_LETTERS[x];
+      svg.appendChild(t2);
+    }
+
+    // hover layer
+    var guide = el('line', {x1:0,y1:padT,x2:0,y2:padT+plotH, stroke:'var(--ink-soft)', 'stroke-width':1, opacity:0});
+    svg.appendChild(guide);
+    var hoverDot = el('circle', {r:4, fill:color, stroke:'var(--surface)', 'stroke-width':1.5, opacity:0});
+    svg.appendChild(hoverDot);
+
+    var hitRect = el('rect', {x:padL, y:0, width:plotW, height:H, fill:'transparent'});
+    svg.appendChild(hitRect);
+
+    function showAt(clientX, clientY, i){
+      guide.setAttribute('x1', xFor(i)); guide.setAttribute('x2', xFor(i)); guide.setAttribute('opacity', 0.5);
+      var mean = (vals[i][0]+vals[i][1])/2;
+      hoverDot.setAttribute('cx', xFor(i)); hoverDot.setAttribute('cy', yFor(mean)); hoverDot.setAttribute('opacity',1);
+      tooltip.innerHTML = '<strong>'+MONTH_NAMES[i]+'</strong> &middot; '+city.place+'<br>low '+vals[i][0]+'&deg;C &middot; high '+vals[i][1]+'&deg;C'+(i===mIdx ? '<br><span style="color:#9ad">'+city.name+' begins here</span>' : '');
+      tooltip.style.left = clientX + 'px';
+      tooltip.style.top = clientY + 'px';
+      tooltip.classList.add('show');
+    }
+    function hide(){
+      guide.setAttribute('opacity',0); hoverDot.setAttribute('opacity',0); tooltip.classList.remove('show');
+    }
+    hitRect.addEventListener('mousemove', function(evt){
+      var rect = svg.getBoundingClientRect();
+      var svgX = (evt.clientX - rect.left) / rect.width * W;
+      var i = Math.round((svgX - padL) / plotW * 11);
+      i = Math.max(0, Math.min(11, i));
+      showAt(evt.clientX, evt.clientY, i);
+    });
+    hitRect.addEventListener('mouseleave', hide);
+    hitRect.addEventListener('touchstart', function(evt){
+      var touch = evt.touches[0];
+      var rect = svg.getBoundingClientRect();
+      var svgX = (touch.clientX - rect.left) / rect.width * W;
+      var i = Math.round((svgX - padL) / plotW * 11);
+      i = Math.max(0, Math.min(11, i));
+      showAt(touch.clientX, touch.clientY, i);
+    }, {passive:true});
+  }
+
+  // ---------- derivative helpers ----------
+  function meanArray(temps){
+    return temps.map(function(v){ return (v[0]+v[1])/2; });
+  }
+  function derivArray(means){
+    // centered difference, cyclic (Dec<->Jan wrap)
+    var out = [];
+    for (var i=0;i<12;i++){
+      var prev = means[(i+11)%12], next = means[(i+1)%12];
+      out.push(Math.round((next-prev)/2*100)/100);
+    }
+    return out;
+  }
+
+  function buildDerivativeChart(svg, city){
+    var W = 300, H = 130;
+    var padL = 30, padR = 10, padT = 10, padB = 20;
+    var plotW = W - padL - padR, plotH = H - padT - padB;
+    var ns = 'http://www.w3.org/2000/svg';
+    function el(tag, attrs){
+      var e = document.createElementNS(ns, tag);
+      for (var k in attrs) e.setAttribute(k, attrs[k]);
+      return e;
+    }
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+
+    var means = meanArray(city.temps);
+    var d = derivArray(means);
+    var maxAbs = Math.max.apply(null, d.map(Math.abs));
+    var yMax = Math.ceil((maxAbs + 0.5));
+    var yMin = -yMax;
+    var zeroY = padT + plotH/2;
+
+    function xFor(i){ return padL + (i/11) * plotW; }
+    function yFor(v){ return padT + plotH - ((v - yMin)/(yMax - yMin)) * plotH; }
+
+    // zero baseline (heavier, it's the reference)
+    svg.appendChild(el('line', {x1:padL, y1:zeroY, x2:W-padR, y2:zeroY, stroke:'var(--muted)', 'stroke-width':1}));
+    var t0 = el('text', {x:padL-6, y:zeroY+3, 'text-anchor':'end', class:'mono'});
+    t0.setAttribute('font-size','9'); t0.setAttribute('fill','var(--muted)'); t0.textContent='0';
+    svg.appendChild(t0);
+    [yMax, yMin].forEach(function(gv){
+      var y = yFor(gv);
+      var t = el('text', {x:padL-6, y:y+3, 'text-anchor':'end', class:'mono'});
+      t.setAttribute('font-size','9'); t.setAttribute('fill','var(--muted)');
+      t.textContent = (gv>0?'+':'')+gv;
+      svg.appendChild(t);
+    });
+
+    var barW = Math.min(20, plotW/12*0.5);
+    var maxIdx = 0, minIdx = 0;
+    d.forEach(function(v,i){ if (v>d[maxIdx]) maxIdx=i; if (v<d[minIdx]) minIdx=i; });
+
+    var bars = [];
+    for (var i=0;i<12;i++){
+      var x = xFor(i);
+      var v = d[i];
+      var y0 = zeroY, y1 = yFor(v);
+      var top = Math.min(y0,y1), h = Math.abs(y1-y0);
+      var color = v>=0 ? 'var(--warm)' : 'var(--cool)';
+      var rTop = v>=0 ? 3 : 0, rBot = v<0 ? 3 : 0;
+      var rect = el('rect', {
+        x: x-barW/2, y: top, width: barW, height: Math.max(h,1),
+        fill: color, opacity: 0.85, rx: 3
+      });
+      svg.appendChild(rect);
+      bars.push({x:x, v:v, i:i});
+    }
+
+    // peak annotations (sparing: exactly two)
+    function annotate(idx, label, above){
+      var x = xFor(idx), v = d[idx], y = yFor(v);
+      var ty = above ? y - 8 : y + 14;
+      var t = el('text', {x:x, y:ty, 'text-anchor':'middle', class:'mono'});
+      t.setAttribute('font-size','8.5'); t.setAttribute('fill','var(--ink-soft)');
+      t.textContent = label;
+      svg.appendChild(t);
+    }
+    if (maxAbs > 0.15){
+      annotate(maxIdx, 'fastest warming', true);
+      annotate(minIdx, 'fastest cooling', false);
+    }
+
+    // new year marker
+    var mIdx = city.month;
+    var markX = xFor(mIdx + (city.day-1)/30);
+    svg.appendChild(el('line', {x1:markX, y1:padT, x2:markX, y2:padT+plotH, stroke:'var(--ink)', 'stroke-width':1.3, 'stroke-dasharray':'2 3', opacity:0.55}));
+
+    // x axis labels
+    for (var x2=0;x2<12;x2++){
+      var t2 = el('text', {x:xFor(x2), y:H-5, 'text-anchor':'middle', class:'mono'});
+      t2.setAttribute('font-size','9');
+      t2.setAttribute('fill', x2===mIdx ? 'var(--ink)' : 'var(--muted)');
+      t2.setAttribute('font-weight', x2===mIdx ? '700' : '400');
+      t2.textContent = MONTH_LETTERS[x2];
+      svg.appendChild(t2);
+    }
+
+    // hover
+    var hitRect = el('rect', {x:padL, y:0, width:plotW, height:H, fill:'transparent'});
+    svg.appendChild(hitRect);
+    hitRect.addEventListener('mousemove', function(evt){
+      var rect = svg.getBoundingClientRect();
+      var svgX = (evt.clientX - rect.left) / rect.width * W;
+      var i = Math.round((svgX - padL) / plotW * 11);
+      i = Math.max(0, Math.min(11, i));
+      var v = d[i];
+      tooltip.innerHTML = '<strong>'+MONTH_NAMES[i]+'</strong> &middot; '+city.place+'<br>'+(v>=0?'+':'')+v+'&deg;C/month'+(v>=0?' (warming)':' (cooling)')+(i===mIdx ? '<br><span style="color:#9ad">'+city.name+' begins here</span>' : '');
+      tooltip.style.left = evt.clientX + 'px';
+      tooltip.style.top = evt.clientY + 'px';
+      tooltip.classList.add('show');
+    });
+    hitRect.addEventListener('mouseleave', function(){ tooltip.classList.remove('show'); });
+  }
+
+  // ---------- cards ----------
+  (function buildCards(){
+    var container = document.getElementById('cards');
+    CAL.forEach(function(c){
+      var card = document.createElement('div');
+      card.className = 'card';
+      card.id = 'card-' + c.id;
+      card.innerHTML =
+        '<div class="card-head"><h3>'+c.name+'</h3><span class="badge '+c.type+'">'+c.badge+'</span></div>'+
+        '<div class="place">'+c.place+'</div>'+
+        '<div class="date-line">2026 &middot; '+c.dateLabel+'</div>'+
+        '<p>'+c.mech+'</p>'+
+        '<p>'+c.ag+'</p>'+
+        '<div class="chart-wrap"><svg class="temp-svg"></svg></div>'+
+        '<div class="chart-foot"><span>monthly temperature, '+c.place.split(',')[0]+'</span><span>hover for values</span></div>'+
+        '<span class="chart-label">Rate of change, &deg;C per month</span>'+
+        '<div class="chart-wrap"><svg class="rate-svg"></svg></div>'+
+        '<div class="rate-legend"><span class="item"><span class="sw" style="background:var(--warm)"></span>warming</span><span class="item"><span class="sw" style="background:var(--cool)"></span>cooling</span></div>'+
+        '<div class="rate-note">'+c.rateNote+'</div>';
+      container.appendChild(card);
+      buildLineChart(card.querySelector('.temp-svg'), c);
+      buildDerivativeChart(card.querySelector('.rate-svg'), c);
+    });
+  })();
+
+  // ---------- data table (table-view twin) ----------
+  (function buildDataTable(){
+    var table = document.getElementById('monthly-table');
+    var thead = '<thead><tr><th>City (calendar)</th>' + MONTH_LETTERS.map(function(l){return '<th>'+l+'</th>';}).join('') + '</tr></thead>';
+    var rows = CAL.map(function(c){
+      var cells = c.temps.map(function(v){
+        var mean = Math.round((v[0]+v[1])/2*10)/10;
+        return '<td class="num">'+mean+'</td>';
+      }).join('');
+      return '<tr><td class="name">'+c.place.split(',')[0]+' <span style="color:var(--muted);font-weight:400;font-family:\'IBM Plex Sans\';font-size:.8em;">('+c.name+')</span></td>'+cells+'</tr>';
+    }).join('');
+    table.innerHTML = thead + '<tbody>' + rows + '</tbody>';
+  })();
+
+  (function buildRateTable(){
+    var table = document.getElementById('rate-table');
+    var thead = '<thead><tr><th>City (calendar)</th>' + MONTH_LETTERS.map(function(l){return '<th>'+l+'</th>';}).join('') + '</tr></thead>';
+    var rows = CAL.map(function(c){
+      var d = derivArray(meanArray(c.temps));
+      var cells = d.map(function(v){
+        return '<td class="num">'+(v>=0?'+':'')+v+'</td>';
+      }).join('');
+      return '<tr><td class="name">'+c.place.split(',')[0]+' <span style="color:var(--muted);font-weight:400;font-family:\'IBM Plex Sans\';font-size:.8em;">('+c.name+')</span></td>'+cells+'</tr>';
+    }).join('');
+    table.innerHTML = thead + '<tbody>' + rows + '</tbody>';
+  })();
+
+})();
+</script>
+</body>
+</html>
