@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rhode Island Labor Reality</title>
+<meta name="description" content="Employment-population ratio for Rhode Island, New England, and the US, decomposed by region and by participation vs. unemployment, with 50-state choropleths.">
+<style>
+:root{
+  color-scheme: light;
+  --surface-1:#fcfcfb; --page:#f4f3ef; --text-primary:#0b0b0b; --text-secondary:#52514e;
+  --muted:#898781; --grid:#e1e0d9; --baseline:#c3c2b7; --border:rgba(11,11,11,0.10);
+  --s-ri:#2a78d6; --s-ma:#eb6834; --s-us:#1baf7a; --s-ne:#eda100;
+  --div-good:#0ca30c; --div-bad:#d03b3b; --div-mid:#f0efec;
+  --card-shadow: 0 1px 2px rgba(11,11,11,0.06), 0 1px 1px rgba(11,11,11,0.04);
+  --accent-soft: #eef4fc;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --surface-1:#1a1a19; --page:#0d0d0d; --text-primary:#ffffff; --text-secondary:#c3c2b7;
+    --muted:#898781; --grid:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,0.10);
+    --s-ri:#3987e5; --s-ma:#d95926; --s-us:#199e70; --s-ne:#c98500;
+    --div-good:#0ca30c; --div-bad:#e66767; --div-mid:#383835;
+    --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 1px 1px rgba(0,0,0,0.2);
+    --accent-soft: #132235;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --surface-1:#1a1a19; --page:#0d0d0d; --text-primary:#ffffff; --text-secondary:#c3c2b7;
+  --muted:#898781; --grid:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,0.10);
+  --s-ri:#3987e5; --s-ma:#d95926; --s-us:#199e70; --s-ne:#c98500;
+  --div-good:#0ca30c; --div-bad:#e66767; --div-mid:#383835;
+  --card-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 1px 1px rgba(0,0,0,0.2);
+  --accent-soft: #132235;
+}
+*{box-sizing:border-box;}
+body{
+  background:var(--page); color:var(--text-primary);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  padding-inline:16px; padding-block: 28px 48px;
+}
+.wrap{max-width:980px; margin:0 auto;}
+.num{ font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-variant-numeric: tabular-nums; }
+header.page-head{margin-bottom:22px;}
+h1{font-size:1.6rem; font-weight:800; letter-spacing:-0.01em; margin:0 0 6px; text-wrap:balance;}
+.subtitle{color:var(--text-secondary); font-size:0.92rem; margin:0 0 4px; max-width:68ch;}
+.asof{color:var(--muted); font-size:0.78rem; margin:0;}
+.card{
+  background:var(--surface-1); border:1px solid var(--border); border-radius:10px;
+  box-shadow: var(--card-shadow); padding:18px 20px; margin-bottom:16px;
+}
+.section-label{font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin:26px 0 8px; font-weight:700;}
+.section-label:first-of-type{margin-top:0;}
+.kpi-row{display:grid; grid-template-columns: 1.3fr 1fr 1fr; gap:12px; margin-bottom:16px;}
+.kpi{
+  background:var(--surface-1); border:1px solid var(--border); border-radius:10px;
+  padding:16px 16px 14px; box-shadow:var(--card-shadow);
+}
+.kpi.lead{background:var(--accent-soft); border-color:var(--s-ri);}
+.kpi-label{font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); margin-bottom:6px;}
+.kpi.lead .kpi-label{color:var(--s-ri); font-weight:700;}
+.kpi-value{font-size:1.9rem; font-weight:700; line-height:1;}
+.kpi.lead .kpi-value{font-size:2.3rem;}
+.kpi-value .unit{font-size:1rem; font-weight:500; color:var(--text-secondary);}
+.kpi-delta{font-size:0.82rem; color:var(--text-secondary); margin-top:6px;}
+.compare-table-wrap, .raw-table-wrap{overflow-x:auto;}
+table{border-collapse:collapse; width:100%; font-size:0.86rem;}
+table.compare th, table.compare td{padding:7px 10px; text-align:right; border-bottom:1px solid var(--grid); white-space:nowrap;}
+table.compare th:first-child, table.compare td:first-child{text-align:left;}
+table.compare thead th{color:var(--muted); font-weight:600; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1px solid var(--baseline);}
+table.compare td{font-family:'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums;}
+table.compare td:first-child{font-family:inherit;}
+table.compare tr.agg td, table.compare tr.agg{font-weight:700;}
+table.compare tr.agg{background:var(--accent-soft);}
+.dot{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:7px; vertical-align:middle; flex-shrink:0;}
+.controls{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px;}
+.legend{display:flex; gap:8px; flex-wrap:wrap;}
+.chip{
+  display:flex; align-items:center; gap:6px; border:1px solid var(--border); background:var(--surface-1);
+  color:var(--text-primary); border-radius:999px; padding:5px 12px 5px 9px; font-size:0.82rem; cursor:pointer;
+  transition: opacity .15s ease;
+}
+.chip[aria-pressed="false"]{opacity:0.4;}
+.chip:focus-visible{outline:2px solid var(--s-ri); outline-offset:2px;}
+.range-btns{display:flex; gap:4px; background:var(--page); border:1px solid var(--border); border-radius:8px; padding:3px;}
+.range-btns button{
+  border:none; background:transparent; color:var(--text-secondary); font-size:0.8rem; padding:5px 10px;
+  border-radius:6px; cursor:pointer; font-family:inherit;
+}
+.range-btns button[aria-pressed="true"]{background:var(--surface-1); color:var(--text-primary); font-weight:600; box-shadow:var(--card-shadow);}
+.chart-card{padding:18px 18px 12px;}
+.chart-head{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:4px;}
+.chart-title{font-size:1.0rem; font-weight:700;}
+.chart-caption{font-size:0.8rem; color:var(--text-secondary); margin:0 0 8px; max-width:72ch;}
+.chart-wrap{position:relative;}
+svg.chart-svg{width:100%; height:auto; display:block; overflow:visible;}
+svg.chart-svg text{font-family: system-ui, -apple-system, "Segoe UI", sans-serif;}
+.tick-label{fill:var(--muted); font-size:10.5px;}
+.grid-line{stroke:var(--grid); stroke-width:1;}
+.baseline{stroke:var(--baseline); stroke-width:1;}
+.crosshair{stroke:var(--muted); stroke-width:1; stroke-dasharray:2,3; opacity:0;}
+.end-label{font-size:10.5px; font-weight:700; font-family:'IBM Plex Mono', ui-monospace, monospace;}
+.tooltip{
+  position:absolute; pointer-events:none; background:var(--text-primary); color:var(--surface-1);
+  border-radius:8px; padding:8px 10px; font-size:0.78rem; line-height:1.5; opacity:0; transition:opacity .08s ease;
+  box-shadow:0 4px 14px rgba(0,0,0,0.25); z-index:5; white-space:nowrap;
+}
+.tooltip .tt-date{font-weight:700; margin-bottom:3px; display:block;}
+.tooltip .tt-row{display:flex; align-items:center; gap:6px;}
+.tooltip .tt-val{font-family:'IBM Plex Mono', ui-monospace, monospace; margin-left:auto; padding-left:14px;}
+.table-toggle{
+  background:none; border:1px solid var(--border); color:var(--text-secondary); font-size:0.8rem;
+  padding:6px 12px; border-radius:8px; cursor:pointer; font-family:inherit; margin-bottom:10px;
+}
+.data-table-wrap{overflow-x:auto; max-height:360px; overflow-y:auto; border:1px solid var(--border); border-radius:8px;}
+table.raw{font-size:0.76rem; min-width:640px;}
+table.raw th, table.raw td{padding:5px 8px; text-align:right; border-bottom:1px solid var(--grid); white-space:nowrap;}
+table.raw th:first-child, table.raw td:first-child{text-align:left; position:sticky; left:0; background:var(--surface-1);}
+table.raw thead th{position:sticky; top:0; background:var(--surface-1); color:var(--muted); font-weight:600; z-index:2;}
+table.raw td{font-family:'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums;}
+footer.methodology{font-size:0.75rem; color:var(--muted); line-height:1.6; margin-top:22px; border-top:1px solid var(--grid); padding-top:16px;}
+footer.methodology p{margin:0 0 8px;}
+
+.smallmult-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
+.smallmult{border:1px solid var(--border); border-radius:8px; padding:10px 10px 6px;}
+.smallmult.is-ri{border-color:var(--s-ri); background:var(--accent-soft);}
+.smallmult-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:2px;}
+.smallmult-name{font-size:0.8rem; font-weight:700;}
+.smallmult-val{font-size:0.78rem; font-family:'IBM Plex Mono', ui-monospace, monospace; color:var(--text-secondary);}
+.smallmult.is-ri .smallmult-val{color:var(--s-ri); font-weight:700;}
+.smallmult svg{width:100%; height:56px; display:block;}
+
+.decomp-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.decomp-panel-title{font-size:0.82rem; font-weight:700; margin-bottom:6px;}
+.decomp-legend{display:flex; gap:14px; font-size:0.76rem; color:var(--text-secondary); margin-bottom:8px;}
+.decomp-legend span{display:inline-flex; align-items:center; gap:5px;}
+
+.map-grid{display:grid; grid-template-columns:1fr; gap:22px;}
+.map-panel-title{font-size:0.92rem; font-weight:700; margin-bottom:2px;}
+.map-panel-caption{font-size:0.78rem; color:var(--text-secondary); margin:0 0 8px;}
+.map-legend{display:flex; align-items:center; gap:8px; font-size:0.72rem; color:var(--muted); margin-top:6px;}
+.map-legend .grad{height:8px; flex:1; border-radius:4px; max-width:220px;}
+.map-state{stroke:var(--surface-1); stroke-width:0.75; cursor:pointer;}
+.map-state.ne-state{stroke:var(--s-ri); stroke-width:2.2;}
+.map-legend{flex-wrap:wrap;}
+.map-legend .tick{white-space:nowrap;}
+.map-wrap{position:relative;}
+
+@media (max-width:640px){
+  .kpi-row{grid-template-columns:1fr;}
+  .decomp-grid{grid-template-columns:1fr;}
+  .smallmult-grid{grid-template-columns:repeat(2,1fr);}
+  h1{font-size:1.35rem;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="page-head">
+    <h1>Rhode Island Labor Reality</h1>
+    <p class="asof">Data through August 2026, seasonally adjusted &middot; BLS release published September 18, 2026</p>
+  </header>
+
+  <section class="kpi-row" id="kpiRow"></section>
+
+  <div class="section-label">Where every New England state stands, August 2026</div>
+  <section class="card">
+    <div class="compare-table-wrap">
+      <table class="compare" id="compareTable"></table>
+    </div>
+  </section>
+
+  <div class="section-label">Employment-population ratio</div>
+  <section class="card chart-card">
+    <div class="controls">
+      <div class="legend" id="legend"></div>
+      <div class="range-btns" id="rangeBtns">
+        <button data-range="10">10Y</button>
+        <button data-range="25">25Y</button>
+        <button data-range="full">1976&ndash;</button>
+      </div>
+    </div>
+    <div class="chart-head"><span class="chart-title">US, New England, Rhode Island, Massachusetts</span></div>
+    <p class="chart-caption">Participation &times; (1 &minus; unemployment rate). New England = unweighted average of the six states below.</p>
+    <div class="chart-wrap" id="wrap-epop">
+      <svg class="chart-svg" id="chart-epop" viewBox="0 0 920 300" preserveAspectRatio="none"></svg>
+      <div class="tooltip" id="tt-epop"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="chart-head"><span class="chart-title">All six New England states</span></div>
+    <div class="smallmult-grid" id="smallmults"></div>
+  </section>
+
+  <div class="section-label">What's driving the trend</div>
+  <section class="card chart-card">
+    <div class="chart-head"><span class="chart-title">Region effect vs. state effect</span></div>
+    <p class="chart-caption">New England minus US, and Rhode Island minus New England. Zero baseline.</p>
+    <div class="chart-wrap" id="wrap-gap">
+      <svg class="chart-svg" id="chart-gap" viewBox="0 0 920 260" preserveAspectRatio="none"></svg>
+      <div class="tooltip" id="tt-gap"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="chart-head"><span class="chart-title">Participation vs. unemployment: what moved the ratio</span></div>
+    <p class="chart-caption">Two-factor decomposition of the change in employment-population ratio. Sums exactly to the total change.</p>
+    <div class="decomp-grid">
+      <div>
+        <div class="decomp-panel-title">Past 1 year (Aug 2025 &rarr; Aug 2026)</div>
+        <div class="chart-wrap"><svg class="chart-svg" id="chart-decomp-1y" viewBox="0 0 440 220" preserveAspectRatio="none"></svg></div>
+      </div>
+      <div>
+        <div class="decomp-panel-title">Past 10 years (Aug 2016 &rarr; Aug 2026)</div>
+        <div class="chart-wrap"><svg class="chart-svg" id="chart-decomp-10y" viewBox="0 0 440 220" preserveAspectRatio="none"></svg></div>
+      </div>
+    </div>
+    <div class="decomp-legend">
+      <span><span class="dot" style="background:var(--s-ri)"></span>Participation effect</span>
+      <span><span class="dot" style="background:var(--s-ma)"></span>Unemployment effect</span>
+      <span>&#9670; total change</span>
+    </div>
+  </section>
+
+  <div class="section-label">The two components on their own</div>
+  <section class="card chart-card">
+    <div class="chart-head"><span class="chart-title">Unemployment rate</span></div>
+    <div class="chart-wrap" id="wrap-ur">
+      <svg class="chart-svg" id="chart-ur" viewBox="0 0 920 260" preserveAspectRatio="none"></svg>
+      <div class="tooltip" id="tt-ur"></div>
+    </div>
+  </section>
+
+  <section class="card chart-card">
+    <div class="chart-head"><span class="chart-title">Labor force participation rate</span></div>
+    <div class="chart-wrap" id="wrap-lfpr">
+      <svg class="chart-svg" id="chart-lfpr" viewBox="0 0 920 260" preserveAspectRatio="none"></svg>
+      <div class="tooltip" id="tt-lfpr"></div>
+    </div>
+  </section>
+
+  <div class="section-label">All 50 states plus DC, August 2026</div>
+  <section class="card">
+    <div class="map-grid" id="mapGrid"></div>
+  </section>
+
+  <section class="card">
+    <button class="table-toggle" id="tableToggle" aria-expanded="false">Show monthly data (last 24 months, employment-population ratio)</button>
+    <div class="data-table-wrap" id="dataTableWrap" hidden>
+      <table class="raw" id="dataTable"></table>
+    </div>
+  </section>
+
+  <footer class="methodology" id="methodology"></footer>
+</div>
+
+<script src="data.js"></script>
+<script>
+(function(){
+  // MAIN columns: date, us_ur,us_lfpr,us_epop, ne_ur,ne_lfpr,ne_epop, ri_ur,ri_lfpr,ri_epop, ma_ur,ma_lfpr,ma_epop,
+  //               ct_ur,ct_lfpr,ct_epop, me_ur,me_lfpr,me_epop, nh_ur,nh_lfpr,nh_epop, vt_ur,vt_lfpr,vt_epop
+  const IDX = {us:[1,2,3], ne:[4,5,6], ri:[7,8,9], ma:[10,11,12], ct:[13,14,15], me:[16,17,18], nh:[19,20,21], vt:[22,23,24]};
+  const MAIN_ENTITIES = [
+    {key:'ri', label:'Rhode Island', var:'--s-ri'},
+    {key:'ma', label:'Massachusetts', var:'--s-ma'},
+    {key:'ne', label:'New England (avg)', var:'--s-ne'},
+    {key:'us', label:'United States', var:'--s-us'}
+  ];
+  const NE_STATES = [
+    {key:'ri', label:'Rhode Island'}, {key:'ma', label:'Massachusetts'}, {key:'ct', label:'Connecticut'},
+    {key:'me', label:'Maine'}, {key:'nh', label:'New Hampshire'}, {key:'vt', label:'Vermont'}
+  ];
+  const hidden = new Set();
+  let rangeYears = 10;
+
+  function monthLabel(ym){
+    const [y,m] = ym.split('-').map(Number);
+    const names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return names[m-1] + ' ' + y;
+  }
+  function yearOf(ym){ return parseInt(ym.slice(0,4),10); }
+  function findYearsAgo(n){
+    const [ly, lm] = MAIN[MAIN.length-1][0].split('-').map(Number);
+    let target = (ly-n) + '-' + String(lm).padStart(2,'0');
+    for (let i=MAIN.length-1; i>=0; i--){
+      if (MAIN[i][0] === target) return MAIN[i];
+      if (MAIN[i][0] < target) return MAIN[i];
+    }
+    return MAIN[0];
+  }
+  function filtered(){
+    if (rangeYears === 'full') return MAIN;
+    const lastYear = yearOf(MAIN[MAIN.length-1][0]);
+    const cutoff = lastYear - rangeYears;
+    return MAIN.filter(r => yearOf(r[0]) >= cutoff);
+  }
+
+  // ---------- KPI ----------
+  function buildKPIs(){
+    const last = MAIN[MAIN.length-1];
+    const yrAgo = findYearsAgo(1);
+    const d1y = DECOMP.find(d => d.entity==='ri' && d.from==='2025-08');
+    const kpiRow = document.getElementById('kpiRow');
+    const epopNow = last[IDX.ri[2]], epopPrev = yrAgo[IDX.ri[2]];
+    const delta = epopNow - epopPrev;
+    kpiRow.innerHTML =
+      '<div class="kpi lead"><div class="kpi-label">RI employment-population ratio</div>'+
+      '<div class="kpi-value num">'+epopNow.toFixed(2)+'<span class="unit">%</span></div>'+
+      '<div class="kpi-delta num">'+(delta<0?'▼':'▲')+' '+(delta<0?'−':'+')+Math.abs(delta).toFixed(2)+' pts vs Aug 2025</div></div>'+
+      '<div class="kpi"><div class="kpi-label">From falling participation</div>'+
+      '<div class="kpi-value num">'+(d1y.participation_effect<0?'−':'+')+Math.abs(d1y.participation_effect).toFixed(2)+'<span class="unit">pts</span></div>'+
+      '<div class="kpi-delta">contribution to the 1&#8209;year change</div></div>'+
+      '<div class="kpi"><div class="kpi-label">From falling unemployment</div>'+
+      '<div class="kpi-value num">'+(d1y.unemployment_effect<0?'−':'+')+Math.abs(d1y.unemployment_effect).toFixed(2)+'<span class="unit">pts</span></div>'+
+      '<div class="kpi-delta">contribution to the 1&#8209;year change</div></div>';
+  }
+
+  function colorVar(key){ return '--s-'+key; }
+
+  function buildCompareTable(){
+    const last = MAIN[MAIN.length-1];
+    const rows = [
+      {key:'ri', label:'Rhode Island'}, {key:'ma', label:'Massachusetts'}, {key:'ct', label:'Connecticut'},
+      {key:'me', label:'Maine'}, {key:'nh', label:'New Hampshire'}, {key:'vt', label:'Vermont'}
+    ];
+    const t = document.getElementById('compareTable');
+    let html = '<thead><tr><th>August 2026</th><th>Unemployment</th><th>Participation</th><th>Employment&ndash;population</th></tr></thead><tbody>';
+    const swatch = k => '<span class="dot" style="background:var(--s-'+ (k==='ri'?'ri':k==='ma'?'ma':'ri') +')"></span>';
+    rows.forEach(r => {
+      const [u,l,e] = IDX[r.key].map(i=>last[i]);
+      const dotColor = r.key==='ri' ? 'var(--s-ri)' : r.key==='ma' ? 'var(--s-ma)' : 'var(--muted)';
+      html += '<tr><td><span class="dot" style="background:'+dotColor+'"></span>'+r.label+'</td>'+
+        '<td>'+u.toFixed(1)+'%</td><td>'+l.toFixed(1)+'%</td><td>'+e.toFixed(2)+'%</td></tr>';
+    });
+    const [nu,nl,ne_] = IDX.ne.map(i=>last[i]);
+    html += '<tr class="agg"><td><span class="dot" style="background:var(--s-ne)"></span>New England (avg)</td>'+
+      '<td>'+nu.toFixed(1)+'%</td><td>'+nl.toFixed(1)+'%</td><td>'+ne_.toFixed(2)+'%</td></tr>';
+    const [usu,usl,use_] = IDX.us.map(i=>last[i]);
+    html += '<tr class="agg"><td><span class="dot" style="background:var(--s-us)"></span>United States</td>'+
+      '<td>'+usu.toFixed(1)+'%</td><td>'+usl.toFixed(1)+'%</td><td>'+use_.toFixed(2)+'%</td></tr>';
+    html += '</tbody>';
+    t.innerHTML = html;
+  }
+
+  // ---------- legend + range controls ----------
+  function buildLegend(){
+    const legend = document.getElementById('legend');
+    legend.innerHTML = MAIN_ENTITIES.map(e =>
+      '<button class="chip" data-key="'+e.key+'" aria-pressed="true">'+
+      '<span class="dot" style="background:var('+e.var+')"></span>'+e.label+'</button>'
+    ).join('');
+    legend.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const k = chip.dataset.key;
+        if (hidden.has(k)) { hidden.delete(k); chip.setAttribute('aria-pressed','true'); }
+        else { hidden.add(k); chip.setAttribute('aria-pressed','false'); }
+        renderLineCharts();
+      });
+    });
+  }
+
+  function buildRangeBtns(){
+    const box = document.getElementById('rangeBtns');
+    box.querySelectorAll('button').forEach(btn => {
+      btn.setAttribute('aria-pressed', String(btn.dataset.range === String(rangeYears)));
+      btn.addEventListener('click', () => {
+        rangeYears = btn.dataset.range === 'full' ? 'full' : Number(btn.dataset.range);
+        box.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b===btn)));
+        renderLineCharts();
+        buildSmallMultiples();
+      });
+    });
+  }
+
+  // ---------- line chart engine (shared by EPOP / UR / LFPR) ----------
+  function drawLineChart(svgId, ttId, metricIdx2, decimals, entities, H){
+    H = H || 300;
+    const svg = document.getElementById(svgId);
+    const tt = ttId ? document.getElementById(ttId) : null;
+    const data = filtered();
+    const M = {top:16, right:66, bottom:26, left:36};
+    const W = 920;
+    const plotW = W - M.left - M.right;
+    const plotH = H - M.top - M.bottom;
+
+    const visible = entities.filter(e => !hidden.has(e.key));
+    let vals = [];
+    data.forEach(row => visible.forEach(e => vals.push(row[IDX[e.key][metricIdx2]])));
+    if (vals.length === 0) vals = [0,1];
+    let yMin = Math.min(...vals), yMax = Math.max(...vals);
+    const pad = Math.max((yMax - yMin) * 0.14, 0.4);
+    yMin -= pad; yMax += pad;
+
+    const x = i => M.left + (data.length === 1 ? plotW/2 : i/(data.length-1) * plotW);
+    const y = v => M.top + (yMax - v)/(yMax - yMin) * plotH;
+
+    let parts = [];
+    const ticks = 4;
+    for (let t=0; t<=ticks; t++){
+      const v = yMin + (yMax-yMin) * t/ticks;
+      const gy = y(v);
+      parts.push('<line class="grid-line" x1="'+M.left+'" x2="'+(W-M.right)+'" y1="'+gy+'" y2="'+gy+'"/>');
+      parts.push('<text class="tick-label" x="'+(M.left-6)+'" y="'+(gy+3)+'" text-anchor="end">'+v.toFixed(decimals===2?1:0)+'%</text>');
+    }
+    parts.push('<line class="baseline" x1="'+M.left+'" x2="'+(W-M.right)+'" y1="'+(H-M.bottom)+'" y2="'+(H-M.bottom)+'"/>');
+
+    const lastYr = yearOf(data[data.length-1][0]);
+    const span = lastYr - yearOf(data[0][0]);
+    const step = span > 40 ? 10 : span > 15 ? 5 : span > 6 ? 2 : 1;
+    data.forEach((row,i) => {
+      const yr = yearOf(row[0]);
+      const mo = row[0].slice(5,7);
+      if (mo === '01' && yr % step === 0 && yr < lastYr){
+        parts.push('<text class="tick-label" x="'+x(i)+'" y="'+(H-M.bottom+16)+'" text-anchor="middle">'+yr+'</text>');
+      }
+    });
+    parts.push('<text class="tick-label" x="'+x(data.length-1)+'" y="'+(H-M.bottom+16)+'" text-anchor="end">'+lastYr+'</text>');
+
+    const lastRow = data[data.length-1];
+    const endpoints = [];
+    visible.forEach(e => {
+      const idx = IDX[e.key][metricIdx2];
+      let d = '';
+      data.forEach((row,i) => { d += (i===0?'M':'L') + x(i).toFixed(2) + ',' + y(row[idx]).toFixed(2) + ' '; });
+      parts.push('<path d="'+d+'" fill="none" stroke="var('+e.var+')" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>');
+      const ex = x(data.length-1), ey = y(lastRow[idx]);
+      parts.push('<circle cx="'+ex+'" cy="'+ey+'" r="3" fill="var('+e.var+')"/>');
+      endpoints.push({e, ex, ey, text:(e.short||e.label)+' '+lastRow[idx].toFixed(decimals)});
+    });
+    endpoints.sort((a,b)=>a.ey-b.ey);
+    for (let i=1;i<endpoints.length;i++){
+      if (endpoints[i].ey - endpoints[i-1].ey < 12) endpoints[i].ey = endpoints[i-1].ey + 12;
+    }
+    endpoints.forEach(ep => {
+      parts.push('<text class="end-label" x="'+(ep.ex+7)+'" y="'+(ep.ey+4)+'" fill="var('+ep.e.var+')">'+ep.text+'</text>');
+    });
+
+    parts.push('<line class="crosshair" id="'+svgId+'-cross" x1="0" x2="0" y1="'+M.top+'" y2="'+(H-M.bottom)+'"/>');
+    visible.forEach(e => {
+      parts.push('<circle class="hover-dot" id="'+svgId+'-dot-'+e.key+'" r="4" fill="var('+e.var+')" stroke="var(--surface-1)" stroke-width="1.5" opacity="0"/>');
+    });
+    parts.push('<rect id="'+svgId+'-hit" x="'+M.left+'" y="0" width="'+plotW+'" height="'+H+'" fill="transparent" style="cursor:crosshair"/>');
+
+    svg.innerHTML = parts.join('');
+    if (!tt) return;
+
+    const hit = document.getElementById(svgId+'-hit');
+    const cross = document.getElementById(svgId+'-cross');
+    const wrap = svg.parentElement;
+
+    function handleMove(clientX, clientY){
+      const rect = svg.getBoundingClientRect();
+      const svgX = (clientX - rect.left) * (W / rect.width);
+      let idx = Math.round((svgX - M.left) / plotW * (data.length - 1));
+      idx = Math.max(0, Math.min(data.length-1, idx));
+      const px = x(idx);
+      cross.setAttribute('x1', px); cross.setAttribute('x2', px); cross.style.opacity = 1;
+
+      let ttHtml = '<span class="tt-date">'+monthLabel(data[idx][0])+'</span>';
+      visible.forEach(e => {
+        const idxCol = IDX[e.key][metricIdx2];
+        const v = data[idx][idxCol];
+        const dot = document.getElementById(svgId+'-dot-'+e.key);
+        dot.setAttribute('cx', px); dot.setAttribute('cy', y(v)); dot.style.opacity = 1;
+        ttHtml += '<div class="tt-row"><span class="dot" style="background:var('+e.var+')"></span>'+e.label+
+          '<span class="tt-val">'+v.toFixed(decimals)+'%</span></div>';
+      });
+      tt.innerHTML = ttHtml;
+      tt.style.opacity = 1;
+      const wrapRect = wrap.getBoundingClientRect();
+      let left = (clientX - wrapRect.left) + 14;
+      const ttWidth = 190;
+      if (left + ttWidth > wrapRect.width) left = (clientX - wrapRect.left) - ttWidth - 14;
+      let top = (clientY - wrapRect.top) - 10;
+      tt.style.left = left + 'px';
+      tt.style.top = Math.max(0, top) + 'px';
+    }
+    function handleLeave(){
+      cross.style.opacity = 0;
+      visible.forEach(e => { const d = document.getElementById(svgId+'-dot-'+e.key); if(d) d.style.opacity = 0; });
+      tt.style.opacity = 0;
+    }
+    hit.addEventListener('pointermove', (ev) => handleMove(ev.clientX, ev.clientY));
+    hit.addEventListener('pointerdown', (ev) => handleMove(ev.clientX, ev.clientY));
+    hit.addEventListener('pointerleave', handleLeave);
+  }
+
+  function renderLineCharts(){
+    const withShort = MAIN_ENTITIES.map(e => Object.assign({}, e, {short:e.key.toUpperCase()}));
+    drawLineChart('chart-epop','tt-epop', 2, 2, withShort, 300);
+    drawLineChart('chart-ur','tt-ur', 0, 1, withShort, 260);
+    drawLineChart('chart-lfpr','tt-lfpr', 1, 1, withShort, 260);
+    drawGapChart();
+  }
+
+  // ---------- gap chart (region effect / state residual) ----------
+  function drawGapChart(){
+    const svg = document.getElementById('chart-gap');
+    const tt = document.getElementById('tt-gap');
+    const data = filtered();
+    const M = {top:16, right:110, bottom:26, left:36};
+    const W = 920, H = 260;
+    const plotW = W - M.left - M.right;
+    const plotH = H - M.top - M.bottom;
+
+    const series = data.map(row => ({
+      date: row[0],
+      neus: row[IDX.ne[2]] - row[IDX.us[2]],
+      rine: row[IDX.ri[2]] - row[IDX.ne[2]]
+    }));
+    const vals = series.flatMap(s => [s.neus, s.rine]);
+    let yMin = Math.min(...vals, 0), yMax = Math.max(...vals, 0);
+    const pad = Math.max((yMax-yMin)*0.16, 0.3);
+    yMin -= pad; yMax += pad;
+
+    const x = i => M.left + (series.length===1?plotW/2:i/(series.length-1)*plotW);
+    const y = v => M.top + (yMax-v)/(yMax-yMin)*plotH;
+
+    let parts = [];
+    const ticks = 4;
+    for (let t=0;t<=ticks;t++){
+      const v = yMin + (yMax-yMin)*t/ticks;
+      const gy = y(v);
+      parts.push('<line class="grid-line" x1="'+M.left+'" x2="'+(W-M.right)+'" y1="'+gy+'" y2="'+gy+'"/>');
+      parts.push('<text class="tick-label" x="'+(M.left-6)+'" y="'+(gy+3)+'" text-anchor="end">'+(v>0?'+':'')+v.toFixed(1)+'</text>');
+    }
+    const zeroY = y(0);
+    parts.push('<line x1="'+M.left+'" x2="'+(W-M.right)+'" y1="'+zeroY+'" y2="'+zeroY+'" stroke="var(--text-secondary)" stroke-width="1.25"/>');
+
+    const lastYr = yearOf(series[series.length-1].date);
+    const span = lastYr - yearOf(series[0].date);
+    const step = span > 40 ? 10 : span > 15 ? 5 : span > 6 ? 2 : 1;
+    series.forEach((s,i) => {
+      const yr = yearOf(s.date), mo = s.date.slice(5,7);
+      if (mo==='01' && yr%step===0 && yr<lastYr){
+        parts.push('<text class="tick-label" x="'+x(i)+'" y="'+(H-M.bottom+16)+'" text-anchor="middle">'+yr+'</text>');
+      }
+    });
+    parts.push('<text class="tick-label" x="'+x(series.length-1)+'" y="'+(H-M.bottom+16)+'" text-anchor="end">'+lastYr+'</text>');
+
+    function line(key, colorVarName, label){
+      let d = '';
+      series.forEach((s,i) => { d += (i===0?'M':'L')+x(i).toFixed(2)+','+y(s[key]).toFixed(2)+' '; });
+      parts.push('<path d="'+d+'" fill="none" stroke="var('+colorVarName+')" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>');
+      const ex = x(series.length-1), ey = y(series[series.length-1][key]);
+      parts.push('<circle cx="'+ex+'" cy="'+ey+'" r="3" fill="var('+colorVarName+')"/>');
+      return {ex, ey, label: label+' '+(series[series.length-1][key]>0?'+':'')+series[series.length-1][key].toFixed(2), colorVarName};
+    }
+    const eps = [line('neus','--s-ne','NE − US'), line('rine','--s-ri','RI − NE')];
+    eps.sort((a,b)=>a.ey-b.ey);
+    for (let i=1;i<eps.length;i++){ if (eps[i].ey-eps[i-1].ey<24) eps[i].ey = eps[i-1].ey+24; }
+    eps.forEach(ep => {
+      parts.push('<text class="end-label" x="'+(ep.ex+7)+'" y="'+(ep.ey+4)+'" fill="var('+ep.colorVarName+')">'+ep.label+'</text>');
+    });
+
+    parts.push('<line class="crosshair" id="gap-cross" x1="0" x2="0" y1="'+M.top+'" y2="'+(H-M.bottom)+'"/>');
+    parts.push('<circle id="gap-dot-neus" r="4" fill="var(--s-ne)" stroke="var(--surface-1)" stroke-width="1.5" opacity="0"/>');
+    parts.push('<circle id="gap-dot-rine" r="4" fill="var(--s-ri)" stroke="var(--surface-1)" stroke-width="1.5" opacity="0"/>');
+    parts.push('<rect id="gap-hit" x="'+M.left+'" y="0" width="'+plotW+'" height="'+H+'" fill="transparent" style="cursor:crosshair"/>');
+
+    svg.innerHTML = parts.join('');
+    const hit = document.getElementById('gap-hit');
+    const cross = document.getElementById('gap-cross');
+    const wrap = svg.parentElement;
+    function handleMove(clientX, clientY){
+      const rect = svg.getBoundingClientRect();
+      const svgX = (clientX-rect.left)*(W/rect.width);
+      let idx = Math.round((svgX-M.left)/plotW*(series.length-1));
+      idx = Math.max(0, Math.min(series.length-1, idx));
+      const px = x(idx);
+      cross.setAttribute('x1',px); cross.setAttribute('x2',px); cross.style.opacity=1;
+      const s = series[idx];
+      const dNE = document.getElementById('gap-dot-neus'); dNE.setAttribute('cx',px); dNE.setAttribute('cy',y(s.neus)); dNE.style.opacity=1;
+      const dRI = document.getElementById('gap-dot-rine'); dRI.setAttribute('cx',px); dRI.setAttribute('cy',y(s.rine)); dRI.style.opacity=1;
+      tt.innerHTML = '<span class="tt-date">'+monthLabel(s.date)+'</span>'+
+        '<div class="tt-row"><span class="dot" style="background:var(--s-ne)"></span>NE − US<span class="tt-val">'+(s.neus>0?'+':'')+s.neus.toFixed(2)+'</span></div>'+
+        '<div class="tt-row"><span class="dot" style="background:var(--s-ri)"></span>RI − NE<span class="tt-val">'+(s.rine>0?'+':'')+s.rine.toFixed(2)+'</span></div>';
+      tt.style.opacity=1;
+      const wrapRect = wrap.getBoundingClientRect();
+      let left = (clientX-wrapRect.left)+14;
+      if (left+190 > wrapRect.width) left = (clientX-wrapRect.left)-190-14;
+      tt.style.left = left+'px';
+      tt.style.top = Math.max(0,(clientY-wrapRect.top)-10)+'px';
+    }
+    function handleLeave(){
+      cross.style.opacity=0;
+      document.getElementById('gap-dot-neus').style.opacity=0;
+      document.getElementById('gap-dot-rine').style.opacity=0;
+      tt.style.opacity=0;
+    }
+    hit.addEventListener('pointermove', ev=>handleMove(ev.clientX, ev.clientY));
+    hit.addEventListener('pointerdown', ev=>handleMove(ev.clientX, ev.clientY));
+    hit.addEventListener('pointerleave', handleLeave);
+  }
+
+  // ---------- small multiples ----------
+  function buildSmallMultiples(){
+    const grid = document.getElementById('smallmults');
+    const data = filtered();
+    grid.innerHTML = NE_STATES.map(s => '<div class="smallmult'+(s.key==='ri'?' is-ri':'')+'" id="sm-'+s.key+'"></div>').join('');
+    NE_STATES.forEach(s => {
+      const idx = IDX[s.key][2];
+      const vals = data.map(r => r[idx]);
+      const yMin = Math.min(...vals), yMax = Math.max(...vals);
+      const pad = Math.max((yMax-yMin)*0.12, 0.2);
+      const lo = yMin-pad, hi = yMax+pad;
+      const W=200,H=56;
+      const x = i => (data.length===1?W/2:i/(data.length-1)*W);
+      const y = v => H - (v-lo)/(hi-lo)*H;
+      let d = '';
+      data.forEach((row,i) => { d += (i===0?'M':'L')+x(i).toFixed(1)+','+y(row[idx]).toFixed(1)+' '; });
+      const color = s.key==='ri' ? 'var(--s-ri)' : 'var(--muted)';
+      const last = vals[vals.length-1];
+      const cont = document.getElementById('sm-'+s.key);
+      cont.innerHTML = '<div class="smallmult-head"><span class="smallmult-name">'+s.label+'</span>'+
+        '<span class="smallmult-val">'+last.toFixed(1)+'%</span></div>'+
+        '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">'+
+        '<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'+
+        '<circle cx="'+x(data.length-1)+'" cy="'+y(last)+'" r="2.5" fill="'+color+'"/>'+
+        '</svg>';
+    });
+  }
+
+  // ---------- decomposition bars ----------
+  function drawDecompChart(svgId, windowFrom){
+    const svg = document.getElementById(svgId);
+    const rows = ['ri','ma','ne','us'].map(k => DECOMP.find(d => d.entity===k && d.from===windowFrom));
+    const labels = {ri:'Rhode Island', ma:'Massachusetts', ne:'New England', us:'United States'};
+    const W = 440, H = 220;
+    const M = {top:10, right:14, bottom:22, left:96};
+    const plotW = W - M.left - M.right;
+    const plotH = H - M.top - M.bottom;
+    const rowH = plotH / rows.length;
+
+    const allVals = rows.flatMap(r => [r.participation_effect, r.unemployment_effect, r.total_change, 0]);
+    let vMin = Math.min(...allVals), vMax = Math.max(...allVals);
+    const pad = Math.max((vMax-vMin)*0.15, 0.2);
+    vMin -= pad; vMax += pad;
+    const xScale = v => M.left + (v - vMin)/(vMax-vMin) * plotW;
+    const zeroX = xScale(0);
+
+    let parts = [];
+    // gridlines vertical at nice steps
+    const range = vMax - vMin;
+    const rawStep = range/4;
+    const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+    const step = Math.ceil(rawStep/mag)*mag;
+    for (let v = Math.ceil(vMin/step)*step; v <= vMax; v += step){
+      const gx = xScale(v);
+      parts.push('<line class="grid-line" x1="'+gx+'" x2="'+gx+'" y1="'+M.top+'" y2="'+(H-M.bottom)+'"/>');
+      parts.push('<text class="tick-label" x="'+gx+'" y="'+(H-M.bottom+14)+'" text-anchor="middle">'+(v>0?'+':'')+v.toFixed(1)+'</text>');
+    }
+    parts.push('<line x1="'+zeroX+'" x2="'+zeroX+'" y1="'+M.top+'" y2="'+(H-M.bottom)+'" stroke="var(--text-secondary)" stroke-width="1.25"/>');
+
+    const barH = Math.min(14, rowH*0.28);
+    rows.forEach((r,i) => {
+      const cy = M.top + rowH*(i+0.5);
+      parts.push('<text class="tick-label" x="'+(M.left-10)+'" y="'+(cy+4)+'" text-anchor="end" font-weight="700">'+labels[r.entity]+'</text>');
+      // participation bar
+      const py1 = cy - barH - 2;
+      const px0 = xScale(0), px1 = xScale(r.participation_effect);
+      parts.push('<rect x="'+Math.min(px0,px1)+'" y="'+py1+'" width="'+Math.abs(px1-px0)+'" height="'+barH+'" rx="2" fill="var(--s-ri)"/>');
+      // unemployment bar
+      const uy1 = cy + 2;
+      const ux1 = xScale(r.unemployment_effect);
+      parts.push('<rect x="'+Math.min(px0,ux1)+'" y="'+uy1+'" width="'+Math.abs(ux1-px0)+'" height="'+barH+'" rx="2" fill="var(--s-ma)"/>');
+      // total marker (diamond)
+      const tx = xScale(r.total_change);
+      const s = 5;
+      parts.push('<path d="M'+tx+','+(cy-s)+' L'+(tx+s)+','+cy+' L'+tx+','+(cy+s)+' L'+(tx-s)+','+cy+' Z" fill="var(--text-primary)"/>');
+    });
+
+    svg.innerHTML = parts.join('');
+  }
+
+  // ---------- choropleth: red/green diverging, centered on the US rate ----------
+  function divFill(goodness){
+    const pct = Math.round(Math.min(1, Math.abs(goodness)) * 100);
+    const pole = goodness >= 0 ? '--div-good' : '--div-bad';
+    return 'color-mix(in srgb, var('+pole+') '+pct+'%, var(--div-mid) '+(100-pct)+'%)';
+  }
+  function buildMap(containerId, metricKey, title, caption, decimals, highIsGood, usVal, badLabel, goodLabel){
+    const wrap = document.createElement('div');
+    const vals = CHORO.map(s => s[metricKey]);
+    const vMin = Math.min(...vals), vMax = Math.max(...vals);
+    const halfRange = Math.max(Math.abs(vMin - usVal), Math.abs(vMax - usVal)) || 1;
+    const W = 1026, H = 604, VX=-63, VY=8;
+    let paths = CHORO.map(s => {
+      const t = (s[metricKey] - usVal) / halfRange;
+      const goodness = highIsGood ? t : -t;
+      const cls = 'map-state' + (s.ne ? ' ne-state' : '');
+      return '<path class="'+cls+'" data-fips="'+s.fips+'" style="fill:'+divFill(goodness)+'" d="'+s.d+'"></path>';
+    }).join('');
+    wrap.innerHTML =
+      '<div class="map-panel-title">'+title+'</div>'+
+      '<p class="map-panel-caption">'+caption+'</p>'+
+      '<div class="map-wrap" id="'+containerId+'-wrap">'+
+        '<svg class="chart-svg" viewBox="'+VX+' '+VY+' '+W+' '+H+'" preserveAspectRatio="xMidYMid meet" id="'+containerId+'-svg">'+paths+'</svg>'+
+        '<div class="tooltip" id="'+containerId+'-tt"></div>'+
+      '</div>'+
+      '<div class="map-legend"><span class="tick">'+badLabel+'</span><span class="grad" style="background:linear-gradient(90deg, var(--div-bad), var(--div-mid), var(--div-good));"></span><span class="tick">'+goodLabel+'</span></div>'+
+      '<div class="map-legend"><span class="tick">US '+usVal.toFixed(decimals)+'%, at center</span></div>';
+    document.getElementById('mapGrid').appendChild(wrap);
+
+    const svg = document.getElementById(containerId+'-svg');
+    const tt = document.getElementById(containerId+'-tt');
+    const outerWrap = document.getElementById(containerId+'-wrap');
+    svg.querySelectorAll('path.map-state').forEach(p => {
+      p.addEventListener('pointermove', (ev) => {
+        const fips = p.getAttribute('data-fips');
+        const s = CHORO.find(x=>x.fips===fips);
+        tt.innerHTML = '<span class="tt-date">'+s.name+'</span>'+
+          '<div class="tt-row">Unemployment<span class="tt-val">'+s.ur.toFixed(1)+'%</span></div>'+
+          '<div class="tt-row">Participation<span class="tt-val">'+s.lfpr.toFixed(1)+'%</span></div>'+
+          '<div class="tt-row">Employment&ndash;pop.<span class="tt-val">'+s.epop.toFixed(2)+'%</span></div>';
+        tt.style.opacity = 1;
+        const r = outerWrap.getBoundingClientRect();
+        let left = (ev.clientX - r.left) + 14;
+        if (left + 170 > r.width) left = (ev.clientX - r.left) - 170 - 14;
+        tt.style.left = left+'px';
+        tt.style.top = Math.max(0,(ev.clientY - r.top) - 10)+'px';
+      });
+      p.addEventListener('pointerleave', () => { tt.style.opacity = 0; });
+    });
+  }
+  function buildMaps(){
+    document.getElementById('mapGrid').innerHTML = '';
+    const last = MAIN[MAIN.length-1];
+    buildMap('map-epop','epop','Employment&ndash;population ratio','New England outlined. Green: above the US rate. Red: below.',2,true,last[IDX.us[2]],'Below US','Above US');
+    buildMap('map-lfpr','lfpr','Labor force participation rate','Green: above the US rate. Red: below.',1,true,last[IDX.us[1]],'Below US','Above US');
+    buildMap('map-ur','ur','Unemployment rate','Green: below the US rate. Red: above.',1,false,last[IDX.us[0]],'Above US','Below US');
+  }
+
+  // ---------- raw data table ----------
+  function buildDataTable(){
+    const t = document.getElementById('dataTable');
+    const rows = MAIN.slice(-24).reverse();
+    let html = '<thead><tr><th>Month</th><th>US</th><th>New England</th><th>Rhode Island</th><th>Massachusetts</th><th>Connecticut</th><th>Maine</th><th>New Hampshire</th><th>Vermont</th></tr></thead><tbody>';
+    rows.forEach(r => {
+      html += '<tr><td>'+monthLabel(r[0])+'</td>'+
+        ['us','ne','ri','ma','ct','me','nh','vt'].map(k => '<td>'+r[IDX[k][2]].toFixed(2)+'%</td>').join('') +
+        '</tr>';
+    });
+    html += '</tbody>';
+    t.innerHTML = html;
+    document.getElementById('tableToggle').addEventListener('click', function(){
+      const wrap = document.getElementById('dataTableWrap');
+      const isHidden = wrap.hidden;
+      wrap.hidden = !isHidden;
+      this.setAttribute('aria-expanded', String(isHidden));
+      this.textContent = isHidden ? 'Hide monthly data' : 'Show monthly data (last 24 months, employment-population ratio)';
+    });
+  }
+
+  function buildMethodology(){ document.getElementById('methodology').innerHTML = "Source: BLS Local Area Unemployment Statistics and CPS state model, seasonally adjusted, via FRED (UNRATE, CIVPART, EMRATIO nationally; &lt;postal&gt;UR and LBSSA&lt;FIPS&gt; by state). Employment&ndash;population ratio = participation &times; (1 &minus; unemployment &divide; 100), checked against BLS&rsquo;s own EMRATIO: mean difference 0.04 points, max 0.12, across 1976&ndash;2026. New England = unweighted average of CT, ME, MA, NH, RI, VT, not a BLS series. Participation/unemployment split uses the exact two-factor identity (symmetric ordering average), no residual. October 2025 is missing everywhere: the 43-day federal shutdown starting October 1, 2025 stopped that month&rsquo;s household survey and it was never backfilled. State-level estimates carry a far smaller sample than the national figures. Choropleths and compare table: August 2026. Data through August 2026; BLS state release published September 18, 2026."; }
+
+  buildKPIs();
+  buildCompareTable();
+  buildLegend();
+  buildRangeBtns();
+  buildSmallMultiples();
+  drawDecompChart('chart-decomp-1y','2025-08');
+  drawDecompChart('chart-decomp-10y','2016-08');
+  buildMaps();
+  buildDataTable();
+  buildMethodology();
+  renderLineCharts();
+  window.addEventListener('resize', function(){ renderLineCharts(); buildSmallMultiples(); });
+})();
+</script>
+</body>
+</html>
