@@ -4,6 +4,8 @@ An interactive, client-side explainer of how English vowels are produced, in pho
 
 Live: https://adambraff.github.io/tools/vowel-space/
 
+Video (90 seconds): https://youtu.be/HOZbPW5CYKE
+
 ## What it does
 
 - **Vowel chart (F1 x F2):** drag a point around the chart and hear the vowel change in real time. Click a reference vowel to snap F1, F2 and F3 to its values.
@@ -11,10 +13,11 @@ Live: https://adambraff.github.io/tools/vowel-space/
 - **F3 slider:** hear the effect of lip rounding and r-coloring (/ɝ/ in "heard" has F3 near 1690 Hz).
 - **Velum (nasality) slider:** adds a nasal peak near 250 Hz, an antiresonance that climbs through the F1 region, and a wider F1 bandwidth.
 - **Source x filter = output panel:** shows glottal harmonics, the vocal tract filter curve, and the resulting output spectrum.
+- **Explainer video:** embedded from YouTube below the controls.
 
 ## How it works
 
-Pure HTML/CSS/JS, no dependencies beyond Google Fonts (Charis SIL, IBM Plex Mono).
+Pure HTML/CSS/JS, no dependencies beyond Google Fonts (Charis SIL, IBM Plex Mono) and the YouTube embed.
 
 - Source: band-limited sawtooth oscillator (net -6 dB/octave, standing in for glottal pulse plus lip radiation) with slight vibrato.
 - Filter: cascade of four Web Audio lowpass biquads acting as Klatt-style formant resonators (bandwidths 70/100/140/250 Hz; F4 fixed above F3).
