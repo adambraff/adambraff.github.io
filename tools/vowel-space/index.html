@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vowel Space Explorer</title>
+<meta name="description" content="Drag around the F1/F2 vowel chart to hear synthesized English vowels, with F0, F3 and nasality controls.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Charis+SIL:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F2F3EF; --panel:#FAFBF8; --ink:#1B2230; --muted:#5E6673; --grid:#D9DDD6; --grid-strong:#BCC2BA;
+  --f1:#C2410C; --f2:#1D6FA3; --f3:#7B3FA0; --harm:#1B2230; --accent:#1B2230; --point:#C2410C; --nas:#2E7D5B;
+  --serif:"Charis SIL","Gentium Plus","Doulos SIL","Noto Serif",Georgia,serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#12161C; --panel:#181D25; --ink:#E4E8EE; --muted:#9AA3AF; --grid:#262D37; --grid-strong:#3A4350;
+    --f1:#F08A5D; --f2:#5DB0E6; --f3:#BC8BE3; --harm:#E4E8EE; --accent:#E4E8EE; --point:#F08A5D; --nas:#5CC49A;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#12161C; --panel:#181D25; --ink:#E4E8EE; --muted:#9AA3AF; --grid:#262D37; --grid-strong:#3A4350;
+  --f1:#F08A5D; --f2:#5DB0E6; --f3:#BC8BE3; --harm:#E4E8EE; --accent:#E4E8EE; --point:#F08A5D; --nas:#5CC49A;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:16px;line-height:1.5;padding:0 16px;padding-block:24px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:20px}
+header h1{font-size:clamp(26px,4vw,36px);line-height:1.15;margin:0;text-wrap:balance;font-weight:700}
+header p{margin:6px 0 0;color:var(--muted);max-width:68ch}
+.main{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.main{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--grid);border-radius:6px;padding:14px}
+.panel h2{font-size:13px;font-family:var(--mono);font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+canvas{display:block;width:100%;touch-action:none}
+#pad{aspect-ratio:1.15/1;cursor:crosshair;border-radius:4px}
+#pad:focus-visible{outline:2px solid var(--f2);outline-offset:3px}
+#spec{aspect-ratio:1.25/1}
+.readout{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:var(--mono);font-size:14px;font-variant-numeric:tabular-nums;margin-top:10px}
+.readout b{font-weight:500}
+.r-f0{color:var(--ink)} .r-f1{color:var(--f1)} .r-f2{color:var(--f2)} .r-f3{color:var(--f3)}
+.nearest{margin-top:6px;color:var(--muted);font-size:15px}
+.nearest span{color:var(--ink);font-size:18px}
+.controls{display:grid;gap:12px;margin-bottom:14px}
+.row{display:grid;grid-template-columns:150px minmax(0,1fr) 76px;gap:10px;align-items:center}
+.row label{font-family:var(--mono);font-size:13px}
+.row output{font-family:var(--mono);font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%}
+#f0{accent-color:var(--ink)} #f3{accent-color:var(--f3)} #vel{accent-color:var(--nas)}
+.r-nas{color:var(--nas)}
+@media (max-width:520px){.row{grid-template-columns:minmax(0,1fr) 70px}.row label{grid-column:1/-1}}
+.btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font-family:var(--mono);font-size:13px;padding:8px 14px;border-radius:4px;border:1px solid var(--grid-strong);background:var(--bg);color:var(--ink);cursor:pointer}
+button:hover{border-color:var(--ink)}
+button:focus-visible{outline:2px solid var(--f2);outline-offset:2px}
+button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.hint{font-size:14px;color:var(--muted)}
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.notes h3{font-size:17px;margin:0 0 4px}
+.notes p{margin:0;max-width:65ch}
+.k1{color:var(--f1);font-weight:700} .k2{color:var(--f2);font-weight:700} .k3{color:var(--f3);font-weight:700}
+footer{font-size:13px;color:var(--muted);max-width:90ch}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>Vowel Space Explorer</h1>
+    <p>Drag the dot around the vowel chart and listen. The buzz from the vocal folds sets the pitch (F0); the shape of the mouth sets the resonances (F1, F2, F3) that make one vowel sound different from another.</p>
+  </header>
+
+  <div class="main">
+    <section class="panel">
+      <h2>Vowel chart · F1 × F2</h2>
+      <canvas id="pad" tabindex="0" aria-label="Vowel chart. Drag or use arrow keys to change F1 and F2; space toggles sound."></canvas>
+      <div class="readout">
+        <span class="r-f0">F0 <b id="rf0">120</b> Hz</span>
+        <span class="r-f1">F1 <b id="rf1">0</b> Hz</span>
+        <span class="r-f2">F2 <b id="rf2">0</b> Hz</span>
+        <span class="r-f3">F3 <b id="rf3">0</b> Hz</span>
+        <span class="r-nas">Velum <b id="rvel">closed</b></span>
+      </div>
+      <div class="nearest">Closest reference vowel: <span id="near">/ɛ/</span> <em id="nearword">head</em></div>
+    </section>
+
+    <section class="panel">
+      <h2>Controls</h2>
+      <div class="controls">
+        <div class="btns">
+          <button id="play" type="button" aria-pressed="false">Sound on</button>
+          <span class="hint">Or just hold down on the chart (mouse or finger).</span>
+        </div>
+        <div class="row">
+          <label for="f0">F0 · pitch</label>
+          <input id="f0" type="range" min="70" max="350" step="1" value="120">
+          <output id="of0" for="f0">120 Hz</output>
+        </div>
+        <div class="row">
+          <label for="f3">F3 · rounding, r</label>
+          <input id="f3" type="range" min="1400" max="3200" step="10" value="2480">
+          <output id="of3" for="f3">2480 Hz</output>
+        </div>
+        <div class="row">
+          <label for="vel">Velum · nasality</label>
+          <input id="vel" type="range" min="0" max="1" step="0.01" value="0">
+          <output id="ovel" for="vel">0.00</output>
+        </div>
+        <div class="btns" id="presets" aria-label="F0 presets">
+          <button type="button" data-f0="110">Adult male ~110</button>
+          <button type="button" data-f0="210">Adult female ~210</button>
+          <button type="button" data-f0="300">Child ~300</button>
+        </div>
+      </div>
+      <h2>Source × filter = output</h2>
+      <canvas id="spec" aria-label="Spectrum: glottal source harmonics, vocal tract filter, and the output spectrum."></canvas>
+    </section>
+  </div>
+
+  <section class="notes">
+    <div>
+      <h3>The source: F0 and its harmonics</h3>
+      <p>The vocal folds open and close F0 times a second. That buzz holds energy at every whole-number multiple of F0 (the harmonics), each a bit weaker than the last. F0 is what you hear as pitch. Move the F0 slider and watch the harmonic lines spread apart while the filter curve stays put.</p>
+    </div>
+    <div>
+      <h3>The filter: formants</h3>
+      <p>The throat and mouth form a tube with resonances, called formants. Harmonics near a formant come out loud and the rest are damped. <span class="k1">F1</span> rises as the jaw opens and the tongue drops, so it tracks vowel height in reverse. <span class="k2">F2</span> rises as the tongue moves forward, so it tracks frontness.</p>
+    </div>
+    <div>
+      <h3>The third formant</h3>
+      <p><span class="k3">F3</span> matters less for telling most vowels apart, but it drops with lip rounding and plunges for r-colored vowels. Click /ɝ/ ("heard") and it snaps F3 to about 1690 Hz. Then drag F3 back up to 2500 with F1 and F2 unchanged and the r-quality goes away.</p>
+    </div>
+    <div>
+      <h3>Nasal vowels</h3>
+      <p>Lowering the velum opens a side branch into the nose. That adds a low <span style="color:var(--nas);font-weight:700">nasal peak</span> near 250 Hz and an <span style="color:var(--nas);font-weight:700">antiresonance</span> (a notch) that climbs through the F1 region, and it widens F1. F2 and F3 barely move. Pick /ɑ/ or /ɛ/, hold the sound on, and slide the velum up for /ɑ̃/ or /ɛ̃/ as in French <em>blanc</em> and <em>vin</em>.</p>
+    </div>
+    <div>
+      <h3>Try this</h3>
+      <p>Pick /i/ ("heed"), then raise F0 to 300 Hz. The harmonics are now so far apart that the lowest one sits above F1, and the filter shape gets sampled only a few times. That is one reason sung vowels from sopranos are hard to identify.</p>
+    </div>
+  </section>
+
+  <footer>Reference vowels are Peterson &amp; Barney (1952) averages for adult male speakers of American English. Sound is synthesized in your browser: a band-limited sawtooth source passed through a cascade of resonators (Klatt-style), with bandwidths of 70, 100 and 140 Hz and a fixed fourth formant above F3. Nasality adds a peaking and a notching filter (a pole-zero pair, as in Klatt 1980) and widens F1's bandwidth to as much as 200 Hz. It is a simplification of real nasal coupling.</footer>
+</div>
+
+<script>
+(() => {
+const VOWELS = [
+  {ipa:"i", word:"heed",  f1:270, f2:2290, f3:3010},
+  {ipa:"ɪ", word:"hid",   f1:390, f2:1990, f3:2550},
+  {ipa:"ɛ", word:"head",  f1:530, f2:1840, f3:2480},
+  {ipa:"æ", word:"had",   f1:660, f2:1720, f3:2410},
+  {ipa:"ɑ", word:"hod",   f1:730, f2:1090, f3:2440},
+  {ipa:"ɔ", word:"hawed", f1:570, f2:840,  f3:2410},
+  {ipa:"ʊ", word:"hood",  f1:440, f2:1020, f3:2240},
+  {ipa:"u", word:"who'd", f1:300, f2:870,  f3:2240},
+  {ipa:"ʌ", word:"hud",   f1:640, f2:1190, f3:2390},
+  {ipa:"ɝ", word:"heard", f1:490, f2:1350, f3:1690},
+];
+const HULL = ["i","æ","ɑ","ɔ","u"];
+const F1R = [200, 900], F2R = [2700, 600];   // F2 reversed: front vowels on the left
+const SPEC_MAX = 4000;
+
+const st = {f0:120, f1:530, f2:1840, f3:2480, vel:0, sustained:false, pressing:false};
+
+// ---------- DOM ----------
+const $ = id => document.getElementById(id);
+const pad = $("pad"), spec = $("spec");
+const f0In = $("f0"), f3In = $("f3"), velIn = $("vel"), playBtn = $("play");
+
+function css(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function colors(){ return {ink:css("--ink"),muted:css("--muted"),grid:css("--grid"),gridS:css("--grid-strong"),
+  panel:css("--panel"),f1:css("--f1"),f2:css("--f2"),f3:css("--f3"),point:css("--point"),mono:css("--mono"),serif:css("--serif")}; }
+
+function fitCanvas(c){
+  const r = c.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+  const w = Math.max(1, Math.round(r.width*d)), h = Math.max(1, Math.round(r.height*d));
+  if (c.width !== w || c.height !== h){ c.width = w; c.height = h; }
+  const ctx = c.getContext("2d"); ctx.setTransform(d,0,0,d,0,0);
+  return {ctx, w:r.width, h:r.height};
+}
+
+// ---------- Audio ----------
+let ac = null, osc, lfo, lfoGain, filters = [], master, nasP, nasZ;
+const fs = () => ac ? ac.sampleRate : 48000;
+function f4(){ return Math.max(3500, st.f3 + 450); }
+function qdB(f, b){ return 20*Math.log10(f/b); }
+function bws(){ return [70 + 130*st.vel, 100, 140, 250]; }
+// nasal pole-zero pair: peak fixed near 250 Hz, notch climbs 350 -> 800 Hz
+function nasal(){ const v=st.vel; return {fp:250, gp:12*v, qp:2.5, fz:350+450*v, gz:-24*v, qz:4}; }
+
+function initAudio(){
+  if (ac) return;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return;
+  try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch(e){}
+  ac = new AC();
+  osc = ac.createOscillator(); osc.type = "sawtooth"; osc.frequency.value = st.f0;
+  lfo = ac.createOscillator(); lfo.frequency.value = 5.2;
+  lfoGain = ac.createGain(); lfoGain.gain.value = st.f0*0.006;
+  lfo.connect(lfoGain).connect(osc.frequency);
+  let node = osc;
+  const fr = [st.f1, st.f2, st.f3, f4()], bw = bws();
+  for (let i=0;i<4;i++){
+    const b = ac.createBiquadFilter(); b.type = "lowpass";
+    b.frequency.value = fr[i]; b.Q.value = qdB(fr[i], bw[i]);
+    node.connect(b); node = b; filters.push(b);
+  }
+  const n = nasal();
+  nasP = ac.createBiquadFilter(); nasP.type="peaking"; nasP.frequency.value=n.fp; nasP.Q.value=n.qp; nasP.gain.value=n.gp;
+  nasZ = ac.createBiquadFilter(); nasZ.type="peaking"; nasZ.frequency.value=n.fz; nasZ.Q.value=n.qz; nasZ.gain.value=n.gz;
+  node.connect(nasP); nasP.connect(nasZ); node = nasZ;
+  master = ac.createGain(); master.gain.value = 0;
+  const comp = ac.createDynamicsCompressor(); comp.threshold.value = -10;
+  node.connect(master).connect(comp).connect(ac.destination);
+  osc.start(); lfo.start();
+}
+function pushAudio(){
+  if (!ac) return;
+  const t = ac.currentTime, tc = 0.015;
+  osc.frequency.setTargetAtTime(st.f0, t, tc);
+  lfoGain.gain.setTargetAtTime(st.f0*0.006, t, tc);
+  const fr = [st.f1, st.f2, st.f3, f4()], bw = bws();
+  filters.forEach((b,i)=>{ b.frequency.setTargetAtTime(fr[i], t, tc); b.Q.setTargetAtTime(qdB(fr[i], bw[i]), t, tc); });
+  const n = nasal();
+  nasP.gain.setTargetAtTime(n.gp, t, tc); nasZ.frequency.setTargetAtTime(n.fz, t, tc); nasZ.gain.setTargetAtTime(n.gz, t, tc);
+}
+function updateGate(){
+  const on = st.sustained || st.pressing;
+  if (on) initAudio();
+  if (!ac) return;
+  if (on && ac.state === "suspended") ac.resume();
+  master.gain.setTargetAtTime(on ? 0.11 : 0, ac.currentTime, on ? 0.02 : 0.04);
+}
+
+// ---------- Filter math (matches Web Audio biquads) ----------
+function lpMag(f, fc, b){
+  const Q = fc/b, w0 = 2*Math.PI*fc/fs(), cw = Math.cos(w0), al = Math.sin(w0)/(2*Q);
+  const b0=(1-cw)/2, b1=1-cw, b2=(1-cw)/2, a0=1+al, a1=-2*cw, a2=1-al;
+  const w = 2*Math.PI*f/fs(), c1=Math.cos(w), s1=Math.sin(w), c2=Math.cos(2*w), s2=Math.sin(2*w);
+  const nr=b0+b1*c1+b2*c2, ni=-(b1*s1+b2*s2), dr=a0+a1*c1+a2*c2, di=-(a1*s1+a2*s2);
+  return Math.sqrt((nr*nr+ni*ni)/(dr*dr+di*di));
+}
+function pkMag(f, fc, Q, g){
+  if (Math.abs(g) < 1e-6) return 1;
+  const A = Math.pow(10, g/40), w0 = 2*Math.PI*fc/fs(), cw = Math.cos(w0), al = Math.sin(w0)/(2*Q);
+  const b0=1+al*A, b1=-2*cw, b2=1-al*A, a0=1+al/A, a1=-2*cw, a2=1-al/A;
+  const w = 2*Math.PI*f/fs(), c1=Math.cos(w), s1=Math.sin(w), c2=Math.cos(2*w), s2=Math.sin(2*w);
+  const nr=b0+b1*c1+b2*c2, ni=-(b1*s1+b2*s2), dr=a0+a1*c1+a2*c2, di=-(a1*s1+a2*s2);
+  return Math.sqrt((nr*nr+ni*ni)/(dr*dr+di*di));
+}
+function H(f){ const fr=[st.f1,st.f2,st.f3,f4()], bw=bws(); let m=1; for(let i=0;i<4;i++) m*=lpMag(f,fr[i],bw[i]);
+  const n=nasal(); return m*pkMag(f,n.fp,n.qp,n.gp)*pkMag(f,n.fz,n.qz,n.gz); }
+const dB = x => 20*Math.log10(Math.max(x,1e-9));
+
+// ---------- Vowel pad ----------
+let padGeo = null;
+function padLayout(w,h){ const L=54, R=14, T=34, B=40; return {L,R,T,B,w,h,iw:w-L-R,ih:h-T-B}; }
+const xOf = (g,f2) => g.L + (f2-F2R[0])/(F2R[1]-F2R[0])*g.iw;
+const yOf = (g,f1) => g.T + (f1-F1R[0])/(F1R[1]-F1R[0])*g.ih;
+const f2Of = (g,x) => F2R[0] + (x-g.L)/g.iw*(F2R[1]-F2R[0]);
+const f1Of = (g,y) => F1R[0] + (y-g.T)/g.ih*(F1R[1]-F1R[0]);
+const clamp = (v,a,b) => Math.min(Math.max(v,a),b);
+
+function drawPad(){
+  const {ctx,w,h} = fitCanvas(pad); const c = colors(); const g = padGeo = padLayout(w,h);
+  ctx.clearRect(0,0,w,h);
+  ctx.font = `11px ${c.mono}`; ctx.textBaseline = "middle";
+  // grid
+  for (let f=200; f<=900; f+=100){ const y=yOf(g,f);
+    ctx.strokeStyle = f%200===0? c.gridS : c.grid; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(g.L,y); ctx.lineTo(g.L+g.iw,y); ctx.stroke();
+    ctx.fillStyle=c.muted; ctx.textAlign="right"; ctx.fillText(f, g.L-6, y); }
+  const step2 = g.iw < 420 ? 400 : 200;
+  for (let f=600; f<=2600; f+=200){ const x=xOf(g,f); const showLab = (f-600)%step2===0;
+    ctx.strokeStyle = f%400===200? c.gridS : c.grid; ctx.beginPath(); ctx.moveTo(x,g.T); ctx.lineTo(x,g.T+g.ih); ctx.stroke();
+    if (showLab){ ctx.fillStyle=c.muted; ctx.textAlign="center"; ctx.fillText(f, x, g.T+g.ih+12); } }
+  ctx.fillStyle=c.f2; ctx.textAlign="center"; ctx.fillText("F2 (Hz)   front  ←  →  back", g.L+g.iw/2, g.T+g.ih+29);
+  ctx.save(); ctx.translate(13, g.T+g.ih/2); ctx.rotate(Math.PI/2); ctx.fillStyle=c.f1;
+  ctx.fillText("F1 (Hz)   close  ←  →  open", 0, 0); ctx.restore();
+  // hull
+  ctx.beginPath(); HULL.forEach((k,i)=>{ const v=VOWELS.find(o=>o.ipa===k); const x=xOf(g,v.f2), y=yOf(g,v.f1); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+  ctx.closePath(); ctx.strokeStyle=c.gridS; ctx.setLineDash([4,4]); ctx.stroke(); ctx.setLineDash([]);
+  // reference vowels
+  VOWELS.forEach(v=>{ const x=xOf(g,v.f2), y=yOf(g,v.f1);
+    ctx.beginPath(); ctx.arc(x,y,3.5,0,Math.PI*2); ctx.fillStyle=c.ink; ctx.fill();
+    ctx.textAlign="left"; ctx.fillStyle=c.ink; ctx.font=`20px ${c.serif}`; ctx.fillText(v.ipa, x+7, y-7);
+    ctx.font=`italic 12px ${c.serif}`; ctx.fillStyle=c.muted; ctx.fillText(v.word, x+7, y+10); });
+  // current point
+  const px=xOf(g,st.f2), py=yOf(g,st.f1);
+  ctx.strokeStyle=c.point; ctx.globalAlpha=.35; ctx.beginPath(); ctx.moveTo(px,g.T); ctx.lineTo(px,g.T+g.ih); ctx.moveTo(g.L,py); ctx.lineTo(g.L+g.iw,py); ctx.stroke(); ctx.globalAlpha=1;
+  ctx.beginPath(); ctx.arc(px,py,9,0,Math.PI*2); ctx.fillStyle=c.point; ctx.globalAlpha=.25; ctx.fill(); ctx.globalAlpha=1;
+  ctx.beginPath(); ctx.arc(px,py,5.5,0,Math.PI*2); ctx.fillStyle=c.point; ctx.fill();
+  ctx.font=`11px ${c.mono}`; ctx.fillStyle=c.muted; ctx.textAlign="left"; ctx.fillText("Click a vowel to snap F1, F2 and F3 to it", g.L, 14);
+}
+
+// ---------- Spectrum ----------
+function drawSpec(){
+  const {ctx,w,h} = fitCanvas(spec); const c = colors();
+  ctx.clearRect(0,0,w,h);
+  const L=44, R=20, gap=14, top=6, bottomAxis=30;
+  const bandH = (h-top-bottomAxis-2*gap)/3, iw=w-L-R, DR=50;
+  const xF = f => L + f/SPEC_MAX*iw;
+  const nH = Math.floor(SPEC_MAX/st.f0);
+  const src = [], out = [];
+  for (let n=1;n<=nH;n++){ src.push(dB(1/n)); out.push(dB(H(n*st.f0)/n)); }
+  const env = []; for (let i=0;i<=400;i++){ const f=i/400*SPEC_MAX; env.push([f, dB(H(Math.max(f,1)))]); }
+  const envMax = Math.max(...env.map(e=>e[1])), outMax = Math.max(...out);
+  const bands = [
+    {label:"Source · glottal buzz", draw:(y0)=>stems(y0, src, 0, c.ink)},
+    {label:"Filter · vocal tract", draw:(y0)=>{ curve(y0, envMax, c.ink, false); marks(y0); }},
+    {label:"Output · what you hear", draw:(y0)=>{ curve(y0, envMax, c.muted, true); stems(y0, out, outMax, c.ink); }},
+  ];
+  function yv(y0,v,ref){ const t=clamp((ref - v)/DR,0,1); return y0 + t*bandH; }
+  function stems(y0, arr, ref, col){
+    ctx.strokeStyle=col; ctx.lineWidth=1.5;
+    arr.forEach((v,i)=>{ const x=xF((i+1)*st.f0), y=yv(y0,v,ref); if (y>=y0+bandH) return;
+      ctx.beginPath(); ctx.moveTo(x,y0+bandH); ctx.lineTo(x,y); ctx.stroke();
+      ctx.beginPath(); ctx.arc(x,y,1.8,0,Math.PI*2); ctx.fillStyle=col; ctx.fill(); });
+  }
+  function curve(y0, ref, col, dashed){
+    ctx.beginPath(); env.forEach(([f,v],i)=>{ const x=xF(f), y=yv(y0,v,ref); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+    ctx.strokeStyle=col; ctx.lineWidth=dashed?1:2; ctx.setLineDash(dashed?[4,3]:[]); ctx.stroke(); ctx.setLineDash([]);
+  }
+  function marks(y0){
+    [[st.f1,c.f1,"F1"],[st.f2,c.f2,"F2"],[st.f3,c.f3,"F3"]].forEach(([f,col,lab])=>{
+      const x=xF(f); ctx.strokeStyle=col; ctx.lineWidth=1.5; ctx.setLineDash([3,3]);
+      ctx.beginPath(); ctx.moveTo(x,y0+12); ctx.lineTo(x,y0+bandH); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle=col; ctx.font=`500 11px ${c.mono}`; ctx.textAlign="center"; ctx.fillText(lab, x, y0+6); });
+    if (st.vel > 0.05){ const n=nasal(), cn=css("--nas"); ctx.fillStyle=cn; ctx.font=`500 11px ${c.mono}`; ctx.textAlign="center";
+      ctx.fillText("N", xF(n.fp), y0+bandH-8); ctx.fillText("Z", xF(n.fz), y0+bandH-8);
+      ctx.strokeStyle=cn; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(xF(n.fz),y0+bandH-16); ctx.lineTo(xF(n.fz),y0+bandH-24); ctx.stroke(); }
+  }
+  bands.forEach((b,i)=>{
+    const y0 = top + i*(bandH+gap);
+    ctx.strokeStyle=c.grid; ctx.lineWidth=1;
+    for (let f=0; f<=SPEC_MAX; f+=500){ const x=xF(f); ctx.beginPath(); ctx.moveTo(x,y0); ctx.lineTo(x,y0+bandH); ctx.stroke(); }
+    ctx.strokeStyle=c.gridS; ctx.beginPath(); ctx.moveTo(L,y0+bandH); ctx.lineTo(L+iw,y0+bandH); ctx.stroke();
+    b.draw(y0);
+    ctx.fillStyle=c.muted; ctx.font=`11px ${c.mono}`; ctx.textAlign="right"; ctx.textBaseline="middle";
+    ctx.fillText("0", L-6, y0+4); ctx.fillText("−50", L-6, y0+bandH-4);
+    ctx.textAlign="right"; ctx.fillStyle=c.ink; ctx.fillText(w < 520 ? b.label.split(" ·")[0] : b.label, L+iw, y0+8);
+  });
+  ctx.fillStyle=c.muted; ctx.textAlign="center"; ctx.font=`11px ${c.mono}`;
+  const yA = h-bottomAxis+10;
+  for (let f=0; f<=SPEC_MAX; f+=1000) ctx.fillText(f, xF(f), yA);
+  ctx.fillText("frequency (Hz) · level (dB)", L+iw/2, yA+14);
+}
+
+// ---------- UI glue ----------
+function nearest(){
+  let best=null, bd=Infinity;
+  VOWELS.forEach(v=>{ const d=Math.hypot(Math.log(st.f1/v.f1)*1.4, Math.log(st.f2/v.f2)); if(d<bd){bd=d;best=v;} });
+  return best;
+}
+function render(){
+  $("rf0").textContent=Math.round(st.f0); $("rf1").textContent=Math.round(st.f1);
+  $("rf2").textContent=Math.round(st.f2); $("rf3").textContent=Math.round(st.f3);
+  $("ovel").textContent=st.vel.toFixed(2); $("rvel").textContent = st.vel<0.05 ? "closed" : st.vel<0.5 ? "partly open" : "open";
+  $("of0").textContent=Math.round(st.f0)+" Hz"; $("of3").textContent=Math.round(st.f3)+" Hz";
+  const n=nearest(); $("near").textContent="/"+n.ipa+"/"; $("nearword").textContent=n.word;
+  drawPad(); drawSpec(); pushAudio();
+}
+let raf=0; const schedule=()=>{ if(!raf) raf=requestAnimationFrame(()=>{raf=0;render();}); };
+
+function setFromPointer(e, allowSnap){
+  const r=pad.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top, g=padGeo;
+  if (allowSnap){
+    const hit = VOWELS.find(v=>Math.hypot(xOf(g,v.f2)-x, yOf(g,v.f1)-y) < 16);
+    if (hit){ st.f1=hit.f1; st.f2=hit.f2; st.f3=hit.f3; f3In.value=hit.f3; schedule(); return; }
+  }
+  st.f2 = clamp(f2Of(g,x), 600, 2700); st.f1 = clamp(f1Of(g,y), 200, 900);
+  if (st.f3 < st.f2 + 250){ st.f3 = Math.min(3200, st.f2 + 250); f3In.value = st.f3; }
+  schedule();
+}
+pad.addEventListener("pointerdown", e=>{ pad.setPointerCapture(e.pointerId); st.pressing=true; setFromPointer(e,true); updateGate(); });
+pad.addEventListener("pointermove", e=>{ if(st.pressing) setFromPointer(e,false); });
+const release=()=>{ if(!st.pressing) return; st.pressing=false; updateGate(); };
+pad.addEventListener("pointerup", release); pad.addEventListener("pointercancel", release);
+pad.addEventListener("keydown", e=>{
+  const k=e.key; let used=true;
+  if(k==="ArrowUp") st.f1=clamp(st.f1-10,200,900); else if(k==="ArrowDown") st.f1=clamp(st.f1+10,200,900);
+  else if(k==="ArrowLeft") st.f2=clamp(st.f2+25,600,2700); else if(k==="ArrowRight") st.f2=clamp(st.f2-25,600,2700);
+  else if(k===" "){ toggle(); } else used=false;
+  if(used){ e.preventDefault(); schedule(); }
+});
+f0In.addEventListener("input", ()=>{ st.f0=+f0In.value; schedule(); });
+velIn.addEventListener("input", ()=>{ st.vel=+velIn.value; schedule(); });
+document.addEventListener("touchend", ()=>{ if (ac && ac.state==="suspended" && (st.sustained||st.pressing)) ac.resume(); }, {passive:true});
+f3In.addEventListener("input", ()=>{ st.f3=Math.max(+f3In.value, st.f2+150); schedule(); });
+function toggle(){ st.sustained=!st.sustained; playBtn.classList.toggle("on",st.sustained);
+  playBtn.setAttribute("aria-pressed",st.sustained); playBtn.textContent=st.sustained?"Sound off":"Sound on"; updateGate(); }
+playBtn.addEventListener("click", toggle);
+$("presets").addEventListener("click", e=>{ const b=e.target.closest("button[data-f0]"); if(!b) return; st.f0=+b.dataset.f0; f0In.value=st.f0; schedule(); });
+new ResizeObserver(schedule).observe(pad); new ResizeObserver(schedule).observe(spec);
+new MutationObserver(schedule).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", schedule);
+if (document.fonts) document.fonts.ready.then(schedule);
+render();
+})();
+</script>
+</body>
+</html>
