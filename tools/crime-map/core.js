@@ -322,11 +322,25 @@
       .map(x => x.replace(/^N\s/i, 'North ').replace(/^S\s/i, 'South ').replace(/^E\s/i, 'East ').replace(/^W\s/i, 'West '))
       .map(x => x.toLowerCase().replace(/\b([a-z])/g, m => m.toUpperCase())).filter(Boolean);
   }
-  // Google News search for serious cases: street name(s) + Providence, from 1 day before to 10 days after
+  // Google News search for serious cases. Street names turned out to be a poor filter (stories
+  // say "pedestrian bridge", not "South Water St"), so search headlines naming Providence plus
+  // words for the offense, from the day before to a week after.
+  const NEWS_WORDS = [
+    [/Murder|Homicide/i, 'homicide OR killed OR murder OR stabbing OR shooting OR shot'],
+    [/Shots/i, 'shooting OR shots OR shot'],
+    [/Robbery/i, 'robbery OR robbed OR knifepoint OR gunpoint'],
+    [/Kidnap/i, 'kidnapping OR abducted'],
+    [/Sex/i, '"sexual assault"'],
+    [/Arson/i, 'arson OR fire'],
+    [/Burglary/i, 'burglary OR burglaries OR "break-in" OR "broke into"'],
+    [/Assault/i, 'assault OR assaulted OR stabbing OR stabbed OR shooting OR shot']
+  ];
   function newsUrl(c) {
     if (!c || c.sev < 7) return null;
+    const w = NEWS_WORDS.find(([re]) => re.test(c.offenses[0]));
+    if (!w) return null;
     const d = new Date(c.date), iso = x => x.toISOString().slice(0, 10);
-    const q = `Providence ${streetsOf(c.location).map(x => `"${x}"`).join(' ')} after:${iso(new Date(d - 864e5))} before:${iso(new Date(+d + 10 * 864e5))}`;
+    const q = `intitle:Providence (${w[1]}) after:${iso(new Date(d - 864e5))} before:${iso(new Date(+d + 8 * 864e5))}`;
     return 'https://news.google.com/search?q=' + encodeURIComponent(q) + '&hl=en-US&gl=US&ceid=US:en';
   }
   // Brown DPS posts crime alerts for incidents on and around College Hill
