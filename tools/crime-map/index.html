@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>East Side Crime Map</title>
+<meta name="description" content="Top Providence police incidents near 56 Cooke St, ranked by severity and distance. Live from the city's open data.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{
+  --bg:#f6f5f2; --panel:#ffffff; --ink:#1d1f23; --muted:#6a6f78; --line:#e3e1dc;
+  --high:#c23b2e; --med:#d98a1c; --low:#7b8796; --home:#1d1f23; --accent:#2f5d8a;
+  --chip:#efede8;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15171a; --panel:#1d2024; --ink:#e8e6e1; --muted:#9aa0a8; --line:#2d3137;
+    --high:#e5584a; --med:#eaa23c; --low:#8e99a8; --home:#f2f0ea; --accent:#79a7d6; --chip:#262a2f;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15171a; --panel:#1d2024; --ink:#e8e6e1; --muted:#9aa0a8; --line:#2d3137;
+  --high:#e5584a; --med:#eaa23c; --low:#8e99a8; --home:#f2f0ea; --accent:#79a7d6; --chip:#262a2f;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1280px;margin:0 auto;padding:20px 16px 40px}
+header h1{margin:0;font-size:22px;letter-spacing:-.01em}
+header p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:16px 0 12px;padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:10px}
+.controls label{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.controls select,.controls input[type=range]{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 6px}
+.controls input[type=range]{padding:0;width:120px;accent-color:var(--accent)}
+.controls .grow{flex:1}
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.stat{background:var(--chip);border-radius:999px;padding:4px 12px;font-size:13px}
+.stat b{font-variant-numeric:tabular-nums}
+.grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+#map{height:calc(100vh - 230px);min-height:420px;border-radius:10px;border:1px solid var(--line);background:var(--panel)}
+@media (max-width:900px){#map{height:62vh;min-height:360px}}
+.list{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;max-height:calc(100vh - 230px);overflow-y:auto}
+@media (max-width:900px){.list{max-height:none}}
+.row{display:grid;grid-template-columns:30px 1fr auto;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+.row:last-child{border-bottom:0}
+.row:hover,.row.on{background:var(--chip)}
+.num{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px}
+.high{background:var(--high)} .med{background:var(--med)} .low{background:var(--low)}
+.off{font-weight:600}
+.sub{color:var(--muted);font-size:13px}
+.right{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.right .d{font-weight:600}
+.tag{display:inline-block;font-size:11px;padding:0 6px;border-radius:4px;background:var(--chip);color:var(--muted);margin-left:4px}
+.empty{padding:24px;color:var(--muted)}
+.pin{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font:700 12px/1 -apple-system,sans-serif;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.pin.big{transform:scale(1.25)}
+.homepin{width:30px;height:30px;border-radius:7px;background:var(--home);color:var(--bg);display:grid;place-items:center;box-shadow:0 1px 5px rgba(0,0,0,.4)}
+.dot{width:8px;height:8px;border-radius:50%;opacity:.55;border:1px solid rgba(255,255,255,.7)}
+.leaflet-tooltip.lbl{background:var(--panel);color:var(--ink);border:1px solid var(--line);box-shadow:0 1px 3px rgba(0,0,0,.2);font-size:11px;padding:1px 5px;border-radius:4px}
+.leaflet-tooltip.lbl:before{display:none}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--panel);color:var(--ink)}
+.leaflet-popup-content{margin:10px 12px;font-size:13px}
+details{margin-top:18px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+summary{cursor:pointer;font-weight:600}
+details p,details li{font-size:13px;color:var(--muted)}
+.sev{columns:3 180px;font-size:13px;color:var(--muted);padding-left:18px}
+footer{margin-top:14px;font-size:12px;color:var(--muted)}
+footer a{color:var(--accent)}
+#status{color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>East Side Crime Map</h1>
+    <p>Providence police incidents near 56 Cooke St, ranked by severity and distance. <span id="status">Loading…</span></p>
+  </header>
+
+  <div class="controls">
+    <label>Window
+      <select id="days"><option value="7">Last 7 days</option><option value="14">Last 14 days</option><option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="180">Last 180 days</option></select>
+    </label>
+    <label>Radius
+      <select id="radius"><option>0.25</option><option>0.5</option><option selected>1</option><option>1.5</option><option>2</option></select> mi
+    </label>
+    <label>Show top
+      <select id="top"><option>10</option><option selected>20</option><option>50</option></select>
+    </label>
+    <label title="Slide left to favor incidents closest to home; right to favor more serious incidents farther out">Closer
+      <input type="range" id="half" min="0.1" max="1" step="0.05" value="0.35"> More serious
+    </label>
+    <label><input type="checkbox" id="labels" checked> Labels</label>
+    <label><input type="checkbox" id="others"> Other incidents</label>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="grid">
+    <div id="map"></div>
+    <div class="list" id="list"><div class="empty">Loading incidents…</div></div>
+  </div>
+
+  <details>
+    <summary>How the ranking works</summary>
+    <p>Each case gets a severity from 1 to 10 by offense type (below), then a proximity factor of 1 / (1 + (distance ÷ h)²), where h is set by the slider (default 0.35 mi, so an incident 0.35 mi away counts half as much as one next door). Score = severity × proximity. Administrative entries such as warrants, traffic violations, lost property and requests for assistance score zero and are left out of the ranking. When a case lists several offenses, the most serious one counts.</p>
+    <p>The city publishes locations only at block level ("300 Block HOPE ST") or as intersections. Pins sit at the middle of the block, placed with Census TIGER address ranges, so treat them as accurate to about half a block. Records with only a street name are placed at the street's midpoint if the street is shorter than 0.4 mi and otherwise skipped (counted as "unplaced"). Distances are straight-line.</p>
+    <ul class="sev" id="sevlist"></ul>
+  </details>
+
+  <footer>
+    Data: <a href="https://data.providenceri.gov/Public-Safety/Providence-Police-Case-Log-Past-180-days/rz3y-pz8v" target="_blank" rel="noopener">Providence Police Case Log (past 180 days)</a>, loaded live in your browser. Streets: US Census TIGER/Line 2025. Map tiles © Esri.
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="core.js"></script>
+<script>
+(function(){
+  const C = window.CrimeCore, H = C.HOME;
+  const API = 'https://data.providenceri.gov/resource/rz3y-pz8v.json';
+  const $ = id => document.getElementById(id);
+  const ctl = ['days','radius','top','half','labels','others'];
+
+  // ----- restore settings: URL params beat saved settings -----
+  const qs = new URLSearchParams(location.search);
+  let saved = {}; try { saved = JSON.parse(localStorage.getItem('crimemap') || '{}'); } catch(e) {}
+  ctl.forEach(k => {
+    const v = qs.has(k) ? qs.get(k) : saved[k];
+    if (v == null) return;
+    const el = $(k);
+    if (el.type === 'checkbox') el.checked = (v === true || v === '1' || v === 'true');
+    else el.value = v;
+  });
+  const val = k => { const el = $(k); return el.type === 'checkbox' ? el.checked : el.value; };
+  function persist(){ const o = {}; ctl.forEach(k => o[k] = val(k)); try { localStorage.setItem('crimemap', JSON.stringify(o)); } catch(e) {} }
+
+  // ----- map -----
+  const dark = matchMedia('(prefers-color-scheme: dark)').matches && document.documentElement.dataset.theme !== 'light';
+  const map = L.map('map', { zoomControl: true, scrollWheelZoom: true }).setView([H.lat, H.lon], 15);
+  const esri = n => `https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/${n}/MapServer/tile/{z}/{y}/{x}`;
+  const shade = dark ? 'Dark' : 'Light';
+  L.tileLayer(esri(`World_${shade}_Gray_Base`), { maxZoom: 19, maxNativeZoom: 16, attribution: 'Tiles © Esri, HERE, Garmin, © OpenStreetMap contributors' }).addTo(map);
+  L.tileLayer(esri(`World_${shade}_Gray_Reference`), { maxZoom: 19, maxNativeZoom: 16 }).addTo(map);
+  L.marker([H.lat, H.lon], { icon: L.divIcon({ className: '', html: '<div class="homepin"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 2 11h3v9h5v-6h4v6h5v-9h3z"/></svg></div>', iconSize: [30,30], iconAnchor: [15,15] }), zIndexOffset: 1000 })
+    .addTo(map).bindTooltip('56 Cooke St (home)');
+  const ring = L.circle([H.lat, H.lon], { radius: 1609.34, color: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(), weight: 1.5, fill: false, dashArray: '4 6' }).addTo(map);
+  const layer = L.layerGroup().addTo(map), otherLayer = L.layerGroup().addTo(map);
+  let markers = {};
+
+  // ----- data -----
+  let rows = null, geo = null, maxDate = null;
+  const since = d => { const t = new Date(Date.now() - d * 864e5); return t.toISOString().slice(0,10) + 'T00:00:00'; };
+  async function load(){
+    $('status').textContent = 'Loading…';
+    const url = `${API}?$select=casenumber,location,reported_date,offense_desc,statute_desc&$where=reported_date>='${since(+val('days'))}'&$limit=50000`;
+    const [r, s] = await Promise.all([
+      fetch(url).then(x => { if (!x.ok) throw new Error('City data API returned ' + x.status); return x.json(); }),
+      geo ? null : fetch('streets.json').then(x => x.json())
+    ]);
+    if (s) geo = C.Geocoder(s);
+    rows = r;
+    maxDate = rows.reduce((m, x) => x.reported_date > m ? x.reported_date : m, '');
+    render();
+  }
+
+  const fmtDate = s => { if (!s) return ''; const d = new Date(s); return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ', ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); };
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+  const precTag = p => p === 'intersection' ? '<span class="tag">intersection</span>' : p === 'street' ? '<span class="tag">street only</span>' : p === 'approx' ? '<span class="tag">approx.</span>' : '';
+
+  function spread(list){
+    // nudge pins that share a spot into a small ring so all numbers are visible
+    const groups = {};
+    list.forEach(c => { const k = c.lat.toFixed(5) + ',' + c.lon.toFixed(5); (groups[k] = groups[k] || []).push(c); });
+    Object.values(groups).forEach(g => {
+      g.forEach((c, i) => {
+        if (g.length === 1) { c.plat = c.lat; c.plon = c.lon; return; }
+        const a = 2 * Math.PI * i / g.length, r = 0.00018;
+        c.plat = c.lat + r * Math.sin(a); c.plon = c.lon + r * Math.cos(a) / Math.cos(c.lat * Math.PI / 180);
+      });
+    });
+  }
+
+  function render(){
+    if (!rows) return;
+    persist();
+    const radius = +val('radius'), top = +val('top'), half = +val('half');
+    const res = C.analyze(rows, geo, { radius, top, half });
+    ring.setRadius(radius * 1609.34);
+    layer.clearLayers(); otherLayer.clearLayers(); markers = {};
+
+    const ranked = res.ranked;
+    spread(ranked);
+    const counted = res.inRadius.filter(c => c.sev > 0);
+    const highs = counted.filter(c => c.sev >= 7).length;
+    const days = +val('days');
+    $('status').textContent = `Data through ${fmtDate(maxDate)}.`;
+    $('stats').innerHTML =
+      `<span class="stat"><b>${counted.length}</b> incidents within ${radius} mi, last ${days} days</span>` +
+      `<span class="stat"><b>${highs}</b> high severity</span>` +
+      `<span class="stat"><b>${counted.filter(c => c.dist < 0.25).length}</b> within 0.25 mi</span>` +
+      `<span class="stat" title="Admin entries (warrants, traffic, lost property) are excluded from the ranking"><b>${res.excluded}</b> admin entries excluded</span>` +
+      `<span class="stat" title="Records on nearby streets that could not be placed: a long street with no block number, or an unmatched address"><b>${res.unlocated}</b> nearby-street records unplaced</span>`;
+
+    if (val('others')) {
+      const ids = new Set(ranked.map(c => c.id));
+      counted.filter(c => !ids.has(c.id)).forEach(c => {
+        L.marker([c.lat, c.lon], { icon: L.divIcon({ className: '', html: `<div class="dot ${C.tier(c.sev)}"></div>`, iconSize: [8,8], iconAnchor: [4,4] }) })
+          .bindTooltip(`${esc(c.offenses[0])} · ${esc(C.prettyLoc(c.location))} · ${c.dist.toFixed(2)} mi · ${fmtDate(c.date)}`).addTo(otherLayer);
+      });
+    }
+
+    const labels = val('labels');
+    const shortOff = s => (s || '').replace('Larceny from Motor Vehicle', 'Car break-in').replace('Motor Vehicle Theft', 'Car theft').replace('Assault, Aggravated', 'Agg. assault').replace('Assault, Simple', 'Simple assault').replace('Larceny, ', 'Larceny: ').replace('Murder\\Manslaughter', 'Homicide');
+    ranked.slice().reverse().forEach(c => {
+      const t = C.tier(c.sev);
+      const m = L.marker([c.plat, c.plon], { icon: L.divIcon({ className: '', html: `<div class="pin ${t}">${c.rank}</div>`, iconSize: [26,26], iconAnchor: [13,13] }), zIndexOffset: 500 - c.rank })
+        .bindPopup(`<b>${c.rank}. ${esc(c.offenses.join(', '))}</b><br>${esc(C.prettyLoc(c.location))} ${precTag(c.precision)}<br>${c.dist.toFixed(2)} mi · ${fmtDate(c.date)}${c.statutes.length ? `<br><span class="sub">${esc(c.statutes.join('; '))}</span>` : ''}<br><span class="sub">Case ${esc(c.id)} · severity ${c.sev}/10</span>`)
+        .addTo(layer);
+      if (labels) m.bindTooltip(shortOff(c.offenses[0]), { permanent: true, direction: 'right', offset: [12, 0], className: 'lbl' });
+      m.on('click', () => highlight(c.id, false));
+      markers[c.id] = m;
+    });
+
+    $('list').innerHTML = ranked.length ? ranked.map(c => `
+      <div class="row" data-id="${esc(c.id)}">
+        <div class="num ${C.tier(c.sev)}">${c.rank}</div>
+        <div><div class="off">${esc(c.offenses[0])}${c.offenses.length > 1 ? ` <span class="sub">+ ${esc(c.offenses.slice(1).join(', '))}</span>` : ''}</div>
+          <div class="sub">${esc(C.prettyLoc(c.location))}${precTag(c.precision)}</div></div>
+        <div class="right"><div class="d">${c.dist.toFixed(2)} mi</div><div class="sub">${fmtDate(c.date)}</div></div>
+      </div>`).join('') : `<div class="empty">No ranked incidents within ${radius} mi in the last ${days} days.</div>`;
+    document.querySelectorAll('.row').forEach(r => r.addEventListener('click', () => highlight(r.dataset.id, true)));
+
+    ranked.forEach(c => markers[c.id] && (markers[c.id].rank = c.rank));
+    const pts = ranked.map(c => [c.plat, c.plon]).concat([[H.lat, H.lon]]);
+    if (ranked.length) map.fitBounds(L.latLngBounds(pts).pad(0.12), { maxZoom: 16 });
+    else map.setView([H.lat, H.lon], 15);
+    setTimeout(declutter, 50);
+  }
+
+  // hide labels that would collide with a higher-ranked label or any pin
+  function declutter(){
+    const ms = Object.values(markers).sort((a, b) => a.rank - b.rank);
+    const hit = (a, b) => !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
+    const shown = [], pins = [];
+    ms.forEach(m => {
+      const pe = m.getElement(), pr = pe && pe.getBoundingClientRect();
+      const t = m.getTooltip();
+      if (t && t.getElement()) {
+        const el = t.getElement(); el.style.visibility = 'visible';
+        const r = el.getBoundingClientRect();
+        const bad = shown.some(b => hit(r, b)) || pins.some(b => hit(r, b));
+        if (bad) el.style.visibility = 'hidden'; else shown.push(r);
+      }
+      if (pr) pins.push(pr);
+    });
+  }
+  map.on('zoomend moveend', () => setTimeout(declutter, 0));
+
+  function highlight(id, fromList){
+    document.querySelectorAll('.row').forEach(r => r.classList.toggle('on', r.dataset.id === id));
+    const m = markers[id]; if (!m) return;
+    if (fromList) { map.panTo(m.getLatLng()); m.openPopup(); }
+    else { const r = document.querySelector(`.row[data-id="${CSS.escape(id)}"]`); if (r) r.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+  }
+
+  $('sevlist').innerHTML = Object.entries(C.SEVERITY).filter(([,v]) => v > 0).sort((a,b) => b[1] - a[1]).map(([k,v]) => `<li>${esc(k.replace('\\','/'))}: ${v}</li>`).join('');
+
+  $('days').addEventListener('change', () => load().catch(fail));
+  ['radius','top','half','labels','others'].forEach(k => $(k).addEventListener(k === 'half' ? 'input' : 'change', render));
+  function fail(e){ $('status').textContent = 'Could not load data: ' + e.message; $('list').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+  load().catch(fail);
+})();
+</script>
+</body>
+</html>
