@@ -284,6 +284,14 @@
       }
     }
     const all = [...cases.values()];
+    // Rhode Island Hospital (593 Eddy St): patient-on-staff assaults say nothing about the
+    // neighborhood, so they drop out of the ranking; other cases there get a tag because
+    // victims are often brought in from elsewhere.
+    for (const c of all) {
+      if (/^5\d\d\s*Block\s*EDDY ST/i.test((c.location || '').trim())) c.hospital = true;
+      if (c.statutes.some(t => /HEALTH CARE PROVIDERS|EMERGENCY SERVICES MEDICAL/i.test(t)) &&
+          c.offenses.every(o => /Assault|Warrant|Statute|Disorderly/i.test(o))) { c.sev = 0; c.hospitalStaff = true; }
+    }
     let unlocated = 0, excluded = 0;
     const inRadius = [];
     for (const c of all) {
@@ -306,10 +314,31 @@
     return { ranked, inRadius, unlocated, excluded, total: all.length };
   }
 
+  const BROWN = { lat: 41.8262, lon: -71.4025 };
+  function streetsOf(loc) {
+    const s = (loc || '').replace(/^\d+\s*Block\s*/i, '').replace(/\s+/g, ' ');
+    return s.split(/[&\/]/).map(x => x.trim()).filter(Boolean)
+      .map(x => x.replace(/\b(ST|STREET|AVE|AVENUE|BLVD|BLV|RD|PL|LN|PLZ|SQ|ALY|CT|TER|PKWY|DR|WAY)$/i, '').trim())
+      .map(x => x.replace(/^N\s/i, 'North ').replace(/^S\s/i, 'South ').replace(/^E\s/i, 'East ').replace(/^W\s/i, 'West '))
+      .map(x => x.toLowerCase().replace(/\b([a-z])/g, m => m.toUpperCase())).filter(Boolean);
+  }
+  // Google News search for serious cases: street name(s) + Providence, from 1 day before to 10 days after
+  function newsUrl(c) {
+    if (!c || c.sev < 7) return null;
+    const d = new Date(c.date), iso = x => x.toISOString().slice(0, 10);
+    const q = `Providence ${streetsOf(c.location).map(x => `"${x}"`).join(' ')} after:${iso(new Date(d - 864e5))} before:${iso(new Date(+d + 10 * 864e5))}`;
+    return 'https://news.google.com/search?q=' + encodeURIComponent(q) + '&hl=en-US&gl=US&ceid=US:en';
+  }
+  // Brown DPS posts crime alerts for incidents on and around College Hill
+  function brownUrl(c) {
+    if (!c || c.sev < 4 || c.lat == null || miles(BROWN, c) > 0.45) return null;
+    return 'https://publicsafety.brown.edu/alerts/crime-alerts';
+  }
+
   function prettyLoc(loc) {
     const t = s => s.toLowerCase().replace(/\b([a-z])/g, x => x.toUpperCase()).replace(/\bBlock\b/i, 'block of');
     return t((loc || '').replace(/\s+/g, ' ').replace(/(\d+)\s*Block\s*/i, '$1 Block ').replace(/\s*&\s*/g, ' & '));
   }
 
-  return { HOME, SEVERITY, severity, tier, norm, miles, Geocoder, analyze, score, prettyLoc };
+  return { HOME, SEVERITY, severity, tier, norm, miles, Geocoder, analyze, score, prettyLoc, newsUrl, brownUrl };
 });

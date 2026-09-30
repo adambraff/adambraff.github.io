@@ -102,7 +102,7 @@ footer a{color:var(--accent)}
 
   <details>
     <summary>How the ranking works</summary>
-    <p>Each case gets a severity from 1 to 10 by offense type (below), then a proximity factor of 1 / (1 + (distance ÷ h)²), where h is set by the slider (default 0.35 mi, so an incident 0.35 mi away counts half as much as one next door). Score = severity × proximity. Administrative entries such as warrants, traffic violations, lost property and requests for assistance score zero and are left out of the ranking. When a case lists several offenses, the most serious one counts.</p>
+    <p>Each case gets a severity from 1 to 10 by offense type (below), then a proximity factor of 1 / (1 + (distance ÷ h)²), where h is set by the slider (default 0.35 mi, so an incident 0.35 mi away counts half as much as one next door). Score = severity × proximity. Administrative entries such as warrants, traffic violations, lost property and requests for assistance score zero and are left out of the ranking, as are assaults on health care workers at Rhode Island Hospital (593 Eddy St), which are almost always patients and staff. Other cases logged at the hospital are tagged, since victims are often brought there from somewhere else. For serious cases the popup has a "Search news" link (a Google News search on the street and date; most incidents never make the news) and, near Brown, a link to Brown's public-safety crime alerts. When a case lists several offenses, the most serious one counts.</p>
     <p>The city publishes locations only at block level ("300 Block HOPE ST") or as intersections. A "block" is a hundred-number range: "100 Block WATERMAN ST" means any address from 100 to 199, and on streets with big lots that range can run half a mile (100–199 Waterman runs from Thayer St to past Cooke St). The map draws each ranked block as a colored stretch of street, placed with Census TIGER address ranges, with the numbered pin at its halfway point. The distance shown for a block is the average distance from home over that whole stretch, and the popup gives the nearest and farthest points. Records with only a street name are placed at the street's midpoint if the street is shorter than 0.4 mi and otherwise skipped (counted as "unplaced"). Distances are straight-line.</p>
     <ul class="sev" id="sevlist"></ul>
   </details>
@@ -165,6 +165,9 @@ footer a{color:var(--accent)}
 
   const fmtDate = s => { if (!s) return ''; const d = new Date(s); return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ', ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); };
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+  const hospTag = c => c.hospital ? '<span class="tag">at RI Hospital</span>' : '';
+  const links = c => { const n = C.newsUrl(c), b = C.brownUrl(c);
+    return (n || b) ? `<br>${n ? `<a href="${n}" target="_blank" rel="noopener">Search news</a>` : ''}${n && b ? ' · ' : ''}${b ? `<a href="${b}" target="_blank" rel="noopener">Brown DPS alerts</a>` : ''}` : ''; };
   const spanTag = c => c.span > 0.15 ? `<span class="tag">block spans ${c.span.toFixed(2)} mi</span>` : '';
   const precTag = p => p === 'intersection' ? '<span class="tag">intersection</span>' : p === 'street' ? '<span class="tag">street only</span>' : p === 'approx' ? '<span class="tag">approx.</span>' : '';
 
@@ -199,7 +202,7 @@ footer a{color:var(--accent)}
       `<span class="stat"><b>${counted.length}</b> incidents within ${radius} mi, last ${days} days</span>` +
       `<span class="stat"><b>${highs}</b> high severity</span>` +
       `<span class="stat"><b>${counted.filter(c => c.dist < 0.25).length}</b> within 0.25 mi</span>` +
-      `<span class="stat" title="Admin entries (warrants, traffic, lost property) are excluded from the ranking"><b>${res.excluded}</b> admin entries excluded</span>` +
+      `<span class="stat" title="Admin entries (warrants, traffic, lost property) and patient assaults on Rhode Island Hospital staff are excluded from the ranking"><b>${res.excluded}</b> admin & hospital-staff entries excluded</span>` +
       `<span class="stat" title="Records naming a mapped street but with no usable block number or intersection (e.g. just &quot;HOPE ST&quot;), anywhere in the mapped area"><b>${res.unlocated}</b> records couldn't be placed</span>`;
 
     if (val('others')) {
@@ -215,7 +218,7 @@ footer a{color:var(--accent)}
     ranked.slice().reverse().forEach(c => {
       const t = C.tier(c.sev);
       const m = L.marker([c.plat, c.plon], { icon: L.divIcon({ className: '', html: `<div class="pin ${t}">${c.rank}</div>`, iconSize: [26,26], iconAnchor: [13,13] }), zIndexOffset: 500 - c.rank })
-        .bindPopup(`<b>${c.rank}. ${esc(c.offenses.join(', '))}</b><br>${esc(C.prettyLoc(c.location))} ${precTag(c.precision)}<br>${c.dmin != null ? `Somewhere along ${c.span.toFixed(2)} mi of street, ${c.dmin.toFixed(2)}–${c.dmax.toFixed(2)} mi from home (avg ${c.dist.toFixed(2)})` : `${c.dist.toFixed(2)} mi`} · ${fmtDate(c.date)}${c.statutes.length ? `<br><span class="sub">${esc(c.statutes.join('; '))}</span>` : ''}<br><span class="sub">Case ${esc(c.id)} · severity ${c.sev}/10</span>`)
+        .bindPopup(`<b>${c.rank}. ${esc(c.offenses.join(', '))}</b><br>${esc(C.prettyLoc(c.location))} ${precTag(c.precision)}<br>${c.dmin != null ? `Somewhere along ${c.span.toFixed(2)} mi of street, ${c.dmin.toFixed(2)}–${c.dmax.toFixed(2)} mi from home (avg ${c.dist.toFixed(2)})` : `${c.dist.toFixed(2)} mi`} · ${fmtDate(c.date)}${c.statutes.length ? `<br><span class="sub">${esc(c.statutes.join('; '))}</span>` : ''}${c.hospital ? '<br><span class="sub">Reported at Rhode Island Hospital; the incident may have happened elsewhere.</span>' : ''}<br><span class="sub">Case ${esc(c.id)} · severity ${c.sev}/10</span>${links(c)}`)
         .addTo(layer);
       if (labels) m.bindTooltip(shortOff(c.offenses[0]), { permanent: true, direction: 'right', offset: [12, 0], className: 'lbl' });
       m.on('click', () => highlight(c.id, false));
@@ -230,7 +233,7 @@ footer a{color:var(--accent)}
       <div class="row" data-id="${esc(c.id)}">
         <div class="num ${C.tier(c.sev)}">${c.rank}</div>
         <div><div class="off">${esc(c.offenses[0])}${c.offenses.length > 1 ? ` <span class="sub">+ ${esc(c.offenses.slice(1).join(', '))}</span>` : ''}</div>
-          <div class="sub">${esc(C.prettyLoc(c.location))}${precTag(c.precision)}${spanTag(c)}</div></div>
+          <div class="sub">${esc(C.prettyLoc(c.location))}${precTag(c.precision)}${spanTag(c)}${hospTag(c)}</div></div>
         <div class="right"><div class="d">${c.dmin != null && c.span > 0.15 ? '~' : ''}${c.dist.toFixed(2)} mi</div><div class="sub">${fmtDate(c.date)}</div></div>
       </div>`).join('') : `<div class="empty">No ranked incidents within ${radius} mi in the last ${days} days.</div>`;
     document.querySelectorAll('.row').forEach(r => r.addEventListener('click', () => highlight(r.dataset.id, true)));

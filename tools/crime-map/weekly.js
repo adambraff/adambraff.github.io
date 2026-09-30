@@ -17,7 +17,7 @@ const counted = res.inRadius.filter(c => c.sev > 0);
 const near = counted.filter(c => c.dist < 0.25).length;
 const high = counted.filter(c => c.sev >= 7);
 const d = s => new Date(s).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-const line = c => `${c.rank}. ${c.offenses[0]} at ${C.prettyLoc(c.location)} (${c.dist.toFixed(2)} mi, ${d(c.date)})`;
+const line = c => `${c.rank}. ${c.offenses[0]} at ${C.prettyLoc(c.location)}${c.hospital ? ' (logged at RI Hospital)' : ''} (${c.dist.toFixed(2)} mi, ${d(c.date)})`;
 
 const out = [];
 out.push(`${counted.length} incidents within 1 mi of 56 Cooke St in the last ${days} days; ${near} within 0.25 mi, ${high.length} high severity.`);
