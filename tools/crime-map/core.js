@@ -157,25 +157,57 @@
       }
       return fallback;
     }
+    // A "block" is a hundred-number range (100-199). On streets with big lots that range
+    // can run for half a mile, so we keep the whole stretch, not just one point.
+    function subline(cs, f1, f2) {
+      if (f1 > f2) [f1, f2] = [f2, f1];
+      const total = lineLen(cs), a = total * f1, b = total * f2, out = [];
+      let acc = 0;
+      out.push(along(cs, f1));
+      for (let i = 1; i < cs.length; i++) {
+        acc += miles(P(cs[i - 1]), P(cs[i]));
+        if (acc > a && acc < b) out.push(P(cs[i]));
+      }
+      out.push(along(cs, f2));
+      return out;
+    }
     function blockIn(edges, N) {
       const lo = N === 0 ? 1 : N, hi = N + 99;
-      let sx = 0, sy = 0, sw = 0, nearest = null, nd = Infinity;
+      let nearest = null, nd = Infinity;
+      const pieces = [];
       for (const e of edges) {
+        let fmin = Infinity, fmax = -Infinity;
         for (const [f, t] of [[e.lf, e.lt], [e.rf, e.rt]]) {
           if (f == null || t == null) continue;
           const a = Math.min(f, t), b = Math.max(f, t);
           const oLo = Math.max(a, lo), oHi = Math.min(b, hi);
           if (oLo <= oHi) {
-            const mid = (oLo + oHi) / 2, frac = b === a ? 0.5 : (mid - f) / (t - f);
-            const p = along(e.cs, frac), w = oHi - oLo + 1;
-            sx += p.lon * w; sy += p.lat * w; sw += w;
+            const fr = h => b === a ? 0.5 : (h - f) / (t - f);
+            const f1 = b === a ? 0 : fr(oLo), f2 = b === a ? 1 : fr(oHi);
+            fmin = Math.min(fmin, f1, f2); fmax = Math.max(fmax, f1, f2);
           } else {
-            const gap = oLo > oHi ? (a > hi ? a - hi : lo - b) : 0;
+            const gap = a > hi ? a - hi : lo - b;
             if (gap < nd) { nd = gap; nearest = along(e.cs, a > hi ? (a === f ? 0 : 1) : (b === f ? 0 : 1)); }
           }
         }
+        if (fmin <= fmax) pieces.push(subline(e.cs, Math.max(0, fmin), Math.min(1, fmax)));
       }
-      if (sw) return { lat: sy / sw, lon: sx / sw, precision: 'block' };
+      if (pieces.length) {
+        // sample every ~50 ft along the stretch; pin goes at the halfway point by length
+        const samples = [];
+        let span = 0;
+        pieces.forEach(pl => {
+          for (let i = 1; i < pl.length; i++) {
+            const d = miles(pl[i - 1], pl[i]), n = Math.max(1, Math.ceil(d / 0.01));
+            for (let k = 0; k < n; k++) samples.push({ lat: pl[i - 1].lat + (pl[i].lat - pl[i - 1].lat) * (k + 0.5) / n, lon: pl[i - 1].lon + (pl[i].lon - pl[i - 1].lon) * (k + 0.5) / n, w: d / n });
+            span += d;
+          }
+        });
+        if (!samples.length) samples.push({ ...pieces[0][0], w: 1 });
+        let acc = 0, pin = samples[0];
+        for (const sm of samples) { acc += sm.w; if (acc >= span / 2) { pin = sm; break; } }
+        return { lat: pin.lat, lon: pin.lon, precision: 'block', span, samples, seg: pieces.map(pl => pl.map(q => [q.lat, q.lon])) };
+      }
       if (nearest && nd <= 200) return { ...nearest, precision: 'approx' };
       return null;
     }
@@ -257,8 +289,13 @@
     for (const c of all) {
       const g = geo.geocode(c.location);
       if (!g) { if (geo.covered(c.location)) unlocated++; continue; }
-      c.lat = g.lat; c.lon = g.lon; c.precision = g.precision;
-      c.dist = miles(o.home, g);
+      c.lat = g.lat; c.lon = g.lon; c.precision = g.precision; c.span = g.span || 0; c.seg = g.seg || null;
+      if (g.samples && g.samples.length > 1) {
+        // average distance over the whole block, since the incident could be anywhere on it
+        let sw = 0, sd = 0, mn = Infinity, mx = 0;
+        for (const sm of g.samples) { const d = miles(o.home, sm); sd += d * sm.w; sw += sm.w; mn = Math.min(mn, d); mx = Math.max(mx, d); }
+        c.dist = sd / sw; c.dmin = mn; c.dmax = mx;
+      } else c.dist = miles(o.home, g);
       if (c.dist > o.radius) continue;
       if (c.sev === 0) { excluded++; c.score = 0; inRadius.push(c); continue; }
       c.score = score(c.sev, c.dist, o.half);

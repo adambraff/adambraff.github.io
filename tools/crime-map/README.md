@@ -7,7 +7,7 @@ Live: https://adambraff.github.io/tools/crime-map/
 ## How it works
 
 - **Data**: the browser pulls the [Providence Police Case Log (past 180 days)](https://data.providenceri.gov/Public-Safety/Providence-Police-Case-Log-Past-180-days/rz3y-pz8v) straight from the city's Socrata API on every load. No backend.
-- **Geocoding**: the city publishes block-level locations ("300 Block HOPE ST") and intersections. `streets.json` holds US Census TIGER/Line 2025 address-range street segments for Providence; `core.js` places each block at its midpoint and each intersection at the shared street vertex. Street-only records are placed only if the street is under 0.4 mi long.
+- **Geocoding**: the city publishes block-level locations ("300 Block HOPE ST") and intersections. `streets.json` holds US Census TIGER/Line 2025 address-range street segments for Providence; `core.js` maps each block (a hundred-number range, which can run up to half a mile) to its full stretch of street, pins it at the halfway point, and uses the average distance over the stretch; intersections go at the shared street vertex. Street-only records are placed only if the street is under 0.4 mi long.
 - **Ranking**: score = severity (1-10 by offense type) × 1 / (1 + (distance / h)²). The slider sets h (default 0.35 mi). Admin entries (warrants, traffic, lost property) score zero.
 - **URL params**: `?days=7&radius=1&top=20&half=0.35&labels=1&others=0`
 
