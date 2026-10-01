@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brunonia Live Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@600;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#7E1712; --brown:#4A2511; --gold:#D99A1E; --gold-soft:#FBEFD2; --cream:#FBF6EE;
+  --ink:#2B1A12; --muted:#7A6556; --line:#E7DCCD; --card:#fff;
+  --slab:"Roboto Slab",Rockwell,Georgia,serif; --sans:Inter,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:clamp(13px,0.95vw,22px);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--cream);color:var(--ink);font-family:var(--sans);overflow:hidden}
+.app{display:grid;grid-template-rows:auto 1fr auto;height:100vh}
+header{background:var(--red);color:#fff;display:flex;align-items:center;gap:1.1rem;padding:.8rem 2rem}
+header img{height:3.6rem;width:3.6rem;object-fit:contain;background:#fff;border-radius:50%;padding:.15rem}
+.t1{font-family:var(--slab);font-weight:800;font-size:2rem;line-height:1}
+.t2{font-size:1rem;opacity:.85;margin-top:.25rem}
+.stat{margin-left:auto;text-align:right;font-size:.95rem;line-height:1.5}
+.stat b{font-size:1.6rem;font-family:var(--slab)}
+.live{display:inline-block;width:.6rem;height:.6rem;border-radius:50%;background:#7CD992;margin-right:.4rem;vertical-align:middle;animation:pulse 2s infinite}
+.live.off{background:#F0B429;animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+main{padding:1.2rem 2rem .6rem;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.grid{display:grid;grid-template-columns:minmax(8rem,1.05fr) minmax(8rem,1fr) minmax(12rem,1.5fr) minmax(8rem,1fr) minmax(10rem,1.35fr) minmax(7rem,.85fr) minmax(16rem,2.4fr) minmax(6rem,.7fr);column-gap:1rem;align-items:center}
+.head{font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:0 1rem .5rem;border-bottom:2px solid var(--line)}
+.rows{flex:1;min-height:0;display:flex;flex-direction:column;gap:.55rem;padding-top:.6rem;overflow:hidden}
+.row{background:var(--card);border:1px solid var(--line);border-radius:.8rem;padding:.75rem 1rem;box-shadow:0 2px 8px rgba(74,37,17,.05);transition:background 1.2s}
+.row.flash{background:var(--gold-soft)}
+.team{font-family:var(--slab);font-weight:800;font-size:1.35rem;color:var(--brown);line-height:1.1}
+.when{font-size:.75rem;color:var(--muted);margin-top:.2rem}
+.cell{font-size:.95rem;line-height:1.3}
+.uc{font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:.3rem}
+.chip{background:#F4EEE6;border-radius:.4rem;padding:.15rem .45rem;font-size:.82rem;color:#4B3A2F}
+.ctl .n{font-weight:700;color:var(--red)}
+.ctl .l{font-size:.78rem;color:var(--muted);margin-top:.15rem}
+.gantt{position:relative;height:2.6rem}
+.track{position:absolute;left:0;right:0;top:.55rem;height:1rem;background:#F4EEE6;border-radius:.5rem}
+.seg{position:absolute;top:.55rem;height:1rem;transition:width .8s,left .8s}
+.seg.p{background:var(--brown);border-radius:.5rem 0 0 .5rem}
+.seg.f{background:#B8823A}
+.seg.r{background:var(--gold);border-radius:0 .5rem .5rem 0}
+.glab{position:absolute;top:1.75rem;left:0;right:0;font-size:.78rem;color:var(--muted);white-space:nowrap}
+.glab b{color:var(--red)}
+.prob{font-family:var(--slab);font-weight:800;font-size:2.1rem;color:var(--red);text-align:right}
+.axis{position:relative;height:1rem}
+.axis span{position:absolute;transform:translateX(-50%);white-space:nowrap;font-size:.7rem;color:var(--muted);font-weight:600;letter-spacing:.02em;text-transform:none}
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;color:var(--muted);text-align:center}
+.empty img{width:16rem;opacity:.95}
+.empty .msg{font-family:var(--slab);font-size:2rem;color:var(--brown)}
+.legend{display:flex;gap:1.2rem;justify-content:flex-end;font-size:.78rem;color:var(--muted);padding:.4rem 1rem 0}
+.legend i{display:inline-block;width:.9rem;height:.6rem;border-radius:.2rem;margin-right:.35rem;vertical-align:middle}
+.ctrls{position:fixed;left:1rem;bottom:2.6rem;display:flex;gap:.4rem;opacity:.0;transition:opacity .3s}
+body:hover .ctrls{opacity:.85}
+.ctrls button{font:inherit;font-size:.78rem;border:1px solid var(--line);background:#fff;color:var(--brown);border-radius:.4rem;padding:.3rem .6rem;cursor:pointer}
+.ctrls button.on{background:var(--brown);color:#fff;border-color:var(--brown)}
+footer{height:2.2rem;overflow:hidden;position:relative;border-top:1px solid var(--line);background:#F7F0E5}
+.tick{position:absolute;white-space:nowrap;top:50%;transform:translateY(-50%);font-size:.85rem;color:#9C8673;font-style:italic;will-change:transform}
+.tick span{margin-right:5rem}
+.tick span::before{content:"🐻";font-style:normal;margin-right:.6rem;opacity:.7}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <img id="logo" alt="">
+    <div><div class="t1">First Bank of Brunonia</div><div class="t2">Analytics Investment Committee · live submissions</div></div>
+    <div class="stat"><div><b id="count">0</b> teams submitted</div><div><span class="live" id="dot"></span><span id="upd">Connecting…</span></div></div>
+  </header>
+  <main id="main"></main>
+  <footer><div class="tick" id="tick"></div></footer>
+</div>
+<div class="ctrls">
+  <button id="sortTime">Order: submitted</button>
+  <button id="sortRoll">Order: full rollout</button>
+</div>
+<script>
+const ENDPOINT="https://script.google.com/macros/s/AKfycbzfwWTwW5Tuil-QMCFGr9oKYIh68WV808cj6F4pWSSDVwar1JEWOQDWG_GYBjkB84EP/exec";
+const KICKOFF=new Date("2026-11-02T12:00:00");
+const AXIS_MAX=80, POLL_MS=8000;
+const SLOGANS=[
+ "Bearing interest since 1764.",
+ "Our vault is a cave. Our CEO is a bear. Your money has never been safer.",
+ "Hibernation-grade security for your savings.",
+ "Ask about our Hibernation CD: lock it up all winter, wake up richer.",
+ "Bear markets? We call that home turf.",
+ "Paws for thought before every loan decision.",
+ "Grizzly about fees? Our tellers are mostly friendly.",
+ "Cub Accounts for our youngest savers.",
+ "Unbearably competitive mortgage rates.",
+ "We never sleep on your deposits. We sleep near them.",
+ "Honey-backed reserves. Ask your teller for details.",
+ "Den of savings, not a den of thieves.",
+ "Fur-st in customer service, six winters running."
+];
+const params=new URLSearchParams(location.search);
+const DEMO=params.has("demo");
+let sortMode=(()=>{try{return localStorage.getItem("brunonia_board_sort")||"time"}catch(e){return "time"}})();
+let latest=[], lastSig="", seen={}, failures=0;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const monthOf=w=>new Date(KICKOFF.getTime()+w*7*864e5).toLocaleString("en-US",{month:"short",year:"numeric"});
+const pct=w=>Math.max(0,Math.min(100,(w/AXIS_MAX)*100));
+
+// logo: reuse the one embedded in the team app so this page stays text-only
+fetch("../brunonia/").then(r=>r.text()).then(t=>{const m=t.match(/const LOGO="(data:image\/[^"]+)"/);if(m){$("logo").src=m[1];window.LOGO=m[1];render()}}).catch(()=>{});
+
+function demoRows(){
+  const now=Date.now();
+  return [
+   {at:new Date(now-600000).toISOString(),team:"Fox Point",useCase:"Credit Underwriting",data:"Checking Account Activity, Credit Bureau Snapshot, Loan Application Data",technique:"Propensity Model",controls:"Data Quality Review, Fair-Lending / Model Risk Validation",release:"Phased Rollout",prod:37,first:43,full:63,prob:.55},
+   {at:new Date(now-500000).toISOString(),team:"Wayland Square",useCase:"Base Marketing",data:"Campaign History, Checking Account Activity",technique:"Executive Dashboard",controls:"No additional controls",release:"Big-Bang Release",prod:14,first:18,full:22,prob:.8},
+   {at:new Date(now-400000).toISOString(),team:"College Hill",useCase:"Fraud Prevention",data:"Card Transactions, Fraud Events and Alerts, Digital Behavior",technique:"Anomaly Detection",controls:"Human Review Queue, Customer Friction Review, Monitoring and Rollback",release:"Phased Rollout",prod:33,first:39,full:59,prob:.6},
+   {at:new Date(now-300000).toISOString(),team:"Federal Hill",useCase:"Customer Experience",data:"Service Interactions, Digital Behavior",technique:"Customer Segmentation",controls:"Data Quality Review",release:"Agile MVP",prod:22,first:26,full:52,prob:.45},
+   {at:new Date(now-200000).toISOString(),team:"Mount Hope",useCase:"External Data Monetization",data:"Card Transactions",technique:"Aggregated Data Product",controls:"Privacy and Legal Review, Data Quality Review",release:"Remediate First",prod:48,first:52,full:56,prob:.3}
+  ];
+}
+function normalize(rows){
+  const by={};
+  rows.forEach(r=>{
+    const name=String(r.team||"").trim(); if(!name) return;
+    const k=name.toLowerCase(); const t=Date.parse(r.at)||0;
+    if(!by[k]||t>=by[k]._t) by[k]={...r,team:name,_t:t};
+  });
+  return Object.values(by);
+}
+async function poll(){
+  try{
+    let rows;
+    if(DEMO) rows=demoRows();
+    else{
+      if(!ENDPOINT.startsWith("https://")) throw new Error("no endpoint");
+      const res=await fetch(ENDPOINT+(ENDPOINT.includes("?")?"&":"?")+"t="+Date.now(),{cache:"no-store"});
+      const j=await res.json(); rows=j.rows||[];
+    }
+    failures=0; $("dot").classList.remove("off");
+    $("upd").textContent="Updated "+new Date().toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",second:"2-digit"});
+    const teams=normalize(rows);
+    const sig=JSON.stringify(teams.map(t=>[t.team,t._t]));
+    if(sig!==lastSig){
+      const fresh=new Set();
+      teams.forEach(t=>{const k=t.team.toLowerCase(); if(lastSig&&seen[k]!==t._t) fresh.add(k); seen[k]=t._t});
+      latest=teams; lastSig=sig; render(fresh);
+    }
+  }catch(e){
+    failures++; $("dot").classList.add("off");
+    $("upd").textContent=failures>2?"Reconnecting…":"Checking…";
+    if(!latest.length) render();
+  }
+}
+function sorted(){
+  const a=[...latest];
+  if(sortMode==="roll") a.sort((x,y)=>(x.full??999)-(y.full??999)||x._t-y._t);
+  else a.sort((x,y)=>x._t-y._t);
+  return a;
+}
+function axisHTML(){
+  let h="";
+  for(let w=0;w<=AXIS_MAX;w+=26){h+=`<span style="left:${pct(w)}%;${w===0?"transform:none":""}">${w===0?"Kickoff":monthOf(w)}</span>`}
+  return h;
+}
+function render(fresh=new Set()){
+  $("count").textContent=latest.length;
+  document.querySelectorAll(".ctrls button").forEach(b=>b.classList.toggle("on",(b.id==="sortTime"&&sortMode==="time")||(b.id==="sortRoll"&&sortMode==="roll")));
+  if(!latest.length){
+    $("main").innerHTML=`<div class="empty">${window.LOGO?`<img src="${window.LOGO}" alt="">`:""}<div class="msg">Waiting for the first team to submit…</div><div>Plans appear here as soon as teams tap Submit.</div></div>`;
+    return;
+  }
+  const rows=sorted().map(t=>{
+    const ctl=String(t.controls||"");
+    const none=!ctl||/^no additional/i.test(ctl);
+    const ctlN=none?0:ctl.split(",").length;
+    const p=Number(t.prod), f=Number(t.first), r=Number(t.full);
+    const prob=t.prob===""||t.prob==null?"—":Math.round(Number(t.prob)*(Number(t.prob)<=1?100:1))+"%";
+    const time=t._t?new Date(t._t).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}):"";
+    return `<div class="row grid${fresh.has(t.team.toLowerCase())?" flash":""}" data-k="${esc(t.team.toLowerCase())}">
+      <div><div class="team">${esc(t.team)}</div><div class="when">${time}</div></div>
+      <div class="cell uc">${esc(t.useCase)}</div>
+      <div class="chips">${String(t.data||"").split(",").filter(Boolean).map(d=>`<span class="chip">${esc(d.trim())}</span>`).join("")}</div>
+      <div class="cell">${esc(t.technique)}</div>
+      <div class="cell ctl"><div class="n">${none?"No added controls":ctlN+" added"}</div>${none?"":`<div class="l">${esc(ctl)}</div>`}</div>
+      <div class="cell">${esc(t.release)}</div>
+      <div class="gantt"><div class="track"></div>
+        <div class="seg p" style="left:0;width:${pct(p)}%"></div>
+        <div class="seg f" style="left:${pct(p)}%;width:${Math.max(0,pct(f)-pct(p))}%"></div>
+        <div class="seg r" style="left:${pct(f)}%;width:${Math.max(0,pct(r)-pct(f))}%"></div>
+        <div class="glab">Prod wk ${p} · Full rollout <b>wk ${r} (${monthOf(r)})</b></div></div>
+      <div class="prob">${prob}</div>
+    </div>`}).join("");
+  $("main").innerHTML=`<div class="grid head"><div>Team</div><div>Use case</div><div>Data sources</div><div>Technique</div><div>Controls</div><div>Release</div><div class="axis">${axisHTML()}</div><div style="text-align:right">Forecast</div></div>
+    <div class="rows">${rows}</div>
+    <div class="legend"><span><i style="background:var(--brown)"></i>Build to production</span><span><i style="background:#B8823A"></i>To first results</span><span><i style="background:var(--gold)"></i>To target full rollout</span></div>`;
+  if(fresh.size) setTimeout(()=>document.querySelectorAll(".row.flash").forEach(e=>e.classList.remove("flash")),2500);
+}
+function setSort(m){sortMode=m;try{localStorage.setItem("brunonia_board_sort",m)}catch(e){}render()}
+$("sortTime").onclick=()=>setSort("time");
+$("sortRoll").onclick=()=>setSort("roll");
+document.addEventListener("keydown",e=>{if(e.key==="s"||e.key==="S")setSort(sortMode==="time"?"roll":"time")});
+
+// ticker
+(function(){
+  const el=$("tick"); const order=[...SLOGANS].sort(()=>Math.random()-.5);
+  el.innerHTML=order.concat(order).map(s=>`<span>${esc(s)}</span>`).join("");
+  let x=0, last=performance.now();
+  function step(now){const dt=(now-last)/1000;last=now;x-=28*dt;const half=el.scrollWidth/2;if(-x>=half)x+=half;el.style.transform=`translateY(-50%) translateX(${x}px)`;requestAnimationFrame(step)}
+  requestAnimationFrame(step);
+})();
+render(); poll(); setInterval(poll,POLL_MS);
+</script>
+</body>
+</html>
