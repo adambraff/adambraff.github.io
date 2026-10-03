@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giventer-Braff Vacation, August 2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<style>
+:root {
+  --scotland: #5b4b8a;
+  --scotland-light: #8a76c4;
+  --argentina: #2a9d8f;
+  --argentina-light: #40c9b5;
+  --switzerland: #c0392b;
+  --switzerland-light: #e8685a;
+  --canada: #2d6a4f;
+  --canada-light: #52b788;
+  --bg: #0f1419;
+  --card: #1a1f2e;
+  --card-hover: #222840;
+  --text: #e8eaed;
+  --text-dim: #9aa0a6;
+  --accent: #8ab4f8;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+/* Hero */
+.hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  background: linear-gradient(135deg, #0f1419 0%, #1a2332 50%, #0f1419 100%);
+  overflow: hidden;
+  padding: 60px 24px 40px;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(138,180,248,0.08) 0%, transparent 70%);
+  top: -100px; right: -100px;
+  border-radius: 50%;
+}
+.hero-badge {
+  display: inline-block;
+  background: rgba(138,180,248,0.1);
+  border: 1px solid rgba(138,180,248,0.2);
+  padding: 8px 20px;
+  border-radius: 24px;
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: 24px;
+  letter-spacing: 0.5px;
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #fff 0%, #8ab4f8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: var(--text-dim);
+  margin-bottom: 32px;
+  max-width: 600px;
+  font-weight: 300;
+}
+.hero-cta {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--accent), #6d9ef0);
+  color: #0f1419;
+  font-weight: 600;
+  padding: 14px 36px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 1.05rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  border: none;
+}
+.hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(138,180,248,0.3); }
+
+/* Section headers */
+.section-header {
+  text-align: center;
+  padding: 48px 0 32px;
+}
+.section-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+.section-header p { color: var(--text-dim); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+
+/* Priorities section */
+.priorities-section {
+  padding: 0 0 60px;
+}
+.voter-picker {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+.voter-btn {
+  background: var(--card);
+  border: 2px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 12px 24px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.voter-btn:hover { border-color: var(--accent); background: rgba(138,180,248,0.08); }
+.voter-btn.active {
+  border-color: var(--accent);
+  background: rgba(138,180,248,0.15);
+  box-shadow: 0 0 20px rgba(138,180,248,0.15);
+}
+.voter-btn .voter-city { display: block; font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
+.voter-btn.has-rankings::after {
+  content: '\2713';
+  position: absolute;
+  top: -6px; right: -6px;
+  background: #34a853;
+  color: white;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sliders-panel {
+  display: none;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.sliders-panel.active { display: block; }
+
+.slider-group {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.slider-group h3 {
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.slider-group > p {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+}
+.slider-row { margin-bottom: 22px; }
+.slider-row:last-child { margin-bottom: 0; }
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.slider-label { font-weight: 500; font-size: 0.95rem; }
+.slider-value {
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-weight: 600;
+  min-width: 80px;
+  text-align: right;
+}
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.08);
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(138,180,248,0.4);
+  transition: transform 0.15s;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.slider-endpoints {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+.weather-slider-row .slider-label { color: #f4b400; }
+
+/* Destination Cards */
+.destinations {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 28px;
+  padding: 0 24px 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.dest-card {
+  background: var(--card);
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.dest-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+.dest-banner {
+  width: 100%;
+  height: 200px;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+}
+.dest-banner.scotland-bg { background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/The_Three_Sisters%2C_Glencoe%2C_Scotland.jpg/1280px-The_Three_Sisters%2C_Glencoe%2C_Scotland.jpg'); }
+.dest-banner.argentina-bg { background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Garganta_del_Diablo_or_Devil_Throat_Iguazu_Falls_Argentina_Luca_Galuzzi_2005.JPG/1280px-Garganta_del_Diablo_or_Devil_Throat_Iguazu_Falls_Argentina_Luca_Galuzzi_2005.JPG'); }
+.dest-banner.switzerland-bg { background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/1_lauterbrunnen_valley_2012.jpg/1280px-1_lauterbrunnen_valley_2012.jpg'); }
+.dest-banner.canada-bg { background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Vancouver_harbour_skyline_%2844723845851%29.jpg/1280px-Vancouver_harbour_skyline_%2844723845851%29.jpg'); }
+.dest-score-badge {
+  position: absolute;
+  top: 12px; right: 12px;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: white;
+}
+.dest-body { padding: 24px; }
+.dest-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+@media (min-width: 900px) { #dest-cards { grid-template-columns: repeat(2, 1fr); } }
+.dest-bases { font-size:0.8rem; color:var(--text-dim); margin:4px 0 12px; }
+.dest-bases strong { color:var(--text); font-weight:600; }
+.dest-tag.scotland { background: rgba(91,75,138,0.35); color: #b9a8f0; }
+.dest-tag.argentina { background: rgba(42,157,143,0.3); color: #5ee0cc; }
+.dest-tag.switzerland { background: rgba(192,57,43,0.3); color: #f2948a; }
+.dest-tag.canada { background: rgba(45,106,79,0.35); color: #7fdcae; }
+.dest-body h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
+.dest-body .tagline { color: var(--text-dim); font-size: 0.95rem; margin-bottom: 16px; font-style: italic; }
+.dest-map { height: 180px; border-radius: 12px; margin-bottom: 16px; z-index: 1; }
+.dest-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.stat-item {
+  background: rgba(255,255,255,0.03);
+  padding: 10px 14px;
+  border-radius: 10px;
+}
+.stat-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-value { font-size: 1rem; font-weight: 600; margin-top: 2px; }
+.dest-highlights {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.dest-highlights h4 { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+.highlight-list { list-style: none; }
+.highlight-list li {
+  padding: 4px 0;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.highlight-list li::before { content: '\2192'; color: var(--accent); font-weight: 600; }
+
+/* Write-ins display */
+.writeins-display {
+  max-width: 700px;
+  margin: 0 auto 40px;
+  padding: 0 24px;
+}
+.writeins-display-card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.writeins-display-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.writein-display-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+.writein-display-item:last-child { margin-bottom: 0; }
+.writein-display-name { font-weight: 600; font-size: 1rem; }
+.writein-display-by { font-size: 0.8rem; color: var(--text-dim); }
+.no-writeins { color: var(--text-dim); font-size: 0.9rem; font-style: italic; }
+
+/* Comparison Table */
+.comparison {
+  max-width: 900px;
+  margin: 0 auto 80px;
+  padding: 0 24px;
+}
+.comp-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.comp-table th, .comp-table td {
+  padding: 14px 18px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+.comp-table th {
+  background: rgba(138,180,248,0.08);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--accent);
+}
+.comp-table th:first-child, .comp-table td:first-child { text-align: left; }
+.comp-table tr { border-bottom: 1px solid rgba(255,255,255,0.04); }
+.comp-table tr:last-child { border-bottom: none; }
+.comp-table td:first-child { font-weight: 500; }
+.score-dot {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* Rankings section */
+.rankings-section {
+  padding: 0 0 80px;
+}
+.rankings-panel {
+  display: none;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.rankings-panel.active { display: block; }
+
+.rank-list { list-style: none; }
+.rank-item {
+  background: var(--card);
+  border: 2px solid rgba(255,255,255,0.06);
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.2s;
+  cursor: grab;
+}
+.rank-item:active { cursor: grabbing; }
+.rank-item.dragging { opacity: 0.5; border-color: var(--accent); }
+.rank-item.drag-over { border-color: var(--accent); background: rgba(138,180,248,0.08); }
+.rank-number {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--accent);
+  min-width: 36px;
+  text-align: center;
+}
+.rank-info { flex: 1; }
+.rank-name { font-weight: 600; font-size: 1.05rem; }
+.rank-score { font-size: 0.8rem; color: var(--text-dim); margin-top: 2px; }
+.rank-arrows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rank-arrow {
+  background: rgba(255,255,255,0.06);
+  border: none;
+  color: var(--text-dim);
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.rank-arrow:hover { background: rgba(138,180,248,0.15); color: var(--accent); }
+.rank-arrow:disabled { opacity: 0.2; cursor: not-allowed; }
+
+.writein-section {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 20px;
+  margin-top: 24px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.writein-section h4 { font-size: 0.95rem; margin-bottom: 12px; }
+.writein-row {
+  display: flex;
+  gap: 10px;
+}
+.writein-input {
+  flex: 1;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px 16px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.writein-input:focus { border-color: var(--accent); }
+.writein-input::placeholder { color: var(--text-dim); }
+.writein-add {
+  background: rgba(138,180,248,0.15);
+  border: 1px solid rgba(138,180,248,0.3);
+  color: var(--accent);
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.writein-add:hover { background: rgba(138,180,248,0.25); }
+
+/* Comments section */
+.comments-panel {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 24px;
+  margin-top: 24px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.comments-panel h3 {
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.comments-panel > p {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+}
+.comment-row {
+  margin-bottom: 14px;
+}
+.comment-row:last-child { margin-bottom: 0; }
+.comment-dest-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+.comment-input {
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.2s;
+  resize: vertical;
+  min-height: 36px;
+  max-height: 120px;
+}
+.comment-input:focus { border-color: var(--accent); }
+.comment-input::placeholder { color: var(--text-dim); }
+.vote-comment {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  font-style: italic;
+  padding: 4px 0 4px 34px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.vote-comment:last-child { border-bottom: none; }
+.vote-comment .comment-dest {
+  color: var(--accent);
+  font-style: normal;
+  font-weight: 500;
+}
+
+.save-rankings-btn {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  margin: 28px auto 0;
+  padding: 16px 32px;
+  background: linear-gradient(135deg, #34a853, #2d9248);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.save-rankings-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(52,168,83,0.3); }
+.save-status {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: #34a853;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.save-status.visible { opacity: 1; }
+
+/* Scoreboard */
+.scoreboard { padding: 0 0 80px; }
+.votes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.vote-card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.vote-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.vote-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: white;
+}
+.vote-card-header h4 { font-size: 1.05rem; }
+.vote-ranking-list {
+  list-style: none;
+}
+.vote-ranking-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 0.9rem;
+}
+.vote-ranking-item:last-child { border-bottom: none; }
+.vote-rank-num {
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--accent);
+  min-width: 24px;
+}
+.vote-ranking-item .dest-name { flex: 1; }
+.vote-ranking-item .borda-pts {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.no-votes {
+  text-align: center;
+  padding: 60px;
+  color: var(--text-dim);
+  grid-column: 1 / -1;
+}
+
+/* Consensus */
+.consensus-section {
+  max-width: 700px;
+  margin: 40px auto 0;
+  padding: 0 24px;
+  display: none;
+}
+.consensus-section.active { display: block; }
+.consensus-card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 28px;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.consensus-card h3 { margin-bottom: 20px; }
+.result-bar-container { margin-bottom: 14px; }
+.result-bar-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.result-bar-label { font-weight: 500; font-size: 0.95rem; }
+.result-bar-score { font-weight: 700; color: var(--accent); font-size: 0.95rem; }
+.result-bar-track {
+  height: 28px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.result-bar-fill {
+  height: 100%;
+  border-radius: 14px;
+  transition: width 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: flex;
+  align-items: center;
+  padding-left: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(0,0,0,0.7);
+}
+.bar-scotland { background: linear-gradient(90deg, var(--scotland), var(--scotland-light)); }
+.bar-argentina { background: linear-gradient(90deg, var(--argentina), var(--argentina-light)); }
+.bar-switzerland { background: linear-gradient(90deg, var(--switzerland), var(--switzerland-light)); }
+.bar-canada { background: linear-gradient(90deg, var(--canada), var(--canada-light)); }
+.bar-writein { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+
+/* Firebase banner */
+.firebase-banner {
+  background: rgba(244,180,0,0.1);
+  border: 1px solid rgba(244,180,0,0.2);
+  border-radius: 12px;
+  padding: 14px 24px;
+  margin: 0 auto 32px;
+  max-width: 700px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #f4b400;
+  display: none;
+}
+.firebase-banner.active { display: block; }
+
+/* Admin reset */
+.admin-section {
+  max-width: 500px;
+  margin: 0 auto 40px;
+  padding: 0 24px;
+  text-align: center;
+}
+.admin-reset-btn {
+  background: rgba(234,67,53,0.12);
+  border: 1px solid rgba(234,67,53,0.3);
+  color: #ea4335;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.admin-reset-btn:hover { background: rgba(234,67,53,0.2); }
+.admin-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+.admin-modal-overlay.active { display: flex; }
+.admin-modal {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 400px;
+  width: 90%;
+  border: 1px solid rgba(255,255,255,0.1);
+  text-align: center;
+}
+.admin-modal h3 { margin-bottom: 8px; color: #ea4335; }
+.admin-modal p { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 20px; }
+.admin-modal input {
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  outline: none;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.admin-modal input:focus { border-color: var(--accent); }
+.admin-modal-btns { display: flex; gap: 12px; justify-content: center; }
+.admin-modal-btns button {
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  border: none;
+}
+.admin-confirm-btn { background: #ea4335; color: white; }
+.admin-cancel-btn { background: rgba(255,255,255,0.08); color: var(--text); }
+.admin-error { color: #ea4335; font-size: 0.8rem; margin-top: 8px; display: none; }
+
+footer {
+  text-align: center;
+  padding: 40px 24px;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+html { scroll-behavior: smooth; }
+
+@media (max-width: 768px) {
+  .destinations { grid-template-columns: 1fr; padding: 0 16px 40px; }
+  .hero h1 { font-size: 2rem; }
+  .slider-group { padding: 20px; }
+  .comp-table th, .comp-table td { padding: 10px 8px; font-size: 0.78rem; }
+  .voter-btn { padding: 10px 16px; font-size: 0.85rem; }
+  .votes-grid { grid-template-columns: 1fr; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-in { animation: fadeInUp 0.5s ease-out forwards; }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="hero-badge">August 19&#8211;28, 2027</div>
+  <h1>Giventer-Braff Vacation</h1>
+  <p class="hero-subtitle">Five family members. Four destinations (plus write-ins). Rank them all. Change your mind whenever.</p>
+  <a href="#priorities" class="hero-cta">Set Your Priorities</a>
+</section>
+
+<!-- ============ PRIORITIES (SLIDERS FIRST) ============ -->
+<section class="priorities-section" id="priorities">
+  <div class="section-header">
+    <h2>Set Your Priorities</h2>
+    <p>Pick your name, then tell us what matters most. This shapes how the destinations are scored for you.</p>
+  </div>
+
+  <div id="firebase-banner" class="firebase-banner">
+    Shared voting is active &#8212; rankings sync across all family members in real time.
+  </div>
+
+  <div class="voter-picker" id="voter-picker"></div>
+
+  <div class="sliders-panel" id="sliders-panel">
+    <div class="slider-group">
+      <h3>How important is each factor?</h3>
+      <p>1 = "meh" &#8594; 10 = "deal-breaker." Scores below update live.</p>
+      <div id="sliders-container"></div>
+    </div>
+    <div class="slider-group">
+      <h3>&#9832; Temperature preference</h3>
+      <p>What weather do you actually want? Scotland is cool, Argentina is mixed, Canada and Switzerland are mild.</p>
+      <div class="slider-row weather-slider-row">
+        <div class="slider-header">
+          <span class="slider-label">Your ideal temperature</span>
+          <span class="slider-value" id="val-temp-pref">5 &#8212; Mild (70s&#176;F)</span>
+        </div>
+        <input type="range" min="1" max="10" value="5" id="slider-temp-pref"
+          oninput="updateTempPref(this.value)">
+        <div class="slider-endpoints">
+          <span>Cold (50s&#176;F)</span><span>Hot (85&#176;F+)</span>
+        </div>
+      </div>
+      <div class="slider-row" style="margin-top:22px;">
+        <div class="slider-header">
+          <span class="slider-label">How much does weather matter?</span>
+          <span class="slider-value" id="val-weather-wt">5 &#8212; Moderate</span>
+        </div>
+        <input type="range" min="1" max="10" value="5" id="slider-weather-wt"
+          oninput="updateWeatherWeight(this.value)">
+        <div class="slider-endpoints">
+          <span>Meh</span><span>Deal-breaker</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DESTINATIONS ============ -->
+<div class="section-header" id="destinations">
+  <h2>The Contenders</h2>
+  <p>Scores personalized to your priorities. No sliders set yet? You'll see unweighted defaults.</p>
+</div>
+
+<div class="destinations container" id="dest-cards"></div>
+
+<!-- Write-ins display -->
+<div class="writeins-display" id="writeins-display" style="display:none;">
+  <div class="writeins-display-card">
+    <h3>&#9997; Write-in Candidates</h3>
+    <div id="writeins-list"></div>
+  </div>
+</div>
+
+<!-- ============ COMPARISON TABLE ============ -->
+<div class="section-header">
+  <h2>Head-to-Head</h2>
+  <p>Objective scores per factor (1&#8211;10). Weather shown as temperature rating (cold to hot).</p>
+</div>
+
+<div class="comparison">
+  <table class="comp-table">
+    <thead>
+      <tr id="comp-head"></tr>
+    </thead>
+    <tbody id="comp-body"></tbody>
+  </table>
+</div>
+
+<!-- ============ RANKINGS ============ -->
+<section class="rankings-section" id="rankings">
+  <div class="section-header">
+    <h2>Rank Your Picks</h2>
+    <p>Drag or use arrows to rank all destinations. Add a write-in if none of these do it for you.</p>
+  </div>
+
+  <div class="rankings-panel" id="rankings-panel">
+    <ul class="rank-list" id="rank-list"></ul>
+
+    <div class="writein-section">
+      <h4>Write-in destination</h4>
+      <div class="writein-row">
+        <input type="text" class="writein-input" id="writein-input" placeholder="e.g. Greece, Japan, Portugal..." maxlength="40">
+        <button class="writein-add" onclick="addWriteIn()">Add</button>
+      </div>
+    </div>
+
+    <div class="comments-panel" id="comments-panel">
+      <h3>&#128172; Comments</h3>
+      <p>Optional notes on any destination &#8212; lobbying encouraged.</p>
+      <div id="comments-container"></div>
+    </div>
+
+    <button class="save-rankings-btn" onclick="saveRankings()">Save My Rankings</button>
+    <div class="save-status" id="save-status">Rankings saved &#10003;</div>
+  </div>
+</section>
+
+<!-- ============ SCOREBOARD ============ -->
+<section class="scoreboard" id="scoreboard">
+  <div class="section-header">
+    <h2>Family Scoreboard</h2>
+    <p>Everyone's rankings. Change yours whenever you want &#8212; no lock-ins.</p>
+  </div>
+
+  <!-- Leaderboard (Borda count) FIRST -->
+  <div class="consensus-section" id="consensus-section">
+    <div class="consensus-card">
+      <h3>Leaderboard</h3>
+      <p style="font-size:0.85rem;color:var(--text-dim);margin-bottom:20px;">Borda count: 1st place = most points, last = fewest. Aggregated across all voters.</p>
+      <div id="consensus-bars"></div>
+    </div>
+  </div>
+
+  <!-- Individual votes SECOND -->
+  <div class="votes-grid" id="votes-grid">
+    <div class="no-votes" id="no-votes"><p>No rankings yet. Someone go first.</p></div>
+  </div>
+
+  <!-- Admin reset -->
+  <div class="admin-section">
+    <button class="admin-reset-btn" onclick="showAdminReset()">&#128274; Admin: Reset All Votes</button>
+  </div>
+</section>
+
+<!-- Admin Reset Modal -->
+<div class="admin-modal-overlay" id="admin-modal">
+  <div class="admin-modal">
+    <h3>&#9888; Reset All Votes</h3>
+    <p>This will permanently delete all rankings and write-ins. Enter the admin password to confirm.</p>
+    <input type="password" id="admin-password" placeholder="Admin password">
+    <div class="admin-modal-btns">
+      <button class="admin-cancel-btn" onclick="hideAdminReset()">Cancel</button>
+      <button class="admin-confirm-btn" onclick="confirmAdminReset()">Reset Everything</button>
+    </div>
+    <div class="admin-error" id="admin-error">Incorrect password.</div>
+  </div>
+</div>
+
+<footer>
+  <p>Built by Adam Braff and Claude Cowork, 2026. Itineraries drafted by G&#248;r.</p>
+</footer>
+
+<script>
+// ===== DATA =====
+var FAMILY = [
+  { name: 'Adam', city: 'Providence', color: '#4285f4', initial: 'A' },
+  { name: 'G\u00f8r', city: 'Providence', color: '#ea4335', initial: 'G' },
+  { name: 'Emma', city: 'Boston', color: '#fbbc04', initial: 'E' },
+  { name: 'Jeremy', city: 'NYC', color: '#34a853', initial: 'J' },
+  { name: 'Andrew', city: 'Chicago', color: '#ff6d01', initial: 'An' }
+];
+
+var CRITERIA = [
+  { id: 'adventure', label: 'Adventure & Outdoors', icon: '⛰', desc: 'Hiking, biking, water, once-in-a-lifetime scenery' },
+  { id: 'food', label: 'Food & Drink', icon: '🍷', desc: 'Unpretentious great meals, local specialties, bars' },
+  { id: 'culture', label: 'Culture & History', icon: '🏛', desc: 'History, museums, architecture, local traditions' },
+  { id: 'walkable', label: 'Walkable City Bases', icon: '🚶', desc: 'Step out of the hotel and be somewhere' },
+  { id: 'nightlife', label: 'Festivals & Nightlife', icon: '🎭', desc: 'Live shows, festivals, late nights' },
+  { id: 'sports', label: 'Pro Spectator Sports', icon: '⚽', desc: 'Watching live pro sports while there' },
+  { id: 'safety', label: 'Safety', icon: '🛡', desc: 'Low crime, personal safety, political stability' },
+  { id: 'travel', label: 'Ease of Travel', icon: '✈', desc: 'Flight time, language, internal logistics, fewer connections to break' }
+];
+
+var DESTINATIONS = {
+  scotland: {
+    name: 'Scotland', short: 'Scotland', tag: 'Fringe + Highlands', color: 'var(--scotland)', barClass: 'bar-scotland',
+    tagline: 'The world’s biggest comedy festival, then a chauffeured van into the Highlands',
+    bases: 'Edinburgh 4 · Glencoe/Highlands 2 · Loch Lomond 2',
+    mapCenter: [56.4, -4.6], mapZoom: 6,
+    markers: [[55.95, -3.19, 'Edinburgh'], [56.68, -5.10, 'Glencoe'], [56.00, -4.58, 'Loch Lomond (Cameron House)']],
+    stats: [['Late Aug Temp', '62–65°F'], ['Flight (East Coast)', '~7 hrs direct'], ['Getting Around', 'Walk, then private van'], ['Festival', 'Edinburgh Fringe + Tattoo'], ['Currency', 'GBP'], ['Language', 'English']],
+    highlights: ['Fringe venue crawl: Pleasance, Assembly, Underbelly', 'Arthur’s Seat sunset hike', 'Royal Edinburgh Military Tattoo', 'Lost Valley hike between the Three Sisters of Glencoe', 'Private motor-yacht afternoon on Loch Lomond'],
+    hotels: 'The Balmoral · Highlands inn TBD · Cameron House 3-bedroom lodge',
+    scores: { adventure: 8, food: 7, culture: 9, walkable: 10, nightlife: 10, sports: 6, safety: 9, travel: 8 },
+    weatherTemp: 3,
+    weatherLabel: 'Cool (62–65°F), showers',
+    scoreNotes: {}
+  },
+  argentina: {
+    name: 'Argentina', short: 'Argentina', tag: 'South America', color: 'var(--argentina)', barClass: 'bar-argentina',
+    tagline: 'Buenos Aires, jungle waterfalls, and Andes wine country, one hour off Eastern time',
+    bases: 'Buenos Aires 3 · Iguazú 2 · Mendoza/Uco Valley 3',
+    mapCenter: [-30.5, -61.0], mapZoom: 4,
+    markers: [[-34.60, -58.38, 'Buenos Aires'], [-25.69, -54.44, 'Iguazú Falls'], [-33.60, -69.20, 'Uco Valley']],
+    stats: [['Late Aug Temp', '62°F / 76°F / 65°F*'], ['Flight (East Coast)', '~11 hrs direct'], ['Getting Around', '2 domestic flights + drivers'], ['Festival', 'Tango BA Festival y Mundial'], ['Currency', 'ARS'], ['Language', 'Spanish']],
+    note: '*Buenos Aires / Iguazú / Mendoza. It’s their late winter; Mendoza nights near freezing.',
+    highlights: ['Devil’s Throat catwalks and the jet boat under the falls', 'Palermo, San Telmo, and a midnight milonga', 'Don Julio and Anchoita (reservations open early and vanish)', 'Gaucho ride and Class III rafting in the Andes foothills', 'Blend your own Malbec at The Vines'],
+    hotels: 'Four Seasons BA or Palacio Duhau · Gran Meliá Iguazú · The Vines',
+    scores: { adventure: 9, food: 10, culture: 8, walkable: 7, nightlife: 9, sports: 9, safety: 6, travel: 5 },
+    weatherTemp: 4,
+    weatherLabel: 'Mixed (62–76°F)',
+    scoreNotes: {}
+  },
+  switzerland: {
+    name: 'Switzerland', short: 'Switzerland', tag: 'Alpine', color: 'var(--switzerland)', barClass: 'bar-switzerland',
+    tagline: 'Paragliding, e-bikes under waterfalls, and swimming in lakes clean enough to drink',
+    bases: 'Zurich 2 · Lake Lucerne 2 · Bernese Oberland 4',
+    mapCenter: [46.85, 8.1], mapZoom: 7,
+    markers: [[47.37, 8.54, 'Zurich'], [47.00, 8.38, 'Bürgenstock / Vitznau'], [46.59, 7.91, 'Lauterbrunnen / Grindelwald']],
+    stats: [['Late Aug Temp', '70–75°F (55–62°F up high)'], ['Flight (East Coast)', '~7.5 hrs direct'], ['Getting Around', 'Trains, cable cars, optional van'], ['Festival', 'Zürcher Theater Spektakel'], ['Currency', 'CHF'], ['Language', 'German, wide English']],
+    highlights: ['Float the Limmat, then Zurich’s bathhouse bars', 'Mount Pilatus cogwheel railway round trip', 'E-bike the Lauterbrunnen valley of 72 waterfalls', 'Tandem paragliding over Mürren or First', 'Private guide across the Aletsch Glacier'],
+    hotels: 'Baur au Lac or Dolder Grand · Bürgenstock or Park Hotel Vitznau · Victoria-Jungfrau or chalet',
+    scores: { adventure: 10, food: 6, culture: 7, walkable: 8, nightlife: 6, sports: 3, safety: 10, travel: 8 },
+    weatherTemp: 6,
+    weatherLabel: 'Mild (70–75°F)',
+    scoreNotes: {}
+  },
+  canada: {
+    name: 'Canada (BC)', short: 'Canada', tag: 'Pacific Northwest', color: 'var(--canada)', barClass: 'bar-canada',
+    tagline: 'Dim sum, floatplanes, orcas, bears, and cold-water surfing',
+    bases: 'Vancouver 3 · Victoria 2 · Tofino 3',
+    mapCenter: [49.2, -124.6], mapZoom: 7,
+    markers: [[49.28, -123.12, 'Vancouver'], [48.43, -123.37, 'Victoria'], [49.15, -125.91, 'Tofino']],
+    stats: [['Late Aug Temp', '70–74°F (mid-60s Tofino)'], ['Flight (East Coast)', '~6 hrs direct'], ['Getting Around', 'Floatplanes + resort shuttles'], ['Festival', 'Summer outdoor festivals'], ['Currency', 'CAD'], ['Language', 'English']],
+    highlights: ['E-bike the Stanley Park seawall', 'Granville Island market and Chinatown dim sum', 'Zodiac orca safari out of Victoria', 'Surf lessons on Chesterman Beach', 'Black bear boat trip in Clayoquot Sound'],
+    hotels: 'Rosewood Georgia or Fairmont Pacific Rim · Fairmont Empress · Wickaninnish Inn',
+    scores: { adventure: 9, food: 8, culture: 6, walkable: 7, nightlife: 6, sports: 5, safety: 9, travel: 9 },
+    weatherTemp: 5,
+    weatherLabel: 'Mild (65–74°F), dry',
+    scoreNotes: {}
+  }
+};
+
+// ===== STATE =====
+var currentVoter = null;
+var weights = {};
+var weatherPref = 5;
+var weatherWeight = 5;
+var allVotes = {};
+var writeIns = {};
+var currentRankings = [];
+var firebaseReady = false;
+var dbVotesRef = null;
+var dbWriteInsRef = null;
+// (savePending removed - simplified Firebase sync)
+
+// ===== FIREBASE =====
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBQvuUwYprKBWqeNsV2mSQ0YUfFgA2xxEU",
+  authDomain: "braff-vacation-voter.firebaseapp.com",
+  databaseURL: "https://braff-vacation-voter-default-rtdb.firebaseio.com",
+  projectId: "braff-vacation-voter",
+  storageBucket: "braff-vacation-voter.firebasestorage.app",
+  messagingSenderId: "429745099670",
+  appId: "1:429745099670:web:0dadb8ec12ea8a51c783b7"
+};
+
+function initFirebase() {
+  try {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    dbVotesRef = firebase.database().ref('vacation-votes-2027');
+    dbWriteInsRef = firebase.database().ref('vacation-writeins-2027');
+    firebaseReady = true;
+    document.getElementById('firebase-banner').classList.add('active');
+
+    dbVotesRef.on('value', function(snapshot) {
+      allVotes = snapshot.val() || {};
+      renderScoreboard();
+      updateVoterPicker();
+    });
+
+    dbWriteInsRef.on('value', function(snapshot) {
+      var data = snapshot.val();
+      writeIns = data || {};
+      renderWriteInsDisplay();
+      if (currentVoter) refreshRankList();
+    });
+
+    console.log('Firebase connected');
+  } catch (e) {
+    console.log('Firebase failed, local only:', e);
+  }
+}
+
+// ===== ADMIN RESET =====
+function showAdminReset() {
+  document.getElementById('admin-modal').classList.add('active');
+  document.getElementById('admin-password').value = '';
+  document.getElementById('admin-error').style.display = 'none';
+  document.getElementById('admin-password').focus();
+}
+
+function hideAdminReset() {
+  document.getElementById('admin-modal').classList.remove('active');
+}
+
+function confirmAdminReset() {
+  var pw = document.getElementById('admin-password').value;
+  if (pw === 'denovo') {
+    // Clear all votes and write-ins
+    if (firebaseReady) {
+      dbVotesRef.remove();
+      dbWriteInsRef.remove();
+    }
+    allVotes = {};
+    writeIns = {};
+    currentRankings = [];
+    currentVoter = null;
+    document.getElementById('sliders-panel').classList.remove('active');
+    document.getElementById('rankings-panel').classList.remove('active');
+    document.querySelectorAll('.voter-btn').forEach(function(b) { b.classList.remove('active'); });
+    renderScoreboard();
+    updateVoterPicker();
+    renderWriteInsDisplay();
+    hideAdminReset();
+  } else {
+    document.getElementById('admin-error').style.display = 'block';
+  }
+}
+
+// Close modal on overlay click
+document.addEventListener('click', function(e) {
+  if (e.target.id === 'admin-modal') hideAdminReset();
+});
+
+// ===== MAPS =====
+function initMaps() {
+  var tileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+  var attribution = 'Tiles \u00a9 Esri';
+  Object.entries(DESTINATIONS).forEach(function(entry) {
+    var key = entry[0], dest = entry[1];
+    var mapEl = document.getElementById('map-' + key);
+    if (!mapEl) return;
+    var map = L.map(mapEl, {
+      scrollWheelZoom: false,
+      dragging: !L.Browser.mobile,
+      zoomControl: false
+    }).setView(dest.mapCenter, dest.mapZoom);
+    L.tileLayer(tileUrl, { attribution: attribution, maxZoom: 16 }).addTo(map);
+    dest.markers.forEach(function(m) {
+      L.circleMarker([m[0], m[1]], {
+        radius: 6,
+        fillColor: '#e76f51',
+        fillOpacity: 0.9,
+        color: '#333',
+        weight: 2
+      }).addTo(map).bindPopup('<strong>' + m[2] + '</strong>');
+    });
+  });
+}
+
+// ===== DESTINATION CARDS =====
+function buildDestCards() {
+  var wrap = document.getElementById('dest-cards');
+  Object.keys(DESTINATIONS).forEach(function(key) {
+    var d = DESTINATIONS[key];
+    var stats = d.stats.map(function(s) {
+      return '<div class="stat-item"><div class="stat-label">' + s[0] + '</div><div class="stat-value">' + s[1] + '</div></div>';
+    }).join('');
+    var hl = d.highlights.map(function(h) { return '<li>' + h + '</li>'; }).join('');
+    var card = document.createElement('div');
+    card.className = 'dest-card';
+    card.innerHTML =
+      '<div class="dest-banner ' + key + '-bg"><span class="dest-score-badge" id="badge-' + key + '">—</span></div>' +
+      '<div class="dest-body">' +
+        '<span class="dest-tag ' + key + '">' + d.tag + '</span>' +
+        '<h3>' + d.name + '</h3>' +
+        '<p class="tagline">' + d.tagline + '</p>' +
+        '<p class="dest-bases"><strong>Nights:</strong> ' + d.bases + '</p>' +
+        '<div id="map-' + key + '" class="dest-map"></div>' +
+        '<div class="dest-stats">' + stats + '</div>' +
+        (d.note ? '<p style="font-size:0.75rem;color:var(--text-dim);margin-top:8px;">' + d.note + '</p>' : '') +
+        '<div class="dest-highlights"><h4>Must-Do</h4><ul class="highlight-list">' + hl + '</ul></div>' +
+        '<p class="dest-bases" style="margin-top:12px;"><strong>Hotels:</strong> ' + d.hotels + '</p>' +
+      '</div>';
+    wrap.appendChild(card);
+  });
+}
+
+// ===== COMPARISON TABLE =====
+function buildCompTable() {
+  var keys = Object.keys(DESTINATIONS);
+  var head = document.getElementById('comp-head');
+  head.innerHTML = '<th>Factor</th>' + keys.map(function(k) {
+    return '<th><span class="score-dot" style="background:' + DESTINATIONS[k].color + '"></span>' + DESTINATIONS[k].short + '</th>';
+  }).join('');
+  var tbody = document.getElementById('comp-body');
+  CRITERIA.forEach(function(c) {
+    var row = document.createElement('tr');
+    row.innerHTML = '<td>' + c.icon + ' ' + c.label + '</td>' + keys.map(function(k) {
+      return '<td>' + DESTINATIONS[k].scores[c.id] + '/10</td>';
+    }).join('');
+    tbody.appendChild(row);
+  });
+  var wrow = document.createElement('tr');
+  wrow.innerHTML = '<td>☀ Temperature</td>' + keys.map(function(k) { return '<td>' + DESTINATIONS[k].weatherLabel + '</td>'; }).join('');
+  tbody.appendChild(wrow);
+  var trow = document.createElement('tr');
+  trow.style.fontWeight = '700';
+  trow.innerHTML = '<td>Non-weather Total</td>' + keys.map(function(k) {
+    var s = 0;
+    for (var c in DESTINATIONS[k].scores) s += DESTINATIONS[k].scores[c];
+    return '<td>' + s + '/' + (CRITERIA.length * 10) + '</td>';
+  }).join('');
+  tbody.appendChild(trow);
+}
+
+// ===== VOTER PICKER =====
+function buildVoterPicker() {
+  var container = document.getElementById('voter-picker');
+  FAMILY.forEach(function(f) {
+    var btn = document.createElement('button');
+    btn.className = 'voter-btn';
+    btn.dataset.name = f.name;
+    btn.innerHTML = f.name + '<span class="voter-city">' + f.city + '</span>';
+    btn.onclick = function() { selectVoter(f.name); };
+    container.appendChild(btn);
+  });
+  updateVoterPicker();
+}
+
+function updateVoterPicker() {
+  document.querySelectorAll('.voter-btn').forEach(function(btn) {
+    var name = btn.dataset.name;
+    var hasRankings = allVotes[name] && allVotes[name].rankings;
+    btn.classList.toggle('has-rankings', !!hasRankings);
+  });
+}
+
+function selectVoter(name) {
+  currentVoter = name;
+  document.querySelectorAll('.voter-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.name === name);
+  });
+
+  // Load existing data or defaults
+  var existing = allVotes[name];
+  if (existing && existing.weights) {
+    weights = {};
+    for (var k in existing.weights) weights[k] = existing.weights[k];
+    weatherPref = existing.weatherPref || 5;
+    weatherWeight = existing.weatherWeight || 5;
+  } else {
+    CRITERIA.forEach(function(c) { weights[c.id] = 5; });
+    weatherPref = 5;
+    weatherWeight = 5;
+  }
+
+  loadComments(existing);
+  buildSliders();
+  document.getElementById('sliders-panel').classList.add('active');
+  document.getElementById('rankings-panel').classList.add('active');
+
+  // Load existing rankings or calculate default order
+  if (existing && existing.rankings) {
+    currentRankings = existing.rankings.slice();
+    // Add any write-ins that appeared after this vote was saved
+    getAllWriteInKeys().forEach(function(k) {
+      if (currentRankings.indexOf(k) === -1) currentRankings.push(k);
+    });
+    // Remove any write-ins that no longer exist
+    currentRankings = currentRankings.filter(function(k) {
+      return DESTINATIONS[k] || writeIns[k];
+    });
+  } else {
+    var scores = calculateScores();
+    currentRankings = Object.keys(scores).sort(function(a, b) { return scores[b] - scores[a]; });
+    // Add any write-ins not in rankings
+    getAllWriteInKeys().forEach(function(k) {
+      if (currentRankings.indexOf(k) === -1) currentRankings.push(k);
+    });
+  }
+  renderRankList();
+  buildCommentsForm();
+  updateDestBadges();
+}
+
+// ===== SLIDERS =====
+function buildSliders() {
+  var container = document.getElementById('sliders-container');
+  container.innerHTML = '';
+  CRITERIA.forEach(function(c) {
+    var val = weights[c.id] || 5;
+    var div = document.createElement('div');
+    div.className = 'slider-row';
+    div.innerHTML =
+      '<div class="slider-header">' +
+        '<span class="slider-label">' + c.icon + ' ' + c.label + '</span>' +
+        '<span class="slider-value" id="val-' + c.id + '">' + val + ' \u2014 ' + WEIGHT_LABELS[val] + '</span>' +
+      '</div>' +
+      '<input type="range" min="1" max="10" value="' + val + '" id="slider-' + c.id + '" ' +
+        'oninput="updateWeight(\'' + c.id + '\', this.value)">' +
+      '<div class="slider-endpoints"><span>Meh</span><span>Deal-breaker</span></div>';
+    container.appendChild(div);
+  });
+
+  // Set weather sliders
+  document.getElementById('slider-temp-pref').value = weatherPref;
+  document.getElementById('val-temp-pref').textContent = weatherPref + ' \u2014 ' + TEMP_LABELS[weatherPref];
+  document.getElementById('slider-weather-wt').value = weatherWeight;
+  document.getElementById('val-weather-wt').textContent = weatherWeight + ' \u2014 ' + WEIGHT_LABELS[weatherWeight];
+}
+
+var WEIGHT_LABELS = {
+  1: 'Irrelevant', 2: 'Barely care', 3: 'Minor factor', 4: 'Somewhat matters',
+  5: 'Moderate', 6: 'Important', 7: 'Very important', 8: 'Major priority',
+  9: 'Critical', 10: 'Non-negotiable'
+};
+
+var TEMP_LABELS = {
+  1: 'Cold (50s\u00b0F)', 2: 'Cold (50s\u00b0F)', 3: 'Cool (60s\u00b0F)', 4: 'Cool (60s\u00b0F)',
+  5: 'Mild (70s\u00b0F)', 6: 'Mild (70s\u00b0F)', 7: 'Warm (80s\u00b0F)', 8: 'Warm (80s\u00b0F)',
+  9: 'Hot (85\u00b0F+)', 10: 'Hot (85\u00b0F+)'
+};
+
+function updateWeight(id, val) {
+  val = parseInt(val);
+  weights[id] = val;
+  document.getElementById('val-' + id).textContent = val + ' \u2014 ' + WEIGHT_LABELS[val];
+  onSlidersChanged();
+}
+
+function updateTempPref(val) {
+  weatherPref = parseInt(val);
+  document.getElementById('val-temp-pref').textContent = weatherPref + ' \u2014 ' + TEMP_LABELS[weatherPref];
+  onSlidersChanged();
+}
+
+function updateWeatherWeight(val) {
+  weatherWeight = parseInt(val);
+  document.getElementById('val-weather-wt').textContent = weatherWeight + ' \u2014 ' + WEIGHT_LABELS[weatherWeight];
+  onSlidersChanged();
+}
+
+function onSlidersChanged() {
+  updateDestBadges();
+  var scores = calculateScores();
+  var baseDests = currentRankings.filter(function(k) { return DESTINATIONS[k]; });
+  var writeInDests = currentRankings.filter(function(k) { return !DESTINATIONS[k]; });
+  baseDests.sort(function(a, b) { return scores[b] - scores[a]; });
+  currentRankings = baseDests.concat(writeInDests);
+  renderRankList();
+}
+
+// ===== SCORING =====
+function calculateScores() {
+  var scores = {};
+  var totalWeight = 0;
+  CRITERIA.forEach(function(c) { totalWeight += (weights[c.id] || 5); });
+  totalWeight += weatherWeight;
+
+  Object.entries(DESTINATIONS).forEach(function(entry) {
+    var key = entry[0], dest = entry[1];
+    var weighted = 0;
+    CRITERIA.forEach(function(c) {
+      weighted += (weights[c.id] || 5) * dest.scores[c.id];
+    });
+    var weatherMatch = 10 - Math.abs(dest.weatherTemp - weatherPref);
+    weighted += weatherWeight * weatherMatch;
+    scores[key] = totalWeight > 0 ? (weighted / totalWeight) : 0;
+  });
+
+  return scores;
+}
+
+function updateDestBadges() {
+  var scores = calculateScores();
+  Object.keys(DESTINATIONS).forEach(function(key) {
+    var badge = document.getElementById('badge-' + key);
+    if (badge) badge.textContent = scores[key].toFixed(1) + '/10';
+  });
+}
+
+// ===== RANKING LIST =====
+function getAllWriteInKeys() {
+  return Object.keys(writeIns);
+}
+
+function getDestName(key) {
+  if (DESTINATIONS[key]) return DESTINATIONS[key].name;
+  if (writeIns[key]) return writeIns[key].name;
+  // Fallback: convert slug to readable name
+  if (key.indexOf('writein_') === 0) {
+    return key.replace('writein_', '').replace(/_/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+  }
+  return key;
+}
+
+function renderRankList() {
+  var list = document.getElementById('rank-list');
+  list.innerHTML = '';
+  var scores = calculateScores();
+  var total = currentRankings.length;
+
+  currentRankings.forEach(function(key, idx) {
+    var li = document.createElement('li');
+    li.className = 'rank-item';
+    li.dataset.key = key;
+    li.draggable = true;
+
+    var isBase = !!DESTINATIONS[key];
+    var scoreText = isBase ? scores[key].toFixed(1) + '/10 weighted score' : 'Write-in';
+    var bordaPts = total - idx;
+
+    li.innerHTML =
+      '<span class="rank-number">#' + (idx + 1) + '</span>' +
+      '<div class="rank-info">' +
+        '<div class="rank-name">' + getDestName(key) + '</div>' +
+        '<div class="rank-score">' + scoreText + ' \u00b7 ' + bordaPts + ' Borda pt' + (bordaPts !== 1 ? 's' : '') + '</div>' +
+      '</div>' +
+      '<div class="rank-arrows">' +
+        '<button class="rank-arrow" onclick="moveRank(\'' + key + '\', -1)"' + (idx === 0 ? ' disabled' : '') + '>\u25B2</button>' +
+        '<button class="rank-arrow" onclick="moveRank(\'' + key + '\', 1)"' + (idx === total - 1 ? ' disabled' : '') + '>\u25BC</button>' +
+      '</div>';
+
+    // Drag events
+    li.addEventListener('dragstart', function(e) {
+      e.dataTransfer.setData('text/plain', key);
+      li.classList.add('dragging');
+    });
+    li.addEventListener('dragend', function() {
+      li.classList.remove('dragging');
+      document.querySelectorAll('.rank-item').forEach(function(el) { el.classList.remove('drag-over'); });
+    });
+    li.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      li.classList.add('drag-over');
+    });
+    li.addEventListener('dragleave', function() {
+      li.classList.remove('drag-over');
+    });
+    li.addEventListener('drop', function(e) {
+      e.preventDefault();
+      li.classList.remove('drag-over');
+      var draggedKey = e.dataTransfer.getData('text/plain');
+      var fromIdx = currentRankings.indexOf(draggedKey);
+      var toIdx = currentRankings.indexOf(key);
+      if (fromIdx !== -1 && toIdx !== -1 && fromIdx !== toIdx) {
+        currentRankings.splice(fromIdx, 1);
+        currentRankings.splice(toIdx, 0, draggedKey);
+        renderRankList();
+      }
+    });
+
+    list.appendChild(li);
+  });
+}
+
+function refreshRankList() {
+  getAllWriteInKeys().forEach(function(k) {
+    if (currentRankings.indexOf(k) === -1) currentRankings.push(k);
+  });
+  currentRankings = currentRankings.filter(function(k) {
+    return DESTINATIONS[k] || writeIns[k];
+  });
+  renderRankList();
+  buildCommentsForm();
+}
+
+function moveRank(key, direction) {
+  var idx = currentRankings.indexOf(key);
+  var newIdx = idx + direction;
+  if (newIdx < 0 || newIdx >= currentRankings.length) return;
+  currentRankings.splice(idx, 1);
+  currentRankings.splice(newIdx, 0, key);
+  renderRankList();
+}
+
+// ===== WRITE-IN =====
+function addWriteIn() {
+  var input = document.getElementById('writein-input');
+  var name = input.value.trim();
+  if (!name) return;
+
+  var slug = 'writein_' + name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+  var exists = false;
+  Object.keys(writeIns).forEach(function(k) {
+    if (writeIns[k].name.toLowerCase() === name.toLowerCase()) exists = true;
+  });
+  Object.keys(DESTINATIONS).forEach(function(k) {
+    if (DESTINATIONS[k].name.toLowerCase() === name.toLowerCase()) exists = true;
+  });
+  if (exists) {
+    input.value = '';
+    return;
+  }
+
+  var writeInData = {
+    name: name,
+    addedBy: currentVoter || 'Unknown',
+    timestamp: new Date().toISOString()
+  };
+
+  if (firebaseReady && dbWriteInsRef) {
+    dbWriteInsRef.child(slug).set(writeInData);
+  }
+  writeIns[slug] = writeInData;
+
+  if (currentRankings.indexOf(slug) === -1) {
+    currentRankings.push(slug);
+  }
+  renderRankList();
+  buildCommentsForm();
+  renderWriteInsDisplay();
+  input.value = '';
+}
+
+// ===== WRITE-INS DISPLAY =====
+function renderWriteInsDisplay() {
+  var container = document.getElementById('writeins-display');
+  var list = document.getElementById('writeins-list');
+  var keys = Object.keys(writeIns);
+
+  if (keys.length === 0) {
+    container.style.display = 'none';
+    return;
+  }
+
+  container.style.display = 'block';
+  list.innerHTML = '';
+  keys.forEach(function(k) {
+    var wi = writeIns[k];
+    var item = document.createElement('div');
+    item.className = 'writein-display-item';
+    item.innerHTML =
+      '<span class="writein-display-name">' + wi.name + '</span>' +
+      '<span class="writein-display-by">Nominated by ' + (wi.addedBy || 'Unknown') + '</span>';
+    list.appendChild(item);
+  });
+}
+
+// ===== COMMENTS =====
+var currentComments = {};
+
+function buildCommentsForm() {
+  var container = document.getElementById('comments-container');
+  container.innerHTML = '';
+  // Show all destinations + write-ins
+  var allKeys = Object.keys(DESTINATIONS).concat(getAllWriteInKeys());
+  allKeys.forEach(function(key) {
+    var div = document.createElement('div');
+    div.className = 'comment-row';
+    div.innerHTML =
+      '<div class="comment-dest-label">' + getDestName(key) + '</div>' +
+      '<textarea class="comment-input" id="comment-' + key + '" placeholder="Any thoughts?" maxlength="200" rows="1"' +
+        ' oninput="currentComments[\'' + key + '\'] = this.value">' +
+        (currentComments[key] || '') +
+      '</textarea>';
+    container.appendChild(div);
+  });
+}
+
+function loadComments(vote) {
+  currentComments = {};
+  if (vote && vote.comments) {
+    for (var k in vote.comments) currentComments[k] = vote.comments[k];
+  }
+}
+
+// ===== SAVE RANKINGS =====
+function saveRankings() {
+  if (!currentVoter) return;
+
+  // Collect comments from textareas (in case oninput didn't fire)
+  var allKeys = Object.keys(DESTINATIONS).concat(getAllWriteInKeys());
+  allKeys.forEach(function(key) {
+    var el = document.getElementById('comment-' + key);
+    if (el) currentComments[key] = el.value;
+  });
+
+  // Strip empty comments
+  var comments = {};
+  for (var k in currentComments) {
+    if (currentComments[k] && currentComments[k].trim()) comments[k] = currentComments[k].trim();
+  }
+
+  var voteData = {
+    rankings: currentRankings.slice(),
+    weights: {},
+    weatherPref: weatherPref,
+    weatherWeight: weatherWeight,
+    comments: comments,
+    timestamp: new Date().toISOString()
+  };
+  for (var k in weights) voteData.weights[k] = weights[k];
+
+  // Set local state immediately so renders are correct
+  allVotes[currentVoter] = voteData;
+
+  // Render immediately with local data
+  renderScoreboard();
+  updateVoterPicker();
+
+  var status = document.getElementById('save-status');
+  status.classList.add('visible');
+  setTimeout(function() { status.classList.remove('visible'); }, 2500);
+
+  // Write to Firebase, then force re-read from server to ensure sync
+  if (firebaseReady && dbVotesRef) {
+    dbVotesRef.child(currentVoter).set(voteData).then(function() {
+      // Force authoritative re-read from server after write confirms
+      dbVotesRef.once('value', function(snapshot) {
+        allVotes = snapshot.val() || {};
+        renderScoreboard();
+        updateVoterPicker();
+      });
+    });
+  }
+}
+
+// ===== SCOREBOARD =====
+function renderScoreboard() {
+  var grid = document.getElementById('votes-grid');
+  var voteEntries = Object.entries(allVotes);
+
+  if (voteEntries.length === 0) {
+    grid.innerHTML = '<div class="no-votes" id="no-votes"><p>No rankings yet. Someone go first.</p></div>';
+    document.getElementById('consensus-section').classList.remove('active');
+    return;
+  }
+
+  grid.innerHTML = '';
+
+  voteEntries.forEach(function(entry) {
+    var name = entry[0], vote = entry[1];
+    if (!vote.rankings) return;
+    var member = FAMILY.find(function(f) { return f.name === name; }) || { color: '#666', initial: name[0] };
+    var total = vote.rankings.length;
+
+    var card = document.createElement('div');
+    card.className = 'vote-card animate-in';
+
+    var header =
+      '<div class="vote-card-header">' +
+        '<div class="vote-avatar" style="background:' + member.color + '">' + member.initial + '</div>' +
+        '<h4>' + name + '</h4>' +
+      '</div>';
+
+    var rankItems = '';
+    vote.rankings.forEach(function(key, idx) {
+      var pts = total - idx;
+      rankItems +=
+        '<li class="vote-ranking-item">' +
+          '<span class="vote-rank-num">' + (idx + 1) + '</span>' +
+          '<span class="dest-name">' + getDestName(key) + '</span>' +
+          '<span class="borda-pts">' + pts + ' pt' + (pts !== 1 ? 's' : '') + '</span>' +
+        '</li>';
+    });
+
+    // Build comments display
+    var commentsHtml = '';
+    if (vote.comments) {
+      var commentKeys = Object.keys(vote.comments);
+      if (commentKeys.length > 0) {
+        commentKeys.forEach(function(ck) {
+          if (vote.comments[ck] && vote.comments[ck].trim()) {
+            commentsHtml += '<div class="vote-comment"><span class="comment-dest">' +
+              getDestName(ck) + ':</span> ' + vote.comments[ck] + '</div>';
+          }
+        });
+      }
+    }
+
+    card.innerHTML = header + '<ul class="vote-ranking-list">' + rankItems + '</ul>' + commentsHtml;
+    grid.appendChild(card);
+  });
+
+  // Consensus (Borda count)
+  if (voteEntries.length >= 1) {
+    var allKeys = {};
+    voteEntries.forEach(function(entry) {
+      var vote = entry[1];
+      if (!vote.rankings) return;
+      vote.rankings.forEach(function(k) { allKeys[k] = true; });
+    });
+
+    var bordaTotals = {};
+    Object.keys(allKeys).forEach(function(k) { bordaTotals[k] = 0; });
+
+    voteEntries.forEach(function(entry) {
+      var vote = entry[1];
+      if (!vote.rankings) return;
+      var total = vote.rankings.length;
+      vote.rankings.forEach(function(key, idx) {
+        bordaTotals[key] = (bordaTotals[key] || 0) + (total - idx);
+      });
+    });
+
+    var maxPts = Math.max.apply(null, Object.values(bordaTotals));
+    var sorted = Object.entries(bordaTotals).sort(function(a, b) { return b[1] - a[1]; });
+
+    var consensusBars = document.getElementById('consensus-bars');
+    consensusBars.innerHTML = sorted.map(function(entry) {
+      var key = entry[0], pts = entry[1];
+      var pct = maxPts > 0 ? (pts / maxPts * 100) : 0;
+      var barClass = DESTINATIONS[key] ? DESTINATIONS[key].barClass : 'bar-writein';
+      return '<div class="result-bar-container">' +
+        '<div class="result-bar-header">' +
+          '<span class="result-bar-label">' + getDestName(key) + '</span>' +
+          '<span class="result-bar-score">' + pts + ' pts</span>' +
+        '</div>' +
+        '<div class="result-bar-track">' +
+          '<div class="result-bar-fill ' + barClass + '" style="width:' + pct + '%"></div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    document.getElementById('consensus-section').classList.add('active');
+  }
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', function() {
+  buildDestCards();
+  initFirebase();
+  initMaps();
+  buildCompTable();
+  buildVoterPicker();
+  renderScoreboard();
+  updateDestBadges();
+  renderWriteInsDisplay();
+});
+</script>
+
+</body>
+</html>
