@@ -281,6 +281,21 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
   margin-bottom: 12px;
 }
 @media (min-width: 900px) { #dest-cards { grid-template-columns: repeat(2, 1fr); } }
+.hero-cta { margin-top:28px; }
+.itin { margin-top:16px; border-top:1px solid rgba(255,255,255,0.08); padding-top:12px; }
+.itin summary { cursor:pointer; font-weight:600; font-size:0.9rem; color:var(--accent); list-style:none; padding:6px 0; }
+.itin summary::-webkit-details-marker { display:none; }
+.itin summary::before { content:'+ '; }
+.itin[open] summary::before { content:'\2212  '; }
+.itin-day { padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06); }
+.itin-day:last-of-type { border-bottom:none; }
+.itin-date { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-dim); }
+.itin-title { font-weight:600; font-size:0.92rem; margin:2px 0 4px; }
+.itin-day ul, .itin-box ul { margin:0; padding-left:18px; font-size:0.85rem; line-height:1.5; color:var(--text); }
+.itin-day li, .itin-box li { margin:2px 0; }
+.itin-box { margin-top:12px; padding:10px 12px; border-radius:6px; background:rgba(255,255,255,0.04); }
+.itin-box h5 { margin:0 0 6px; font-size:0.8rem; font-weight:700; }
+.itin-box.fix { border-left:3px solid #e9c46a; border-radius:3px; }
 .dest-bases { font-size:0.8rem; color:var(--text-dim); margin:4px 0 12px; }
 .dest-bases strong { color:var(--text); font-weight:600; }
 .dest-tag.scotland { background: rgba(91,75,138,0.35); color: #b9a8f0; }
@@ -801,7 +816,6 @@ html { scroll-behavior: smooth; }
 <section class="hero" id="top">
   <div class="hero-badge">August 19&#8211;28, 2027</div>
   <h1>Giventer-Braff Vacation</h1>
-  <p class="hero-subtitle">Five family members. Four destinations (plus write-ins). Rank them all. Change your mind whenever.</p>
   <a href="#priorities" class="hero-cta">Set Your Priorities</a>
 </section>
 
@@ -809,7 +823,6 @@ html { scroll-behavior: smooth; }
 <section class="priorities-section" id="priorities">
   <div class="section-header">
     <h2>Set Your Priorities</h2>
-    <p>Pick your name, then tell us what matters most. This shapes how the destinations are scored for you.</p>
   </div>
 
   <div id="firebase-banner" class="firebase-banner">
@@ -821,12 +834,10 @@ html { scroll-behavior: smooth; }
   <div class="sliders-panel" id="sliders-panel">
     <div class="slider-group">
       <h3>How important is each factor?</h3>
-      <p>1 = "meh" &#8594; 10 = "deal-breaker." Scores below update live.</p>
       <div id="sliders-container"></div>
     </div>
     <div class="slider-group">
       <h3>&#9832; Temperature preference</h3>
-      <p>What weather do you actually want? Scotland is cool, Argentina is mixed, Canada and Switzerland are mild.</p>
       <div class="slider-row weather-slider-row">
         <div class="slider-header">
           <span class="slider-label">Your ideal temperature</span>
@@ -856,7 +867,6 @@ html { scroll-behavior: smooth; }
 <!-- ============ DESTINATIONS ============ -->
 <div class="section-header" id="destinations">
   <h2>The Contenders</h2>
-  <p>Scores personalized to your priorities. No sliders set yet? You'll see unweighted defaults.</p>
 </div>
 
 <div class="destinations container" id="dest-cards"></div>
@@ -872,7 +882,6 @@ html { scroll-behavior: smooth; }
 <!-- ============ COMPARISON TABLE ============ -->
 <div class="section-header">
   <h2>Head-to-Head</h2>
-  <p>Objective scores per factor (1&#8211;10). Weather shown as temperature rating (cold to hot).</p>
 </div>
 
 <div class="comparison">
@@ -888,7 +897,6 @@ html { scroll-behavior: smooth; }
 <section class="rankings-section" id="rankings">
   <div class="section-header">
     <h2>Rank Your Picks</h2>
-    <p>Drag or use arrows to rank all destinations. Add a write-in if none of these do it for you.</p>
   </div>
 
   <div class="rankings-panel" id="rankings-panel">
@@ -904,7 +912,6 @@ html { scroll-behavior: smooth; }
 
     <div class="comments-panel" id="comments-panel">
       <h3>&#128172; Comments</h3>
-      <p>Optional notes on any destination &#8212; lobbying encouraged.</p>
       <div id="comments-container"></div>
     </div>
 
@@ -917,14 +924,12 @@ html { scroll-behavior: smooth; }
 <section class="scoreboard" id="scoreboard">
   <div class="section-header">
     <h2>Family Scoreboard</h2>
-    <p>Everyone's rankings. Change yours whenever you want &#8212; no lock-ins.</p>
   </div>
 
   <!-- Leaderboard (Borda count) FIRST -->
   <div class="consensus-section" id="consensus-section">
     <div class="consensus-card">
       <h3>Leaderboard</h3>
-      <p style="font-size:0.85rem;color:var(--text-dim);margin-bottom:20px;">Borda count: 1st place = most points, last = fewest. Aggregated across all voters.</p>
       <div id="consensus-bars"></div>
     </div>
   </div>
@@ -963,7 +968,7 @@ html { scroll-behavior: smooth; }
 var FAMILY = [
   { name: 'Adam', city: 'Providence', color: '#4285f4', initial: 'A' },
   { name: 'G\u00f8r', city: 'Providence', color: '#ea4335', initial: 'G' },
-  { name: 'Emma', city: 'Boston', color: '#fbbc04', initial: 'E' },
+  { name: 'Emma', city: 'NYC', color: '#fbbc04', initial: 'E' },
   { name: 'Jeremy', city: 'NYC', color: '#34a853', initial: 'J' },
   { name: 'Andrew', city: 'Chicago', color: '#ff6d01', initial: 'An' }
 ];
@@ -982,13 +987,13 @@ var CRITERIA = [
 var DESTINATIONS = {
   scotland: {
     name: 'Scotland', short: 'Scotland', tag: 'Fringe + Highlands', color: 'var(--scotland)', barClass: 'bar-scotland',
-    tagline: 'The world’s biggest comedy festival, then a chauffeured van into the Highlands',
+    tagline: 'The world’s biggest comedy festival, then Glencoe and Loch Lomond',
     bases: 'Edinburgh 4 · Glencoe/Highlands 2 · Loch Lomond 2',
     mapCenter: [56.4, -4.6], mapZoom: 6,
     markers: [[55.95, -3.19, 'Edinburgh'], [56.68, -5.10, 'Glencoe'], [56.00, -4.58, 'Loch Lomond (Cameron House)']],
-    stats: [['Late Aug Temp', '62–65°F'], ['Flight (East Coast)', '~7 hrs direct'], ['Getting Around', 'Walk, then private van'], ['Festival', 'Edinburgh Fringe + Tattoo'], ['Currency', 'GBP'], ['Language', 'English']],
+    stats: [['Late Aug Temp', '62–65°F'], ['Flight (East Coast)', '~7 hrs direct'], ['Getting Around', 'Walk; Highlands transport TBD'], ['Festival', 'Edinburgh Fringe + Tattoo'], ['Currency', 'GBP'], ['Language', 'English']],
     highlights: ['Fringe venue crawl: Pleasance, Assembly, Underbelly', 'Arthur’s Seat sunset hike', 'Royal Edinburgh Military Tattoo', 'Lost Valley hike between the Three Sisters of Glencoe', 'Private motor-yacht afternoon on Loch Lomond'],
-    hotels: 'The Balmoral · Highlands inn TBD · Cameron House 3-bedroom lodge',
+    hotels: 'The Balmoral · Inverlochy Castle or Glencoe House · Cameron House 3-bedroom lodge',
     scores: { adventure: 8, food: 7, culture: 9, walkable: 10, nightlife: 10, sports: 6, safety: 9, travel: 8 },
     weatherTemp: 3,
     weatherLabel: 'Cool (62–65°F), showers',
@@ -1010,7 +1015,7 @@ var DESTINATIONS = {
     scoreNotes: {}
   },
   switzerland: {
-    name: 'Switzerland', short: 'Switzerland', tag: 'Alpine', color: 'var(--switzerland)', barClass: 'bar-switzerland',
+    name: 'Bernese Mountains, Switzerland', short: 'Bernese Mtns', tag: 'Alpine', color: 'var(--switzerland)', barClass: 'bar-switzerland',
     tagline: 'Paragliding, e-bikes under waterfalls, and swimming in lakes clean enough to drink',
     bases: 'Zurich 2 · Lake Lucerne 2 · Bernese Oberland 4',
     mapCenter: [46.85, 8.1], mapZoom: 7,
@@ -1024,18 +1029,86 @@ var DESTINATIONS = {
     scoreNotes: {}
   },
   canada: {
-    name: 'Canada (BC)', short: 'Canada', tag: 'Pacific Northwest', color: 'var(--canada)', barClass: 'bar-canada',
+    name: 'British Columbia', short: 'British Columbia', tag: 'Pacific Northwest', color: 'var(--canada)', barClass: 'bar-canada',
     tagline: 'Dim sum, floatplanes, orcas, bears, and cold-water surfing',
-    bases: 'Vancouver 3 · Victoria 2 · Tofino 3',
+    bases: 'Vancouver 4 · Victoria 2 · Tofino 3',
     mapCenter: [49.2, -124.6], mapZoom: 7,
     markers: [[49.28, -123.12, 'Vancouver'], [48.43, -123.37, 'Victoria'], [49.15, -125.91, 'Tofino']],
-    stats: [['Late Aug Temp', '70–74°F (mid-60s Tofino)'], ['Flight (East Coast)', '~6 hrs direct'], ['Getting Around', 'Floatplanes + resort shuttles'], ['Festival', 'Summer outdoor festivals'], ['Currency', 'CAD'], ['Language', 'English']],
+    stats: [['Late Aug Temp', '70–74°F (mid-60s Tofino)'], ['Flight (East Coast)', '~6 hrs direct'], ['Getting Around', 'Floatplane, ferry, drive'], ['Festival', 'Summer outdoor festivals'], ['Currency', 'CAD'], ['Language', 'English']],
     highlights: ['E-bike the Stanley Park seawall', 'Granville Island market and Chinatown dim sum', 'Zodiac orca safari out of Victoria', 'Surf lessons on Chesterman Beach', 'Black bear boat trip in Clayoquot Sound'],
     hotels: 'Rosewood Georgia or Fairmont Pacific Rim · Fairmont Empress · Wickaninnish Inn',
     scores: { adventure: 9, food: 8, culture: 6, walkable: 7, nightlife: 6, sports: 5, safety: 9, travel: 9 },
     weatherTemp: 5,
     weatherLabel: 'Mild (65–74°F), dry',
     scoreNotes: {}
+  }
+};
+
+
+var ITINERARIES = {
+  scotland: {
+    days: [
+      ['Thu Aug 19', 'Fly overnight to Edinburgh', ['Direct options from Newark, JFK and Boston (~7 hrs)']],
+      ['Fri Aug 20', 'Edinburgh: arrive and ease in', ['Check in at The Balmoral, right at the seam of Old Town and New Town', 'Walk the Royal Mile and Victoria Street', 'First Fringe shows at the Pleasance Courtyard; dinner at Dishoom, St Andrew Square']],
+      ['Sat Aug 21', 'Edinburgh: hill, castle, Tattoo', ['Morning hike up Arthur’s Seat for the 360-degree view over the city and the Firth of Forth', 'Hearts or Hibs if there’s a home match that weekend, otherwise Edinburgh Castle', 'Evening: Royal Edinburgh Military Tattoo on the castle esplanade']],
+      ['Sun Aug 22', 'Edinburgh: Stockbridge and a Fringe crawl', ['Stockbridge Sunday market, then the Water of Leith path to Dean Village', 'Lunch at The Scran & Scallie', 'Back-to-back 50-minute sets at Assembly George Square and Underbelly']],
+      ['Mon Aug 23', 'Edinburgh: underground and Leith', ['South Bridge Vaults tour', 'Dinner in Leith at The Kitchin or Restaurant Martin Wishart', 'Nightcap at Panda & Sons (through the barbershop bookcase) or Bramble']],
+      ['Tue Aug 24', 'To Glencoe (~3 hrs)', ['Stop at Stirling Castle on the way', 'Cross Rannoch Moor into the glen', 'Pints by the fire at the Clachaig Inn']],
+      ['Wed Aug 25', 'Glencoe: the big hike', ['Lost Valley (Coire Gabhail) hike between the Three Sisters, about 3 hrs round trip', 'Langoustines at Lochleven Seafood Café', 'Alternative: Jacobite steam train from Fort William over the Glenfinnan Viaduct']],
+      ['Thu Aug 26', 'To Loch Lomond (~1.5–2 hrs)', ['Kilchurn Castle ruins and Inveraray en route', 'Check in to a 3-bedroom lochside lodge at Cameron House', 'Wood-fired dinner at The Boat House']],
+      ['Fri Aug 27', 'Loch Lomond: on the water', ['Private afternoon cruise on the resort’s motor yacht', 'Hawk walk on the estate, or hike Conic Hill for the loch view', 'Fire-pit cookout at the lodge']],
+      ['Sat Aug 28', 'Home', ['Glasgow airport is ~30 min from Cameron House']]
+    ],
+    book: ['The Balmoral: Fringe-season rooms go early', 'Tattoo tickets, which go on sale the winter before', 'The Kitchin and Martin Wishart: 3–6 months out', 'Jacobite steam train seats', 'Cameron House 3-bedroom lodge'],
+    fixes: ['Gemini’s Highlands hotel, The Fife Arms, is in Braemar, 2.5+ hrs east of Glencoe. Swapped for Inverlochy Castle (Fort William, 20 min away) or Glencoe House.', 'Edinburgh to Glencoe is closer to 3 hrs than 2.5.', 'How we get around the Highlands (self-drive vs. driver) is undecided.']
+  },
+  argentina: {
+    days: [
+      ['Thu Aug 19', 'Fly overnight to Buenos Aires', ['Direct from JFK or Miami (~11 hrs); arrive Friday morning, only one hour ahead of Eastern']],
+      ['Fri Aug 20', 'Buenos Aires: Recoleta', ['Check in at the Four Seasons or Palacio Duhau', 'Recoleta Cemetery and the mansions along Avenida Alvear', 'Late dinner (porteños eat at 10)']],
+      ['Sat Aug 21', 'Buenos Aires: Palermo and a milonga', ['Murals and shops of Palermo Soho', 'Dinner at Don Julio', 'Midnight milonga at La Viruta; Tango BA Festival events if the dates line up']],
+      ['Sun Aug 22', 'Buenos Aires: San Telmo and football', ['San Telmo Sunday market around Plaza Dorrego', 'Boca Juniors or River Plate home match if the fixture list cooperates', 'Drinks at Florería Atlántico (entrance through the flower shop)']],
+      ['Mon Aug 23', 'Fly to Iguazú (~1 hr 50)', ['Check in at the Gran Meliá, the one hotel inside the national park', 'Upper and Lower Circuit trails in the afternoon', 'Caipirinhas on the terrace facing the falls']],
+      ['Tue Aug 24', 'Iguazú: the full soak', ['7:30 a.m. walk before the day-trippers arrive; watch for toucans and coatis', 'Park train to the Devil’s Throat catwalks', 'Gran Aventura jet boat into the spray under the falls']],
+      ['Wed Aug 25', 'Fly to Mendoza', ['Usually connects through Buenos Aires; a direct Iguazú–Mendoza flight runs only some seasons', 'Drive ~1.5 hrs to The Vines in the Uco Valley', 'Dinner at Siete Fuegos (Francis Mallmann’s open-fire place)']],
+      ['Thu Aug 26', 'Uco Valley: wine and horses', ['Gaucho horseback ride into the Andes foothills', 'Tasting lunch at Zuccardi Piedra Infinita', 'Blend-your-own-Malbec session at The Vines']],
+      ['Fri Aug 27', 'The Andes', ['Snow day: August is ski season at Penitentes and Las Leñas, or drive toward Aconcagua and Puente del Inca if the pass is open', 'Alternative: Catena Zapata lunch and vineyard biking', 'Farewell asado']],
+      ['Sat Aug 28', 'Home', ['Mendoza to Buenos Aires, then the overnight flight north']]
+    ],
+    book: ['Don Julio: reservations open on the first of the prior month and fill in minutes', 'Gran Meliá falls-view rooms (not jungle-view)', 'Siete Fuegos dinner seatings', 'Winery lunches at Catena and Zuccardi: 60–90 days out'],
+    fixes: ['White-water rafting on the Mendoza River is mainly a November–March activity; the river is low and very cold in August. Swapped in a snow day.', 'Seeing the Brazilian side of the falls requires a Brazil e-visa for US citizens.', 'Tango BA Festival dates for 2027 aren’t set; it usually runs mid-to-late August.', 'Two domestic flights plus the long-haul means more connections to break. Norway taught us to plan a fallback.']
+  },
+  switzerland: {
+    days: [
+      ['Thu Aug 19', 'Fly overnight to Zurich', ['Direct from JFK, Newark and Boston (~7.5 hrs)']],
+      ['Fri Aug 20', 'Zurich: on the river', ['Check in at Baur au Lac or The Dolder Grand', 'Float the Limmat with the locals', 'Sunset at a riverside bathhouse bar (Rimini Bar or Barfussbar)']],
+      ['Sat Aug 21', 'Zurich: old and new', ['Niederdorf old town, then the Viadukt arches and Freitag tower in Zurich West', 'Zürcher Theater Spektakel on the lakeside lawns', 'Dinner among the Picassos at Kronenhalle']],
+      ['Sun Aug 22', 'To Lake Lucerne (45 min)', ['Check in at Bürgenstock or Park Hotel Vitznau', 'Chapel Bridge and the Lucerne old town', 'Swim off the hotel dock']],
+      ['Mon Aug 23', 'Mount Pilatus golden round trip', ['Boat to Alpnachstad, world’s steepest cogwheel railway up, cable cars down to Kriens', 'Afternoon private motorboat to swim under the cliffs', 'Optional splurge: Focus Atelier at Vitznau']],
+      ['Tue Aug 24', 'To the Bernese Oberland (~2 hrs by train)', ['Base in Grindelwald, Wengen or Mürren (the last two are car-free)', 'E-bike the Lauterbrunnen valley past Staubbach Falls', 'Trümmelbach Falls inside the mountain']],
+      ['Wed Aug 25', 'Grindelwald First', ['First Cliff Walk', 'Hike to the Bachalpsee lake', 'Mountain cart, flyer or trottibike back down']],
+      ['Thu Aug 26', 'The big one', ['Tandem paragliding over Mürren or First', 'Via ferrata from Mürren to Gimmelwald for the braver half', 'Raclette at a mountain hut']],
+      ['Fri Aug 27', 'Glacier day', ['Jungfraujoch, then a guided walk on the Aletsch Glacier', 'Alternative: Schilthorn and an easy ridge hike', 'Fondue farewell']],
+      ['Sat Aug 28', 'Home', ['Train straight to Zurich airport (~2.5 hrs)']]
+    ],
+    book: ['Private glacier guide: books out months ahead for August', 'Chalet or multi-room hotel in Grindelwald/Wengen', 'Bürgenstock or Vitznau', 'Kronenhalle: 4–6 weeks', 'Focus Atelier: 2–3 months'],
+    fixes: ['The Aletsch Glacier is in Valais, not the Oberland; the practical access is from Jungfraujoch.', 'Food is the weak spot here: excellent but pricey and cheese-heavy. Norway’s lesson was to go casual in non-foodie countries.']
+  },
+  canada: {
+    days: [
+      ['Thu Aug 19', 'Fly to Vancouver', ['~6 hrs direct from the East Coast; you land the same afternoon, so this trip gets an extra night', 'Check in at the Fairmont Pacific Rim or Rosewood Hotel Georgia', 'Dim sum or izakaya dinner']],
+      ['Fri Aug 20', 'Vancouver: seawall', ['E-bike the Stanley Park seawall', 'Granville Island market', 'Evening at the PNE fair (it opens around this date) or the Richmond Night Market']],
+      ['Sat Aug 21', 'Vancouver: mountains', ['Grouse Grind hike or the Sea to Sky Gondola in Squamish', 'Whitecaps or BC Lions if either is home', 'Gastown cocktail bars']],
+      ['Sun Aug 22', 'Vancouver: Chinatown and Main Street', ['Chinatown market walk and dumpling class', 'Main Street shops', 'Dinner at Published on Main (Michelin star) or Hawksworth']],
+      ['Mon Aug 23', 'Floatplane to Victoria (~35 min)', ['Harbour Air from Coal Harbour to the Inner Harbour', 'Check in at the Fairmont Empress', 'Fan Tan Alley and North America’s oldest Chinatown']],
+      ['Tue Aug 24', 'Victoria: orcas', ['Private zodiac whale-watching charter in the Salish Sea', 'Butchart Gardens in the afternoon', 'Dinner at The Courtney Room']],
+      ['Wed Aug 25', 'To Tofino', ['Drive across Vancouver Island (~4.5 hrs) with a stop at Cathedral Grove’s giant firs, or charter a floatplane', 'Check in at the Wickaninnish Inn on Chesterman Beach', 'Tacos from the original Tacofino truck']],
+      ['Thu Aug 26', 'Tofino: surf and bears', ['Beginner surf lesson at Cox Bay or Chesterman', 'Low-tide boat trip to watch black bears in Clayoquot Sound', 'Dinner at Wolf in the Fog']],
+      ['Fri Aug 27', 'Tofino: hot springs and rainforest', ['Boat or floatplane to Hot Springs Cove', 'Rainforest boardwalk trails in Pacific Rim National Park', 'Farewell dinner at The Pointe']],
+      ['Sat Aug 28', 'Home', ['Harbour Air or Pacific Coastal from Tofino to Vancouver, then the flight east']]
+    ],
+    book: ['Wickaninnish Inn: August sells out 8–10 months ahead (i.e., right about now)', 'Published on Main: reservations release 30 days out and go fast', 'Wolf in the Fog and The Pointe: 30–60 days', 'Private whale-watching zodiac'],
+    fixes: ['There’s no scheduled floatplane from Victoria to Tofino; it’s a 4.5-hr drive or a charter. Scheduled seaplanes do run Vancouver–Tofino, which works for the trip home.', 'Gemini’s Stanley Park comedy festival is not a reliable annual event. Swapped in the PNE fair and the Richmond Night Market.', 'Rosewood Hotel Georgia has announced a renovation; confirm it’s open for August 2027.']
   }
 };
 
@@ -1180,9 +1253,24 @@ function buildDestCards() {
         (d.note ? '<p style="font-size:0.75rem;color:var(--text-dim);margin-top:8px;">' + d.note + '</p>' : '') +
         '<div class="dest-highlights"><h4>Must-Do</h4><ul class="highlight-list">' + hl + '</ul></div>' +
         '<p class="dest-bases" style="margin-top:12px;"><strong>Hotels:</strong> ' + d.hotels + '</p>' +
+        buildItinerary(key) +
       '</div>';
     wrap.appendChild(card);
   });
+}
+
+function buildItinerary(key) {
+  var it = ITINERARIES[key];
+  if (!it) return '';
+  var days = it.days.map(function(dd) {
+    return '<div class="itin-day"><div class="itin-date">' + dd[0] + '</div><div class="itin-title">' + dd[1] + '</div><ul>' +
+      dd[2].map(function(x) { return '<li>' + x + '</li>'; }).join('') + '</ul></div>';
+  }).join('');
+  var list = function(arr) { return '<ul>' + arr.map(function(x) { return '<li>' + x + '</li>'; }).join('') + '</ul>'; };
+  return '<details class="itin"><summary>Sample day-by-day itinerary</summary>' + days +
+    '<div class="itin-box"><h5>Book early</h5>' + list(it.book) + '</div>' +
+    '<div class="itin-box fix"><h5>Changes from the Gemini draft</h5>' + list(it.fixes) + '</div>' +
+    '</details>';
 }
 
 // ===== COMPARISON TABLE =====
