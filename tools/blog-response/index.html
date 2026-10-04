@@ -13,19 +13,19 @@ ol{padding-left:20px} li{margin:8px 0}
 small{color:var(--mute)}
 </style></head><body><main>
 <h1>Blog Response</h1>
-<p class="sub">One click on the GoDaddy Customers page: who opened, clicked, bounced or unsubscribed from the latest braff.co post.</p>
+<p class="sub">Who opened, clicked, bounced or unsubscribed from the latest braff.co post, read from GoDaddy's Customers page.</p>
 <div class="card"><b>Setup, once:</b> drag this button to your bookmarks bar. (If you added an earlier version, delete it and drag this one again.)<br><br>
-<a class="btn" id="bm" href="#" onclick="event.preventDefault();alert('Drag me to the bookmarks bar instead of clicking.')">Blog response v2</a></div>
+<a class="btn" id="bm" href="#" onclick="event.preventDefault();alert('Drag me to the bookmarks bar instead of clicking.')">Blog response v3</a></div>
 <div class="card"><b>After each post</b> (wait a day or two for opens to settle):
 <ol>
-<li>Click <b>Blog response</b> in your bookmarks bar. If you are not already on GoDaddy's Customers page, it takes you there; sign in if asked, then click the bookmark again.</li>
-<li>A white panel appears at top right. Keep the tab in front for about 30 seconds while it pages through your contacts.</li>
-<li>Read the report in the panel. <b>Download CSV</b> saves every contact's latest activity.</li>
+<li>Click <b>Blog response</b> from any page. It opens GoDaddy's full, unfiltered Customers list; sign in if asked.</li>
+<li>Once the contact list appears, click the bookmark again. A small progress box appears at top right; keep the tab in front for about a minute.</li>
+<li>The report fills the screen. <b>Open in new tab</b> keeps a copy you can leave open; <b>Download CSV</b> saves every contact's latest activity.</li>
 </ol></div>
-<p><small>Runs entirely in your browser, using your own GoDaddy login. It reads the contact list the same way you would by paging through it; nothing is sent anywhere. Each contact counts once, at their latest action, so run it before your next post goes out. Opens are inflated by Apple Mail privacy preloading.</small></p>
+<p><small>Runs entirely in your browser, using your own GoDaddy login. It reads the contact list the same way you would by paging through it; nothing is sent anywhere. Each contact counts once, at their latest action, so run it before your next post goes out. A reader who clicks and later reopens the email shows up as an open, not a click. Opens are inflated by Apple Mail privacy preloading.</small></p>
 </main>
 <script>
-fetch('scan.js?v=2').then(r=>r.text()).then(t=>{
+fetch('scan.js?v=3').then(r=>r.text()).then(t=>{
   const one=t.replace(/^\s*\/\/.*$/gm,'').replace(/\s*\n\s*/g,' ').trim();
   document.getElementById('bm').href='javascript:'+encodeURIComponent(one);
 });
