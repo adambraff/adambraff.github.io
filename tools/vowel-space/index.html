@@ -147,7 +147,7 @@ header .watch a{color:var(--f2)}
     </div>
   </section>
 
-  <footer>Reference vowels are Peterson &amp; Barney (1952) averages for adult male speakers of American English. Sound is synthesized in your browser: a band-limited sawtooth source passed through a cascade of resonators (Klatt-style), with bandwidths of 70, 100 and 140 Hz and a fixed fourth formant above F3. Nasality adds a peaking and a notching filter (a pole-zero pair, as in Klatt 1980) and widens F1's bandwidth to as much as 200 Hz. It is a simplification of real nasal coupling.</footer>
+  <footer>Reference vowels are Peterson &amp; Barney (1952) averages for adult male speakers of American English, except /o/ (&ldquo;hoed&rdquo;), which they did not record because it is usually a diphthong [o&#650;] in English; its values are the adult male means from Hillenbrand et al. (1995). Sound is synthesized in your browser: a band-limited sawtooth source passed through a cascade of resonators (Klatt-style), with bandwidths of 70, 100 and 140 Hz and a fixed fourth formant above F3. Nasality adds a peaking and a notching filter (a pole-zero pair, as in Klatt 1980) and widens F1's bandwidth to as much as 200 Hz. It is a simplification of real nasal coupling.</footer>
 </div>
 
 <script>
@@ -159,6 +159,7 @@ const VOWELS = [
   {ipa:"æ", word:"had",   f1:660, f2:1720, f3:2410},
   {ipa:"ɑ", word:"hod",   f1:730, f2:1090, f3:2440},
   {ipa:"ɔ", word:"hawed", f1:570, f2:840,  f3:2410},
+  {ipa:"o", word:"hoed",  f1:498, f2:910,  f3:2459},   // Hillenbrand et al. (1995); not in Peterson & Barney
   {ipa:"ʊ", word:"hood",  f1:440, f2:1020, f3:2240},
   {ipa:"u", word:"who'd", f1:300, f2:870,  f3:2240},
   {ipa:"ʌ", word:"hud",   f1:640, f2:1190, f3:2390},

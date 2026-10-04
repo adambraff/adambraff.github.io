@@ -29,4 +29,6 @@ Pure HTML/CSS/JS, no dependencies beyond Google Fonts (Charis SIL, IBM Plex Mono
 
 Reference vowels: Peterson, G. E. & Barney, H. L. (1952). Control methods used in a study of the vowels. *JASA* 24(2), 175-184. Adult male averages.
 
+/o/ ("hoed"), which Peterson & Barney did not record: Hillenbrand, J., Getty, L. A., Clark, M. J. & Wheeler, K. (1995). Acoustic characteristics of American English vowels. *JASA* 97(5), 3099-3111. Mean steady-state F1/F2/F3 of the 45 adult male talkers (498 / 910 / 2459 Hz).
+
 Klatt, D. H. (1980). Software for a cascade/parallel formant synthesizer. *JASA* 67(3), 971-995.
