@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Blog Response</title>
+<style>
+:root{--bg:#fafaf7;--fg:#1a1a1a;--mute:#666;--card:#fff;--line:#e3e1da;--acc:#111}
+@media (prefers-color-scheme:dark){:root{--bg:#151515;--fg:#eee;--mute:#aaa;--card:#1f1f1f;--line:#333;--acc:#f2f2f2}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 -apple-system,system-ui,sans-serif}
+main{max-width:640px;margin:0 auto;padding:40px 16px}
+h1{font-size:28px;margin:0 0 4px} .sub{color:var(--mute);margin:0 0 28px}
+.btn{display:inline-block;padding:12px 18px;border-radius:8px;background:var(--acc);color:var(--bg);font-weight:600;text-decoration:none;cursor:grab}
+ol{padding-left:20px} li{margin:8px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin:24px 0}
+small{color:var(--mute)}
+</style></head><body><main>
+<h1>Blog Response</h1>
+<p class="sub">One click on the GoDaddy Customers page: who opened, clicked, bounced or unsubscribed from the latest braff.co post.</p>
+<div class="card"><b>Setup, once:</b> drag this button to your bookmarks bar.<br><br>
+<a class="btn" id="bm" href="#" onclick="event.preventDefault();alert('Drag me to the bookmarks bar instead of clicking.')">Blog response</a></div>
+<div class="card"><b>After each post</b> (wait a day or two for opens to settle):
+<ol>
+<li>Click <b>Blog response</b> in your bookmarks bar. If you are not already on GoDaddy's Customers page, it takes you there; sign in if asked, then click the bookmark again.</li>
+<li>Keep the tab in front for about 30 seconds while it pages through your contacts.</li>
+<li>Read the report in the panel. <b>Download CSV</b> saves every contact's latest activity.</li>
+</ol></div>
+<p><small>Runs entirely in your browser, using your own GoDaddy login. It reads the contact list the same way you would by paging through it; nothing is sent anywhere. Each contact counts once, at their latest action, so run it before your next post goes out. Opens are inflated by Apple Mail privacy preloading.</small></p>
+</main>
+<script>
+fetch('scan.js').then(r=>r.text()).then(t=>{document.getElementById('bm').href='javascript:'+encodeURIComponent(t)});
+</script>
+</body></html>
