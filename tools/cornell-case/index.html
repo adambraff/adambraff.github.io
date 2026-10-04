@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seven-defendant outcome model</title>
+<style>
+  :root {
+    --bg: #f3efe6;
+    --ink: #1c1915;
+    --muted: #5e584e;
+    --card: #fffdf8;
+    --line: #e3d9c8;
+    --accent: #8c3a2f;
+    --accent-ink: #fffaf6;
+    --shadow: 0 1px 2px rgba(40, 30, 15, 0.06);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.45 "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  header, main { width: 100%; margin: 0; padding: 0 16px; }
+  header { padding-top: 28px; }
+  h1 { font-family: Georgia, "Iowan Old Style", serif; font-size: 28px; font-weight: 600; margin: 0 0 8px; letter-spacing: -0.02em; }
+  .lede { color: var(--muted); max-width: 68ch; margin: 0 0 18px; }
+  .layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 16px; align-items: start; padding-bottom: 48px; width: 100%; }
+  .viz-full { width: 100%; padding: 0 16px 8px; }
+  .viz-full .block { margin-top: 0; }
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 14px 14px 16px;
+  }
+  .controls { position: sticky; top: 12px; }
+  h2 { font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); margin: 16px 0 8px; font-weight: 650; }
+  h2:first-child { margin-top: 2px; }
+  label { display: block; font-size: 13px; margin: 8px 0 3px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .row.two { grid-template-columns: 1fr 1fr; }
+  input[type="number"] {
+    width: 100%;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 8px;
+    padding: 7px 8px;
+    font: inherit;
+    color: var(--ink);
+  }
+  .hint { color: var(--muted); font-size: 12px; margin: 4px 0 0; }
+  .strengths label { display: grid; grid-template-columns: 28px 1fr 72px; gap: 8px; align-items: center; margin: 6px 0; }
+  .strengths input { width: 72px; }
+  .who { color: var(--muted); font-size: 12px; }
+  button, .presets button {
+    font: inherit;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: #fff;
+    padding: 7px 10px;
+    cursor: pointer;
+    color: var(--ink);
+  }
+  #run {
+    width: 100%;
+    margin-top: 12px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-color: #732f26;
+    font-weight: 650;
+    padding: 10px 12px;
+  }
+  #run:disabled { opacity: 0.6; cursor: progress; }
+  .presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .presets button { font-size: 12px; padding: 5px 8px; }
+  .presets button[aria-pressed='true'] { background: var(--accent); color: var(--accent-ink); border-color: #732f26; }
+  details { margin-top: 10px; }
+  summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+  .status { min-height: 1.2em; color: var(--muted); font-size: 13px; margin: 8px 0 0; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 12px 10px; box-shadow: var(--shadow); }
+  .card .k { color: var(--muted); font-size: 12px; }
+  .card .v { font-family: Georgia, serif; font-size: 26px; margin-top: 2px; }
+  .card .s { color: var(--muted); font-size: 12px; }
+  .block { margin-top: 16px; }
+  .scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+  table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+  th, td { padding: 7px 8px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--line); }
+  th:first-child, td:first-child { text-align: left; position: sticky; left: 0; background: var(--card); }
+  th { color: var(--muted); font-weight: 600; background: #faf7f1; }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 8px 0 10px; font-size: 12px; color: var(--muted); }
+  .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+  .person { display: grid; grid-template-columns: 34px 1fr 64px; gap: 8px; align-items: center; margin: 6px 0; }
+  .presets-top { margin: 0 0 8px; }
+  .bar { display: flex; height: 14px; width: 100%; border-radius: 4px; overflow: hidden; background: #ece6da; }
+  .bar span { display: block; height: 100%; }
+  .hist { display: grid; gap: 4px; }
+  .hist-row { display: grid; grid-template-columns: 16px 1fr 52px; gap: 8px; align-items: center; font-size: 13px; }
+  .hist-row .track { background: #ece6da; border-radius: 4px; height: 10px; }
+  .hist-row .fill { background: var(--accent); height: 10px; border-radius: 4px; }
+  .note { color: var(--muted); font-size: 13px; max-width: 78ch; }
+  footer.note { margin-top: 14px; }
+  @media (max-width: 860px) {
+    .layout, .cards { grid-template-columns: 1fr; }
+    .controls { position: static; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Seven-defendant outcome model</h1>
+  <p class="lede">A seeded Monte Carlo of charging, pleas, and a first trial for D1–D7. Same assumptions as the Python script. This is a scenario model, not a prediction or a legal opinion. A mistrial stops that defendant. Nothing here is a finding about a real person.</p>
+</header>
+<div class="viz-full">
+    <div class="block">
+      <h2>Each defendant, best outcome to worst</h2>
+      <div class="legend" id="legend"></div>
+      <div id="bars"></div>
+      <p class="hint">The number on the right is the chance of a felony sex result. Green is the best result for that defendant, red is the worst.</p>
+    </div>
+</div>
+<main class="layout">
+  <aside class="panel controls">
+
+    <h2>Situations</h2>
+    <div class="presets presets-top" id="presets"></div>
+    <h2>Run size</h2>
+    <div class="row two">
+      <div><label for="iters">Iterations</label><input id="iters" type="number" min="500" max="100000" step="500" value="20000"></div>
+      <div><label for="seed">Seed</label><input id="seed" type="number" step="1" value="20241019"></div>
+    </div>
+    <h2>Case dials</h2>
+    <label for="pressure">Political pressure (0 to 1)</label>
+    <input id="pressure" type="number" min="0" max="1" step="0.05" value="0.55">
+    <label for="friction">Legal friction (0 to 1)</label>
+    <input id="friction" type="number" min="0" max="1" step="0.05" value="0.60">
+    <p class="hint">Friction is the New York consent rule plus the statement-versus-lawsuit conflict. It discounts trial convictions only.</p>
+    <h2>Venue prior</h2>
+    <div class="row">
+      <div><label for="venue0">Prosecution</label><input id="venue0" type="number" min="0" max="1" step="0.01" value="0.30"></div>
+      <div><label for="venue1">Mixed</label><input id="venue1" type="number" min="0" max="1" step="0.01" value="0.50"></div>
+      <div><label for="venue2">Defense</label><input id="venue2" type="number" min="0" max="1" step="0.01" value="0.20"></div>
+    </div>
+    <p class="hint">Rescaled to sum to 1 if they do not.</p>
+    <h2>If two or more go to trial</h2>
+    <div class="row">
+      <div><label for="join0">Full joinder</label><input id="join0" type="number" min="0" max="1" step="0.05" value="0.40"></div>
+      <div><label for="join1">Partial</label><input id="join1" type="number" min="0" max="1" step="0.05" value="0.40"></div>
+      <div><label for="join2">Separate</label><input id="join2" type="number" min="0" max="1" step="0.05" value="0.20"></div>
+    </div>
+    <h2>Evidence strength</h2>
+    <div class="strengths" id="strengths"></div>
+    <h2>Plea acceptance</h2>
+    <div class="row two">
+      <div><label for="misdMult">Sex-misdemeanor multiplier</label><input id="misdMult" type="number" min="0" max="1.5" step="0.05" value="1"></div>
+      <div><label for="felMult">Felony-plea multiplier</label><input id="felMult" type="number" min="0" max="1.5" step="0.05" value="1"></div>
+    </div>
+    <p class="hint">1 leaves the base model alone. Lower numbers mean defendants reject registrable pleas more often.</p>
+    <details>
+      <summary>Challenge weights and noise</summary>
+      <div class="row two">
+        <div><label for="defSolo">Defense weight, solo</label><input id="defSolo" type="number" min="0.1" step="0.05" value="1"></div>
+        <div><label for="defExtra">Defense extra per co-defendant</label><input id="defExtra" type="number" min="0" step="0.05" value="0.45"></div>
+        <div><label for="prosExtra">Prosecution extra per co-defendant</label><input id="prosExtra" type="number" min="0" step="0.05" value="0.15"></div>
+        <div><label for="chalShift">Challenge shift</label><input id="chalShift" type="number" min="0" step="0.05" value="0.55"></div>
+        <div><label for="sdShared">Shared charging noise</label><input id="sdShared" type="number" min="0" step="0.05" value="0.45"></div>
+        <div><label for="sdIdio">Individual charging noise</label><input id="sdIdio" type="number" min="0" step="0.05" value="0.35"></div>
+        <div><label for="sdPlea">Shared plea posture</label><input id="sdPlea" type="number" min="0" step="0.05" value="0.35"></div>
+        <div><label for="sdVerdict">Joint-verdict shock</label><input id="sdVerdict" type="number" min="0" step="0.01" value="0.04"></div>
+      </div>
+    </details>
+    <button id="run" type="button">Run</button>
+    <p class="status" id="status"></p>
+  </aside>
+  <section>
+    <div class="cards" id="cards"></div>
+    <div class="block scroll">
+      <table id="table"></table>
+    </div>
+    <div class="block">
+      <h2>How many felony sex adjudications</h2>
+      <div class="hist" id="hist"></div>
+    </div>
+    <div class="block">
+      <h2>Jury lean by how many defendants share it</h2>
+      <p class="hint">This is not the number of jurors. It is how many defendants are in the same trial. A shared jury gives the prosecution more say, because defense strikes are split.</p>
+      <div class="scroll"><table id="jury"></table></div>
+    </div>
+    <div class="block">
+      <h2>Charge mix, including no charges</h2>
+      <div class="scroll"><table id="charges"></table></div>
+    </div>
+    <p class="note" id="defs"></p>
+  </section>
+</main>
+<script>
+const DEFENDANTS = [
+  { id: "D1", profile: "Central, direct involvement. Title IX expelled.", strength: 0.82 },
+  { id: "D2", profile: "Central, direct involvement. Title IX expelled.", strength: 0.74 },
+  { id: "D3", profile: "Involved. Title IX suspended.", strength: 0.52 },
+  { id: "D4", profile: "Involved. Title IX suspended.", strength: 0.44 },
+  { id: "D5", profile: "Peripheral. Already graduated.", strength: 0.30 },
+  { id: "D6", profile: "Peripheral. Title IX not responsible.", strength: 0.20 },
+  { id: "D7", profile: "Peripheral. Title IX not responsible.", strength: 0.14 }
+];
+
+const OUTCOME_LABELS = [
+  "No charges",
+  "Plea, non-sex",
+  "Plea, misdemeanor",
+  "Plea, felony probation",
+  "Plea, felony custody",
+  "Guilty, lead count",
+  "Guilty, lesser only",
+  "Acquittal",
+  "Mistrial"
+];
+const BEST_TO_WORST = [0, 7, 8, 1, 2, 6, 3, 4, 5];
+const OUTCOME_COLORS = ["#1f7a3a", "#4c9a45", "#86b34a", "#c4be4a", "#e0b23a", "#e08a32", "#d4652c", "#c4472a", "#9d2a24"];
+const PLEA_LENIENCY = { 1: 1, 2: 0.62, 3: 0.28, 4: 0 };
+
+const PRESETS = {
+  "Ordinary politics": { pressure: 0, title: "Turns political and media pressure off. Charging and plea offers look like a normal case, not one the Attorney General is under pressure to bring." },
+  "Heavy political pressure": { pressure: 1, title: "Maximum pressure. More defendants are charged, and the offers that remain are harsher." },
+  "Consent law is a smaller hurdle": { friction: 0.30, title: "Lowers the trial discount from New York's intoxication rule and the conflicting statements. Lead-count convictions get easier. Pleas do not change." },
+  "Consent law blocks the case": { friction: 0.85, title: "A strong discount at trial because voluntary intoxication is not incapacitation unless she was physically helpless, and the 2024 statement is softer than the lawsuit." },
+  "Jury pool leans toward the prosecution": { venue0: 0.45, venue1: 0.40, venue2: 0.15, title: "More young, prosecution-leaning jurors before challenges. Raises convictions, especially lesser counts." },
+  "Jury pool leans toward the defense": { venue0: 0.20, venue1: 0.48, venue2: 0.32, title: "More jurors who stick to the statute and personal responsibility. Acquittals rise. Charging does not change." },
+  "Defendants refuse sex-offender pleas": { misdMult: 0.55, felMult: 0.35, title: "They mostly reject pleas that mean registration. More cases go to trial, and felony results fall unless the jury convicts." }
+};
+
+function clip(x, lo, hi) { return Math.min(hi, Math.max(lo, x)); }
+function softmax(logits) {
+  let m = logits[0];
+  for (let i = 1; i < logits.length; i++) if (logits[i] > m) m = logits[i];
+  const e = logits.map(v => Math.exp(v - m));
+  const s = e.reduce((a, b) => a + b, 0);
+  return e.map(v => v / s);
+}
+function renorm(arr) {
+  const clean = arr.map(v => Math.max(0, v));
+  const s = clean.reduce((a, b) => a + b, 0);
+  if (!(s > 0)) return clean.map(() => 1 / clean.length);
+  return clean.map(v => v / s);
+}
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function randn(rng) {
+  let u = rng();
+  const v = rng();
+  if (u < 1e-12) u = 1e-12;
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+function choice(rng, probs) {
+  let r = rng();
+  let c = 0;
+  for (let i = 0; i < probs.length; i++) {
+    c += probs[i];
+    if (r < c) return i;
+  }
+  return probs.length - 1;
+}
+function pickWeighted(rng, pairs) {
+  const probs = pairs.map(p => p[1]);
+  return pairs[choice(rng, probs)][0];
+}
+
+function chargeProbabilities(s, p, shock) {
+  const logits = [
+    1.85 - 2.40 * s - 0.70 * p,
+    0.15 + 0.15 * s,
+    -1.05 + 2.00 * s + 0.40 * p,
+    -2.35 + 2.50 * s + 0.55 * p
+  ];
+  for (let i = 0; i < 4; i++) logits[i] += shock;
+  logits[0] -= 0.55 * shock;
+  return softmax(logits);
+}
+function pOffer(s, pressure) {
+  return clip(0.93 - 0.08 * pressure - 0.06 * s, 0.70, 0.98);
+}
+function pAccept(leniency, strength, pressure, misdMult, felMult) {
+  const logit = -1.15 + 2.10 * leniency + 1.10 * strength - 0.20 * pressure;
+  let p = 1 / (1 + Math.exp(-logit));
+  if (leniency >= 0.99) return clip(p, 0, 0.995);
+  if (leniency >= 0.60) return clip(p * misdMult, 0, 0.995);
+  return clip(p * felMult, 0, 0.995);
+}
+function offerDist(charge, s, p, posture) {
+  const h = clip(posture, -0.9, 0.9);
+  let weights;
+  if (charge === 1) {
+    const nonsex = clip(0.64 - 0.28 * s - 0.08 * p - 0.10 * h, 0.08, 0.90);
+    weights = [[1, nonsex], [2, 1 - nonsex]];
+  } else if (charge === 2) {
+    weights = [
+      [1, clip(0.24 - 0.18 * s - 0.06 * p - 0.06 * h, 0.02, 0.55)],
+      [2, clip(0.36 - 0.12 * s - 0.04 * p - 0.05 * h, 0.05, 0.60)],
+      [3, clip(0.26 + 0.14 * s + 0.05 * p + 0.04 * h, 0.08, 0.70)],
+      [4, 0.18 + 0.10 * s]
+    ];
+  } else {
+    weights = [
+      [1, clip(0.10 - 0.06 * s - 0.04 * p - 0.04 * h, 0.01, 0.30)],
+      [2, clip(0.22 - 0.10 * s - 0.05 * p - 0.04 * h, 0.04, 0.45)],
+      [3, clip(0.38 + 0.06 * s + 0.04 * h, 0.12, 0.65)],
+      [4, 0.30 + 0.12 * s + 0.06 * p]
+    ];
+  }
+  const sum = weights.reduce((a, w) => a + w[1], 0);
+  return weights.map(([k, v]) => [k, v / sum]);
+}
+function partition(rng, idxs, strengths, joinProbs) {
+  if (idxs.length <= 1) return [idxs.slice()];
+  const mode = choice(rng, joinProbs);
+  if (mode === 0) return [idxs.slice()];
+  if (mode === 2) return idxs.map(i => [i]);
+  const ordered = idxs.slice().sort((a, b) => strengths[b] - strengths[a]);
+  const groups = [];
+  let i = 0;
+  while (i < ordered.length) {
+    if (i === ordered.length - 1) { groups.push([ordered[i]]); break; }
+    if (ordered.length - i === 3 && rng() < 0.35) { groups.push(ordered.slice(i, i + 3)); break; }
+    groups.push(ordered.slice(i, i + 2));
+    i += 2;
+  }
+  return groups;
+}
+function juryProbabilities(k, venue, P) {
+  let defenseTotal, pros;
+  if (k <= 1) {
+    defenseTotal = P.defSolo;
+    pros = 1;
+  } else {
+    defenseTotal = P.defSolo + P.defExtra * (k - 1);
+    pros = 1 + P.prosExtra * (k - 1);
+  }
+  const perDef = defenseTotal / k;
+  const shift = P.chalShift * (pros - perDef);
+  const logits = [
+    Math.log(Math.max(venue[0], 1e-6)) + shift,
+    Math.log(Math.max(venue[1], 1e-6)),
+    Math.log(Math.max(venue[2], 1e-6)) - shift
+  ];
+  return softmax(logits);
+}
+function verdictProbabilities(s, jury, charge, friction, joined, isStrongest, isWeakest, groupShock) {
+  const lean = jury === 0 ? 1 : jury === 2 ? -1 : 0;
+  const severity = charge === 1 ? 0 : charge === 2 ? 1 : 2;
+  let lead = 0.04 + 0.40 * s + 0.14 * lean - 0.16 * friction - 0.05 * severity + groupShock;
+  let lesser = 0.07 + 0.18 * s + 0.10 * lean - 0.05 * friction + 0.04 * severity + 0.5 * groupShock;
+  const contested = 1 - Math.min(1, Math.abs(s - 0.50) * 1.6);
+  const hung = 0.11 + 0.07 * (1 - Math.abs(lean)) * (0.45 + 0.55 * contested);
+  let acquit = 0.62 - 0.42 * s - 0.16 * lean + 0.14 * friction + 0.02 * severity - groupShock;
+  if (joined && isStrongest && !isWeakest) { lead += 0.05; lesser += 0.03; acquit -= 0.06; }
+  if (joined && isWeakest && !isStrongest) { lead -= 0.03; lesser -= 0.04; acquit += 0.06; }
+  const raw = [lead, lesser, acquit, hung].map(v => Math.max(0.015, v));
+  const sum = raw.reduce((a, b) => a + b, 0);
+  return raw.map(v => v / sum);
+}
+function isFelony(outcome, charge) {
+  if (outcome === 3 || outcome === 4) return true;
+  if (outcome === 5 && (charge === 2 || charge === 3)) return true;
+  if (outcome === 6 && charge === 3) return true;
+  return false;
+}
+function isWalk(outcome) { return outcome === 0 || outcome === 1 || outcome === 7; }
+
+function freshState() {
+  return {
+    outcome: DEFENDANTS.map(() => new Int32Array(9)),
+    charge: DEFENDANTS.map(() => new Int32Array(4)),
+    felony: new Int32Array(7),
+    walk: new Int32Array(7),
+    trial: new Int32Array(7),
+    felonyHist: new Int32Array(8),
+    sumProceedings: 0,
+    itersWithTrial: 0,
+    itersWithMistrial: 0
+  };
+}
+function runIterations(P, rng, n, state) {
+  const strengths = P.strengths;
+  for (let t = 0; t < n; t++) {
+    const climate = randn(rng) * P.sdShared;
+    const posture = randn(rng) * P.sdPlea;
+    const trialIdxs = [];
+    const chargeNow = new Array(7);
+    const outcomeNow = new Array(7);
+    for (let i = 0; i < 7; i++) {
+      const shock = climate + randn(rng) * P.sdIdio;
+      const c = choice(rng, chargeProbabilities(strengths[i], P.pressure, shock));
+      chargeNow[i] = c;
+      state.charge[i][c]++;
+      if (c === 0) { outcomeNow[i] = 0; continue; }
+      if (rng() > pOffer(strengths[i], P.pressure)) { trialIdxs.push(i); outcomeNow[i] = -1; continue; }
+      const offer = pickWeighted(rng, offerDist(c, strengths[i], P.pressure, posture));
+      if (rng() < pAccept(PLEA_LENIENCY[offer], strengths[i], P.pressure, P.misdMult, P.felMult)) {
+        outcomeNow[i] = offer;
+      } else {
+        trialIdxs.push(i);
+        outcomeNow[i] = -1;
+      }
+    }
+    const groups = trialIdxs.length ? partition(rng, trialIdxs, strengths, P.join) : [];
+    if (trialIdxs.length) {
+      state.sumProceedings += groups.length;
+      state.itersWithTrial++;
+    }
+    let mistrialThis = 0;
+    for (const group of groups) {
+      const jp = juryProbabilities(group.length, P.venue, P);
+      const jury = choice(rng, jp);
+      const joined = group.length > 1;
+      let strongest = group[0], weakest = group[0];
+      for (const i of group) {
+        if (strengths[i] > strengths[strongest]) strongest = i;
+        if (strengths[i] < strengths[weakest]) weakest = i;
+      }
+      const gshock = joined ? randn(rng) * P.sdVerdict : 0;
+      for (const i of group) {
+        state.trial[i]++;
+        const vp = verdictProbabilities(
+          strengths[i], jury, chargeNow[i], P.friction, joined, i === strongest, i === weakest, gshock
+        );
+        outcomeNow[i] = [5, 6, 7, 8][choice(rng, vp)];
+      }
+    }
+    let felonies = 0;
+    for (let i = 0; i < 7; i++) {
+      const o = outcomeNow[i];
+      state.outcome[i][o]++;
+      if (isFelony(o, chargeNow[i])) { state.felony[i]++; felonies++; }
+      if (isWalk(o)) state.walk[i]++;
+      if (o === 8) mistrialThis++;
+    }
+    state.felonyHist[felonies]++;
+    if (mistrialThis) state.itersWithMistrial++;
+  }
+}
+
+function readParams() {
+  const num = id => {
+    const v = Number(document.getElementById(id).value);
+    if (!Number.isFinite(v)) throw new Error("Enter a number in every field.");
+    return v;
+  };
+  const strengths = DEFENDANTS.map((_, i) => clip(num("s" + i), 0, 1));
+  const venue = renorm([num("venue0"), num("venue1"), num("venue2")]);
+  const join = renorm([num("join0"), num("join1"), num("join2")]);
+  const iters = Math.round(clip(num("iters"), 500, 100000));
+  return {
+    iters,
+    seed: Math.round(num("seed")) >>> 0,
+    pressure: clip(num("pressure"), 0, 1),
+    friction: clip(num("friction"), 0, 1),
+    venue, join, strengths,
+    misdMult: clip(num("misdMult"), 0, 1.5),
+    felMult: clip(num("felMult"), 0, 1.5),
+    defSolo: Math.max(0.05, num("defSolo")),
+    defExtra: Math.max(0, num("defExtra")),
+    prosExtra: Math.max(0, num("prosExtra")),
+    chalShift: Math.max(0, num("chalShift")),
+    sdShared: Math.max(0, num("sdShared")),
+    sdIdio: Math.max(0, num("sdIdio")),
+    sdPlea: Math.max(0, num("sdPlea")),
+    sdVerdict: Math.max(0, num("sdVerdict"))
+  };
+}
+
+function pct(x) { return (100 * x).toFixed(1) + "%"; }
+function num1(x) { return x.toFixed(2); }
+
+function render(P, state) {
+  const n = P.iters;
+  const cards = [
+    ["Felony sex results", (state.felony.reduce((a, b) => a + b, 0) / n), "expected count out of 7"],
+    ["At least one felony", state.felonyHist.reduce((a, v, i) => a + (i >= 1 ? v : 0), 0) / n, "share of runs"],
+    ["No felony sex result", state.felonyHist[0] / n, "share of runs"],
+    ["Not charged", DEFENDANTS.reduce((a, _, i) => a + state.outcome[i][0], 0) / n, "expected defendants"],
+    ["Pleas", DEFENDANTS.reduce((a, _, i) => a + state.outcome[i][1] + state.outcome[i][2] + state.outcome[i][3] + state.outcome[i][4], 0) / n, "expected defendants"],
+    ["People at a first trial", state.trial.reduce((a, b) => a + b, 0) / n, "expected defendants"],
+    ["Trial proceedings", state.sumProceedings / n, "expected, after joinder"],
+    ["Any trial", state.itersWithTrial / n, "share of runs"],
+    ["Acquittals", DEFENDANTS.reduce((a, _, i) => a + state.outcome[i][7], 0) / n, "expected defendants"],
+    ["Mistrials", DEFENDANTS.reduce((a, _, i) => a + state.outcome[i][8], 0) / n, "expected defendants"],
+    ["Any mistrial", state.itersWithMistrial / n, "share of runs"],
+    ["Walk, no sex finding", state.walk.reduce((a, b) => a + b, 0) / n, "expected defendants"]
+  ];
+  document.getElementById("cards").innerHTML = cards.map(([k, v, s]) => {
+    const show = (k === "At least one felony" || k === "No felony sex result" || k === "Any trial" || k === "Any mistrial") ? pct(v) : num1(v);
+    return `<div class="card"><div class="k">${k}</div><div class="v">${show}</div><div class="s">${s}</div></div>`;
+  }).join("");
+
+  document.getElementById("legend").innerHTML = BEST_TO_WORST.map((k, rank) =>
+    `<span><i class="sw" style="background:${OUTCOME_COLORS[rank]}"></i>${OUTCOME_LABELS[k]}</span>`).join("");
+
+  document.getElementById("bars").innerHTML = DEFENDANTS.map((d, i) => {
+    const parts = BEST_TO_WORST.map((k, rank) => {
+      const w = 100 * state.outcome[i][k] / n;
+      return `<span style="width:${w}%;background:${OUTCOME_COLORS[rank]}" title="${OUTCOME_LABELS[k]} ${pct(w / 100)}"></span>`;
+    }).join("");
+    const fel = state.felony[i] / n;
+    return `<div class="person"><strong>${d.id}</strong><div class="bar">${parts}</div><span>${pct(fel)}</span></div>`;
+  }).join("");
+
+  const heads = ["Defendant", ...OUTCOME_LABELS, "Felony sex", "Walks", "Reaches trial"];
+  let html = "<thead><tr>" + heads.map(h => `<th>${h}</th>`).join("") + "</tr></thead><tbody>";
+  DEFENDANTS.forEach((d, i) => {
+    const cells = [d.id + " (" + P.strengths[i].toFixed(2) + ")"];
+    for (let k = 0; k < 9; k++) cells.push(pct(state.outcome[i][k] / n));
+    cells.push(pct(state.felony[i] / n), pct(state.walk[i] / n), pct(state.trial[i] / n));
+    html += "<tr>" + cells.map(c => `<td>${c}</td>`).join("") + "</tr>";
+  });
+  html += "</tbody>";
+  document.getElementById("table").innerHTML = html;
+
+  const maxHist = Math.max(...state.felonyHist);
+  document.getElementById("hist").innerHTML = Array.from(state.felonyHist).map((v, i) => {
+    const share = v / n;
+    const w = maxHist ? (100 * v / maxHist) : 0;
+    return `<div class="hist-row"><span>${i}</span><div class="track"><div class="fill" style="width:${w}%"></div></div><span>${pct(share)}</span></div>`;
+  }).join("");
+
+  let jhtml = "<thead><tr><th>Defendants together</th><th>Prosecution-leaning</th><th>Mixed</th><th>Defense-leaning</th></tr></thead><tbody>";
+  [1, 2, 3, 4, 5, 6, 7].forEach(k => {
+    const jp = juryProbabilities(k, P.venue, P);
+    jhtml += `<tr><td>${k}</td><td>${pct(jp[0])}</td><td>${pct(jp[1])}</td><td>${pct(jp[2])}</td></tr>`;
+  });
+  document.getElementById("jury").innerHTML = jhtml + "</tbody>";
+
+  let chtml = "<thead><tr><th>Defendant</th><th>No charges</th><th>Misdemeanor</th><th>Felony sex</th><th>Higher degree or multi-count</th></tr></thead><tbody>";
+  DEFENDANTS.forEach((d, i) => {
+    chtml += `<tr><td>${d.id}</td>` + [0, 1, 2, 3].map(c => `<td>${pct(state.charge[i][c] / n)}</td>`).join("") + "</tr>";
+  });
+  document.getElementById("charges").innerHTML = chtml + "</tbody>";
+
+  document.getElementById("defs").textContent =
+    "From the defendant's side, the bar runs best to worst: no charges, acquittal, mistrial, non-sex plea, misdemeanor plea, lesser-count conviction, felony probation plea, felony custody plea, then a guilty verdict on the lead count. A felony sex adjudication is a felony plea, a guilty verdict on a felony lead count, or a lesser-included conviction on a higher-degree or multi-count filing. A lesser conviction on an ordinary felony filing counts as a misdemeanor. Walking with no sex finding means no charges, a non-sex plea, or an acquittal. The same seed and settings repeat on this page. The random stream is not NumPy's, so totals can differ slightly from the Python script.";
+}
+
+const BASE_VALUES = {
+  iters: 20000, seed: 20241019, pressure: 0.55, friction: 0.60,
+  venue0: 0.30, venue1: 0.50, venue2: 0.20,
+  join0: 0.40, join1: 0.40, join2: 0.20,
+  misdMult: 1, felMult: 1,
+  defSolo: 1, defExtra: 0.45, prosExtra: 0.15, chalShift: 0.55,
+  sdShared: 0.45, sdIdio: 0.35, sdPlea: 0.35, sdVerdict: 0.04
+};
+
+function applyValues(extra) {
+  const v = Object.assign({}, BASE_VALUES, extra || {});
+  Object.keys(v).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = v[id];
+  });
+  DEFENDANTS.forEach((d, i) => {
+    const el = document.getElementById("s" + i);
+    if (el && !(extra && ("s" + i) in extra)) el.value = d.strength;
+  });
+}
+
+function boot() {
+  const box = document.getElementById("strengths");
+  box.innerHTML = DEFENDANTS.map((d, i) =>
+    `<label><span>${d.id}</span><span class="who">${d.profile}</span><input id="s${i}" type="number" min="0" max="1" step="0.01" value="${d.strength}"></label>`
+  ).join("");
+  document.getElementById("presets").innerHTML = Object.keys(PRESETS).map(name =>
+    `<button type="button" data-preset="${name}" title="${PRESETS[name].title}">${name}</button>`).join("");
+  let activePreset = null;
+  document.getElementById("presets").addEventListener("click", ev => {
+    const btn = ev.target.closest("button");
+    if (!btn) return;
+    const name = btn.getAttribute("data-preset");
+    document.querySelectorAll("#presets button").forEach(b => b.setAttribute("aria-pressed", "false"));
+    if (activePreset === name) {
+      activePreset = null;
+      applyValues({});
+    } else {
+      activePreset = name;
+      btn.setAttribute("aria-pressed", "true");
+      applyValues(PRESETS[name]);
+    }
+    startRun();
+  });
+  document.getElementById("run").addEventListener("click", startRun);
+  document.getElementById("defs").textContent = "Open the file and press Run. Nothing is uploaded.";
+  startRun();
+}
+
+let running = false;
+async function startRun() {
+  if (running) return;
+  let P;
+  try { P = readParams(); }
+  catch (err) {
+    document.getElementById("status").textContent = err.message;
+    return;
+  }
+  running = true;
+  const btn = document.getElementById("run");
+  btn.disabled = true;
+  const status = document.getElementById("status");
+  const t0 = performance.now();
+  const rng = mulberry32(P.seed);
+  const state = freshState();
+  const batch = 1000;
+  for (let done = 0; done < P.iters; done += batch) {
+    const n = Math.min(batch, P.iters - done);
+    runIterations(P, rng, n, state);
+    status.textContent = "Running " + (done + n).toLocaleString() + " of " + P.iters.toLocaleString();
+    await new Promise(r => setTimeout(r, 0));
+  }
+  render(P, state);
+  const secs = ((performance.now() - t0) / 1000).toFixed(1);
+  status.textContent = P.iters.toLocaleString() + " iterations in " + secs + "s. Seed " + P.seed + ".";
+  btn.disabled = false;
+  running = false;
+}
+
+if (typeof window !== "undefined" && document.getElementById("run")) boot();
+</script>
+</body>
+</html>
