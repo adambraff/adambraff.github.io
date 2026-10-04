@@ -13,11 +13,11 @@ Video (90 seconds): https://youtu.be/HOZbPW5CYKE
 - **F3 slider:** hear the effect of lip rounding and r-coloring (/ɝ/ in "heard" has F3 near 1690 Hz).
 - **Velum (nasality) slider:** adds a nasal peak near 250 Hz, an antiresonance that climbs through the F1 region, and a wider F1 bandwidth.
 - **Source x filter = output panel:** shows glottal harmonics, the vocal tract filter curve, and the resulting output spectrum.
-- **Explainer video:** embedded from YouTube below the controls.
+- **Explainer video:** linked from the page header (opens on YouTube).
 
 ## How it works
 
-Pure HTML/CSS/JS, no dependencies beyond Google Fonts (Charis SIL, IBM Plex Mono) and the YouTube embed.
+Pure HTML/CSS/JS, no dependencies beyond Google Fonts (Charis SIL, IBM Plex Mono).
 
 - Source: band-limited sawtooth oscillator (net -6 dB/octave, standing in for glottal pulse plus lip radiation) with slight vibrato.
 - Filter: cascade of four Web Audio lowpass biquads acting as Klatt-style formant resonators (bandwidths 70/100/140/250 Hz; F4 fixed above F3).
