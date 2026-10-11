@@ -7,6 +7,7 @@ Live: https://adambraff.github.io/tools/nyg-was-playbook/
 ## What's in it
 
 - **Plays**: 13 animated situations drawn on a whiteboard field (Giants offense, Commanders offense, special teams). Tap any player for his role on that play and who he is; each play has a short explanation and rough outcome odds.
+- **Spotter**: both full rosters sorted by jersey number, with a number lookup, injury status and projected starters.
 - **Personnel**: decoder for 10, 11, 12, 13, 21 and 22 personnel, with the typical defensive response and how each team uses it.
 - **Glossary**: 30 football terms (formations, run and pass concepts, pressure, coverage shells) with mini diagrams.
 - **Coaches**: tendency cards for both coordinators and head coaches, with a tell to watch for each.

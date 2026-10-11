@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Interactive playbook for Giants at Commanders, Week 5 2026: animated plays, personnel decoder, glossary, coordinator tendencies, prop odds and win probability.">
+<meta name="description" content="Interactive playbook for Giants at Commanders, Week 5 2026: animated plays, jersey-number spotter, personnel decoder, glossary, coordinator tendencies, prop odds and win probability.">
 <title>Giants at Commanders Playbook</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -116,7 +116,36 @@ footer a{color:var(--muted)}
 .note{font-size:12.5px;color:var(--muted)}
 svg text{font-family:var(--mono)}
 .pl{cursor:pointer}
-/* personnel + glossary */
+/* spotter */
+.spotbar{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 14px;align-items:stretch;margin-bottom:14px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px}
+@media (max-width:620px){.spotbar{grid-template-columns:1fr}.numin{grid-template-columns:auto 1fr;align-items:center}.numin input{font-size:2rem}.hit .nm{font-size:1.1rem}}
+.numin{display:grid;gap:4px;background:var(--board);border:1px solid var(--line);border-radius:4px;padding:10px 14px}
+.numin span{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.numin input{font-family:var(--display);font-weight:800;font-size:2.6rem;width:5.5ch;border:0;border-bottom:2px solid var(--ink);background:transparent;color:var(--ink);padding:0;line-height:1}
+.numin input:focus{outline:none;border-bottom-color:var(--gold)}
+.spothit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-content:center}
+.spothit>p{grid-column:1/-1;margin:0}
+.hit{background:var(--board);border:1px solid var(--line);border-left:5px solid var(--muted);border-radius:4px;padding:8px 12px;min-width:0}
+.hit.nyg{border-left-color:var(--nyg)} .hit.was{border-left-color:var(--was)}
+.hit .nm{font-family:var(--display);font-weight:800;font-size:1.35rem;text-transform:uppercase;line-height:1.05}
+.spotctl{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-bottom:12px}
+.chk{display:flex;gap:6px;align-items:center;font-size:13.5px;cursor:pointer}
+.chk input{width:16px;height:16px;accent-color:var(--nyg)}
+.spotcols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+.spotcols.single{grid-template-columns:minmax(0,1fr)}
+@media (max-width:700px){.spotcols{grid-template-columns:minmax(0,1fr)}}
+.spotcols h2{margin-bottom:6px}
+.jlist{list-style:none;margin:0;padding:0;background:var(--board);border:1px solid var(--line);border-radius:4px}
+.jlist li{display:grid;grid-template-columns:3.2rem minmax(0,1fr) auto;gap:10px;align-items:center;padding:5px 10px;border-bottom:1px solid var(--line)}
+.jlist li:last-child{border-bottom:0}
+.jlist li.flash{background:var(--gold);background:color-mix(in srgb,var(--gold) 22%,transparent)}
+.jlist li.dim{opacity:.55}
+.jn{font-family:var(--display);font-weight:800;font-size:1.55rem;line-height:1;text-align:right;font-variant-numeric:tabular-nums}
+.jn.nyg{color:var(--nyg)} .jn.was{color:var(--was)}
+.jname{font-weight:600;font-size:14px;line-height:1.2}
+.jname .star{color:var(--gold);margin-left:4px}
+.jpos{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.04em}
+.tag.out{color:var(--bad);border-color:var(--bad)}
 .pgrid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:20px;align-items:start}
 @media (max-width:860px){.pgrid{grid-template-columns:1fr}}
 .code{font-family:var(--display);font-weight:800;font-size:3.4rem;line-height:.8;color:var(--ink)}
@@ -168,6 +197,7 @@ table.props td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;white
 
 <nav class="tabs" role="tablist">
   <button role="tab" aria-selected="true" data-tab="plays">Plays</button>
+  <button role="tab" aria-selected="false" data-tab="spot">Spotter</button>
   <button role="tab" aria-selected="false" data-tab="pers">Personnel</button>
   <button role="tab" aria-selected="false" data-tab="gloss">Glossary</button>
   <button role="tab" aria-selected="false" data-tab="coach">Coaches</button>
@@ -209,6 +239,24 @@ table.props td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;white
       <div class="card" id="oddscard"></div>
     </div>
   </div>
+</section>
+
+<!-- SPOTTER -->
+<section id="tab-spot" hidden>
+  <div class="spotbar">
+    <label class="numin" for="spotnum"><span>Jersey #</span><input id="spotnum" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" placeholder="e.g. 52" autocomplete="off"></label>
+    <div class="spothit" id="spothit"><p class="note">Type a number to see who wears it on each team.</p></div>
+  </div>
+  <div class="spotctl">
+    <div class="side" style="flex:1 1 320px">
+      <button class="nyg" data-spot="NYG" aria-pressed="false">Giants</button>
+      <button class="st" data-spot="BOTH" aria-pressed="true">Both</button>
+      <button class="was" data-spot="WAS" aria-pressed="false">Commanders</button>
+    </div>
+    <label class="chk"><input type="checkbox" id="spotall"> Include IR and practice squad</label>
+  </div>
+  <div class="spotcols" id="spotcols"></div>
+  <p class="note" style="margin-top:10px">Rosters from giants.com and commanders.com as of Oct 11. ★ marks a projected starter. "Out" comes from Friday's injury report; "elevated" means called up from the practice squad for this game. Inactives post around 11:30 AM ET.</p>
 </section>
 
 <!-- PERSONNEL -->
@@ -960,6 +1008,187 @@ function renderGloss(){
  $("#glist").innerHTML=GL.filter(g=>gcat==="All"||g.c===gcat).map(g=>`<div class="card"><p class="when">${g.c}</p><h3>${g.t}</h3>${diagram(Array.isArray(g.s)?g.s:{...g.s,alt:g.t})}<p>${g.d}</p></div>`).join("");
 }
 
+/* ================= spotter ================= */
+const R_NYG=`0|Brian Burns|OLB|IR
+1|Malik Nabers|WR|A
+2|Deonte Banks|CB|A
+3|Abdul Carter|OLB|A
+5|Kayvon Thibodeaux|OLB|A
+6|Jaxson Dart|QB|IR
+8|Jevón Holland|S|A
+9|Isaiah Likely|TE|A
+12|Colton Hood|CB|A
+13|Jake Haener|QB|A
+15|Jordan Stout|P|A
+17|Darnell Mooney|WR|A
+18|J.J. McCarthy|QB|A
+19|Jameis Winston|QB|A
+20|Greg Newsome II|CB|A
+21|Paulson Adebo|CB|IR
+22|Dru Phillips|CB|A
+23|Najee Harris|RB|A
+24|Ar'Darius Washington|S|A
+25|Jason Pinnock|S|OUT
+26|Devin Singletary|RB|A
+27|Tyler Nubin|S|A
+28|Elijah Campbell|DB|A
+29|Tyrone Tracy Jr.|RB|A
+31|Nic Jones|CB|A
+33|Jaden Robinson|CB|PS
+34|Dominic Zvada|K|A
+35|Nikko Reed|CB|A
+35|Jarrick Bernard-Converse|CB|IR
+36|Phil Mafah|RB|PS
+37|Dontae Fleming|WR|PS
+38|Korie Black|CB|IR
+39|Thaddeus Dixon|CB|IR
+41|Micah McFadden|LB|A
+43|Raheem Layne|S|PS
+44|Cam Skattebo|RB|A
+45|Patrick Ricard|FB|A
+46|Zaire Barnes|LB|A
+47|Grant Finley|FB|PS
+48|Trace Ford|OLB|UP
+49|Tremaine Edmunds|LB|A
+51|Jack Kelly|LB|A
+52|Arvell Reese|LB|A
+53|Jihad Ward|OLB|A
+54|Malik Harrison|LB|PS
+55|Chandler Martin|LB|PS
+57|Chauncey Golston|DL|IR
+58|Ben Mann|LS|A
+60|Bryan Hudson|C/G|A
+61|John Michael Schmitz Jr.|C|A
+64|Aaron Stinnie|OL|A
+65|Francis Mauigoa|OL|A
+69|Geno VanDeMark|OL|PS
+70|Ryan Schernecke|OL|PS
+71|Marcus Mbow|OL|A
+72|Jermaine Eluemunor|T|A
+74|J.C. Davis|OL|A
+76|Jon Runyan Jr.|G|A
+78|Andrew Thomas|T|A
+79|Jarrod Gray|OL|PS
+80|Gunner Olszewski|WR|IR
+81|Jalin Hyatt|WR|PS
+82|Calvin Austin III|WR|IR
+83|Dalen Cambre|WR|UP
+84|Theo Johnson|TE|A
+85|Chris Manhertz|TE|A
+86|Thomas Fidone II|TE|A
+87|Braxton Berrios|WR|IR
+88|Malachi Fields|WR|A
+89|Charlie Jones|WR|A
+90|PJ Mustipher|DL|PS
+91|Darius Alexander|DL|A
+93|Shelby Harris|DL|A
+94|Josh Tupou|DL|PS
+95|Roy Robertson-Harris|DL|IR
+96|C.J. Ravenell|DL|PS
+97|Bobby Jamison-Travis|DL|A
+98|DJ Reader|DL|A
+99|C.J. Okoye|DL|A`;
+const R_WAS=`0|Mike Sainristil|CB|A
+1|Rachaad White|RB|A
+2|Amik Robertson|CB|A
+3|Stefon Diggs|WR|OUT
+4|Frankie Luvu|LB|A
+5|Jayden Daniels|QB|A
+6|Dyami Brown|WR|A
+8|Marcus Mariota|QB|OUT
+10|Tress Way|P|A
+11|Luke McCaffrey|WR|A
+12|Van Jefferson|WR|PS
+13|Treylon Burks|WR|A
+14|Antonio Williams|WR|A
+15|Sam Hartman|QB|PS
+16|Athan Kaliakmanis|QB|A
+17|Terry McLaurin|WR|Q
+18|Tyler Owens|S|OUT
+19|Drew Stevens|K|A
+20|Quan Martin|S|A
+22|Jacory Croskey-Merritt|RB|A
+23|Trey Amos|CB|IR
+24|Fabian Moreau|CB|A
+24|Craig Reynolds|RB|PS
+25|Nick Cross|S|OUT
+26|Jeremy McNichols|RB|IR
+29|Rasul Douglas|CB|A
+30|Austin Ekeler|RB|A
+35|Percy Butler|S|OUT
+36|Darren Hall|S|PS
+37|Isaac Yiadom|CB|A
+38|Fred Davis II|CB|PS
+39|Jeremy Reaves|S|A
+41|Javontae Jean-Baptiste|OLB|A
+45|K'Lavon Chaisson|OLB|A
+48|Joshua Josephs|OLB|A
+50|Ricky Barber|DT|PS
+51|Ale Kaho|LB|PS
+52|Sonny Styles|LB|A
+54|Leo Chenal|LB|IR
+55|Byron Cowart|DT|PS
+56|Kain Medrano|LB|A
+57|Austin Keys|LB|PS
+58|Jordan Magee|LB|IR
+59|T.J. Maguranyanga|DE|PS
+61|Julian Good-Jones|C/G|PS
+62|Tanoa Togiai|G|A
+63|Lucas Patrick|G|A
+66|Matt Gulbin|C|A
+67|Nick Allegretti|C/G|A
+69|Tyler Ott|LS|A
+71|Andrew Wylie|T/G|A
+72|Josh Conerly Jr.|T|A
+73|Trent Scott|T/G|PS
+74|Brandon Coleman|T|A
+75|Chris Paul|G|A
+76|Sam Cosmi|G|A
+77|Esa Pole|OT|PS
+78|Laremy Tunsil|T|IR
+80|Colson Yankoff|TE|A
+82|Ben Sinnott|TE|A
+83|Jaylin Lane|WR|IR
+85|Chig Okonkwo|TE|A
+86|Jaden Bradley|WR|PS
+87|John Bates|TE|A
+89|Jack Westover|TE|PS
+90|Charles Omenihu|DE|OUT
+91|Deatrich Wise Jr.|DE|IR
+92|Dorance Armstrong|OLB|A
+93|Charles Snowden|LB|PS
+94|Daron Payne|DT|A
+95|Jer'Zhan Newton|DT|IR
+96|Shy Tuttle|DT|A
+97|Tim Settle|DT|A
+98|Odafe Oweh|OLB|A
+99|Javon Kinlaw|DT|A`;
+const parseR=t=>t.split("\n").map(l=>{const [n,nm,pos,st]=l.split("|");return {n:+n,nm,pos,st};});
+const ROST={NYG:parseR(R_NYG),WAS:parseR(R_WAS)};
+const normN=x=>x.replace(/\s*\(likely\)/,"").replace(/ Jr\.?$/,"").trim();
+const starters={NYG:new Set(),WAS:new Set()};
+["NYG","WAS"].forEach(t=>Object.values(P[t]).forEach(d=>{
+ const r=ROST[t].find(x=>normN(x.nm)===normN(d.n)); if(r){d.no=r.n;starters[t].add(r.nm);}
+}));
+const STLAB={A:"",OUT:"Out",Q:"Questionable",IR:"IR",PS:"Practice squad",UP:"Elevated"};
+let spotTeam="BOTH";
+function spotTag(st){if(!STLAB[st])return"";const c=st==="OUT"||st==="IR"?"out":st==="Q"?"q":st==="UP"?"new":"";return `<span class="tag ${c}">${STLAB[st]}</span>`;}
+function renderSpot(){
+ const all=$("#spotall").checked, q=$("#spotnum").value.replace(/\D/g,"");
+ const teams=spotTeam==="BOTH"?["NYG","WAS"]:[spotTeam];
+ $("#spotcols").className="spotcols"+(teams.length===1?" single":"");
+ $("#spotcols").innerHTML=teams.map(t=>{
+  const rows=ROST[t].filter(r=>all||!(r.st==="IR"||r.st==="PS")).sort((a,b)=>a.n-b.n);
+  return `<div><h2 style="color:var(--${t.toLowerCase()})">${t==="NYG"?"Giants":"Commanders"}</h2><ul class="jlist">${rows.map(r=>`<li class="${q!==""&&+q===r.n?"flash":""} ${r.st==="OUT"||r.st==="IR"?"dim":""}" data-n="${r.n}"><span class="jn ${t.toLowerCase()}">${r.n}</span><span><span class="jname">${r.nm}${starters[t].has(r.nm)?'<span class="star" title="Projected starter">★</span>':""}</span><br><span class="jpos">${r.pos}</span></span><span>${spotTag(r.st)}</span></li>`).join("")}</ul></div>`;
+ }).join("");
+ if(q===""){$("#spothit").innerHTML=`<p class="note">Type a number to see who wears it on each team.</p>`;return;}
+ $("#spothit").innerHTML=["NYG","WAS"].map(t=>{const hits=ROST[t].filter(r=>r.n===+q);
+  return `<div class="hit ${t.toLowerCase()}"><p class="eyebrow">${t==="NYG"?"Giants":"Commanders"} #${q}</p>${hits.length?hits.map(h=>`<div class="nm">${h.nm}</div><span class="jpos">${h.pos}</span> ${spotTag(h.st)}`).join("<br>"):'<p class="note" style="margin:0">Nobody wears it.</p>'}</div>`;}).join("");
+}
+$("#spotnum").addEventListener("input",renderSpot);
+$("#spotall").addEventListener("change",renderSpot);
+document.querySelectorAll("[data-spot]").forEach(b=>b.addEventListener("click",()=>{spotTeam=b.dataset.spot;document.querySelectorAll("[data-spot]").forEach(x=>x.setAttribute("aria-pressed",x===b));renderSpot();}));
+
 /* ================= coaches ================= */
 const COACHES=[
  {team:"nyg",role:"Giants offensive coordinator",name:"Matt Nagy",
@@ -1039,7 +1268,7 @@ function renderProps(){
 }
 
 /* ================= tabs ================= */
-const TABS=["plays","pers","gloss","coach","props","script","roster","watch"];
+const TABS=["plays","spot","pers","gloss","coach","props","script","roster","watch"];
 document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{
  document.querySelectorAll("nav.tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));
  TABS.forEach(k=>$("#tab-"+k).hidden=k!==b.dataset.tab);
@@ -1097,7 +1326,7 @@ const WATCH = [
 ];
 
 /* ================= init ================= */
-load();wp();renderPers();renderGloss();renderCoaches();renderProps();roster("NYG");roster("WAS");
+renderSpot();load();wp();renderPers();renderGloss();renderCoaches();renderProps();roster("NYG");roster("WAS");
 $("#watchlist").innerHTML=WATCH.map(w=>`<div class="card"><p class="when">${w[0]}</p><h3>${w[1]}</h3><p>${w[2]}</p></div>`).join("");
 try{const t=localStorage.getItem("nygwas-tab");if(t){const b=document.querySelector(`nav.tabs button[data-tab="${t}"]`);if(b)b.click();}}catch(e){}
 })();
