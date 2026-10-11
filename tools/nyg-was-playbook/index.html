@@ -1,0 +1,1049 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Interactive playbook for Giants at Commanders, Week 5 2026: animated plays, personnel decoder, glossary, coordinator tendencies, prop odds and win probability.">
+<title>Giants at Commanders Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;700;800&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: coach's whiteboard. Field diagram is the hero; picker above, explanation beside (stacks on phones). */
+:root{
+  --bg:#eef1ee; --board:#fbfcfa; --ink:#18201c; --muted:#5b6660; --line:#d4dbd6;
+  --turf:#e4ede4; --turf-line:#ffffff; --turf-ink:#7f9584;
+  --nyg:#1c43a6; --nyg-soft:#dfe6f7; --was:#8a1c2c; --was-soft:#f5e1e3; --gold:#c99a1a;
+  --good:#2f7d4a; --warn:#b7791f; --bad:#b4372f;
+  --display:"Saira Condensed","Arial Narrow",sans-serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121614; --board:#1a201d; --ink:#e7ece9; --muted:#9aa7a0; --line:#2e3833;
+  --turf:#1c2a21; --turf-line:#3d5244; --turf-ink:#6f8a77;
+  --nyg:#7d9cf0; --nyg-soft:#1d2a4a; --was:#e5737f; --was-soft:#3a1d22; --gold:#e3b84a;
+  --good:#5bbf7c; --warn:#e0a84a; --bad:#ef7a70; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121614; --board:#1a201d; --ink:#e7ece9; --muted:#9aa7a0; --line:#2e3833;
+  --turf:#1c2a21; --turf-line:#3d5244; --turf-ink:#6f8a77;
+  --nyg:#7d9cf0; --nyg-soft:#1d2a4a; --was:#e5737f; --was-soft:#3a1d22; --gold:#e3b84a;
+  --good:#5bbf7c; --warn:#e0a84a; --bad:#ef7a70; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+img{max-width:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:20px 48px}
+header.top{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:flex-end;justify-content:space-between;border-bottom:3px solid var(--ink);padding-bottom:12px}
+.matchup{font-family:var(--display);font-weight:800;font-size:clamp(2rem,6vw,3.4rem);line-height:.9;text-transform:uppercase;letter-spacing:.01em;margin:0;text-wrap:balance}
+.matchup .nyg{color:var(--nyg)} .matchup .was{color:var(--was)} .matchup .at{font-weight:500;color:var(--muted);font-size:.6em}
+.meta{font-family:var(--mono);font-size:12px;color:var(--muted);display:grid;gap:2px;text-align:right}
+.meta b{color:var(--ink);font-weight:600}
+nav.tabs{display:flex;flex-wrap:wrap;gap:4px;margin:16px 0 18px}
+nav.tabs button{font-family:var(--display);font-weight:700;font-size:1.02rem;text-transform:uppercase;letter-spacing:.05em;border:1.5px solid var(--line);background:var(--board);color:var(--muted);padding:6px 12px;border-radius:3px;cursor:pointer}
+nav.tabs button[aria-selected="true"]{background:var(--ink);color:var(--board);border-color:var(--ink)}
+button:focus-visible,.sit:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.picker{display:grid;gap:10px;margin-bottom:14px}
+.side{display:flex;gap:6px;flex-wrap:wrap}
+.side button{flex:1 1 150px;font-family:var(--display);font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-radius:3px;cursor:pointer;border:2px solid var(--line);background:var(--board);color:var(--ink)}
+.side button.nyg[aria-pressed="true"]{border-color:var(--nyg);background:var(--nyg-soft);color:var(--nyg)}
+.side button.was[aria-pressed="true"]{border-color:var(--was);background:var(--was-soft);color:var(--was)}
+.side button.st[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+.sits{display:flex;flex-wrap:wrap;gap:6px}
+.sit,.chipbtn{font-family:var(--body);font-size:13px;border:1px solid var(--line);background:var(--board);color:var(--ink);padding:5px 10px;border-radius:999px;cursor:pointer}
+.sit .dd{font-family:var(--mono);font-size:11px;color:var(--muted);margin-right:6px}
+.sit[aria-pressed="true"],.chipbtn[aria-pressed="true"]{background:var(--ink);color:var(--board);border-color:var(--ink)}
+.sit[aria-pressed="true"] .dd{color:var(--board);opacity:.75}
+.fieldbox{background:var(--board);border:1px solid var(--line);border-radius:4px;padding:10px}
+.fieldbox svg{display:block;width:100%;height:auto;touch-action:manipulation}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-top:8px}
+.btn{font-family:var(--display);font-weight:700;font-size:1rem;text-transform:uppercase;letter-spacing:.06em;padding:7px 16px;border-radius:3px;border:2px solid var(--ink);background:var(--ink);color:var(--board);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;gap:5px;align-items:center}
+.sw{width:18px;height:0;border-top:2.5px solid var(--nyg)} .sw.d{border-top-style:dashed}
+.hint{font-size:12px;color:var(--muted);margin:6px 0 0}
+.panel{display:grid;gap:14px;min-width:0}
+.card{background:var(--board);border:1px solid var(--line);border-radius:4px;padding:14px 16px;min-width:0}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+h2,h3{font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.02em;line-height:1;margin:0 0 8px;text-wrap:balance}
+h2{font-size:1.65rem} h3{font-size:1.2rem}
+.card p{margin:0 0 8px;max-width:65ch} .card p:last-child{margin-bottom:0}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px}
+.kv dt{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding-top:3px}
+.kv dd{margin:0}
+.stack{display:flex;height:16px;border-radius:2px;overflow:hidden;margin:6px 0 10px;border:1px solid var(--line)}
+.stack div{height:100%}
+.odds{list-style:none;margin:0;padding:0;display:grid;gap:3px;font-size:13px}
+.odds li{display:grid;grid-template-columns:12px 1fr auto;gap:8px;align-items:center}
+.odds .chip{width:12px;height:12px;border-radius:2px}
+.odds .pct{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.player{border-left:4px solid var(--muted);padding-left:12px}
+.player.nyg{border-color:var(--nyg)} .player.was{border-color:var(--was)}
+.player .nm{font-family:var(--display);font-size:1.4rem;font-weight:800;text-transform:uppercase;line-height:1}
+.tag{display:inline-block;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;padding:1px 6px;border-radius:2px;border:1px solid var(--line);color:var(--muted);margin:4px 4px 0 0}
+.tag.q{color:var(--warn);border-color:var(--warn)} .tag.new{color:var(--good);border-color:var(--good)}
+.gauge{position:relative;height:46px;border-radius:3px;overflow:hidden;border:1px solid var(--line);display:flex;margin:10px 0 4px}
+.gauge .g{background:var(--nyg);transition:width .35s ease} .gauge .w{background:var(--was);flex:1}
+.gl{display:flex;justify-content:space-between;font-family:var(--display);font-weight:800;font-size:1.6rem;text-transform:uppercase}
+.gl .a{color:var(--nyg)} .gl .b{color:var(--was)}
+.ctl{display:grid;gap:12px}
+.ctl label{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center;font-size:14px;cursor:pointer}
+.ctl label small{grid-column:1/-1;color:var(--muted);font-size:12px}
+.ctl input[type=checkbox]{width:18px;height:18px;accent-color:var(--nyg)}
+.ctl input[type=range]{width:100%;accent-color:var(--nyg)}
+.rng{display:grid;gap:4px;font-size:14px}
+.rng .row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.score{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:13px;color:var(--muted)}
+.quarters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:700px){.quarters{grid-template-columns:1fr 1fr}}
+.quarters .card h3{font-size:1rem} .quarters .card p{font-size:13.5px}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start}
+@media (max-width:760px){.two{grid-template-columns:1fr}}
+table.roster{width:100%;border-collapse:collapse;font-size:13.5px}
+table.roster th{text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);border-bottom:1.5px solid var(--ink);padding:6px 6px 4px}
+table.roster td{border-bottom:1px solid var(--line);padding:6px;vertical-align:top}
+table.roster td.pos,table.roster td.num{font-family:var(--mono);font-size:12px;white-space:nowrap;font-variant-numeric:tabular-nums}
+table.roster tr.unit td{font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.04em;border-bottom:none;padding-top:14px;font-size:1rem}
+.scroll{overflow-x:auto}
+.watch{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px}
+.watch .card h3{font-size:1.15rem}
+.when{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:0 0 2px}
+footer{margin-top:28px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+footer a{color:var(--muted)}
+.note{font-size:12.5px;color:var(--muted)}
+svg text{font-family:var(--mono)}
+.pl{cursor:pointer}
+.pgrid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.pgrid{grid-template-columns:1fr}}
+.code{font-family:var(--display);font-weight:800;font-size:3.4rem;line-height:.8;color:var(--ink)}
+.digits{display:flex;gap:18px;align-items:flex-end;margin-bottom:10px;flex-wrap:wrap}
+.digits small{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.meter{display:flex;height:10px;border-radius:2px;overflow:hidden;border:1px solid var(--line);margin:4px 0 2px}
+.meter .r{background:var(--good)} .meter .p{background:var(--gold);flex:1}
+svg.mini{display:block;width:100%;height:auto;background:var(--turf);border-radius:3px}
+.gfilter{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.glist{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));gap:14px}
+.glist .card{display:grid;gap:8px;align-content:start}
+.glist h3{font-size:1.1rem;margin:0}
+.glist p{font-size:13.5px;margin:0}
+table.props{width:100%;border-collapse:collapse;font-size:13.5px}
+table.props th{text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);border-bottom:1.5px solid var(--ink);padding:6px}
+table.props td{border-bottom:1px solid var(--line);padding:8px 6px;vertical-align:top}
+table.props td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pbar{display:inline-block;width:56px;height:8px;border:1px solid var(--line);border-radius:2px;vertical-align:middle;margin-right:6px;background:var(--bg);position:relative;overflow:hidden}
+.pbar i{position:absolute;left:0;top:0;bottom:0;background:var(--gold)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:10px;margin-bottom:18px}
+.tile .big{font-family:var(--display);font-weight:800;font-size:1.9rem;line-height:1}
+.tile .sub{font-size:12.5px;color:var(--muted)}
+.coaches{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:14px}
+.coach{border-top:4px solid var(--muted)} .coach.nyg{border-top-color:var(--nyg)} .coach.was{border-top-color:var(--was)}
+.coach ul{margin:6px 0 0;padding-left:18px;font-size:13.5px} .coach li{margin-bottom:4px}
+.stat{display:inline-block;font-family:var(--mono);font-size:11.5px;padding:2px 7px;border-radius:2px;background:var(--bg);border:1px solid var(--line);margin:2px 4px 2px 0}
+.coach .tell{font-size:13.5px;border-left:3px solid var(--gold);padding-left:10px;margin-top:8px}
+@media (prefers-reduced-motion: reduce){.gauge .g{transition:none}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="m-nyg" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--nyg)"/></marker>
+  <marker id="m-was" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--was)"/></marker>
+</defs></svg>
+
+<div class="wrap">
+<header class="top">
+  <h1 class="matchup"><span class="nyg">Giants</span> <span class="at">at</span> <span class="was">Commanders</span></h1>
+  <div class="meta">
+    <span><b>Week 5</b> · Sun Oct 11, 2026 · 1:00 PM ET · FOX</span>
+    <span>Northwest Stadium, Landover MD</span>
+    <span>NYG 3-1 · WAS 1-3 · WAS −3.5 · Total 42.5 · ML WAS −190 / NYG +160</span>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" aria-selected="true" data-tab="plays">Plays</button>
+  <button role="tab" aria-selected="false" data-tab="pers">Personnel</button>
+  <button role="tab" aria-selected="false" data-tab="gloss">Glossary</button>
+  <button role="tab" aria-selected="false" data-tab="coach">Coaches</button>
+  <button role="tab" aria-selected="false" data-tab="props">Props</button>
+  <button role="tab" aria-selected="false" data-tab="script">Game script</button>
+  <button role="tab" aria-selected="false" data-tab="roster">Who's who</button>
+  <button role="tab" aria-selected="false" data-tab="watch">What to watch</button>
+</nav>
+
+<section id="tab-plays">
+  <div class="picker">
+    <div class="side">
+      <button class="nyg" data-side="NYG" aria-pressed="true">Giants have the ball</button>
+      <button class="was" data-side="WAS" aria-pressed="false">Commanders have the ball</button>
+      <button class="st" data-side="ST" aria-pressed="false">Special teams</button>
+    </div>
+    <div class="sits" id="sits"></div>
+  </div>
+  <div class="grid">
+    <div>
+      <div class="fieldbox">
+        <svg id="field" viewBox="0 0 454 362" role="img" aria-label="Formation diagram"></svg>
+      </div>
+      <div class="controls">
+        <div style="display:flex;gap:8px">
+          <button class="btn" id="run">Run the play</button>
+          <button class="btn ghost" id="reset">Reset</button>
+        </div>
+        <div class="legend">
+          <span><i class="sw" id="lgO"></i><span id="lgOt">offense route</span></span>
+          <span><i class="sw d" id="lgD"></i><span id="lgDt">defense movement</span></span>
+        </div>
+      </div>
+      <div class="card" id="playerinfo" style="margin-top:10px"></div>
+    </div>
+    <div class="panel">
+      <div class="card" id="playcard"></div>
+      <div class="card" id="oddscard"></div>
+    </div>
+  </div>
+</section>
+
+<section id="tab-pers" hidden>
+  <div class="card" style="margin-bottom:14px">
+    <p class="eyebrow">How to read a personnel number</p>
+    <p>When a substitution happens, count the offense's running backs and tight ends. The first digit is running backs (fullbacks included), the second is tight ends. Wide receivers are whatever is left of the five skill players. "12 personnel" means 1 back, 2 tight ends, 2 receivers. The defense matches with its own package, so a personnel change is the first clue to what's coming.</p>
+  </div>
+  <div class="gfilter" id="perschips"></div>
+  <div class="pgrid">
+    <div class="fieldbox" id="persdiag"></div>
+    <div class="card" id="perstext"></div>
+  </div>
+</section>
+
+<section id="tab-gloss" hidden>
+  <div class="gfilter" id="gfilter"></div>
+  <div class="glist" id="glist"></div>
+</section>
+
+<section id="tab-coach" hidden>
+  <p class="note" style="margin:0 0 12px">Four games of 2026 data is a small sample. Where this season's number isn't available, I note the coach's track record instead.</p>
+  <div class="coaches" id="coaches"></div>
+</section>
+
+<section id="tab-props" hidden>
+  <div class="tiles" id="tiles"></div>
+  <div class="card scroll">
+    <h2>Player props</h2>
+    <p class="note">A yardage or reception line is roughly the market's median: it expects about a 50% chance of going over. Where both sides are priced, the percentage strips out the bookmaker's margin. Lines from Oct 9–10 (DraftKings, FanDuel, BetMGM, consensus); they move until kickoff.</p>
+    <table class="props" id="ptable"></table>
+  </div>
+</section>
+
+<section id="tab-script" hidden>
+  <div class="grid">
+    <div class="card">
+      <p class="eyebrow">Pregame win probability, with swing factors</p>
+      <h2>How it likely plays out</h2>
+      <div class="gl"><span class="a" id="wpN">37%</span><span class="b" id="wpW">63%</span></div>
+      <div class="gauge" aria-hidden="true"><div class="g" id="gbar" style="width:37%"></div><div class="w"></div></div>
+      <div style="display:flex;justify-content:space-between" class="note"><span>Giants</span><span>Commanders</span></div>
+      <p class="score" id="proj"></p>
+      <p class="note">The starting point is 37% for the Giants, matching the moneyline (Washington −190, Giants +160) and Kalshi's 63¢ on Washington. Flip the toggles to see how much each development would move it. The adjustments are my estimates.</p>
+    </div>
+    <div class="card ctl">
+      <div class="rng">
+        <span>Turnover margin (Giants perspective)</span>
+        <input type="range" id="to" min="-3" max="3" step="1" value="0" aria-label="Turnover margin">
+        <div class="row"><span>−3</span><span id="toV">even</span><span>+3</span></div>
+      </div>
+      <label><span>Daniels leaves with the elbow (Kaliakmanis in)</span><input type="checkbox" id="f1"><small>Mariota is out, so the rookie third-stringer would finish. Biggest single swing on the board.</small></label>
+      <label><span>Terry McLaurin inactive</span><input type="checkbox" id="f2"><small>Questionable with a hamstring. Diggs is already out, which would leave Burks and rookie Antonio Williams as the top receivers.</small></label>
+      <label><span>Giants get 3+ sacks</span><input type="checkbox" id="f3"><small>They have 3 sacks all season. If Carter beats Brandon Coleman (Tunsil's fill-in at LT), this flips.</small></label>
+      <label><span>Giants score TDs on most red-zone trips</span><input type="checkbox" id="f4"><small>Washington allows TDs on 80% of trips; the Giants convert 54.5%.</small></label>
+      <label><span>Washington runs for 140+ yards</span><input type="checkbox" id="f5"><small>Daniels ran for 100 yards on 12 carries before his injury. A Giants defense allowing 4.7 a carry is vulnerable here.</small></label>
+      <label><span>Winston throws 2+ interceptions</span><input type="checkbox" id="f6"><small>He has 5 interceptions this season and a 36.8 passer rating when blitzed. Washington blitzes more than almost anyone.</small></label>
+    </div>
+  </div>
+  <h3 style="margin-top:22px">Most likely script, quarter by quarter</h3>
+  <div class="quarters">
+    <div class="card"><p class="eyebrow">Q1</p><h3>Washington tests the brace</h3><p>Expect Blough to ease Daniels in with quick throws and the run game rather than designed QB runs. The rushing prop (28.5 yards, versus 50 a game before the injury) says the market expects the same. Watch whether Daniels keeps on any zone reads.</p></div>
+    <div class="card"><p class="eyebrow">Q2</p><h3>Giants go heavy</h3><p>The Giants use two-back, two-tight-end sets on about a quarter of their snaps. That pulls Washington out of nickel and into its base defense, and the Giants try to grind the clock. They rank second in time of possession.</p></div>
+    <div class="card"><p class="eyebrow">Q3</p><h3>The thin secondary</h3><p>Washington is down to Quan Martin and Jeremy Reaves at safety, and it's tied for last in second-half points allowed (17.8 a game). Second-half explosive plays are the Giants' best route to a win.</p></div>
+    <div class="card"><p class="eyebrow">Q4</p><h3>One-score finish</h3><p>All three Giants wins came by one score, two of them sealed by late interceptions. They have outscored opponents by only 3 points total. If Daniels looks rusty, expect another tight fourth quarter decided by a turnover.</p></div>
+  </div>
+</section>
+
+<section id="tab-roster" hidden>
+  <p class="note" style="margin:0 0 12px">Projected starters from depth charts, Friday's injury report (Oct 9) and team news. Spots marked "likely" are my best read; inactives post about 90 minutes before kickoff (around 11:30 AM ET).</p>
+  <div class="two">
+    <div class="card scroll"><h2 style="color:var(--nyg)">Giants</h2><table class="roster" id="rNYG"></table></div>
+    <div class="card scroll"><h2 style="color:var(--was)">Commanders</h2><table class="roster" id="rWAS"></table></div>
+  </div>
+</section>
+
+<section id="tab-watch" hidden>
+  <div class="watch" id="watchlist"></div>
+</section>
+
+<footer>
+  Sources: <a href="https://www.giants.com/news/giants-vs-commanders-week-5-injury-report-malik-nabers-andrew-thomas-cam-skattebo" target="_blank" rel="noopener">Giants.com injury report</a> ·
+  <a href="https://www.giants.com/news/week-5-washington-commanders-jameis-winston-isaiah-likely-abdul-carter-arvell-reese-deonte-banks" target="_blank" rel="noopener">Giants.com players to watch</a> ·
+  <a href="https://sports.yahoo.com/articles/giants-commanders-matchup-giants-football-151009467.html" target="_blank" rel="noopener">Giants-Commanders matchup (Yahoo)</a> ·
+  <a href="https://sports.yahoo.com/articles/inside-matchup-commanders-giants-clash-120000806.html" target="_blank" rel="noopener">Inside the matchup (Yahoo)</a> ·
+  <a href="https://www.scoresandodds.com/prop-bets/6228653/jayden-daniels" target="_blank" rel="noopener">ScoresAndOdds Daniels props</a> ·
+  <a href="https://www.rotowire.com/football/article/commanders-vs-giants-betting-odds-picks-and-predictions-for-week-5-139996" target="_blank" rel="noopener">RotoWire</a> ·
+  <a href="https://www.si.com/betting/giants-vs-commanders-best-nfl-prop-bets-and-anytime-touchdown-scorer-picks-for-nfl-week-5-looking-likely-01m4fansm446" target="_blank" rel="noopener">SI props</a> ·
+  <a href="https://www.sportsgambler.com/betting-tips/nfl/new-york-giants-vs-washington-commanders-prediction-odds-2026-10-11/" target="_blank" rel="noopener">SportsGambler</a> ·
+  <a href="https://fanduel.com/research/commanders-vs-giants-predictions-odds-picks-best-bets-for-nfl-week-5-2026" target="_blank" rel="noopener">FanDuel Research</a> ·
+  <a href="https://www.oddsshopper.com/articles/prediction-markets/giants-vs-commanders-week-5-picks" target="_blank" rel="noopener">OddsShopper (Kalshi)</a> ·
+  <a href="https://www.squawka.com/us/nfl/nfl-news/giants-vs-commanders-prediction-picks-odds-week-5/" target="_blank" rel="noopener">Squawka</a> ·
+  <a href="https://www.sharpfootballanalysis.com/fantasy/giants-commanders-week-5-fantasy-football-preview-nfl-worksheet-rich-hribar-2026/" target="_blank" rel="noopener">Sharp Football</a>.
+  Play diagrams are illustrative reconstructions of each staff's tendencies, not leaked game plans. Play-level odds are my estimates.
+</footer>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+
+const P = {
+ NYG:{
+  QB:{n:"Jameis Winston",no:19,t:["starter"],b:"Took over after Jaxson Dart's knee injury in Week 2; 2-0 as the starter. Strong downfield (5 of 6 on 20+ air yards last week) but 3.9 yards per attempt and a 36.8 rating when blitzed."},
+  RB:{n:"Cam Skattebo",no:44,t:["shoulder, full Fri"],b:"Downhill, contact-seeking runner; 235 rushing yards on 68 carries. Najee Harris and Tyrone Tracy Jr. rotate in."},
+  FB:{n:"Patrick Ricard",no:null,t:["new"],b:"Harbaugh's fullback from Baltimore. He's on the field for the Giants' 21 and 22 personnel groupings, more than a quarter of their snaps."},
+  TE:{n:"Isaiah Likely",no:null,t:["new","knee/groin, full Fri"],b:"Second in the NFL among TEs with 35 targets and first with 13 catches for first downs. Lines up inline, in the slot and out wide."},
+  TE2:{n:"Theo Johnson",no:84,t:[],b:"Bigger blocking tight end; the second TE in 12 and 22 personnel."},
+  X:{n:"Malik Nabers",no:1,t:["knee, full Fri"],b:"WR1 and the deep threat; 6 catches for 112 yards and a TD last week. Practiced fully Friday after knee soreness."},
+  Z:{n:"Darnell Mooney",no:17,t:["new"],b:"Veteran speed receiver who stretches the field; also the Giants' jet-sweep runner."},
+  SL:{n:"Malachi Fields",no:null,t:["rookie"],b:"Third-round rookie; big-bodied target with a size edge on 5'8\" corner Amik Robertson."},
+  LT:{n:"Andrew Thomas",no:78,t:["groin, full Fri"],b:"Franchise left tackle; protects Winston's blind side."},
+  LG:{n:"Jon Runyan Jr.",no:null,t:[],b:"Left guard; just signed a two-year extension. Pulls on power runs."},
+  C:{n:"John Michael Schmitz",no:61,t:[],b:"Center; snaps the ball and calls out the protection."},
+  RG:{n:"Bryan Hudson",no:null,t:["ankle, full Fri"],b:"Starting again at right guard. No. 10 overall pick Francis Mauigoa is the other option."},
+  RT:{n:"Jermaine Eluemunor",no:72,t:[],b:"Right tackle."},
+  EDGE1:{n:"Abdul Carter",no:3,t:[],b:"Second-year star rusher; nine pressures last week, eight of them in under 2.5 seconds. With Brian Burns on IR, he is the pass rush."},
+  EDGE2:{n:"Kayvon Thibodeaux",no:5,t:[],b:"Opposite edge rusher; sets the edge against the run."},
+  NT:{n:"DJ Reader",no:null,t:["new"],b:"Run-stuffing nose tackle; eats double teams so linebackers run free."},
+  DT:{n:"Shelby Harris",no:null,t:["new"],b:"Veteran interior lineman; Chauncey Golston (neck) is out."},
+  DT2:{n:"Darius Alexander (likely)",no:null,t:[],b:"Second-year interior lineman rotating in with Golston out."},
+  MLB:{n:"Tremaine Edmunds",no:49,t:["new"],b:"Wears the green-dot helmet and relays the defensive call. Long, rangy coverage linebacker."},
+  WLB:{n:"Arvell Reese",no:52,t:["rookie"],b:"No. 5 overall pick; leads the NFL with 27 solo tackles. PFF Defensive Player of the Week in Week 4. Likely the spy on Daniels."},
+  CB1:{n:"Deonte Banks",no:2,t:["calf, full Fri"],b:"NFC Defensive Player of the Week: 98-yard pick-six to beat Arizona. Press-man corner."},
+  CB2:{n:"Greg Newsome II",no:20,t:["new"],b:"Boundary corner signed from Cleveland; had an INT last week."},
+  NB:{n:"Dru Phillips / Colton Hood",no:null,t:[],b:"Nickel (slot) corner. Phillips played it last year; Hood is the second-round rookie."},
+  FS:{n:"Jevón Holland",no:null,t:[],b:"Free safety; three INTs, tied for the NFL lead. Plays the deep middle."},
+  SS:{n:"Tyler Nubin",no:27,t:[],b:"Strong safety; starting with Jason Pinnock (concussion) out."},
+  P:{n:"Jordan Stout",no:null,t:["new"],b:"Punter, signed from Baltimore; one of the league's longest kickers."}
+ },
+ WAS:{
+  QB:{n:"Jayden Daniels",no:5,t:["back from elbow"],b:"Returning from a dislocated left (non-throwing) elbow, his second in two seasons, wearing a brace that stops full extension. 63.4 rating under pressure vs 109.2 clean. Ran 12 times for 100 yards before the injury."},
+  RB:{n:"Jacory Croskey-Merritt",no:22,t:["groin, full Fri"],b:"Lead back. Rachaad White (shoulder) rotates."},
+  TE:{n:"Chig Okonkwo",no:null,t:["new"],b:"Move tight end added in free agency; Blough wants more 12 and 13 personnel."},
+  TE2:{n:"Ben Sinnott",no:null,t:["rib, full Fri"],b:"Second tight end."},
+  X:{n:"Terry McLaurin",no:17,t:["questionable, hamstring"],b:"Washington's best receiver. Did not practice until a limited Friday. If he sits, the receiver room is very thin."},
+  Z:{n:"Treylon Burks",no:null,t:[],b:"Big former first-rounder; with Stefon Diggs out he is effectively WR2."},
+  SL:{n:"Antonio Williams",no:null,t:["rookie"],b:"Third-round rookie; 4-64-1 in the one full game with Daniels."},
+  LT:{n:"Brandon Coleman",no:null,t:[],b:"Filling in for Laremy Tunsil (torn triceps, IR). Started at LT during the 2024 NFC title run. Lines up across from Carter on most snaps."},
+  LG:{n:"Chris Paul",no:null,t:[],b:"Left guard."},
+  C:{n:"Nick Allegretti",no:null,t:["hip/Achilles, full Fri"],b:"Center."},
+  RG:{n:"Sam Cosmi",no:null,t:["back from concussion"],b:"Right guard; cleared after a concussion."},
+  RT:{n:"Josh Conerly Jr.",no:null,t:[],b:"Second-year right tackle, former first-round pick."},
+  EDGE1:{n:"Odafe Oweh",no:null,t:["new"],b:"Speed rusher; 12 pressures, two sacks and a forced fumble. Charles Omenihu is out."},
+  EDGE2:{n:"K'Lavon Chaisson",no:null,t:[],b:"Edge rusher; 11 pressures. Rested Friday, no designation."},
+  DT:{n:"Daron Payne",no:94,t:[],b:"Interior anchor; 12 pressures."},
+  DT2:{n:"Javon Kinlaw",no:null,t:[],b:"Interior lineman; Tim Settle joins him in base defense. Jer'Zhan Newton is on IR."},
+  LB1:{n:"Frankie Luvu",no:4,t:["groin, full Fri"],b:"Blitzing linebacker; the most likely player to show up in an A-gap look."},
+  LB2:{n:"Sonny Styles",no:null,t:["rookie"],b:"First-round rookie linebacker/safety hybrid; 5 pressures and a sack. Leo Chenal and Jordan Magee are on IR."},
+  CB1:{n:"Fabian Moreau",no:null,t:[],b:"Veteran boundary corner; Trey Amos (ankle) is out."},
+  CB2:{n:"Amik Robertson",no:null,t:[],b:"5'8\" corner who plays aggressively at the line. A size mismatch against Malachi Fields and a double-move target."},
+  NB:{n:"Mike Sainristil",no:null,t:[],b:"Nickel corner; aggressive slot blitzer."},
+  FS:{n:"Quan Martin",no:20,t:[],b:"One of only two healthy veteran safeties."},
+  SS:{n:"Jeremy Reaves",no:39,t:[],b:"Usually a special-teams ace, forced into the lineup with Butler, Cross and Owens all out."},
+  K:{n:"Commanders kicker",no:null,t:[],b:"Kicks off from his own 35."}
+ }
+};
+const ST_ROLES={
+ K:["Kicker","Kicks off from his own 35. Under the dynamic kickoff rules he is the only kicking-team player not at the setup line."],
+ L:["Coverage player","Lines up at the receiving team's 40. Can't move until the ball is caught or hits the ground in the landing zone, then sprints to his lane."],
+ B:["Front-line blocker","Lines up in the 'setup zone' between his own 30 and 35. Engages the coverage player in front of him once the ball lands."],
+ KR:["Kick returner","Stands in the landing zone (goal line to the 20). Catches and picks a lane behind his blockers."],
+ P:["Punter","Takes the snap about 14 yards deep. Hang time matters as much as distance: it gives the gunners time to arrive."],
+ LS:["Long snapper","Fires the ball 14 yards to the punter, then blocks and covers."],
+ PL:["Punt line","Blocks briefly, then releases downfield in coverage lanes."],
+ SH:["Shield","Three-man wall in front of the punter. The middle man (personal protector) makes the protection call."],
+ G:["Gunner","Lines up wide and sprints downfield to tackle the returner. The fastest player on the unit."],
+ J:["Jammer","Two jammers ('vise') double each gunner to slow his release and protect the return."],
+ R:["Rusher","Threatens to block the punt, then peels back to block for the return."],
+ PR:["Punt returner","Decides in the air: catch and return, fair catch (wave arm), or let it bounce."],
+ HU:["Hold-up","Mid-field blocker who picks up the first coverage man to break free."]
+};
+const COACH = {
+ NYG:{o:"OC Matt Nagy, with Greg Roman's run game: heavy personnel, motion, counters", d:"DC Dennard Wilson: press coverage, disguised shells, blitzed 51% in Week 4"},
+ WAS:{o:"OC David Blough, 30, first-time play-caller: 12 personnel, sequencing, play-action", d:"DC Daronte Jones: top-3 blitz rate with zone behind it (Cover 3, Cover 6)"}
+};
+
+const OL = (o)=>[
+ {id:"LT",p:[-0.7,-2.7]},{id:"LG",p:[-0.7,-1.35]},{id:"C",p:[-0.7,0]},{id:"RG",p:[-0.7,1.35]},{id:"RT",p:[-0.7,2.7]}
+].map(z=>({...z,path:o?o(z):[]}));
+const shift=(dx,dy)=>z=>[[z.p[0]+dx,z.p[1]+dy]];
+
+const PLAYS = [
+{side:"NYG",dd:"1st & 10",title:"Shotgun inside zone with a slant RPO",ball:35,togo:10,
+ o:[...OL(shift(1.2,1)),
+  {id:"QB",p:[-5,0],path:[[-5.3,-0.8]]},
+  {id:"RB",p:[-5,-1.5],path:[[-3.4,0.2],[0,1.4],[4,2.2],[7,2.6]]},
+  {id:"TE",p:[-0.9,4.1],path:[[0.8,3.8]]},
+  {id:"X",p:[-0.7,-19],path:[[16,-19]]},
+  {id:"SL",p:[-1.3,-12],path:[[3,-12],[7,-8]]},
+  {id:"Z",p:[-1.3,18],path:[[12,18],[10.5,19.5]]}],
+ d:[{id:"EDGE2",p:[1,-4.1],path:[[-1.5,-3.6]]},{id:"DT2",p:[1,-0.9],path:[[0.3,0.2]]},{id:"DT",p:[1,1],path:[[0.6,2]]},{id:"EDGE1",p:[1,4],path:[[-0.5,3.3]]},
+  {id:"LB2",p:[5,-1.8],path:[[2.5,0]]},{id:"LB1",p:[5,1.8],path:[[2.4,2.2]]},
+  {id:"CB1",p:[6.5,-19],path:[[14,-18.5]]},{id:"NB",p:[5,-11.5],path:[[5.5,-9]]},{id:"CB2",p:[7,18],path:[[11,18.5]]},
+  {id:"FS",p:[12,-7],path:[[13,-9]]},{id:"SS",p:[12,7],path:[[8,4]]}],
+ ball:{seq:[{t0:.22,t1:.22,from:"QB",to:"RB"}]},
+ call:"Eleven personnel (1 RB, 1 TE, 3 WR). The line steps right in unison and each blocker takes whoever shows up in his gap. Winston reads the nickel: if Sainristil fills against the run, he pulls it and throws the slant to Fields behind him.",
+ why:"Washington's zone-heavy defense often keeps both safeties 12 yards deep. That leaves six defenders near the line against six Giants blockers, so the math favors running. Washington allows 4.0 yards a carry, sixth-best in the league, so this is a grind rather than a gift.",
+ key:"The strong safety (Reaves). If he creeps down before the snap, the box is loaded and the Giants should throw.",
+ odds:[["Run gains 4+ yds",42,"good"],["Run gains 0–3",37,"muted"],["Tackle for loss",14,"bad"],["RPO slant thrown",6,"nyg"],["Fumble",1,"bad"]],
+ notes:{RB:"Presses the line, reads the first down-lineman, and cuts back if the defense overflows.",SL:"Runs the slant; it only matters if Winston pulls the ball.",QB:"Reads the nickel, not the defensive end: he is the one player who can't play both run and slant.",NB:"The 'conflict' defender. Whatever he does is wrong on an RPO.",SS:"Rotates down late to fill the run alley."}},
+
+{side:"NYG",dd:"2nd & 7",title:"Twelve personnel play-action shot",ball:42,togo:7,
+ o:[...OL(z=>[[z.p[0]-1.2,z.p[1]]]),
+  {id:"QB",p:[-1,0],path:[[-4,-0.4],[-7.5,0]]},
+  {id:"RB",p:[-6.5,0],path:[[-4,1.8],[-2.5,2.5]]},
+  {id:"TE",p:[-0.9,4.1],path:[[3,4],[10,-7],[11,-13]]},
+  {id:"TE2",p:[-0.9,-4.1],path:[[-0.2,-5],[3,-10]]},
+  {id:"X",p:[-0.7,-17],path:[[11,-17],[23,-6]]},
+  {id:"Z",p:[-1.3,16],path:[[14,16],[14,7]]}],
+ d:[{id:"EDGE2",p:[1,-4.9],path:[[-2,-4]]},{id:"DT2",p:[1,-1],path:[[-0.6,-0.6]]},{id:"DT",p:[1,1],path:[[-0.6,0.8]]},{id:"EDGE1",p:[1,5],path:[[-2.5,3.5]]},
+  {id:"LB2",p:[5,-1.6],path:[[2.5,-0.8],[6,-5]]},{id:"LB1",p:[5,1.6],path:[[2.2,2],[5,4]]},
+  {id:"CB1",p:[6.5,-17],path:[[19,-15]]},{id:"NB",p:[5,-9],path:[[8,-11]]},{id:"CB2",p:[7,16],path:[[16,15]]},
+  {id:"FS",p:[12,-7],path:[[20,-3]]},{id:"SS",p:[12,7],path:[[5,5]]}],
+ ball:{seq:[{t0:.55,t1:.86,from:"QB",to:"X"}]},
+ call:"Two tight ends, quarterback under center: it looks exactly like the Giants' run downs. Winston fakes the handoff to Skattebo, the linebackers step up, and Nabers runs a deep post behind them while Likely crosses underneath.",
+ why:"Run success sets up this throw. Once a safety drops into the box to stop Skattebo, Washington is in single-high and the post attacks the middle of the field. Winston was 5 of 6 for 166 yards on throws of 20+ air yards last week, and Washington is starting a special-teamer at safety.",
+ key:"The linebackers' first step. If they move forward on the fake, the window behind them opens.",
+ odds:[["Explosive (20+ yds)",22,"good"],["Completion under 20",33,"nyg"],["Incomplete",33,"muted"],["Sack",7,"bad"],["Interception",5,"bad"]],
+ notes:{X:"Sells a go route, then breaks to the post once the corner turns to run.",TE:"Crosser at 10 yards; the checkdown if the safety takes the post.",FS:"Rotates to the deep middle. He is the only player who can take away the post.",SS:"Drops into the box to stop the run. The play-action punishes this."}},
+
+{side:"NYG",dd:"2nd & 5",title:"Twenty-two personnel jet sweep",ball:48,togo:5,
+ o:[...OL(z=>[[z.p[0]+0.8,z.p[1]-1.2]]),
+  {id:"QB",p:[-1,0],path:[[-1.6,-0.6],[-3,1]]},
+  {id:"FB",p:[-4,0],path:[[-2,-3.5],[1,-6.5]]},
+  {id:"RB",p:[-7,0],path:[[-5,2],[-3,3.5]]},
+  {id:"TE",p:[-0.9,4.1],path:[[0.4,3]]},
+  {id:"TE2",p:[-0.9,-4.1],path:[[1.5,-6]]},
+  {id:"Z",p:[-1.3,15],path:[[-1.6,4],[-1.8,0.5],[-1.2,-6],[3,-12],[9,-15]],t0:0},
+  {id:"X",p:[-0.7,-16],path:[[3,-16.5]]}],
+ d:[{id:"EDGE2",p:[1,-5],path:[[-1,-4]]},{id:"DT2",p:[1,-1.4],path:[[0,-1.6]]},{id:"DT",p:[1,1.4],path:[[0.4,1.8]]},{id:"EDGE1",p:[1,5.2],path:[[-0.5,4]]},
+  {id:"LB2",p:[4.5,-2.4],path:[[3,-5],[4,-10]]},{id:"LB1",p:[4.5,1],path:[[3,0],[4,-6]]},{id:"LB3",p:[4.5,4],path:[[3,2]]},
+  {id:"CB1",p:[6,-16],path:[[5,-15.5]]},{id:"CB2",p:[6,15],path:[[5,10]]},
+  {id:"FS",p:[11,-4],path:[[9,-12]]},{id:"SS",p:[8,5],path:[[5,3]]}],
+ ball:{seq:[{t0:.2,t1:.2,from:"QB",to:"Z"}]},
+ call:"Fullback Ricard and two tight ends: the heaviest set in football. Mooney sprints across the formation in 'jet motion' and takes a handoff at full speed going the other way. Ricard and the backside tight end lead the way to the edge.",
+ why:"The Giants line up heavier than 11 personnel on 62% of snaps, and 22 personnel on 27%, a rate almost no other NFL team approaches. Heavy sets drag Washington into its base defense with three linebackers, and the jet sweep punishes those slower defenders by running away from them. A Mooney jet sweep gained 9 yards against Tennessee.",
+ key:"The backside linebacker. If he gets stuck watching the run fake to Skattebo, nobody contains the edge.",
+ odds:[["Gain 5+ yds",36,"good"],["Gain 1–4",30,"nyg"],["No gain or loss",26,"bad"],["Fumble on exchange",3,"bad"],["Penalty",5,"muted"]],
+ notes:{Z:"Jet motion: starts moving before the snap, takes the handoff at full speed.",FB:"Leads to the edge and kicks out the first defender he meets.",RB:"Fakes going the opposite way to freeze the linebackers.",LB3:"Washington's third linebacker, in the game only because of the Giants' heavy personnel."}},
+
+{side:"NYG",dd:"3rd & 8",title:"Empty backfield vs a simulated pressure",ball:47,togo:8,
+ o:[...OL(z=>[[z.p[0]-1.5,z.p[1]*1.15]]),
+  {id:"QB",p:[-5,0],path:[[-6,0]]},
+  {id:"X",p:[-0.7,-20],path:[[11,-20],[11,-10]]},
+  {id:"SL",p:[-1.3,-14],path:[[18,-14]]},
+  {id:"TE",p:[-1.3,-8],path:[[6,-8],[7,-5],[11,-3]]},
+  {id:"RB",p:[-1.3,9],path:[[4,9],[4,13]]},
+  {id:"Z",p:[-0.7,19],path:[[19,19]]}],
+ d:[{id:"EDGE2",p:[1,-4.6],path:[[4,-9]]},{id:"DT2",p:[1,-1.9],path:[[-3,-1.5]]},{id:"DT",p:[1,1.9],path:[[-3,1.4]]},{id:"EDGE1",p:[1,4.4],path:[[-4,2.6]]},
+  {id:"LB2",p:[1.6,-0.6],path:[[-3.5,-0.3]]},{id:"LB1",p:[1.6,0.6],path:[[6.5,-4]]},
+  {id:"NB",p:[3,-9],path:[[-3,-3.5]]},
+  {id:"CB1",p:[6,-20],path:[[11,-19]]},{id:"CB2",p:[6,19],path:[[16,19]]},
+  {id:"FS",p:[11,-6],path:[[17,-12]]},{id:"SS",p:[11,6],path:[[6,10]]}],
+ ball:{seq:[{t0:.36,t1:.55,from:"QB",to:"TE"}]},
+ call:"Everyone spreads out: five receivers, nobody in the backfield. That forces the defense to show its hand. Two linebackers stand in the A gaps beside the center, threatening a six-man blitz.",
+ why:"Daronte Jones comes from Brian Flores's Minnesota defense, and Washington blitzes at a top-3 rate. Here Luvu drops out, the nickel blitzes from the slot instead, and the defensive end peels into coverage. Only five rush, but from places the protection didn't expect. Winston completes 50% for 3.9 yards an attempt against blitzes, so the Giants want the ball out fast to Likely in the hole the blitzer vacated.",
+ key:"Which linebacker stays. If Luvu drops right into Likely's path, it's a coin flip between a quick completion and a tipped ball.",
+ odds:[["Converts first down",38,"good"],["Catch short of sticks",30,"muted"],["Incomplete",20,"muted"],["Sack",8,"bad"],["Interception",4,"bad"]],
+ notes:{TE:"Option route: sits down if the middle is open, breaks away from the nearest defender if not. Winston's hot read.",LB1:"Shows blitz, drops into the hot window. The disguise.",NB:"The surprise blitzer off the slot.",EDGE2:"Drops into coverage instead of rushing; pass rushers in coverage are how you confuse a protection call.",QB:"Must identify the five rushers before the snap and get rid of it in under 2.5 seconds."}},
+
+{side:"NYG",dd:"4th & 1",title:"QB sneak from a jumbo set",ball:52,togo:1,
+ o:[...OL(z=>[[z.p[0]+0.9,z.p[1]*0.8]]),
+  {id:"QB",p:[-1,0],path:[[0,0],[1.6,0.2]]},
+  {id:"FB",p:[-3,0],path:[[-1,0.1],[0.6,0.2]]},
+  {id:"RB",p:[-5.5,0],path:[[-3.5,1.5]]},
+  {id:"TE",p:[-0.9,4],path:[[0.6,3.6]]},
+  {id:"TE2",p:[-0.9,-4],path:[[0.6,-3.6]]},
+  {id:"X",p:[-0.9,-6],path:[[0.6,-5.8]]}],
+ d:[{id:"EDGE2",p:[1,-4.8],path:[[0,-3.6]]},{id:"DT2",p:[1,-1.8],path:[[0.3,-1.2]]},{id:"DT",p:[1,-0.5],path:[[0.4,-0.2]]},{id:"DT3",p:[1,0.7],path:[[0.4,0.4]]},{id:"EDGE1",p:[1,4.8],path:[[0,3.6]]},
+  {id:"LB2",p:[3,-1.6],path:[[1.6,-0.5]]},{id:"LB1",p:[3,1.6],path:[[1.6,0.5]]},{id:"LB3",p:[3,4],path:[[1.8,2.5]]},
+  {id:"CB1",p:[3,-7.5],path:[[2,-5.5]]},{id:"CB2",p:[5,6.5],path:[[3,4.5]]},{id:"SS",p:[5,-2],path:[[2.4,-0.5]]}],
+ ball:{},
+ call:"Everyone packed tight: three tight ends or a fullback in the backfield, receivers in close. Winston takes the snap and pushes forward behind the center. The fullback and back push from behind.",
+ why:"A quarterback sneak is the highest-percentage play in football for one yard: it starts closest to the line and adds the QB as an extra blocker-runner. Harbaugh's Ravens were among the most aggressive fourth-down teams in the league, and his Giants have the personnel to do it.",
+ key:"The center's first step. If Schmitz gets under the nose tackle, the sneak is over before the defense reacts.",
+ odds:[["Converts",76,"good"],["Stopped short",20,"bad"],["Fumble or penalty",4,"muted"]],
+ notes:{QB:"Gets low, finds the crease between the center and a guard, and keeps legs churning.",C:"Fires out low and drives the nose tackle back. The whole play.",FB:"Pushes the pile from behind."}},
+
+{side:"NYG",dd:"2-min drill",title:"Hurry-up sideline routes vs two-deep",ball:30,togo:10,
+ o:[...OL(z=>[[z.p[0]-1.5,z.p[1]*1.1]]),
+  {id:"QB",p:[-5,0],path:[[-7,0]]},
+  {id:"RB",p:[-5,1.5],path:[[-3,3],[1,6]]},
+  {id:"TE",p:[-1.3,-8],path:[[10,-8],[12,-11]]},
+  {id:"X",p:[-0.7,-20],path:[[16,-20]]},
+  {id:"SL",p:[-1.3,10],path:[[9,10],[9,13]]},
+  {id:"Z",p:[-0.7,19],path:[[14,19],[12,22]]}],
+ d:[{id:"EDGE2",p:[1,-4.6],path:[[-4,-3]]},{id:"DT2",p:[1,-1.5],path:[[-3,-1]]},{id:"DT",p:[1,1.5],path:[[-3,1]]},{id:"EDGE1",p:[1,4.6],path:[[-4,3]]},
+  {id:"LB2",p:[6,-4],path:[[9,-6]]},{id:"LB1",p:[6,4],path:[[9,5]]},
+  {id:"CB1",p:[8,-20],path:[[6,-19]]},{id:"NB",p:[7,10],path:[[6,13]]},{id:"CB2",p:[8,19],path:[[7,20]]},
+  {id:"FS",p:[16,-10],path:[[20,-13]]},{id:"SS",p:[16,10],path:[[20,14]]}],
+ ball:{seq:[{t0:.42,t1:.62,from:"QB",to:"Z"}]},
+ call:"No huddle, three receivers, Winston in the gun. The routes break toward the sideline so the receiver can catch it and step out of bounds, stopping the clock without a timeout.",
+ why:"With the clock running, Washington sits back in a soft two-deep zone and gives up the short middle to protect against the big play. The Giants take the comeback outside the cornerback, and every completion that ends out of bounds saves about 30 seconds.",
+ key:"The cornerback's depth. If he plays 8 yards off, the comeback at 12 is there all drive.",
+ odds:[["Completion, out of bounds",38,"good"],["Completion in bounds",24,"nyg"],["Incomplete",28,"muted"],["Sack",6,"bad"],["Interception",4,"bad"]],
+ notes:{Z:"Comeback: runs hard upfield, plants at 14 and works back toward the sideline.",FS:"Deep half. Two-deep zones protect against the bomb and concede the underneath.",RB:"Releases to the flat as a checkdown once he confirms no blitzer."}},
+
+{side:"WAS",dd:"1st & 10",title:"Daniels zone read from the pistol",ball:25,togo:10,
+ o:[...OL(z=>[[z.p[0]+1,z.p[1]-1]]),
+  {id:"QB",p:[-4,0],path:[[-3.3,1.2],[-0.5,4.6],[3.5,6.5],[8,7.5]]},
+  {id:"RB",p:[-7,0],path:[[-3.8,-0.9],[-0.6,-2.6]]},
+  {id:"TE",p:[-0.9,-4.1],path:[[0.6,-4.6]]},
+  {id:"X",p:[-0.7,-18],path:[[6,-18]]},
+  {id:"SL",p:[-1.3,-11],path:[[5,-10]]},
+  {id:"Z",p:[-1.3,16],path:[[6,16]]}],
+ d:[{id:"EDGE1",p:[1,4.3],path:[[-2.3,1.3]]},{id:"DT2",p:[1,2.1],path:[[0.6,1.4]]},{id:"NT",p:[1,0.4],path:[[0.3,-0.6]]},{id:"EDGE2",p:[1,-4.4],path:[[-0.6,-4.2]]},
+  {id:"MLB",p:[5,-1.4],path:[[1.8,-2.4]]},{id:"WLB",p:[5,1.4],path:[[2.5,4.6],[3.8,6.6]]},
+  {id:"CB1",p:[6,-18],path:[[8,-17]]},{id:"NB",p:[5,-11],path:[[6,-9]]},{id:"CB2",p:[7,16],path:[[8,14]]},
+  {id:"FS",p:[11,-4],path:[[8,-1]]},{id:"SS",p:[11,5],path:[[6.5,6.5]]}],
+ ball:{},
+ call:"Pistol: Daniels four yards back with the back directly behind him. The line blocks everyone except the backside defensive end, Carter. Daniels watches Carter: if Carter crashes toward the running back, Daniels pulls the ball and runs where Carter just left.",
+ why:"Zone read turns the quarterback into an extra runner so the offense isn't outnumbered. The Giants' counter is the 'scrape exchange': Carter crashes on purpose and Reese loops outside to take the quarterback. The animation shows that collision. Washington's line ranks last in run-block win rate, so the QB's legs matter more than usual, but the market's 28.5-yard rushing line says nobody expects many designed runs.",
+ key:"Carter's first step, then Reese. If Reese is late, Daniels has a crease to the sideline.",
+ odds:[["Daniels keeps, 4+ yds",30,"good"],["Handoff, 4+ yds",20,"was"],["Short gain",32,"muted"],["Tackle for loss",15,"bad"],["Fumble",3,"bad"]],
+ notes:{EDGE1:"The 'read' defender: left unblocked on purpose. Crashing inside is a trap for the quarterback.",WLB:"Scrapes outside to the quarterback once Carter crashes: the exchange.",QB:"Keeps if the end crashes, gives if the end sits.",RB:"Runs the inside zone path as if he is getting the ball either way."}},
+
+{side:"WAS",dd:"2nd & 6",title:"Twelve personnel bootleg",ball:38,togo:6,
+ o:[...OL(z=>[[z.p[0]+0.6,z.p[1]-1.4]]),
+  {id:"QB",p:[-1,0],path:[[-4,-1],[-5,3.5],[-4,8]]},
+  {id:"RB",p:[-6.5,0],path:[[-3.5,-2.2],[-1,-3.5]]},
+  {id:"TE",p:[-0.9,-4.1],path:[[0.8,-2],[3,6],[4,12],[8,14]]},
+  {id:"TE2",p:[-0.9,4.1],path:[[6,5],[13,13]]},
+  {id:"X",p:[-0.7,-17],path:[[10,-15],[16,2]]},
+  {id:"Z",p:[-1.3,16],path:[[19,17]]}],
+ d:[{id:"EDGE2",p:[1,-5],path:[[-2,-2],[-3,4]]},{id:"DT2",p:[1,-1.6],path:[[0.2,-2.6]]},{id:"NT",p:[1,0],path:[[0.4,-0.6]]},{id:"DT",p:[1,1.8],path:[[0,0.9]]},{id:"EDGE1",p:[1,5],path:[[-2.6,7]]},
+  {id:"MLB",p:[5,1.4],path:[[5,6],[11,13]]},{id:"WLB",p:[5,-1.4],path:[[3,-2.8],[4,8],[6,13]]},
+  {id:"CB1",p:[1,-17],path:[[10,-15],[16,0]]},{id:"CB2",p:[1,16],path:[[19,16]]},
+  {id:"FS",p:[14,0],path:[[15,4]]},{id:"SS",p:[7,2],path:[[9,-2]]}],
+ ball:{seq:[{t0:.6,t1:.8,from:"QB",to:"TE"}]},
+ call:"Two tight ends, Daniels under center. He fakes the outside run to the left, then rolls right with nobody near him and has three receivers layered at short, medium and deep levels flowing the same way.",
+ why:"Blough leans on 12 personnel and showed more play-action after Week 1. Bootlegs move the pocket away from the pass rush, which matters with a backup left tackle and a quarterback in an elbow brace. The Giants answer with press-man Cover 1: everyone covers someone, Holland plays deep middle.",
+ key:"Carter. On a boot he must stay home instead of chasing the fake; if he does, Daniels has to throw early or eat it.",
+ odds:[["Completion 6+ yds",38,"good"],["Short completion",22,"was"],["Daniels scramble",10,"was"],["Incomplete",22,"muted"],["Sack",6,"bad"],["Interception",2,"bad"]],
+ notes:{EDGE1:"Contain: refuses to bite on the run fake and meets Daniels at the edge.",TE:"Drags across the formation to the flat; the easiest completion.",WLB:"Bites on the run fake, then has to chase the crossing tight end.",X:"Deep crosser behind the linebackers, the big-play option."}},
+
+{side:"WAS",dd:"3rd & 7",title:"Double A-gap look against trips",ball:44,togo:7,
+ o:[...OL(z=>[[z.p[0]-1.5,z.p[1]*1.1]]),
+  {id:"QB",p:[-5,0],path:[[-6.5,0]]},
+  {id:"RB",p:[-5,-1.5],path:[[-3.5,-0.6]]},
+  {id:"TE",p:[-0.9,4.2],path:[[8,6],[8,9]]},
+  {id:"SL",p:[-1.3,8],path:[[5,8],[6,4]]},
+  {id:"Z",p:[-1.3,14],path:[[7,14],[7,18]]},
+  {id:"X",p:[-0.7,-18],path:[[12,-18],[12,-8]]}],
+ d:[{id:"EDGE2",p:[1,-4.6],path:[[-4,-2.4]]},{id:"NT",p:[1,-1.6],path:[[-3.5,-1]]},{id:"DT2",p:[1,1.8],path:[[3,2.8]]},{id:"EDGE1",p:[1,4.6],path:[[-4.6,2.2]]},
+  {id:"MLB",p:[1.6,-0.6],path:[[-4,0]]},{id:"WLB",p:[1.6,0.6],path:[[4,0.5]]},
+  {id:"CB1",p:[1,-18],path:[[11,-17]]},{id:"NB",p:[4,8],path:[[6,6]]},{id:"CB2",p:[5,14],path:[[7,16.5]]},
+  {id:"SS",p:[6,4.5],path:[[8,7]]},{id:"FS",p:[13,1],path:[[14,-2]]}],
+ ball:{seq:[{t0:.42,t1:.58,from:"QB",to:"SL"}]},
+ call:"Washington puts three receivers to one side. The Giants walk Edmunds and Reese up into the A gaps. At the snap Edmunds rushes, Reese drops to spy Daniels, and a defensive tackle slips into the underneath zone. Four rushers, but not the four the line expected.",
+ why:"Daniels has a 63.4 rating under pressure and 109.2 when clean, and the Giants rank last in pressure rate (22.1%). Disguise is how a defense without Brian Burns manufactures pressure. Reese as spy also takes away the scramble, which is Daniels's best answer to man coverage on third down.",
+ key:"Reese after the snap. If he mirrors Daniels, the scramble lane closes and Daniels must hit the slot quickly.",
+ odds:[["Pass converts",30,"good"],["Daniels scramble converts",12,"was"],["Stopped short",30,"muted"],["Incomplete",18,"muted"],["Sack",7,"bad"],["Interception",3,"bad"]],
+ notes:{WLB:"Spy: shadows the quarterback instead of rushing or covering a receiver.",MLB:"Real blitzer through the A gap.",DT2:"Drops into coverage under the slot, a 'creeper' look.",SL:"Quick option route inside; the throw Washington wants on third and medium."}},
+
+{side:"WAS",dd:"3rd & 6",title:"Giants Cover 0 blitz",ball:55,togo:6,
+ o:[...OL(z=>[[z.p[0]-1.2,z.p[1]*1.1]]),
+  {id:"QB",p:[-5,0],path:[[-6,0]]},
+  {id:"RB",p:[-5,1.5],path:[[-4,2.5]]},
+  {id:"TE",p:[-0.9,4.1],path:[[-0.6,4.6]]},
+  {id:"SL",p:[-1.3,-10],path:[[2,-10],[6,-5]]},
+  {id:"X",p:[-0.7,-18],path:[[18,-18]]},
+  {id:"Z",p:[-0.7,16],path:[[5,16],[5,19]]}],
+ d:[{id:"EDGE2",p:[1,-4.8],path:[[-4,-2.6]]},{id:"NT",p:[1,-0.6],path:[[-3.5,-0.3]]},{id:"DT2",p:[1,1.6],path:[[-3.5,1.2]]},{id:"EDGE1",p:[1,5],path:[[-4.5,2.8]]},
+  {id:"MLB",p:[2,-1.8],path:[[-3.6,-1.2]]},{id:"SS",p:[4,3],path:[[-3,2.2]]},
+  {id:"WLB",p:[4.5,1],path:[[-2,2.5]]},
+  {id:"CB1",p:[1,-18],path:[[18,-17]]},{id:"NB",p:[2,-10],path:[[4,-8],[6.5,-5.5]]},{id:"CB2",p:[1,16],path:[[5,17]]},
+  {id:"FS",p:[7,-1],path:[[3,1.5]]}],
+ ball:{seq:[{t0:.3,t1:.45,from:"QB",to:"SL"}]},
+ call:"The Giants send everyone: six or seven rushers, every receiver covered man-to-man, and no safety deep. Washington keeps the back and tight end in to block and Daniels has to throw before the free rusher gets home.",
+ why:"With Brian Burns lost for the season, Wilson blitzed on 51% of dropbacks in Week 4. Cover 0 is the riskiest version: if Daniels hits the quick slant, there is nobody behind the defender to stop a touchdown. It's an aggressive call against a quarterback in a brace who may not want to get hit.",
+ key:"The free rusher. Count rushers versus blockers; if the Giants have one more, Daniels has about 2 seconds.",
+ odds:[["Quick completion converts",30,"good"],["Big play (20+)",12,"was"],["Incomplete",25,"muted"],["Sack",16,"bad"],["Daniels scramble",11,"was"],["Interception",6,"bad"]],
+ notes:{FS:"Usually deep; here he's blitzing too. Nobody is guarding the end zone.",SL:"Quick slant: the 'hot' throw against an all-out blitz.",RB:"Stays in to block. Washington needs seven blockers to match six rushers.",NB:"Pure man on the slot with no help behind him."}},
+
+{side:"WAS",dd:"2nd & goal at 4",title:"QB power at the goal line",ball:96,togo:4,goal:true,
+ o:[{id:"LT",p:[-0.7,-2.7],path:[[0.4,-2.1]]},{id:"LG",p:[-0.7,-1.35],path:[[0.6,-1.1]]},{id:"C",p:[-0.7,0],path:[[0.4,-0.7]]},{id:"RG",p:[-0.7,1.35],path:[[-1.6,1.2],[-1.6,3],[0.5,4]]},{id:"RT",p:[-0.7,2.7],path:[[0.6,2]]},
+  {id:"QB",p:[-4,0],path:[[-2.6,0.8],[-0.4,2.8],[2.5,3.6],[4.6,3.8]]},
+  {id:"RB",p:[-4,-1.6],path:[[-1.6,0.6],[0.6,2.8]]},
+  {id:"TE",p:[-0.9,4.1],path:[[0.6,5]]},
+  {id:"TE2",p:[-0.9,-4.1],path:[[0.6,-4.6]]},
+  {id:"X",p:[-0.7,-13],path:[[3,-12]]},
+  {id:"Z",p:[-0.7,12],path:[[3,11.5]]}],
+ d:[{id:"EDGE2",p:[1,-5],path:[[0,-3.5]]},{id:"DT2",p:[1,-1.6],path:[[0.2,-0.8]]},{id:"NT",p:[1,0.6],path:[[0.3,1.3]]},{id:"DT",p:[1,2.4],path:[[0.3,2.8]]},{id:"EDGE1",p:[1,5.4],path:[[-0.6,4.6]]},
+  {id:"MLB",p:[3,-1.2],path:[[1.6,1.6]]},{id:"WLB",p:[3,2],path:[[1.4,3.6]]},
+  {id:"CB1",p:[1,-13],path:[[2.8,-11]]},{id:"CB2",p:[1,12],path:[[2.8,11]]},
+  {id:"SS",p:[3.6,5],path:[[2,4.4]]},{id:"FS",p:[3.6,-5],path:[[2.4,-1]]}],
+ ball:{},
+ call:"Shotgun with the back beside Daniels. The right guard pulls, the back leads through the hole, and Daniels carries it himself. With the quarterback as the runner, the offense has an extra blocker.",
+ why:"QB runs are the most efficient goal-line play in football because they add a blocker. The question is whether Washington will risk its franchise QB in traffic three weeks after an elbow dislocation. The market prices Daniels to score a TD at about 28%, which implies a few goal-line carries at most.",
+ key:"Whether Daniels runs it at all. A Commanders goal-line QB run is a tell about how healthy they think he is.",
+ odds:[["Touchdown",38,"good"],["Gain, short of goal",37,"was"],["Stuffed",20,"bad"],["Turnover",5,"bad"]],
+ notes:{QB:"Ball carrier. Elbow brace on the left arm; watch how he carries the ball.",RG:"Pulls to lead the quarterback.",RB:"Lead blocker on the linebacker.",MLB:"Must fill the hole before the pulling guard arrives."}},
+
+{side:"ST",oT:"WAS",dT:"NYG",dd:"Kickoff",title:"Dynamic kickoff: Commanders kick to the Giants",ball:60,togo:0,zoom:{yd:5,losY:228},noFD:true,
+ o:[{id:"K",p:[-25,0],path:[[-4,0],[8,1]],t0:0},
+  ...[-22,-17.5,-13,-8.5,-4,4,8.5,13,17.5,22].map((y,i)=>({id:"L"+(i+1),p:[0,y],path:[[18,y*0.6],[25,y*0.25]],t0:.42}))],
+ d:[...[-20,-14,-8,-3,3,8,14,20,0].map((y,i)=>({id:"B"+(i+1),p:[i===8?10:6.5,y],path:[[15,y*0.6]],t0:.42})),
+  {id:"KR",p:[34,-2],path:[[33.5,0],[26,1],[20,2]],t0:.42},{id:"KR2",p:[29,6],path:[[27,3],[22,1]],t0:.42}],
+ ball:{start:"K",spot:[-25,0],seq:[{t0:.05,t1:.42,from:"K",to:"KR"}]},
+ who:["Kicking team (Commanders)","Receiving team (Giants)"],
+ call:"Since 2024 the kickoff looks nothing like the old version. The ten coverage players line up at the receiving team's 40, the receiving team's blockers stand in a 'setup zone' 5 to 10 yards away, and nobody but the kicker and returners can move until the ball is caught or lands in the landing zone (goal line to the 20).",
+ why:"The rule cuts down on high-speed collisions while bringing returns back. A kick into the end zone is a touchback at the 35, so kickers aim short of the goal line and make the returner field it. The fight is between a coverage team that starts closer than ever and blockers who are already engaged.",
+ key:"Where the kick lands. Inside the 10 means the Giants must return it; deep in the end zone means a free start at the 35.",
+ odds:[["Returned past the 35",28,"good"],["Returned short of 35",32,"muted"],["Touchback (ball at 35)",35,"nyg"],["Big return (50+)",3,"good"],["Penalty or fumble",2,"bad"]],
+ notes:{}},
+
+{side:"ST",oT:"NYG",dT:"WAS",dd:"4th & 8",title:"Giants shield punt",ball:30,togo:8,zoom:{yd:6,losY:272},
+ o:[{id:"LS",p:[-0.7,0],path:[[2,0.5],[16,1],[36,1]],t0:.2},{id:"PL1",p:[-0.7,-1.3],path:[[3,-3],[34,-4]],t0:.2},{id:"PL2",p:[-0.7,1.3],path:[[3,3],[34,4]],t0:.2},{id:"PL3",p:[-0.7,-2.6],path:[[4,-7],[33,-8]],t0:.2},{id:"PL4",p:[-0.7,2.6],path:[[4,7],[33,8]],t0:.2},
+  {id:"SH1",p:[-5,-1.3],path:[[-4,-1.6],[30,-3]],t0:.25},{id:"SH2",p:[-5,0],path:[[-4,0],[28,1]],t0:.25},{id:"SH3",p:[-5,1.3],path:[[-4,1.6],[30,3]],t0:.25},
+  {id:"G1",p:[-0.7,-21],path:[[4,-21],[38,-6]]},{id:"G2",p:[-0.7,21],path:[[3,21],[38,5]]},
+  {id:"P",p:[-14,0],path:[[-13,0]]}],
+ d:[{id:"J1",p:[1.2,-22],path:[[6,-20],[30,-10]]},{id:"J2",p:[1.2,-19.5],path:[[5,-19],[30,-8]]},{id:"J3",p:[1.2,19.5],path:[[5,19],[30,8]]},{id:"J4",p:[1.2,22],path:[[6,20],[30,10]]},
+  ...[-3,-1.2,0.6,2.4].map((y,i)=>({id:"R"+(i+1),p:[1,y],path:[[-3,y*0.8],[12,y*3]],t0:0})),
+  {id:"R5",p:[3,-6],path:[[15,-8]]},{id:"HU",p:[20,0],path:[[30,-1]]},{id:"PR",p:[44,-1],path:[[43,-1],[43,-1],[36,2]]}],
+ ball:{start:"LS",spot:[-0.3,0],seq:[{t0:0,t1:.12,from:"LS",to:"P"},{t0:.2,t1:.62,from:"P",to:"PR"}]},
+ who:["Punting team (Giants)","Return team (Commanders)"],
+ call:"Five linemen block briefly then release, three 'shield' players form a wall five yards in front of the punter, and two gunners split wide. The punter stands about 14 yards behind the snap.",
+ why:"Field position is worth points: each 10 yards of punt distance is worth roughly half a point to the punting team. Jordan Stout came over from Baltimore with Harbaugh. Washington will double-team each gunner with two jammers to buy the returner time.",
+ key:"The gunners against their jammers. A gunner who gets free early forces a fair catch.",
+ odds:[["Fair catch",38,"nyg"],["Return 0–9 yds",33,"muted"],["Return 10+ yds",13,"was"],["Downed or out of bounds",12,"nyg"],["Muff or block",4,"bad"]],
+ notes:{}}
+];
+
+let side="NYG", idx=0, sel=null, raf=null, tNow=0;
+let YD=7.9, LOSY=262; const CX=227;
+const S=p=>[CX+p[1]*YD, LOSY-p[0]*YD];
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+function plays(){return PLAYS.filter(p=>p.side===side);}
+function cur(){return plays()[idx];}
+function oTeam(p){return p.oT||p.side;}
+function dTeam(p){return p.dT||(p.side==="NYG"?"WAS":"NYG");}
+const LBL={EDGE1:"EDG",EDGE2:"EDG",DT2:"DT",DT3:"DT",TE2:"TE",LB1:"LB",LB2:"LB",LB3:"LB",CB1:"CB",CB2:"CB",KR2:"KR"};
+function lbl(id){return LBL[id]||id.replace(/\d+$/,"");}
+function info(t,id){
+ const d=P[t][id]; if(d) return d;
+ if(id==="LB3"&&t==="WAS") return {n:"Third linebacker",t:[],b:"With Chenal and Magee on IR, Washington's third linebacker is a backup. He only plays against heavy personnel."};
+ if(id==="LB3"||id==="DT3") return {n:id==="LB3"?"Third linebacker":"Extra defensive lineman",t:[],b:"Extra big body added for short-yardage and heavy sets."};
+ const r=ST_ROLES[lbl(id)]; if(r) return {n:r[0],t:[],b:r[1]};
+ return {n:id,t:[],b:""};
+}
+
+function along(pts,t){
+ if(pts.length===1||t<=0) return pts[0];
+ const segs=[];let L=0;
+ for(let i=1;i<pts.length;i++){const d=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);segs.push(d);L+=d;}
+ if(L===0) return pts[0];
+ let target=Math.min(1,t)*L;
+ for(let i=0;i<segs.length;i++){if(target<=segs[i]||i===segs.length-1){const f=segs[i]?Math.min(1,target/segs[i]):1;return [pts[i][0]+(pts[i+1][0]-pts[i][0])*f,pts[i][1]+(pts[i+1][1]-pts[i][1])*f];}target-=segs[i];}
+ return pts[pts.length-1];
+}
+const full=pl=>[pl.p,...(pl.path||[])];
+function posAt(pl,t){const t0=pl.t0||0;const lt=t<=t0?0:(t-t0)/(1-t0);return along(full(pl),lt);}
+function find(p,id){return p.o.find(z=>z.id===id)||p.d.find(z=>z.id===id);}
+function ballPos(t){
+ const p=cur(), b=p.ball||{};
+ if(t===0) return b.spot||[-0.3,0];
+ let holder=b.start||"QB";
+ for(const s of (b.seq||[])){
+  if(t<s.t0) break;
+  if(t<s.t1){const a=posAt(find(p,s.from),s.t0), c=posAt(find(p,s.to),s.t1), f=(t-s.t0)/(s.t1-s.t0);
+   const arc=s.t1-s.t0>.25?Math.sin(f*Math.PI)*0.6:0;
+   return [a[0]+(c[0]-a[0])*f+arc, a[1]+(c[1]-a[1])*f];}
+  holder=s.to;
+ }
+ return posAt(find(p,holder),t);
+}
+
+function drawField(){
+ const p=cur(), oT=oTeam(p), dT=dTeam(p);
+ YD=(p.zoom&&p.zoom.yd)||7.9; LOSY=(p.zoom&&p.zoom.losY)||262;
+ const oc=`var(--${oT.toLowerCase()})`, dc=`var(--${dT.toLowerCase()})`;
+ let s="";
+ const half=26.67*YD;
+ s+=`<rect x="0" y="0" width="454" height="362" style="fill:var(--board)"/><rect x="${CX-half}" y="0" width="${half*2}" height="362" style="fill:var(--turf)"/>`;
+ const gl=100-p.ball;
+ const gy=LOSY-gl*YD;
+ if(gy>0){s+=`<rect x="${CX-half}" y="0" width="${half*2}" height="${gy}" style="fill:var(--${dT.toLowerCase()}-soft)"/><text x="${CX}" y="${Math.max(18,gy-12)}" text-anchor="middle" style="fill:var(--${dT.toLowerCase()});font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:4px">END ZONE</text>`;}
+ const ownGoal=LOSY+p.ball*YD;
+ if(ownGoal<362){s+=`<rect x="${CX-half}" y="${ownGoal}" width="${half*2}" height="${362-ownGoal}" style="fill:var(--${oT.toLowerCase()}-soft)"/>`;}
+ const lo=Math.floor(p.ball-(362-LOSY)/YD)-1, hi=Math.ceil(p.ball+LOSY/YD)+1;
+ for(let yd=Math.max(0,lo);yd<=Math.min(100,hi);yd++){
+  const y=LOSY-(yd-p.ball)*YD; if(y<0||y>362) continue;
+  if(yd%5===0){s+=`<line x1="${CX-half}" x2="${CX+half}" y1="${y}" y2="${y}" style="stroke:var(--turf-line);stroke-width:${yd===100||yd===0?3:1.4}"/>`;}
+  else if(YD>6){ [-1,1].forEach(k=>{const hx=CX+k*3.08*YD;s+=`<line x1="${hx-3}" x2="${hx+3}" y1="${y}" y2="${y}" style="stroke:var(--turf-line);stroke-width:1"/>`;});}
+  if(yd%10===0&&yd>0&&yd<100){const lab=yd<=50?yd:100-yd;s+=`<text x="${CX-half+14}" y="${y+4}" style="fill:var(--turf-ink);font-size:12px;font-weight:600">${lab}</text><text x="${CX+half-14}" y="${y+4}" text-anchor="end" style="fill:var(--turf-ink);font-size:12px;font-weight:600">${lab}</text>`;}
+ }
+ if(p.side==="ST"&&p.zoom&&p.zoom.yd===5){
+  const lz1=LOSY-40*YD, lz2=LOSY-20*YD;
+  s+=`<rect x="${CX-half}" y="${lz1}" width="${half*2}" height="${lz2-lz1}" style="fill:var(--gold);opacity:.12"/><text x="${CX-half+4}" y="${lz2-4}" style="fill:var(--gold);font-size:9px;font-weight:600">LANDING ZONE</text>`;
+  const sz1=LOSY-10*YD, sz2=LOSY-5*YD;
+  s+=`<rect x="${CX-half}" y="${sz1}" width="${half*2}" height="${sz2-sz1}" style="fill:var(--nyg);opacity:.08"/><text x="${CX-half+4}" y="${sz2+11}" style="fill:var(--nyg);font-size:9px;font-weight:600">SETUP ZONE</text>`;
+ }
+ s+=`<line x1="${CX-half}" x2="${CX+half}" y1="${LOSY}" y2="${LOSY}" style="stroke:var(--nyg);stroke-width:2;opacity:.55"/>`;
+ if(!p.goal&&!p.noFD&&p.togo){const fy=LOSY-p.togo*YD;s+=`<line x1="${CX-half}" x2="${CX+half}" y1="${fy}" y2="${fy}" style="stroke:var(--gold);stroke-width:2.5"/><text x="${CX+half-4}" y="${fy-4}" text-anchor="end" style="fill:var(--gold);font-size:9px;font-weight:600">LINE TO GAIN</text>`;}
+ s+=`<text x="${CX-half+4}" y="${LOSY-4}" style="fill:var(--nyg);font-size:9px;font-weight:600;opacity:.8">${p.side==="ST"&&p.noFD?"KICKING TEAM SETUP LINE":"LINE OF SCRIMMAGE"}</text>`;
+ const route=(pl,isO)=>{if(!pl.path||!pl.path.length) return "";const pts=full(pl).map(S);
+  return `<polyline points="${pts.map(q=>q.join(",")).join(" ")}" fill="none" style="stroke:${isO?oc:dc};stroke-width:${isO?2:1.6};opacity:${isO?.85:.7}" ${isO?"":'stroke-dasharray="4 3"'} marker-end="url(#m-${(isO?oT:dT).toLowerCase()})"/>`;};
+ s+=`<g id="routes">${p.d.map(z=>route(z,false)).join("")}${p.o.map(z=>route(z,true)).join("")}</g>`;
+ const pl=(z,isO)=>{const [x,y]=S(z.p);const lab=lbl(z.id);const c=isO?oc:dc;const isSel=sel&&sel.id===z.id&&sel.o===isO;const t=isO?oT:dT;
+  const glyph=isO?`<circle r="9.5" style="fill:var(--board);stroke:${isSel?"var(--gold)":c};stroke-width:${isSel?3.2:2.2}"/><text y="3" text-anchor="middle" style="fill:${c};font-size:${lab.length>2?6.2:7.6}px;font-weight:600">${lab}</text>`
+   :`<circle r="10" style="fill:var(--board);stroke:var(--gold);stroke-width:3;opacity:${isSel?1:0}"/><path d="M-6,-6 L6,6 M6,-6 L-6,6" style="stroke:${c};stroke-width:2.6;stroke-linecap:round"/><text y="17" text-anchor="middle" style="fill:${c};font-size:7px;font-weight:600">${lab}</text>`;
+  return `<g class="pl" data-id="${z.id}" data-o="${isO?1:0}" transform="translate(${x},${y})" tabindex="0" role="button" aria-label="${info(t,z.id).n}">${glyph}<circle r="13" fill="transparent"/></g>`;};
+ s+=`<g id="men">${p.d.map(z=>pl(z,false)).join("")}${p.o.map(z=>pl(z,true)).join("")}</g>`;
+ const bp=S(ballPos(0));
+ s+=`<ellipse id="ball" cx="${bp[0]}" cy="${bp[1]}" rx="4.2" ry="2.8" style="fill:#8b5a2b;stroke:var(--board);stroke-width:1"/>`;
+ $("#field").innerHTML=s;
+ $("#field").querySelectorAll(".pl").forEach(g=>{
+  const h=()=>{sel={id:g.dataset.id,o:g.dataset.o==="1"};const keep=tNow;drawField();showPlayer();setFrame(keep);};
+  g.addEventListener("click",h);g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();h();}});
+ });
+ $("#lgO").style.borderTopColor=css(`--${oT.toLowerCase()}`);$("#lgD").style.borderTopColor=css(`--${dT.toLowerCase()}`);
+ $("#lgOt").textContent=p.who?p.who[0]:"offense (○)";$("#lgDt").textContent=p.who?p.who[1]:"defense (✕)";
+}
+function setFrame(t){
+ tNow=t; const p=cur();
+ $("#field").querySelectorAll(".pl").forEach(g=>{
+  const isO=g.dataset.o==="1";const z=(isO?p.o:p.d).find(q=>q.id===g.dataset.id);
+  const [x,y]=S(posAt(z,t));g.setAttribute("transform",`translate(${x},${y})`);
+ });
+ const b=$("#ball");if(b){const [x,y]=S(ballPos(t));b.setAttribute("cx",x);b.setAttribute("cy",y);}
+ const r=$("#routes");if(r) r.style.opacity=t>0?.35:1;
+}
+function run(){
+ cancelAnimationFrame(raf);
+ if(matchMedia("(prefers-reduced-motion: reduce)").matches){setFrame(1);return;}
+ const D=cur().side==="ST"?4200:3200;let st=null;
+ const step=ts=>{if(!st)st=ts;const t=Math.min(1,(ts-st)/D);setFrame(t);if(t<1)raf=requestAnimationFrame(step);};
+ raf=requestAnimationFrame(step);
+}
+const COL=k=>({good:"var(--good)",bad:"var(--bad)",muted:"var(--line)",nyg:"var(--nyg)",was:"var(--was)"})[k];
+function showPlay(){
+ const p=cur(), oT=oTeam(p), dT=dTeam(p);
+ const ctx=p.side==="ST"?`${p.dd} · special teams`:`${p.dd} · ${oT==="NYG"?"Giants":"Commanders"} ball`;
+ const rows=p.side==="ST"?"":`<dt>Offense</dt><dd>${COACH[oT].o}</dd><dt>Defense</dt><dd>${COACH[dT].d}</dd>`;
+ $("#playcard").innerHTML=`<p class="eyebrow">${ctx}</p><h2>${p.title}</h2>
+  <p>${p.call}</p><p><b>Why this call:</b> ${p.why}</p>
+  <dl class="kv"><dt>Watch</dt><dd>${p.key}</dd>${rows}</dl>`;
+ $("#oddscard").innerHTML=`<p class="eyebrow">Rough odds for this play</p>
+  <div class="stack">${p.odds.map(o=>`<div style="width:${o[1]}%;background:${COL(o[2])}" title="${o[0]}"></div>`).join("")}</div>
+  <ul class="odds">${p.odds.map(o=>`<li><span class="chip" style="background:${COL(o[2])}"></span><span>${o[0]}</span><span class="pct">~${o[1]}%</span></li>`).join("")}</ul>
+  <p class="note" style="margin-top:8px">My estimates for this play, based on both teams' 2026 numbers.</p>`;
+}
+function showPlayer(){
+ const p=cur();
+ if(!sel){$("#playerinfo").innerHTML=`<p class="eyebrow">Player detail</p><p class="note">Offense moves up the page. Tap a circle or an ✕ on the field for that player's job on this play and who he is.</p>`;return;}
+ const t=sel.o?oTeam(p):dTeam(p); const d=info(t,sel.id); const note=(p.notes||{})[sel.id];
+ const tags=(d.t||[]).map(x=>`<span class="tag ${/questionable/.test(x)?"q":/rookie|new/.test(x)?"new":""}">${x}</span>`).join("");
+ $("#playerinfo").innerHTML=`<div class="player ${t.toLowerCase()}"><p class="eyebrow">${t==="NYG"?"Giants":"Commanders"} · ${lbl(sel.id)}${d.no?` · #${d.no}`:""}</p>
+  <div class="nm">${d.n}</div>${tags}
+  ${note?`<p style="margin-top:8px"><b>On this play:</b> ${note}</p>`:""}
+  <p style="margin-top:8px">${d.b}</p></div>`;
+}
+function renderSits(){
+ $("#sits").innerHTML=plays().map((p,i)=>`<button class="sit" aria-pressed="${i===idx}" data-i="${i}"><span class="dd">${p.dd}</span>${p.title}</button>`).join("");
+ $("#sits").querySelectorAll(".sit").forEach(b=>b.addEventListener("click",()=>{idx=+b.dataset.i;sel=null;load();}));
+}
+function load(){cancelAnimationFrame(raf);tNow=0;renderSits();drawField();showPlay();showPlayer();}
+document.querySelectorAll(".side button").forEach(b=>b.addEventListener("click",()=>{
+ side=b.dataset.side;idx=0;sel=null;
+ document.querySelectorAll(".side button").forEach(x=>x.setAttribute("aria-pressed",x===b));load();}));
+$("#run").addEventListener("click",run);
+$("#reset").addEventListener("click",()=>{cancelAnimationFrame(raf);setFrame(0);});
+
+function mini(spec,oT="nyg",dT="was"){
+ const v=spec.v||[-8,20,-24,24];
+ const vb=`${v[2]} ${-v[1]} ${v[3]-v[2]} ${v[1]-v[0]}`;
+ const pt=p=>`${p[1]},${-p[0]}`;
+ const oc=`var(--${oT})`,dc=`var(--${dT})`;
+ const sc=(v[3]-v[2])/48;
+ let s=`<svg class="mini" viewBox="${vb}" role="img" aria-label="${spec.alt||"diagram"}">`;
+ s+=`<line x1="${v[2]}" x2="${v[3]}" y1="0" y2="0" style="stroke:var(--turf-line);stroke-width:${.35*sc}"/>`;
+ (spec.Z||[]).forEach(z=>{s+=`<ellipse cx="${z.c[1]}" cy="${-z.c[0]}" rx="${z.ry}" ry="${z.rx}" style="fill:${dc};opacity:.16;stroke:${dc};stroke-width:${.2*sc}"/>${z.l?`<text x="${z.c[1]}" y="${-z.c[0]+.5}" text-anchor="middle" style="fill:${dc};font-size:${1.25*sc}px;font-weight:600;opacity:.9">${z.l}</text>`:""}`;});
+ const rt=(m,c,dash,team)=>m.r&&m.r.length?`<polyline points="${[m.p,...m.r].map(pt).join(" ")}" fill="none" style="stroke:${c};stroke-width:${.32*sc}" ${dash?`stroke-dasharray="${.8*sc} ${.6*sc}"`:""} marker-end="url(#m-${team})"/>`:"";
+ (spec.X||[]).forEach(m=>{s+=rt(m,dc,true,dT);});
+ (spec.O||[]).forEach(m=>{s+=rt(m,oc,m.dash,oT);});
+ (spec.O||[]).forEach(m=>{const r=(m.l?1.75:1.1)*sc;s+=`<circle cx="${m.p[1]}" cy="${-m.p[0]}" r="${r}" style="fill:var(--board);stroke:${oc};stroke-width:${.28*sc}"/>`;
+  if(m.l) s+=`<text x="${m.p[1]}" y="${-m.p[0]+.5*sc}" text-anchor="middle" style="fill:${oc};font-size:${(m.l.length>2?1.1:1.4)*sc}px;font-weight:600">${m.l}</text>`;});
+ (spec.X||[]).forEach(m=>{const a=.95*sc,x=m.p[1],y=-m.p[0];s+=`<path d="M${x-a},${y-a} L${x+a},${y+a} M${x+a},${y-a} L${x-a},${y+a}" style="stroke:${dc};stroke-width:${.34*sc};stroke-linecap:round"/>`;
+  if(m.l) s+=`<text x="${x}" y="${y+2.6*sc}" text-anchor="middle" style="fill:${dc};font-size:${1.25*sc}px;font-weight:600">${m.l}</text>`;});
+ (spec.T||[]).forEach(t=>{s+=`<text x="${t[1]}" y="${-t[0]}" text-anchor="middle" style="fill:var(--ink);font-size:${1.15*sc}px;font-weight:600">${t[2]}</text>`;});
+ return s+"</svg>";
+}
+const o=(x,y,l,r,dash)=>({p:[x,y],l,r,dash});
+const ol=(f)=>[[-0.7,-2.6],[-0.7,-1.3],[-0.7,0],[-0.7,1.3],[-0.7,2.6]].map((p,i)=>({p,r:f?f(p,i):null}));
+const dl4=()=>[o(1,-4,"DE"),o(1,-1.2,"DT"),o(1,1.2,"DT"),o(1,4,"DE")];
+const recv=()=>[o(-0.7,-19,"X"),o(-1.3,-11,"SL"),o(-1.3,11,"SL"),o(-0.7,19,"Z")];
+const COVV=[-6,27,-24,24];
+
+const PERS=[
+ {k:"11",name:"Eleven",rb:1,te:1,wr:3,league:"~60%",run:35,def:"Nickel (5 defensive backs)",
+  O:[...ol(),o(-5,0,"QB"),o(-5,-1.5,"RB"),o(-0.9,4.1,"TE"),o(-0.7,-19,"X"),o(-1.3,-12,"SL"),o(-1.3,17,"Z")],
+  X:[...dl4(),o(5,-1.8,"LB"),o(5,1.8,"LB"),o(6.5,-19,"CB"),o(5,-12,"NB"),o(6.5,17,"CB"),o(12,-7,"S"),o(12,7,"S")],
+  spot:"Three receivers split wide, one tight end next to the tackle, one back beside the quarterback.",
+  game:"The NFL's default grouping, but not the Giants': they're in 11 on only about 38% of snaps. Washington used 11 on 47% of snaps in the Colts game. When the Giants go 11 it usually means a passing down."},
+ {k:"12",name:"Twelve",rb:1,te:2,wr:2,league:"~20%",run:50,def:"Base 4-3/3-4 or nickel",
+  O:[...ol(),o(-1,0,"QB"),o(-6.5,0,"RB"),o(-0.9,4.1,"TE"),o(-1.6,5.6,"TE"),o(-0.7,-17,"X"),o(-1.3,15,"Z")],
+  X:[...dl4(),o(4.5,-2.5,"LB"),o(4.5,0.5,"LB"),o(4.5,3.5,"LB"),o(6,-17,"CB"),o(6,15,"CB"),o(12,-5,"S"),o(9,6,"S")],
+  spot:"Two tight ends (one often a step off the line as a 'wing'), two receivers.",
+  game:"David Blough's favorite: Okonkwo and Sinnott together give Daniels play-action and bootleg looks. The Giants use 12 on about 12% of snaps. The defense can't tell run from pass, which is the point."},
+ {k:"13",name:"Thirteen",rb:1,te:3,wr:1,league:"~4%",run:68,def:"Base, often 8 in the box",
+  O:[...ol(),o(-1,0,"QB"),o(-6.5,0,"RB"),o(-0.9,4.1,"TE"),o(-0.9,-4.1,"TE"),o(-1.6,5.6,"TE"),o(-0.7,-15,"X")],
+  X:[o(1,-5,"DE"),...[o(1,-1.2,"DT"),o(1,1.2,"DT")],o(1,5,"DE"),o(4,-3,"LB"),o(4,0,"LB"),o(4,3,"LB"),o(5,-15,"CB"),o(4,8,"CB"),o(7,-4,"S"),o(7,4,"S")],
+  spot:"Three tight ends bunched near the line. Usually short yardage or goal line.",
+  game:"The Giants surprised Arizona by lining up 13 personnel and then spreading all three tight ends out wide (empty 13): two red-zone touchdowns. Washington is expected to use more 13 under Blough."},
+ {k:"21",name:"Twenty-one",rb:2,te:1,wr:2,league:"~7%",run:55,def:"Base",
+  O:[...ol(),o(-1,0,"QB"),o(-4,0,"FB"),o(-7,0,"RB"),o(-0.9,4.1,"TE"),o(-0.7,-16,"X"),o(-1.3,15,"Z")],
+  X:[...dl4(),o(4.5,-2.5,"LB"),o(4.5,0.5,"LB"),o(4.5,3.5,"LB"),o(6,-16,"CB"),o(6,15,"CB"),o(12,-4,"S"),o(9,5,"S")],
+  spot:"Two backs stacked behind the quarterback (the 'I-formation'), one tight end, two receivers.",
+  game:"Means fullback Patrick Ricard is in. For the Giants, a strong run tell, though play-action from the I-formation is how Harbaugh's Ravens hit big plays."},
+ {k:"22",name:"Twenty-two",rb:2,te:2,wr:1,league:"~1–2%",run:72,def:"Base or goal-line",
+  O:[...ol(),o(-1,0,"QB"),o(-4,0,"FB"),o(-7,0,"RB"),o(-0.9,4.1,"TE"),o(-0.9,-4.1,"TE"),o(-0.7,-15,"X")],
+  X:[o(1,-5,"DE"),o(1,-1.2,"DT"),o(1,1.2,"DT"),o(1,5,"DE"),o(4,-3,"LB"),o(4,0,"LB"),o(4,3,"LB"),o(5,-15,"CB"),o(5,9,"CB"),o(8,-3,"S"),o(7,4,"S")],
+  spot:"Fullback plus a tailback, two tight ends, one receiver. Eight big blockers.",
+  game:"The Giants' signature: about 27% of their snaps, a rate almost no one in the NFL approaches. It forces Washington into its base defense with backup linebackers (Chenal and Magee are on IR). Expect jet sweeps and play-action off it, not only runs."},
+ {k:"10",name:"Ten",rb:1,te:0,wr:4,league:"~1–2%",run:15,def:"Dime (6 defensive backs)",
+  O:[...ol(),o(-5,0,"QB"),o(-5,-1.5,"RB"),o(-0.7,-20,"X"),o(-1.3,-13,"SL"),o(-1.3,12,"SL"),o(-0.7,20,"Z")],
+  X:[...dl4(),o(6,0,"LB"),o(7,-20,"CB"),o(6,-13,"NB"),o(6,12,"DB"),o(7,20,"CB"),o(14,-7,"S"),o(14,7,"S")],
+  spot:"Four receivers, no tight end.",
+  game:"A two-minute or desperation look. If Washington trails late and McLaurin is out, it's Burks, Williams, McCaffrey and a depth receiver."}
+];
+let persK="22";
+function renderPers(){
+ $("#perschips").innerHTML=PERS.map(x=>`<button class="chipbtn" aria-pressed="${x.k===persK}" data-k="${x.k}">${x.k} personnel</button>`).join("");
+ $("#perschips").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{persK=b.dataset.k;renderPers();}));
+ const x=PERS.find(q=>q.k===persK);
+ $("#persdiag").innerHTML=mini({v:[-9,15,-22,22],O:x.O,X:x.X,alt:x.k+" personnel"})+`<p class="hint" style="margin-top:8px">Offense in blue (○), the typical defensive response in red (✕).</p>`;
+ $("#perstext").innerHTML=`<div class="digits"><div class="code">${x.k}</div><div><small>backs</small><b>${x.rb}</b></div><div><small>tight ends</small><b>${x.te}</b></div><div><small>receivers</small><b>${x.wr}</b></div></div>
+  <h3>${x.name} personnel</h3><p><b>How to spot it:</b> ${x.spot}</p>
+  <dl class="kv"><dt>Defense sends</dt><dd>${x.def}</dd><dt>League use</dt><dd>${x.league} of snaps (approx.)</dd></dl>
+  <p class="eyebrow" style="margin-top:10px">Run / pass lean (approx. league-wide)</p>
+  <div class="meter"><div class="r" style="width:${x.run}%"></div><div class="p"></div></div>
+  <div class="note" style="display:flex;justify-content:space-between"><span>Run ${x.run}%</span><span>Pass ${100-x.run}%</span></div>
+  <p style="margin-top:10px"><b>In this game:</b> ${x.game}</p>`;
+}
+
+const GL=[
+ {c:"Formations",t:"Under center, pistol, shotgun",d:"Where the quarterback stands. Under center (hands under the center) favors runs and play-action. Shotgun (5–7 yards back) gives him time to see the defense. Pistol (4 yards back, back directly behind) splits the difference and is built for zone reads.",
+  s:{v:[-9,3,-9,9],O:[...ol(),o(-1,-4,"UC"),o(-4,0,"PIS"),o(-5.5,4,"GUN")]}},
+ {c:"Formations",t:"Trips",d:"Three receivers to one side. It overloads that side of the defense and isolates the lone receiver on the other side, usually the best one.",
+  s:{v:[-7,5,-22,22],O:[...ol(),o(-5,0,"QB"),o(-5,-1.5,"RB"),o(-0.7,-19,"X"),o(-1.3,8,"SL"),o(-1.3,13,"SL"),o(-0.7,19,"Z")]}},
+ {c:"Formations",t:"Bunch",d:"Three receivers clustered tightly. Their routes cross at the snap, which creates natural 'picks' against man coverage.",
+  s:{v:[-7,5,-14,14],O:[...ol(),o(-5,0,"QB"),o(-0.7,8,"A",[[4,12]]),o(-2,9.5,"B",[[3,6]]),o(-2,6.5,"C",[[6,8]])]}},
+ {c:"Formations",t:"Empty",d:"No running back in the backfield; five receivers. Forces the defense to show its coverage and blitz before the snap, but leaves only five blockers.",
+  s:{v:[-7,5,-22,22],O:[...ol(),o(-5,0,"QB"),o(-0.7,-19,"X"),o(-1.3,-12,"SL"),o(-1.3,-6,"TE"),o(-1.3,10,"RB"),o(-0.7,19,"Z")]}},
+ {c:"Formations",t:"Motion and jet motion",d:"A player moving before the snap. Motion reveals coverage (if a defender follows him, it's man) and shifts the blocking angles. Jet motion is a full sprint across the formation, often ending in a handoff.",
+  s:{v:[-7,6,-16,16],O:[...ol(),o(-1,0,"QB"),o(-1.3,14,"Z",[[-1.3,4],[-1.6,0],[-1.2,-6],[2,-12]],true)]}},
+ {c:"Formations",t:"Personnel (11, 12, 22…)",d:"Two digits: running backs, then tight ends. 11 = 1 RB, 1 TE, 3 WR. See the Personnel tab for each grouping.",
+  s:{v:[-8,4,-12,12],O:[...ol(),o(-1,0,"QB"),o(-6.5,0,"1"),o(-0.9,4.1,"2"),o(-0.9,-4.1,"2")]}},
+ {c:"Runs",t:"Inside zone",d:"The whole line steps the same direction and blocks whoever is in its gap. The back aims at a guard and cuts to the first opening. The Giants' and Commanders' base run.",
+  s:{v:[-8,5,-8,8],O:[...ol((p)=>[[0.8,p[1]+1]]),o(-4,0,"QB"),o(-7,0,"RB",[[-3,0.6],[0.5,1.3],[3.5,1.6]])],X:[o(1,-3,""),o(1,-0.8,""),o(1,1.6,""),o(1,3.8,""),o(4.5,-1.5,""),o(4.5,1.8,"")]}},
+ {c:"Runs",t:"Outside (wide) zone",d:"Linemen run sideways together and try to reach the defender outside them. The back aims at the edge and either turns the corner or cuts back. Blough ran it well in Week 2.",
+  s:{v:[-8,5,-8,10],O:[...ol((p)=>[[-0.3,p[1]+3]]),o(-1,0,"QB"),o(-6.5,0,"RB",[[-4.5,4],[-1,6.5],[3,7.5]]),o(-0.9,4,"TE",[[-0.3,7]])],X:[o(1,-3,""),o(1,0,""),o(1,2.6,""),o(1,5.2,"")]}},
+ {c:"Runs",t:"Power",d:"A guard on the far side pulls behind the line and leads through the hole; a fullback or tight end kicks out the end. Downhill, physical, a Greg Roman staple.",
+  s:{v:[-8,5,-8,8],O:[o(-0.7,-2.6,""),o(-0.7,-1.3,"G",[[-1.6,-1.3],[-1.6,2],[0.6,3.8]]),o(-0.7,0,""),o(-0.7,1.3,""),o(-0.7,2.6,""),o(-1,0,"QB"),o(-4,0,"FB",[[-1.2,3],[0.5,4.6]]),o(-7,0,"RB",[[-3.5,0.8],[0,3],[3.5,3.6]])],X:[o(1,4.6,"DE")]}},
+ {c:"Runs",t:"Counter",d:"The back takes a fake step one way while two blockers pull the other way. Linebackers flow toward the fake and get caught out of position.",
+  s:{v:[-8,5,-8,8],O:[o(-0.7,-2.6,""),o(-0.7,-1.3,"G",[[-1.6,-1.3],[-1.6,2.4],[0.4,4]]),o(-0.7,0,""),o(-0.7,1.3,""),o(-0.7,2.6,""),o(-0.9,-4,"TE",[[-1.8,-3.5],[-1.8,3.5],[1,5.2]]),o(-5,0,"QB"),o(-5,-1.5,"RB",[[-5.2,-2.6],[-3.6,1],[0,3.8],[3,4.4]])]}},
+ {c:"Runs",t:"Jet sweep",d:"A receiver in jet motion takes a handoff at full speed and races for the edge. Gets the fastest player on the field to the perimeter before the defense can flow.",
+  s:{v:[-7,5,-16,16],O:[...ol((p)=>[[0.5,p[1]-1]]),o(-1,0,"QB"),o(-1.3,14,"Z",[[-1.5,2],[-1.5,-4],[2,-11],[4,-14]])]}},
+ {c:"Runs",t:"QB sneak",d:"Quarterback takes the snap and lunges forward behind the center. Converts about three-quarters of the time on third or fourth and 1.",
+  s:{v:[-6,4,-7,7],O:[...ol((p)=>[[0.5,p[1]*0.9]]),o(-1,0,"QB",[[1.3,0]]),o(-3.5,0,"FB",[[-1.2,0]])],X:[o(1,-1.2,""),o(1,0,""),o(1,1.2,"")]}},
+ {c:"Passes",t:"Play-action",d:"The quarterback fakes a handoff before throwing. Linebackers and safeties who step up to stop the run leave space behind them.",
+  s:{v:[-9,20,-18,10],O:[...ol(),o(-1,0,"QB",[[-4,-0.4],[-7.5,0]]),o(-6.5,0,"RB",[[-3.5,2]]),o(-0.7,-16,"X",[[10,-16],[19,-6]])],X:[o(5,-2,"LB",[[2.6,-1.4]]),o(5,2,"LB",[[2.6,1.6]]),o(13,-6,"S",[[9,-3]])]}},
+ {c:"Passes",t:"Bootleg",d:"Run fake one way, quarterback rolls out the other with receivers flooding his side at three depths. Moves the pocket away from the pass rush.",
+  s:{v:[-8,14,-10,16],O:[...ol((p)=>[[0.4,p[1]-1]]),o(-1,0,"QB",[[-3.5,-1],[-5,3.5],[-3,8]]),o(-6.5,0,"RB",[[-3.5,-2.5]]),o(-0.9,-4,"TE",[[1,-1],[3,7],[4,12]]),o(-0.9,4,"TE",[[6,6],[12,13]])]}},
+ {c:"Passes",t:"RPO (run-pass option)",d:"The line blocks a run, but the quarterback watches one defender. If that defender plays the run, he throws behind him; if he drops into coverage, he hands off.",
+  s:{v:[-8,10,-15,6],O:[...ol((p)=>[[1,p[1]+1]]),o(-5,0,"QB"),o(-5,-1.5,"RB",[[-3.3,0.3],[1,1.6]]),o(-1.3,-11,"SL",[[2.5,-11],[6.5,-7]])],X:[o(5,-8,"NB",[[3,-5]]),o(5,-1.8,"LB")]}},
+ {c:"Passes",t:"Screen",d:"The line lets rushers through on purpose, then releases downfield to block for a back or receiver who catches a short pass behind them.",
+  s:{v:[-9,8,-6,12],O:[...ol((p,i)=>i>=2?[[1.5,p[1]+3.5],[3,p[1]+5]]:[[-1.5,p[1]]]),o(-5,0,"QB",[[-8,0]]),o(-5,1.5,"RB",[[-4,4],[-2,7.5],[3,9]])],X:[o(1,1,"",[[-5,0.5]]),o(1,3.5,"",[[-5,2]])]}},
+ {c:"Passes",t:"Hot route and checkdown",d:"A hot route is a quick throw to the spot a blitzer just vacated. A checkdown is the safe short throw to a back or tight end when deeper receivers are covered.",
+  s:{v:[-8,10,-14,8],O:[...ol(),o(-5,0,"QB"),o(-1.3,-9,"TE",[[5,-7]]),o(-5,1.5,"RB",[[-3,3],[1,5]])],X:[o(4,-7,"LB",[[-3,-1.5]]),o(1.6,0.6,"LB",[[-3,0.3]])],T:[[6.5,-7,"HOT"],[2.5,5.5,"CHECK"]]}},
+ {c:"Pressure",t:"Blitz and A-gap look",d:"A blitz sends more than four rushers. The A gaps are the spaces on either side of the center; linebackers standing there before the snap threaten to rush straight up the middle, the shortest path to the quarterback.",
+  s:{v:[-7,5,-8,8],O:[...ol(),o(-5,0,"QB")],X:[o(1,-3.6,""),o(1,-1.6,""),o(1,1.6,""),o(1,3.6,""),o(1.6,-0.6,"LB",[[-3.5,-0.3]]),o(1.6,0.6,"LB",[[-3.5,0.3]])],T:[[-1.8,-0.65,"A"],[-1.8,0.65,"A"]]}},
+ {c:"Pressure",t:"Simulated pressure (creeper)",d:"The defense shows a blitz and rushes only four, but not the expected four: a linebacker or nickel rushes while a defensive lineman drops into coverage. The protection blocks the wrong people. A Brian Flores trademark that Daronte Jones brought to Washington.",
+  s:{v:[-7,8,-12,8],O:[...ol(),o(-5,0,"QB")],X:[o(1,-4,"DE",[[4,-8]]),o(1,-1.6,""),o(1,1.6,""),o(1,3.8,""),o(1.6,-0.6,"LB",[[-3.5,-0.6]]),o(1.6,0.6,"LB",[[5,2]]),o(3,-8,"NB",[[-3.5,-3]])]}},
+ {c:"Pressure",t:"Stunt (twist)",d:"Two pass rushers swap lanes: one crashes into a gap to occupy blockers, the other loops around behind him. Beats offensive linemen who don't pass off their man cleanly.",
+  s:{v:[-6,4,-8,8],O:[...ol(),o(-5,0,"QB")],X:[o(1,1.4,"DT",[[-0.5,3.2],[-2.8,3.4]]),o(1,4,"DE",[[0.8,2.2],[-0.6,0.8],[-3,0.6]])]}},
+ {c:"Pressure",t:"Spy",d:"A defender assigned to shadow a running quarterback instead of rushing or covering. Expect Arvell Reese to spy Daniels on passing downs.",
+  s:{v:[-7,8,-8,8],O:[...ol(),o(-5,0,"QB",[[-6,3],[-2,5]])],X:[o(6,0,"SPY",[[5,3],[3,4.5]])]}},
+ {c:"Coverage",t:"Single-high vs two-high",d:"Before the snap, count the deep safeties. One deep means an extra defender near the line (run defense, man coverage). Two deep means the defense is protecting against the long pass and inviting runs.",
+  s:{v:[-5,20,-24,24],O:[...ol(),o(-5,0,"QB"),...recv()],X:[o(14,-12,"S"),o(14,12,"S"),o(17,0,"1-HI")],T:[[18.5,-12,"two-high"],[19.5,6,"or"]]}},
+ {c:"Coverage",t:"Cover 0",d:"Everyone in man coverage, no deep safety, everyone else blitzes. Maximum pressure, maximum risk: one missed tackle is a touchdown.",
+  s:{v:COVV,O:[...ol(),o(-5,0,"QB"),...recv(),o(-5,1.5,"RB")],X:[o(1,-19,"CB"),o(2,-11,"NB"),o(2,11,"S"),o(1,19,"CB"),o(1,-3.8,"",[[-3,-2.5]]),o(1,-1.4,"",[[-3,-0.8]]),o(1,1.4,"",[[-3,0.8]]),o(1,3.8,"",[[-3,2.5]]),o(2,0,"LB",[[-3,0]]),o(4,2.5,"LB",[[-2,2]])]}},
+ {c:"Coverage",t:"Cover 1",d:"Man coverage on every receiver with one free safety deep in the middle as a safety net. The Giants' press-man base.",
+  s:{v:COVV,O:[...ol(),o(-5,0,"QB"),...recv()],X:[o(1,-19,"CB"),o(2,-11,"NB"),o(2,11,"S"),o(1,19,"CB"),o(5,0,"LB")],Z:[{c:[18,0],rx:6,ry:14,l:"deep middle"}]}},
+ {c:"Coverage",t:"Cover 2",d:"Two safeties split the deep field in halves; five defenders cover short zones. Strong against short throws to the sideline; weak in the deep middle and along the sideline between corner and safety.",
+  s:{v:COVV,O:[...ol(),o(-5,0,"QB"),...recv()],X:[o(4,-19,"CB"),o(4,19,"CB"),o(14,-11,"S"),o(14,11,"S")],Z:[{c:[18,-12],rx:6,ry:11,l:"deep ½"},{c:[18,12],rx:6,ry:11,l:"deep ½"},{c:[5,-18],rx:3,ry:5,l:"flat"},{c:[5,18],rx:3,ry:5,l:"flat"},{c:[7,-6],rx:3,ry:4},{c:[7,0],rx:3,ry:3},{c:[7,6],rx:3,ry:4}]}},
+ {c:"Coverage",t:"Cover 3",d:"Three deep defenders split the field into thirds; four cover underneath. The most common zone in football and a Washington staple. Weak spots: the seams between the thirds and the flats.",
+  s:{v:COVV,O:[...ol(),o(-5,0,"QB"),...recv()],X:[o(7,-19,"CB"),o(7,19,"CB"),o(14,0,"FS"),o(7,-9,"SS")],Z:[{c:[19,-16],rx:6,ry:7,l:"deep ⅓"},{c:[19,0],rx:6,ry:8,l:"deep ⅓"},{c:[19,16],rx:6,ry:7,l:"deep ⅓"},{c:[6,-14],rx:3,ry:4},{c:[7,-4],rx:3,ry:4},{c:[7,4],rx:3,ry:4},{c:[6,14],rx:3,ry:4}]}},
+ {c:"Coverage",t:"Cover 4 (quarters)",d:"Four deep defenders each take a quarter of the field; three cover underneath. Safeties read the slot receivers and jump short routes. Stout against deep passes and runs, soft underneath.",
+  s:{v:COVV,O:[...ol(),o(-5,0,"QB"),...recv()],X:[o(7,-19,"CB"),o(7,19,"CB"),o(11,-8,"S"),o(11,8,"S")],Z:[{c:[18,-18],rx:6,ry:5.5},{c:[18,-6],rx:6,ry:5.5},{c:[18,6],rx:6,ry:5.5},{c:[18,18],rx:6,ry:5.5},{c:[7,-10],rx:3,ry:5},{c:[7,0],rx:3,ry:4},{c:[7,10],rx:3,ry:5}]}},
+ {c:"Coverage",t:"Cover 6",d:"Quarters on one side, Cover 2 on the other: a hybrid that lets the defense match a formation that's lopsided. Washington leans on it, which leaves the curl-to-flat area open on the Cover 2 side.",
+  s:{v:COVV,O:[...ol(),o(-5,0,"QB"),...recv()],X:[o(7,-19,"CB"),o(4,19,"CB"),o(11,-8,"S"),o(14,11,"S")],Z:[{c:[18,-18],rx:6,ry:5.5,l:"¼"},{c:[18,-6],rx:6,ry:5.5,l:"¼"},{c:[18,12],rx:6,ry:11,l:"½"},{c:[5,18],rx:3,ry:5,l:"flat"}]}},
+ {c:"Coverage",t:"Press vs off",d:"Press: the cornerback lines up within a yard and jams the receiver at the snap to disrupt timing. Off: he lines up 6–8 yards back to see the play and prevent the deep ball. Dennard Wilson's Giants play a lot of press.",
+  s:{v:[-3,10,-22,22],O:[o(-0.7,-19,"X"),o(-0.7,19,"Z")],X:[o(1,-19,"CB"),o(7,19,"CB")],T:[[3.5,-19,"press"],[9.2,19,"off"]]}},
+ {c:"Coverage",t:"Robber",d:"A safety who starts deep and drops down to the middle at about 10 yards at the snap, 'robbing' crossing routes and digs the quarterback thinks are open.",
+  s:{v:[-6,20,-20,20],O:[...ol(),o(-5,0,"QB"),o(-0.7,-17,"X",[[11,-17],[11,-4]])],X:[o(15,-4,"S",[[10,-2]])]}}
+];
+let gcat="All";
+function renderGloss(){
+ const cats=["All",...new Set(GL.map(g=>g.c))];
+ $("#gfilter").innerHTML=cats.map(c=>`<button class="chipbtn" aria-pressed="${c===gcat}" data-c="${c}">${c}</button>`).join("");
+ $("#gfilter").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{gcat=b.dataset.c;renderGloss();}));
+ $("#glist").innerHTML=GL.filter(g=>gcat==="All"||g.c===gcat).map(g=>`<div class="card"><p class="when">${g.c}</p><h3>${g.t}</h3>${mini({...g.s,alt:g.t})}<p>${g.d}</p></div>`).join("");
+}
+
+const COACHES=[
+ {team:"nyg",role:"Giants offensive coordinator",name:"Matt Nagy",
+  stats:["Heavier than 11 personnel: 62%","22 personnel: 27%","12 personnel: 12%","2nd in time of possession","6th-most rush attempts, 3.7 yds/carry"],
+  notes:["Ex-Bears head coach and Andy Reid disciple; his Chicago offenses were shotgun-heavy (about 71%). With Harbaugh, the Giants have gone the other way: fullback, two tight ends, clock control.","Greg Roman (run game) and Brian Callahan (passing game, quarterbacks) share the offensive room, so the scheme blends Reid's motion and screens, Roman's gap runs, and Callahan's play-action.","Misdirection is a theme: counters, jet sweeps by Darnell Mooney, and 'empty 13' (three tight ends spread wide), which produced two red-zone TDs against Arizona."],
+  tell:"Ricard on the field means run or play-action. Three receivers on the field means pass. Tight ends split wide in the red zone means the Giants want a matchup on a linebacker."},
+ {team:"nyg",role:"Giants defensive coordinator",name:"Dennard Wilson",
+  stats:["Blitzed 51.3% in Week 4","Last in pressure rate (22.1%)","3 sacks, fewest in NFL","6 INTs, tied for 1st","Takeaway on 17.5% of drives (3rd)"],
+  notes:["Came from Mike Macdonald's 2023 Ravens staff via the Titans. Base 3-4 and nickel, heavy press coverage, and safeties that disguise one-high and two-high shells until the snap.","Losing Brian Burns in Week 2 turned him into a blitzer: the four-man rush can't get home, so he sends linebackers and defensive backs.","The approach yields turnovers more than sacks. The Giants are tied for first in interceptions and second in pass breakups."],
+  tell:"Edmunds and Reese walking up into the A gaps on third down. Watch which one actually rushes. Reese is the likely spy on Daniels."},
+ {team:"was",role:"Commanders offensive coordinator",name:"David Blough",
+  stats:["Age 30, first-year play-caller","Only 5 sacks allowed","OL 9th in pass protection","OL last in run-block win rate"],
+  notes:["Promoted from assistant quarterbacks coach three days after Kliff Kingsbury left. He never coached a position group before this year.","Leans on 12 personnel with Chig Okonkwo and Ben Sinnott, and plans more 13. Film analysts credit his sequencing: he shows a look early, then returns to it later flipped or with a play-action fake built off the defense's reaction.","Added more play-action after a flat Week 1. Runs wide zone more than gap schemes."],
+  tell:"An early play that works will come back later as a fake. When you see a formation for the second time, expect a counter-punch off it."},
+ {team:"was",role:"Commanders defensive coordinator",name:"Daronte Jones",
+  stats:["Blitz rate top-3 in NFL (37–52% by tracker)","6th in pressure rate","Fewest penalties (19)","80% red-zone TDs allowed","17.8 2nd-half pts allowed (tied last)"],
+  notes:["First-time NFL coordinator; spent three years as Brian Flores's passing-game coordinator in Minnesota. Quinn gave him full control of the scheme.","Blitzes with zone behind it, mainly Cover 3 and Cover 6, rather than the man-heavy look Washington used under Quinn. Line stunts and simulated pressures are central.","Likes three-safety packages, but three safeties are injured this week. Against Giants' heavy personnel he goes to base defense, adding Tim Settle on the line."],
+  tell:"The deep-curl and flat area on the Cover 2 side of his Cover 6. Quick throws there are what beat this defense."},
+ {team:"nyg",role:"Giants head coach",name:"John Harbaugh",
+  stats:["18 seasons in Baltimore","12 playoff trips","First year with NYG"],
+  notes:["His Ravens were among the league's most aggressive teams on fourth down, especially fourth and short in plus territory.","He brought fullback Patrick Ricard and punter Jordan Stout from Baltimore, and an identity built on special teams and the run game."],
+  tell:"Fourth and 1 near midfield: expect the Giants to go for it."},
+ {team:"was",role:"Commanders head coach",name:"Dan Quinn",
+  stats:["3rd season in Washington","Took defensive play-calling in 2025"],
+  notes:["Washington was one of the league's most aggressive fourth-down teams in 2024, its NFC Championship season, and Quinn backed his quarterback on short yardage then.","With Daniels coming back from an elbow injury, the bigger question is whether he still trusts designed QB runs and sneaks."],
+  tell:"Washington on fourth and short: does Daniels sneak it, or do they hand off and protect him?"}
+];
+function renderCoaches(){
+ $("#coaches").innerHTML=COACHES.map(c=>`<div class="card coach ${c.team}"><p class="when">${c.role}</p><h2>${c.name}</h2>
+  <div>${c.stats.map(s=>`<span class="stat">${s}</span>`).join("")}</div>
+  <ul>${c.notes.map(n=>`<li>${n}</li>`).join("")}</ul>
+  <p class="tell"><b>Tell to watch:</b> ${c.tell}</p></div>`).join("");
+}
+
+const imp=a=>a<0?(-a)/(-a+100):100/(a+100);
+function dev(over,under){const a=imp(over),b=imp(under);return a/(a+b);}
+const PROPS=[
+ {pl:"Jayden Daniels",tm:"was",mk:"Rushing yards",ln:"28.5",px:"−112 / −112",p:dev(-112,-112),side:"over",
+  read:"He ran for 50 a game before the injury. A line near 29 (30.5 at BetMGM) says the market expects Washington to limit designed runs while he wears the brace."},
+ {pl:"Jayden Daniels",tm:"was",mk:"Passing yards",ln:"197.5",px:"−113 / −111",p:dev(-113,-111),side:"over",
+  read:"A modest number against a Giants defense allowing 205 a game. The market is pricing in rust, a thin receiver room, and a run-first plan."},
+ {pl:"Jayden Daniels",tm:"was",mk:"Passing TDs",ln:"1.5",px:"+126 / −162",p:dev(126,-162),side:"over (2+)",
+  read:"Roughly 4 in 10 for two or more touchdown passes."},
+ {pl:"Jayden Daniels",tm:"was",mk:"Interceptions",ln:"0.5",px:"+110 / −140",p:dev(110,-140),side:"over (1+)",
+  read:"About a 45% chance he throws at least one. The Giants are tied for the league lead in interceptions."},
+ {pl:"Jayden Daniels",tm:"was",mk:"Completions",ln:"18.5",px:"−104 / −123",p:dev(-104,-123),side:"over",
+  read:"Implies about 28 to 30 attempts."},
+ {pl:"Jayden Daniels",tm:"was",mk:"Anytime TD",ln:"yes",px:"+235",p:imp(235)*0.9,side:"scores",
+  read:"About a 27% chance he runs one in, after the bookmaker's margin. Two years ago this would have been much shorter."},
+ {pl:"Jameis Winston",tm:"nyg",mk:"Passing yards",ln:"200.5",px:"−114 / −114",p:.5,side:"over",
+  read:"Close to his Week 4 output (250) minus his Week 3 dud (118). Washington allows 242 passing yards a game, so the market expects the Giants to run more than throw."},
+ {pl:"Jameis Winston",tm:"nyg",mk:"Pass attempts",ln:"31.5",px:"under −114",p:1-imp(-114)*0.96,side:"over",
+  read:"About 31 throws: a ball-control game plan with the Giants' heavy personnel."},
+ {pl:"Jameis Winston",tm:"nyg",mk:"Completions",ln:"18.5",px:"under −113",p:1-imp(-113)*0.96,side:"over",
+  read:"Implies roughly a 59% completion rate on 31 attempts. He completed 62% last week."},
+ {pl:"Malik Nabers",tm:"nyg",mk:"Receiving yards",ln:"54.5",px:"over −114",p:imp(-114)*0.96,side:"over",
+  read:"Low for a WR1 who had 112 last week. The market is hedging on his knee soreness and the Giants' run-heavy approach."},
+ {pl:"Isaiah Likely",tm:"nyg",mk:"Receptions",ln:"4.5",px:"over −113",p:imp(-113)*0.96,side:"over (5+)",
+  read:"The market makes Likely, not Nabers, the Giants' most reliable target. Washington has given up five TDs to tight ends."},
+ {pl:"Malachi Fields",tm:"nyg",mk:"Receiving yards",ln:"25.5",px:"−114 / −114",p:.5,side:"over",
+  read:"A role player's line, but he has a size mismatch on Amik Robertson."},
+ {pl:"Cam Skattebo",tm:"nyg",mk:"Rushing yards",ln:"—",px:"not yet posted",p:null,side:"",
+  read:"No line as of Saturday. Last week's was 69.5 and he ran for 58. He's at 3.5 a carry this season against a Washington run defense allowing 4.0."}
+];
+function renderProps(){
+ const g=[
+  ["Washington −3.5","Spread (−112). The market makes the Commanders a field-goal-plus favorite."],
+  ["42.5 points","Total, down from 43.5 earlier in the week. Implies about Commanders 23, Giants 19.5."],
+  ["NYG 37%","Moneyline WAS −190 / NYG +160, after removing the margin. Kalshi had Washington at 63¢."],
+  ["55%","Both teams score 15+ points (−124): the market expects neither offense to be shut down."]
+ ];
+ $("#tiles").innerHTML=g.map(x=>`<div class="card tile"><div class="big">${x[0]}</div><div class="sub">${x[1]}</div></div>`).join("");
+ $("#ptable").innerHTML=`<thead><tr><th>Player</th><th>Prop</th><th>Line</th><th>Price (over / under)</th><th>Implied</th><th>What it tells you</th></tr></thead><tbody>${
+  PROPS.map(r=>`<tr><td><b style="color:var(--${r.tm})">${r.pl}</b></td><td>${r.mk}</td><td class="n">${r.ln}</td><td class="n">${r.px}</td>
+   <td class="n">${r.p==null?"—":`<span class="pbar"><i style="width:${Math.round(r.p*100)}%"></i></span>${Math.round(r.p*100)}% ${r.side}`}</td><td>${r.read}</td></tr>`).join("")}</tbody>`;
+}
+
+const TABS=["plays","pers","gloss","coach","props","script","roster","watch"];
+document.querySelectorAll("nav.tabs button").forEach(b=>b.addEventListener("click",()=>{
+ document.querySelectorAll("nav.tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));
+ TABS.forEach(k=>$("#tab-"+k).hidden=k!==b.dataset.tab);
+ try{localStorage.setItem("nygwas-tab",b.dataset.tab);}catch(e){}
+}));
+
+const BASE=0.37;
+const lg=p=>Math.log(p/(1-p)), ex=x=>1/(1+Math.exp(-x));
+function probit(p){
+ const a=[-39.69683028665376,220.9460984245205,-275.9285104469687,138.3577518672690,-30.66479806614716,2.506628277459239],
+ b=[-54.47609879822406,161.5858368580409,-155.6989798598866,66.80131188771972,-13.28068155288572],
+ c=[-0.007784894002430293,-0.3223964580411365,-2.400758277161838,-2.549732539343734,4.374664141464968,2.938163982698783],
+ d=[0.007784695709041462,0.3224671290700398,2.445134137142996,3.754408661907416],pl=.02425;
+ let q,r;
+ if(p<pl){q=Math.sqrt(-2*Math.log(p));return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+ if(p>1-pl){q=Math.sqrt(-2*Math.log(1-p));return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+ q=p-.5;r=q*q;return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+}
+function wp(){
+ let x=lg(BASE);
+ const to=+$("#to").value; x+=0.55*to;
+ if($("#f1").checked)x+=0.9; if($("#f2").checked)x+=0.15; if($("#f3").checked)x+=0.45;
+ if($("#f4").checked)x+=0.4; if($("#f5").checked)x-=0.5; if($("#f6").checked)x-=0.7;
+ const p=Math.min(.97,Math.max(.03,ex(x)));
+ $("#wpN").textContent=Math.round(p*100)+"%";$("#wpW").textContent=Math.round((1-p)*100)+"%";
+ $("#gbar").style.width=(p*100)+"%";
+ $("#toV").textContent=to===0?"even":(to>0?"Giants +"+to:"Commanders +"+(-to));
+ const m=13.5*probit(p), tot=42.5, n=(tot+m)/2, w=(tot-m)/2;
+ $("#proj").textContent=`Projected final ≈ Giants ${Math.round(n)}, Commanders ${Math.round(w)}`;
+}
+["#to","#f1","#f2","#f3","#f4","#f5","#f6"].forEach(s=>$(s).addEventListener("input",wp));
+
+const ORDER={off:["QB","RB","FB","TE","TE2","X","Z","SL","LT","LG","C","RG","RT"],def:["EDGE1","EDGE2","NT","DT","DT2","MLB","WLB","LB1","LB2","CB1","CB2","NB","FS","SS"]};
+const OUT={NYG:"Out: QB Jaxson Dart (IR), OLB Brian Burns (IR), DL Chauncey Golston, S Jason Pinnock, CB Paulson Adebo (IR), WR Calvin Austin (IR).",
+ WAS:"Out: WR Stefon Diggs, QB Marcus Mariota, CB Trey Amos, S Percy Butler, S Nick Cross, S Tyler Owens, DE Charles Omenihu; IR: LT Laremy Tunsil, DT Jer'Zhan Newton, LB Leo Chenal, WR Jaylin Lane."};
+function roster(t){
+ const rows=(k,h)=>`<tr class="unit"><td colspan="3">${h}</td></tr>`+ORDER[k].filter(id=>P[t][id]).map(id=>{const d=P[t][id];
+  return `<tr><td class="pos">${lbl(id)}</td><td><b>${d.n}</b>${d.no?` <span class="note">#${d.no}</span>`:""}<br><span class="note">${d.b}</span></td><td>${(d.t||[]).map(x=>`<span class="tag ${/questionable/.test(x)?"q":/rookie|new/.test(x)?"new":""}">${x}</span>`).join("")}</td></tr>`;}).join("");
+ $("#r"+t).innerHTML=`<thead><tr><th>Pos</th><th>Player</th><th>Status</th></tr></thead><tbody>${rows("off","Offense")}${rows("def","Defense")}<tr><td colspan="3" class="note" style="padding-top:12px">${OUT[t]}</td></tr></tbody>`;
+}
+
+const WATCH = [
+ ["Before every snap","Count the deep safeties","Two safeties deep (two-high) means the defense is protecting against the deep pass and inviting the run. One deep (single-high) means an extra man in the box and more one-on-one coverage outside. From the box you'll see this clearly, and it predicts the play better than anything else."],
+ ["Every substitution","Read the personnel","Count backs and tight ends as players run on. If Patrick Ricard jogs in, the Giants are in 21 or 22 and the run (or play-action) is coming. If Washington answers with a third linebacker, the jet sweep is in play."],
+ ["Giants passing downs","Carter vs. Coleman","Washington lost Laremy Tunsil, one of the best pass-blocking tackles in the league, to a torn triceps in August. Brandon Coleman replaces him. Abdul Carter had nine pressures last week. If Carter wins this matchup, Daniels is in trouble."],
+ ["Commanders zone reads","Does Daniels keep it?","Every zone read is a decision by Daniels, but also a decision by his coaches to expose an elbow he has dislocated twice. The market's 28.5-yard rushing line says to expect few designed runs. Watch how Arvell Reese tracks him when they do."],
+ ["Giants deep shots","Washington's emergency safeties","Butler, Cross and Owens are all out, and corner Trey Amos too. Jeremy Reaves, mostly a special-teamer, starts next to Quan Martin. Look for play-action to pull Reaves forward and a throw behind him to Nabers."],
+ ["Red zone","The 80% defense","Washington has allowed touchdowns on 80% of red-zone trips. When the Giants cross the 20, watch for tight ends split wide (empty 13), the look that scored twice against Arizona."],
+ ["Third downs","A-gap linebackers","Both defenses blitz heavily and love to stand two linebackers next to the center. Watch which one actually rushes. That disguise is how both teams compensate for four-man rushes that can't get home."],
+ ["Tight ends","Isaiah Likely's day","Likely's reception line (4.5) is the market's vote that he's the Giants' most reliable target, and Washington has given up five tight-end touchdowns already."],
+ ["Every Winston pass","Winston under pressure","Winston has 6 TDs and 5 INTs this season, and his completion rate falls to 33% when pressured. Washington blitzes more than almost anyone, so a Giants win probably needs fewer than two interceptions."]
+];
+
+load();wp();renderPers();renderGloss();renderCoaches();renderProps();roster("NYG");roster("WAS");
+$("#watchlist").innerHTML=WATCH.map(w=>`<div class="card"><p class="when">${w[0]}</p><h3>${w[1]}</h3><p>${w[2]}</p></div>`).join("");
+try{const t=localStorage.getItem("nygwas-tab");if(t){const b=document.querySelector(`nav.tabs button[data-tab="${t}"]`);if(b)b.click();}}catch(e){}
+})();
+</script>
+</body>
+</html>
