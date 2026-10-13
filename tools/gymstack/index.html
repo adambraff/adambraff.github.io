@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>2026 Gym Tech Stack</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: scenario chips; stack diagram (bottom = system of record, top = decisions) beside a step panel with mechanism, timing and records grouped by level */
+:root{
+  --bg:#EDF0EE; --surface:#FFFFFF; --ink:#15201B; --muted:#56655E; --line:#C7D0CB; --band:#E2E8E4; --node:#FFFFFF; --hi:#FFF2E8;
+  --live:#D9480F; --load:#1F64C4; --score:#11795A; --act:#B3195A; --third:#6D4FC4;
+  --live-soft:#FBE3D6; --load-soft:#DCE8F8; --score-soft:#D6EEE5; --act-soft:#F8DDE8; --third-soft:#E7E0F8;
+  --display:'Barlow Condensed','Arial Narrow',system-ui,sans-serif;
+  --body:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1513; --surface:#161E1B; --ink:#E6ECE8; --muted:#97A59E; --line:#2D3934; --band:#18221F; --node:#1D2723; --hi:#2C2118;
+  --live:#FF8A4C; --load:#6AA8FF; --score:#3CC690; --act:#FF6FA6; --third:#AE92FF;
+  --live-soft:#3A2418; --load-soft:#17283F; --score-soft:#123126; --act-soft:#3A1828; --third-soft:#271F3F;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1513; --surface:#161E1B; --ink:#E6ECE8; --muted:#97A59E; --line:#2D3934; --band:#18221F; --node:#1D2723; --hi:#2C2118;
+  --live:#FF8A4C; --load:#6AA8FF; --score:#3CC690; --act:#FF6FA6; --third:#AE92FF;
+  --live-soft:#3A2418; --load-soft:#17283F; --score-soft:#123126; --act-soft:#3A1828; --third-soft:#271F3F;
+  color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+.wrap{max-width:1500px;margin:0 auto;padding-inline:20px;padding-block:28px 48px;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-direction:column;gap:6px;max-width:900px}
+.eyebrow{font-family:var(--display);font-weight:600;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--live)}
+h1{margin:0;font-family:var(--display);font-weight:700;font-size:clamp(34px,5vw,52px);line-height:1;text-wrap:balance}
+.lede{margin:0;color:var(--muted);font-size:17px;max-width:72ch}
+.caveat{margin:0;font-size:14px;color:var(--muted);max-width:90ch;border-left:3px solid var(--line);padding-left:12px}
+.adv{display:inline-block;font:700 11px/1 var(--display);letter-spacing:.08em;padding:3px 6px;border-radius:4px;border:1.2px solid var(--muted);color:var(--muted);vertical-align:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.lab{font-family:var(--display);font-size:14px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.chip{font:600 16px/1 var(--display);letter-spacing:.02em;padding:11px 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;min-height:44px}
+.chip:hover{border-color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip:focus-visible,.btn:focus-visible,.seg button:focus-visible{outline:3px solid var(--live);outline-offset:2px}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:20px;align-items:start}
+@media (max-width:1200px){.main{grid-template-columns:minmax(0,1fr)}}
+.diagram{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.dtop{display:flex;justify-content:flex-end;align-items:center;gap:10px;flex-wrap:wrap;padding:0 4px}
+.dtop .hint{font-size:13px;color:var(--muted)}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{font:600 15px/1 var(--display);padding:0 14px;min-height:40px;border:none;background:var(--surface);color:var(--ink);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.scroll{overflow-x:auto}
+svg.map{display:block;width:100%;min-width:900px;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:14px;color:var(--muted);padding:4px 6px 2px}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.sw{width:26px;height:4px;border-radius:2px;display:inline-block}
+.sw.dash{height:0;border-top:3px dashed var(--muted);border-radius:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.count{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-variant-numeric:tabular-nums}
+.kind{font:600 13px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;border-radius:6px}
+.kind.live{background:var(--live-soft);color:var(--live)} .kind.load{background:var(--load-soft);color:var(--load)}
+.kind.score{background:var(--score-soft);color:var(--score)} .kind.act{background:var(--act-soft);color:var(--act)}
+.kind.third{background:var(--third-soft);color:var(--third)}
+.panel h2{margin:0;font-family:var(--display);font-weight:700;font-size:30px;line-height:1.05;text-wrap:balance}
+.route{font-size:14px;color:var(--muted)}
+.route b{color:var(--ink);font-weight:600}
+.facts{display:flex;flex-wrap:wrap;gap:6px}
+.fact{font-size:13px;padding:4px 9px;border-radius:6px;background:var(--band);color:var(--ink)}
+.fact b{font-weight:600;color:var(--muted);margin-right:4px}
+.fact.staff{background:var(--live-soft);color:var(--live);font-weight:600}
+.body{margin:0}
+.value{margin:0;padding:12px 14px;border-radius:10px;background:var(--band)}
+.vl{display:block;font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.branch{display:flex;flex-direction:column;gap:6px;padding:12px 14px;border:1.5px dashed var(--line);border-radius:10px}
+.branch .seg{align-self:flex-start;flex-wrap:wrap}
+.recs{display:flex;flex-direction:column;gap:8px}
+.grp{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.grp h3{margin:0;font:700 13px/1 var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:8px 10px;background:var(--bg);display:flex;justify-content:space-between}
+.grp h3 span{font-weight:500;letter-spacing:.04em;text-transform:none;font-family:var(--body)}
+.rows{display:flex;flex-direction:column}
+.row{padding:6px 10px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:1px}
+.row:first-child{border-top:none}
+.row.new{background:var(--hi)}
+.rtop{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.rk{font-family:var(--mono);font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+.row.new .rk{color:var(--live)}
+.rv{font-size:14.5px;overflow-wrap:anywhere}
+.rs{font-size:12px;color:var(--muted)}
+.tag{font:700 10.5px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;padding:3px 6px;border-radius:4px;flex:none}
+.tag.o{background:var(--band);color:var(--ink)}
+.tag.e{background:var(--third-soft);color:var(--third)}
+.tag.p{background:var(--score-soft);color:var(--score)}
+.none{padding:8px 10px;font-size:13px;color:var(--muted);font-style:italic}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{font:600 16px/1 var(--display);letter-spacing:.03em;min-height:44px;padding:0 18px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.dots{display:flex;gap:4px;flex-wrap:wrap}
+.dot{width:22px;height:22px;border-radius:50%;border:none;padding:0;background:transparent;cursor:pointer;display:grid;place-items:center}
+.dot i{display:block;width:9px;height:9px;border-radius:50%;background:var(--line)}
+.dot.done i{background:var(--muted)}
+.dot[aria-current="step"] i{width:12px;height:12px;background:var(--live)}
+.dot:focus-visible{outline:2px solid var(--live)}
+details.text{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 18px}
+details.text summary{cursor:pointer;font:600 17px/1.3 var(--display);letter-spacing:.02em}
+details.text ol{margin:10px 0 0;padding-left:22px;display:flex;flex-direction:column;gap:6px;max-width:100ch}
+details.text li span{color:var(--muted);font-size:14px}
+/* SVG */
+.band{fill:var(--band)}
+.bandnum{font-family:var(--display);font-weight:700;font-size:15px;fill:var(--ink);letter-spacing:.08em}
+.bandblurb{font-family:var(--body);font-size:13px;fill:var(--muted)}
+.tpbox{fill:none;stroke:var(--third);stroke-dasharray:5 5;stroke-width:1.2;opacity:.6}
+.tphead{font-family:var(--display);font-weight:700;font-size:14px;letter-spacing:.1em;fill:var(--third)}
+.tpsub{font-family:var(--body);font-size:12px;fill:var(--muted)}
+.node rect.box{fill:var(--node);stroke:var(--line);stroke-width:1.3;transition:stroke .3s,fill .3s}
+.node text.lbl{font-family:var(--display);font-weight:600;font-size:15px;fill:var(--ink);text-anchor:middle}
+.node rect.advbg{fill:var(--node);stroke:var(--muted);stroke-width:1}
+.node text.advt{font-family:var(--display);font-weight:700;font-size:10px;fill:var(--muted);text-anchor:middle;letter-spacing:.06em}
+.node.touched rect.box{stroke:var(--muted);stroke-width:1.8}
+.node.on rect.box{stroke-width:3}
+.node.on.k-live rect.box{stroke:var(--live);fill:var(--live-soft)}
+.node.on.k-load rect.box{stroke:var(--load);fill:var(--load-soft)}
+.node.on.k-score rect.box{stroke:var(--score);fill:var(--score-soft)}
+.node.on.k-act rect.box{stroke:var(--act);fill:var(--act-soft)}
+.node.on.k-third rect.box{stroke:var(--third);fill:var(--third-soft)}
+.actor circle.bg{fill:var(--node);stroke:var(--line);stroke-width:1.3}
+.actor.touched circle.bg{stroke:var(--muted);stroke-width:1.8}
+.actor.on circle.bg{stroke:var(--live);stroke-width:3;fill:var(--live-soft)}
+.actor .fig{fill:var(--ink)}
+.actor text{font-family:var(--display);font-weight:600;font-size:15px;fill:var(--ink);text-anchor:middle}
+.edge{fill:none;stroke-linecap:round}
+.edge.future{stroke:var(--line);stroke-width:1.6}
+.edge.past{stroke-width:2.2;opacity:.55}
+.edge.active{stroke-width:3.6}
+.edge.staff{stroke-dasharray:8 6}
+.edge.future.staff{stroke-dasharray:3 6}
+.edge.hide{display:none}
+.k-live.edge{stroke:var(--live)} .k-load.edge{stroke:var(--load)} .k-score.edge{stroke:var(--score)} .k-act.edge{stroke:var(--act)} .k-third.edge{stroke:var(--third)}
+.edge.future{stroke:var(--line)}
+.mk-live{fill:var(--live)} .mk-load{fill:var(--load)} .mk-score{fill:var(--score)} .mk-act{fill:var(--act)} .mk-third{fill:var(--third)} .mk-future{fill:var(--line)}
+.pk.k-live{fill:var(--live)} .pk.k-load{fill:var(--load)} .pk.k-score{fill:var(--score)} .pk.k-act{fill:var(--act)} .pk.k-third{fill:var(--third)}
+.halo{opacity:.25}
+.elab rect{fill:var(--surface);stroke-width:1.5}
+.elab text{font-family:var(--display);font-weight:600;font-size:13px;fill:var(--ink);text-anchor:middle}
+.elab.k-live rect{stroke:var(--live)} .elab.k-load rect{stroke:var(--load)} .elab.k-score rect{stroke:var(--score)} .elab.k-act rect{stroke:var(--act)} .elab.k-third rect{stroke:var(--third)}
+@media (prefers-reduced-motion: reduce){.node rect.box{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>2026 gym tech stack</h1>
+  </header>
+
+  <div class="chips" role="group" aria-label="Member action">
+    <span class="lab">Members</span>
+    <span class="chips" id="chips"></span>
+  </div>
+
+  <div class="main">
+    <section class="diagram" aria-label="Technology stack diagram">
+      <div class="dtop">
+        <div class="seg" role="group" aria-label="Diagram view">
+          <button type="button" id="vAll" aria-pressed="true">Full path</button>
+          <button type="button" id="vFocus" aria-pressed="false">Current hop only</button>
+        </div>
+      </div>
+      <div class="scroll"><svg class="map" id="map" viewBox="0 0 1200 690" role="img" aria-labelledby="mapdesc"><desc id="mapdesc">Five layers of a gym technology stack, from the system of record at the bottom to data and decisions at the top, with third-party data on the right. The current hop is described in the step panel and in the text version below.</desc></svg></div>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--live)"></i>Live request or event</span>
+        <span><i class="sw" style="background:var(--load)"></i>Data load into the warehouse</span>
+        <span><i class="sw" style="background:var(--score)"></i>Analysis and scoring</span>
+        <span><i class="sw" style="background:var(--act)"></i>Action sent back to a tool</span>
+        <span><i class="sw" style="background:var(--third)"></i>Third-party data in</span>
+        <span><i class="sw dash"></i>Person acts or approves</span>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="meta"><span class="count" id="count" aria-live="polite"></span><span class="kind" id="kind"></span></div>
+      <h2 id="title"></h2>
+      <div class="route" id="route"></div>
+      <div class="facts" id="facts"></div>
+      <p class="body" id="body"></p>
+      <p class="value"><span class="vl">What this layer adds</span><span id="value"></span></p>
+      <div class="branch" id="branch" hidden>
+        <span class="vl" id="branchq"></span>
+        <div class="seg" id="branchseg" role="group" aria-label="Choose a path"></div>
+      </div>
+      <div class="controls">
+        <button class="btn" id="back" type="button">Back</button>
+        <button class="btn primary" id="play" type="button">Play</button>
+        <button class="btn" id="next" type="button">Next</button>
+      </div>
+      <div class="dots" id="dots" role="group" aria-label="Steps"></div>
+      <div class="recs" id="recs"></div>
+    </aside>
+  </div>
+
+  <details class="text" id="textv">
+    <summary>Text version of this flow</summary>
+    <ol id="textlist"></ol>
+  </details>
+</div>
+
+<script>
+(function(){
+const NS='http://www.w3.org/2000/svg';
+const LAYERS=[
+  {n:5,name:'DATA & DECISIONS',blurb:'Combines the sources, scores members and clubs, recommends actions',top:20},
+  {n:4,name:'OPERATIONS',blurb:'Staff, and the systems that hire, schedule, pay and direct them',top:150},
+  {n:3,name:'MEMBER EXPERIENCE',blurb:'What members and guests touch in the club and the app',top:280},
+  {n:2,name:'REVENUE ENGINE',blurb:'Turns ads and site visits into leads and joins, then keeps members in touch',top:410},
+  {n:1,name:'CORE PLATFORM',blurb:'System of record: who is a member, what they owe, whether they can get in',top:540}
+];
+const N={
+  actor:{x:90,y:470,actor:true,name:'Prospect or member',l:['Prospect','or member']},
+  emp:{x:90,y:196,actor:true,name:'Employee or candidate',l:['Employee','or candidate']},
+  dash:{x:290,y:92,l:['Dashboards','& reporting']},
+  ai:{x:500,y:92,l:['AI agents'],adv:1},
+  model:{x:710,y:92,l:['Models','& scores'],adv:1},
+  wh:{x:900,y:92,l:['Data','warehouse'],adv:1},
+  staff:{x:268,y:222,w:144,l:['Scheduling, tasks','& time clock']},
+  desk:{x:434,y:222,w:144,l:['Front desk','& club team']},
+  hr:{x:600,y:222,w:144,l:['HR, recruiting','& payroll']},
+  fac:{x:766,y:222,w:144,l:['Maintenance','tickets']},
+  fin:{x:932,y:222,w:144,l:['Finance','& accounting']},
+  app:{x:290,y:352,l:['Member app']},
+  book:{x:500,y:352,l:['Class booking']},
+  fb:{x:710,y:352,l:['Feedback','& surveys']},
+  tablet:{x:900,y:352,l:['Club sales','tablet']},
+  web:{x:290,y:482,l:['Website','& join flow']},
+  ads:{x:500,y:482,l:['Ad platforms']},
+  crm:{x:710,y:482,l:['CRM & lead','management']},
+  tags:{x:900,y:482,l:['Web analytics','& tags']},
+  cms:{x:290,y:612,l:['Club management','& billing']},
+  pay:{x:500,y:612,l:['Payment processor','& vault']},
+  access:{x:710,y:612,l:['Door access']},
+  coll:{x:900,y:612,l:['Collections','agency']},
+  tloc:{x:1105,y:102,l:['Foot-traffic','panel'],adv:1,tp:1},
+  tgeo:{x:1105,y:182,l:['Area','demographics'],adv:1,tp:1},
+  tbench:{x:1105,y:262,l:['Public reviews','& benchmarks'],adv:1,tp:1}
+};
+const NAME=k=>N[k].name||N[k].l.join(' ');
+const KIND={live:'Live request or event',load:'Data load',score:'Analysis & scoring',act:'Action sent back',third:'Third-party data'};
+const TYPE={o:'Observed',e:'Estimated',p:'Predicted'};
+const GROUPS=[['m','Person & account','member, guest or employee'],['e','Events & transactions','things that happened, when'],['a','Club, class & market','aggregates, not one person'],['p','Predictions & actions','scores and what was done']];
+
+// step: [from,to,kind,title,body,value,how,when,who('a'|'s'),adds[[group,field,value,type,src]], par]
+const A='a',Sf='s';
+const SC=[
+ {key:'join',label:'Joins online',steps:[
+  ['actor','ads','live','Taps an ad','A prospect who lives seven minutes from the club taps a paid social ad.','The ad platform logs the impression, the click and the campaign. The person is still anonymous, so the click is stored under an ad click ID with no member ID attached.','Ad click','Seconds',A,[['e','ad_click','Fall promo, paid social','o','ads'],['e','click_id','clk_88231 (anonymous)','o','ads']]],
+  ['ads','web','live','Lands on the join page','The click arrives with its click ID and campaign tags in the web address.','If the join flow keeps the click ID through checkout, the warehouse can later credit the join to the ad that produced it.','Link parameters','Seconds',A,[['e','landing_page','/join, utm_source=paid_social','o','web']]],
+  ['web','tags','live','Form steps recorded','Analytics tags log the page view and each step of the join form.','Because each step is logged, the marketing team can see where prospects drop out: plan selection, the payment page or the contract.','Browser tag','Seconds',A,[['e','form_progress','plan picked, payment page reached','o','tags']],1],
+  ['web','cms','live','Agreement signed','The prospect chooses the premium tier, signs a 12-month agreement and enters bank details.','The club management system creates the member, the contract and the dues schedule, and every later report draws on this record. No money has moved yet.','API call','Seconds',A,[['m','member_id','M-204817','o','cms'],['m','plan','Premium, 12-month term','o','cms'],['m','monthly_dues','$59.99','o','cms'],['m','home_club','Club 14','o','cms'],['e','agreement','signed Oct 13, 7:12 pm','o','cms']]],
+  ['web','pay','live','Bank details go to the vault','The account number goes straight to the payment processor’s vault, which returns a token in its place.','Because the club system and the warehouse hold only the token, most of the security burden for bank data stays with the processor.','Secure payment form','Seconds',A,[['m','payment_ref','tok_ach_5521 (token only)','o','pay']],1],
+  ['cms','pay','live','Initial payment submitted','The enrollment fee ($79) and first month ($59.99) are submitted as an ACH bank debit.','ACH debits stay pending for several business days, and the bank can return one during that window for insufficient funds, a closed account or a disputed debit.','API call','Seconds',A,[['e','initial_payment','$138.99 submitted, pending','o','pay']]],
+  ['tags','ads','live','Join reported to the ad platform','The confirmation page reports a conversion. Advanced setups also send a server-side confirmation from the club system and remove duplicates.','The ad platform uses reported conversions to decide whom to bid on. The operator chooses which value to report; here it is the $138.99 initial payment rather than a lifetime estimate.','Browser tag (optional server-side)','Seconds',A,[['e','conversion','join, value $138.99 initial payment','o','tags']]],
+  ['cms','crm','live','Welcome series starts','The new member syncs to the CRM, which starts a welcome series.','Onboarding messages go out in the first weeks of membership, when many early cancellations happen.','Webhook or sync','Minutes',A,[['p','journey','new member welcome, day 0','o','crm']]],
+  ['pay','cms','live','Payment settles','Three business days later, the processor confirms that the debit settled.','The payment counts as collected only once it settles. Had the bank returned it, the member would have entered the missed-payment flow.','Webhook','2–4 business days',A,[['e','initial_payment','$138.99 settled Oct 16','o','pay']]],
+  ['pay','fin','live','Deposit reconciled','Finance matches the processor’s deposit to the club system’s transactions.','Finance books processor fees and returns against each deposit before the figures reach the P&amp;L.','Settlement file','Daily',A,[['e','reconciled','deposit Oct 16, matched','o','fin']]],
+  ['cms','wh','load','Copied to the warehouse','Member, contract and payment records are copied into the warehouse alongside ad and web data.','Refresh schedules vary by platform, from every few minutes to once a night. The warehouse is the one place where club, ad and web data share tables.','Scheduled or streaming sync','Minutes to overnight',A,[]],
+  ['tags','wh','load','Identity matched','The warehouse links the anonymous click ID to M-204817 through the email address entered on the join form.','Ad clicks and web visits have no member ID of their own, and until the warehouse matches them, marketing spend can’t be tied to members.','Identity matching','Overnight',A,[['m','linked_ids','clk_88231 → M-204817','o','wh']]],
+  ['tgeo','wh','third','Area context added','Census-tract demographics for the member’s home area are attached, along with a drive time calculated in the warehouse.','These figures describe the neighborhood rather than the household, so they are used for market analysis and kept out of decisions about an individual member.','Licensed data load','Monthly',A,[['a','home_tract_median_income','$88K (area estimate)','e','tgeo'],['m','drive_time','7 min (calculated)','e','wh']]],
+  ['wh','model','score','Scored at join','A model estimates the member’s 24-month contribution margin and early-cancel risk.','With no visit or payment history yet, the day-one estimate is rough; the model rescores the member as history accumulates.','Model run','Overnight',A,[['p','predicted_value','$1,140, 24-mo contribution','p','model'],['p','early_cancel_risk','low','p','model']]],
+  ['model','ads','act','Lookalike seed list refreshed','Members who joined directly and agreed to marketing are uploaded as a seed audience.','Ad platforms build lookalike audiences from the seed list. Google, Meta and the others accept only customer data collected directly, with disclosure and consent.','Audience upload','Weekly',A,[['p','audience','high-value seed list (consented members)','o','ads']]],
+  ['wh','dash','score','Outcome measured','The dashboard shows settled joins, cost per settled join and 90-day retention by channel.','Marketing compares channels on the share of joins still paying at day 90, alongside cost per join.','Report refresh','Daily',A,[['a','cost_per_settled_join','$92, paid social, Oct','o','wh']]]
+ ]},
+ {key:'tour',label:'Requests a trial',steps:[
+  ['actor','web','live','Requests a trial pass','A visitor enters a name, email and phone number for a three-day pass.','The club now has contact details for someone who was anonymous a minute earlier.','Web form','Seconds',A,[['m','lead_id','L-77310','o','crm'],['m','lead_source','organic search','o','web']]],
+  ['web','crm','live','Lead created','The form posts to the CRM, which holds the lead until it becomes a member.','Every call, text and visit with the prospect is recorded against the lead.','Form integration','Seconds',A,[['e','lead_created','Oct 13, 12:04 pm','o','crm']]],
+  ['crm','desk','live','Follow-up task for an advisor','A membership advisor gets a task to call within the hour.','Operators often test how much a fast first call raises conversion, and the effect varies by club and lead source.','Task assignment','Minutes',Sf,[['e','first_call','18 min after request','o','crm']]],
+  ['crm','actor','live','Confirmation and reminder','A text confirms the pass, and a reminder goes out the morning of the visit.','Reminders go out the day before and the morning of the visit.','Text message','Minutes, then day of visit',A,[]],
+  ['actor','access','live','Visits on the pass','The guest scans the pass at the door.','The scan is recorded against the lead, so the visit counts toward that lead source.','Pass scan','Seconds',A,[['e','guest_visit','Thu 6:10 pm, Club 14','o','access']]],
+  ['desk','tablet','live','Tour and sign-up','The advisor gives a tour and the guest signs up on the club sales tablet.','In-club joins create the same contract record in the club management system as online joins.','Staff action','During the visit',Sf,[['m','member_id','M-205020','o','cms'],['m','plan','Basic, 12-month term','o','cms']]],
+  ['tablet','cms','live','Agreement created','The tablet writes the agreement to the club management system.','From here, the club management system holds the contract.','API call','Seconds',A,[['e','agreement','signed at club, Thu 6:48 pm','o','cms']]],
+  ['cms','crm','live','Lead closed as won','The CRM marks the lead converted and links it to the member ID.','Linking the lead ID to the member ID lets marketing measure conversion by lead source.','Sync','Minutes',A,[['m','linked_ids','L-77310 → M-205020','o','crm']]],
+  ['crm','wh','load','Leads and outcomes loaded','Leads, calls, visits and joins are copied to the warehouse.','With every stage in the same tables, the whole funnel can be counted from first form to signed agreement.','Scheduled sync','Overnight',A,[]],
+  ['wh','dash','score','Outcome measured','The dashboard shows lead-to-visit and visit-to-join rates by source and by advisor.','Managers see which lead sources and which advisors turn trial visits into joins.','Report refresh','Daily',A,[['a','trial_to_join','31%, organic search, Sept','o','wh']]]
+ ]},
+ {key:'checkin',label:'Checks in',steps:[
+  ['actor','access','live','Scans at the door','The member scans an app barcode at 6:42 on a Tuesday morning.','The door system logs every scan, including the ones that end in a denial.','Barcode scan','Seconds',A,[['m','member_id','M-204817','o','cms'],['e','scan','Tue 6:42:05 am, Club 14','o','access']]],
+  ['access','cms','live','Eligibility checked','The door asks the club management system whether this member is active, paid up and allowed at this club. If the network is down, the door falls back to a cached permission list.','A live lookup reflects payments and freezes made minutes earlier, and the cached list keeps the door working during an outage.','API request and response','Under a second',A,[['m','status','active, $0 due, all-club access','o','cms']]],
+  ['cms','access','live','Access granted, visit recorded','The door unlocks and logs the visit.','Denied scans are logged too, with the reason (past due, frozen or wrong club).','API response','Under a second',A,[['e','visit','granted, recorded','o','access']]],
+  ['cms','desk','live','Greeting cue at the desk','The member’s name and photo appear at the desk, with a note that this is the 10th visit this month.','Staff can greet regulars by name and catch account problems before the member reaches the floor.','Screen update','Seconds',A,[],1],
+  ['access','wh','load','Visits copied to the warehouse','Every scan, grant and denial is copied to the warehouse.','In the warehouse, visit history is joined to plan, payments and feedback.','Scheduled or streaming sync','Minutes to overnight',A,[]],
+  ['wh','model','score','Attendance signal updated','The model compares recent visits with this member’s usual pattern.','A drop in attendance is often an early churn signal, though each operator has to test how well it predicts cancellations among its own members.','Model run','Overnight',A,[['p','visits_30d_vs_usual','10 vs 9, steady','o','wh'],['p','churn_risk','low','p','model']]],
+  ['wh','dash','score','Arrivals by hour','The dashboard shows check-ins by hour and club.','Check-ins count arrivals. Estimating how many people are inside at once requires exit scans or an assumed visit length.','Report refresh','Daily',A,[['a','weekday_arrivals_5_7pm','212 avg, Club 14','o','wh']]],
+  ['tloc','wh','third','Market visit estimates','A foot-traffic panel estimates visits to gyms in the trade area.','Panel vendors extrapolate from a sample of phones, so the figures are estimates, useful for trends and share within a defined market, period and competitor set.','Licensed data load','Monthly',A,[['a','est_share_of_gym_visits','31%, 10-min trade area, Sept','e','tloc']]],
+  ['dash','staff','act','Schedule adjusted','The club manager moves two front-desk hours into the 5–7 pm peak.','The manager makes the scheduling decision, with the arrivals data as one input.','Staff decision','Next schedule cycle',Sf,[['p','action','+2 desk hours, 5–7 pm','o','staff']]]
+ ]},
+ {key:'book',label:'Books a class',steps:[
+  ['actor','app','live','Looks for a class','The member searches for reformer Pilates on Thursday evening.','Members search, book and cancel in the app, which passes each request to the booking system.','App','Seconds',A,[['m','member_id','M-204817','o','cms']]],
+  ['app','book','live','Class is full: joins the waitlist','All 12 reformers in the 6:15 pm class are booked, so the member joins the waitlist in position 3.','The booking system enforces capacity and plan rules, such as an earlier booking window for premium members.','API call','Seconds',A,[['a','thu_6_15_class','12 of 12 booked, 4 waitlisted','o','book'],['e','waitlist','position 3','o','book']]],
+  ['book','cms','live','Plan checked','The booking system asks the club management system whether the plan includes reformer classes.','Add-on charges are billed through the club management system along with dues.','API request and response','Seconds',A,[['m','reformer_included','no, $15 per class','o','cms']]],
+  ['app','book','live','Two booked members cancel','Two members cancel before the cutoff.','A spot opens only when a booked member cancels, which is why reminders prompt members to cancel when they can’t come.','App','Day of class',A,[['e','cancellations','2 before cutoff','o','book']]],
+  ['book','crm','live','Promoted from the waitlist','The member moves into the class and gets a text, and the $15 add-on is charged.','The booking system fills the spot from the waitlist and bills the add-on with no staff involvement.','Event plus text','Minutes',A,[['e','booking','confirmed from waitlist','o','book'],['e','add_on_charge','$15','o','cms']]],
+  ['desk','book','live','Attendance taken','The instructor checks attendees in, and one booked member does not show.','Attendance and no-shows are recorded separately from bookings, since the numbers often differ.','Staff action','At class time',Sf,[['e','attended','yes','o','book'],['a','thu_6_15_attendance','11 of 12, 1 no-show','o','book']]],
+  ['book','wh','load','Bookings and attendance loaded','Bookings, waitlists, cancellations and attendance are copied to the warehouse.','In the warehouse, class behavior is linked to each member’s plan and payment history.','Scheduled sync','Overnight',A,[]],
+  ['wh','model','score','Demand estimated','The model adds up eight weeks of bookings and waitlists by time slot.','Counting waitlisted members captures demand from people who were turned away, which attendance figures miss.','Model run','Weekly',A,[['p','thu_6pm_demand','about 16 per class vs 12 reformers','p','model']]],
+  ['model','dash','act','Suggests adding a class','The model recommends a second Thursday 6:15 pm class.','The output is a recommendation for a manager to review.','Recommendation','Weekly',A,[['p','recommendation','add 2nd Thu 6:15 pm class','p','model']]],
+  ['dash','staff','act','Manager checks and approves','The manager checks instructor availability, room and reformer capacity, and whether add-on revenue covers instructor pay.','The manager weighs constraints the model doesn’t see before approving the class.','Staff decision','Next month’s schedule',Sf,[['p','decision','approved, starts Nov 5','o','staff']]],
+  ['wh','dash','score','Outcome measured','The dashboard tracks fill rate, waitlist length and add-on revenue for the new slot over six weeks.','After six weeks, the comparison shows whether the second class added demand or split the existing class.','Report refresh','Weekly',A,[['a','measure','fill rate and add-on revenue, weeks 1–6','o','wh']]]
+ ]},
+ {key:'complain',label:'Complains',steps:[
+  ['actor','fb','live','Leaves a low score','The member gives a post-visit survey 3 out of 10: “Cable machine broken again, locker room dirty.”','The survey captures the complaint privately, before the member posts a public review.','Survey','Seconds',A,[['m','member_id','M-204817','o','cms'],['e','survey','3 of 10, Oct 13','o','fb'],['e','comment','“Cable machine broken again, locker room dirty”','o','fb']]],
+  ['fb','ai','live','Tagged by AI','An AI agent tags the comment by topic and urgency.','AI tagging can sort hundreds of comments a week, though it can misidentify which machine is meant or how urgent the problem is.','AI classification','Minutes',A,[['p','tags','equipment, cleanliness; urgency high','p','ai']]],
+  ['ai','desk','live','Staff review the tags','The manager confirms the comment is about cable station 2 and finds an open ticket for it.','The manager resolves anything ambiguous and checks for an existing ticket before anyone opens a new one.','Staff review','Within hours',Sf,[['e','reviewed','confirmed, matches ticket #4471','o','desk']]],
+  ['desk','fac','live','Linked to the existing ticket','The complaint is attached to ticket #4471, which moves up in priority.','Each linked complaint raises the priority of the existing ticket instead of opening a duplicate.','Ticket update','Minutes',Sf,[['e','ticket_4471','acknowledged, 3 linked complaints','o','fac']]],
+  ['desk','staff','live','Cleaning task assigned','The club team gets a locker-room task due by 11 am.','The task has an owner and a deadline, and its completion is logged.','Task assignment','Minutes',Sf,[['e','task','locker room clean, due 11 am','o','staff']],1],
+  ['fac','desk','live','Work completed','The technician closes the ticket with a photo, and the cleaning task is marked done.','The reply to the member waits for the closed ticket and the completed task.','Ticket and task closed','Hours to days',Sf,[['e','ticket_4471','closed Oct 15, part replaced','o','fac'],['e','task','done 10:40 am','o','staff']]],
+  ['desk','crm','live','Manager replies','The manager sends a reply once both jobs are confirmed done.','The reply names what was fixed and when.','Staff message','After completion',Sf,[['e','reply','sent Oct 15','o','crm']]],
+  ['crm','actor','live','Member hears back','“Thanks for flagging it. Station 2 has a new part, and we added a midday locker-room clean.”','The member learns what changed because of the complaint.','Email or text','Minutes',A,[]],
+  ['fac','wh','load','Feedback, tickets and tasks loaded','Survey scores, ticket times and task completion are copied to the warehouse.','With scores, ticket times and task completion in one place, managers can check how fast complaints get fixed.','Scheduled sync','Overnight',A,[]],
+  ['tbench','wh','third','Public ratings added','Public review ratings for the club and nearby gyms are loaded.','The club’s scores can be compared with those of nearby gyms on the same review sites.','Licensed or collected data','Weekly',A,[['a','google_rating','4.6 vs 4.1 nearby average','o','tbench']]],
+  ['wh','dash','score','Outcome measured','The dashboard tracks time to fix, repeat complaints about the same equipment, and whether this member keeps visiting.','The measures are recurrence and retention: whether station 2 draws more complaints, and whether this member stays.','Report refresh','Weekly',A,[['a','median_time_to_fix','2.1 days, Club 14, Oct','o','wh']]]
+ ]},
+ {key:'lapse',label:'Stops visiting',steps:[
+  ['access','wh','load','No visits, and the data shows it','No scans come in, and the gap shows up in the visit history.','Absence is visible only when visits are recorded per member.','Scheduled sync','Overnight',A,[['m','member_id','M-198442','o','cms'],['e','last_visit','Sept 21, 22 days ago','o','access']]],
+  ['wh','model','score','Risk score rises','Visits have fallen from about nine a month to none.','A drop in attendance is often an early churn signal, which the operator has to validate on its own members.','Model run','Overnight',A,[['p','churn_risk','high','p','model']]],
+  ['model','crm','act','Scores synced to the CRM','Overnight, risk scores and segments sync to the CRM.','The score moves into the tool the retention team uses for outreach.','Reverse sync','Overnight',A,[['p','segment','at risk, no visits 21+ days','o','crm']]],
+  ['crm','app','act','Outreach, with a holdout','A come-back message offering a free coaching session goes to a random 90% of the segment, and the other 10% get nothing.','Comparing the outreach group with the holdout separates members the outreach brought back from members who would have returned anyway.','Campaign','Next morning',A,[['p','group','outreach (10% random holdout)','o','crm'],['p','offer','free coaching session','o','crm']]],
+  ['crm','desk','act','Calls for high-value members','Advisors call the 50 at-risk members with the highest predicted value.','Staff calling time is limited, so it goes to the members with the most predicted value at stake.','Call list','This week',Sf,[['e','call','voicemail left Oct 14','o','crm']],1],
+  ['actor','access','live','Comes back','The member visits on Oct 17 and books the free session.','For this member, the return visit is the first evidence that the outreach worked.','Barcode scan','Seconds',A,[['e','visit','Oct 17','o','access']]],
+  ['access','wh','load','Return recorded','The visit is copied to the warehouse.','The return visit is stored next to the outreach record.','Scheduled sync','Overnight',A,[]],
+  ['wh','dash','score','Outcome measured','The dashboard compares the outreach group with the holdout on the share still paying at day 90 and on visits per month.','Outreach is credited only with the difference between the two groups.','Report refresh','At day 90',A,[['a','incremental_retention','+4.2 pts vs holdout','e','wh']]]
+ ]},
+ {key:'cancel',label:'Tries to cancel',q:'What does the member choose?',steps:[
+  ['actor','web','live','Clicks Cancel online','The member picks a reason: “too expensive right now.”','The stated reason determines which offer, if any, the member sees.','Web page','Seconds',A,[['m','member_id','M-204817','o','cms'],['e','cancel_request','Oct 13, reason: cost','o','web']]],
+  ['web','cms','live','Contract checked','The site asks the club management system for the term, months left and any fees.','The club management system is the only record of what this member owes.','API request and response','Seconds',A,[['m','contract','4 months left, no early-cancel fee','o','cms']]],
+  ['crm','web','act','Offer from a precomputed score','Last night’s value and risk scores are already in the CRM, so the cancel page reads them instantly.','Because scores are computed overnight and stored in the CRM, the cancel page doesn’t wait on the warehouse.','API request and response','Seconds',A,[['p','predicted_value','$1,140, 24-mo contribution','p','model'],['p','offer','3-month freeze at $9.99 per month','p','crm']]],
+  ['web','actor','live','One offer, and a plain Cancel button','The page shows the freeze offer next to an equally visible “Cancel anyway” button.','Cancellation rules vary by state. California, for example, requires online cancellation for memberships bought online, and the FTC’s 2024 click-to-cancel rule was vacated in July 2025 (status as of October 2026).','Web page','Seconds',A,[]]
+ ],branches:[
+  {label:'Takes the freeze',steps:[
+   ['web','cms','live','Freeze applied','The membership freezes for three months at $9.99 a month.','Dues continue at a lower rate instead of stopping.','API call','Seconds',A,[['m','status','frozen Nov 1 to Jan 31, $9.99/mo','o','cms']]],
+   ['cms','crm','live','Return message scheduled','The CRM queues a welcome-back message for the week the freeze ends.','The message goes out the week the member is due back.','Sync','Minutes',A,[['p','journey','return from freeze, Jan 26','o','crm']]],
+   ['cms','wh','load','Request and outcome loaded','The request, reason, offer and outcome are copied to the warehouse.','Each save attempt is stored with its reason, offer and outcome.','Scheduled sync','Overnight',A,[]],
+   ['wh','dash','score','Outcome measured','The dashboard tracks offers accepted and the share of members still paying 90 days after their freeze ends.','A freeze counts as a save only if the member is still paying 90 days after it ends.','Report refresh','Monthly',A,[['a','save_rate','24% of cost-reason requests, Sept','o','wh']]]
+  ]},
+  {label:'Cancels anyway',steps:[
+   ['web','cms','live','Cancellation processed','The cancellation takes effect at the end of the current billing period, with one final draft.','The club management system sets the end date and the final draft.','API call','Seconds',A,[['m','status','cancel effective Nov 30','o','cms'],['e','final_draft','Nov 1, $59.99','o','cms']]],
+   ['cms','access','live','Access set to expire','Door permissions end on Nov 30.','Door access ends on the same date as billing.','Permission update','Seconds',A,[['m','access_until','Nov 30','o','access']]],
+   ['cms','crm','live','Confirmation sent','An email confirms the end date and the final charge.','A written end date and final charge reduce disputes and chargebacks.','Email','Minutes',A,[['e','confirmation','emailed Oct 13','o','crm']]],
+   ['cms','wh','load','Request and outcome loaded','The request, reason, offer and outcome are copied to the warehouse.','The cancellation is stored next to the member’s visits, payments and feedback.','Scheduled sync','Overnight',A,[]],
+   ['wh','dash','score','Outcome measured','The dashboard shows cancellations by reason and how many former members rejoin within six months.','Sorting cancellations by reason separates causes the club can address (cost, crowding, cleanliness) from ones it can’t (moving away).','Report refresh','Monthly',A,[['a','cost_reason_share','38% of Sept cancels','o','wh']]]
+  ]}
+ ]},
+ {key:'decline',label:'Misses a payment',q:'Does the member fix it?',steps:[
+  ['cms','pay','live','Monthly dues submitted','On the billing date (the 1st, as an example policy), dues are submitted for every active member.','The club management system submits dues for the whole membership in one batch.','Batch submission','Billing day',A,[['m','member_id','M-201377','o','cms'],['e','draft','$59.99 ACH, Nov 1','o','cms']]],
+  ['pay','cms','live','Returned by the bank','Two business days later, the bank returns the debit for insufficient funds.','Each return comes with a code (R01 for insufficient funds, R02 for a closed account), and the club retries or asks for a new payment method depending on the code.','Webhook','2–3 business days',A,[['e','draft','returned R01, Nov 4','o','pay']]],
+  ['cms','crm','live','Update-payment message','The member gets a text with a secure link to update payment.','The member can fix the problem before any fee or access limit applies.','Text message','Same day',A,[['e','message','text, Nov 4','o','crm']]],
+  ['cms','access','live','Door flag set','As an example policy, the next check-in shows a payment alert.','Staff will see the alert when the member next visits.','Permission update','Seconds',A,[['m','access_flag','payment alert','o','cms']]]
+ ],branches:[
+  {label:'Updates payment',steps:[
+   ['actor','access','live','Shows up to work out','The member scans in on Wednesday evening.','The front desk sees the payment alert at check-in.','Barcode scan','Seconds',A,[['e','scan','Nov 6, 6:30 pm','o','access']]],
+   ['access','desk','live','Switches from bank debit to a card','At the desk, the member adds a card on the tablet, and the card number goes to the processor’s vault.','Staff resolve the balance in person, without a phone call.','Staff action','Minutes',Sf,[['m','payment_ref','tok_card_9013 (token only)','o','pay']]],
+   ['cms','pay','live','Card charged and approved','The past-due $59.99 is charged to the new card and approved.','Card approvals come back in seconds, while ACH debits take days to settle.','API call','Seconds',A,[['e','recovery','$59.99 approved, Nov 6','o','pay']]],
+   ['pay','fin','live','Recovery reconciled','The charge appears in the next deposit and is matched.','Finance books the recovered cash once it shows up in a deposit.','Settlement file','1–2 days',A,[['e','reconciled','Nov 8 deposit','o','fin']]],
+   ['cms','wh','load','Payments loaded','Drafts, returns and recoveries are copied to the warehouse.','Payment history is stored next to visits and plan.','Scheduled sync','Overnight',A,[]],
+   ['wh','model','score','Payment-risk score updated','The model uses observed payment history: returns, method changes and recoveries.','The score rests on observed payment behavior. Demographic data would need validation and a clear permitted use before it informed decisions about individual members.','Model run','Overnight',A,[['p','payment_risk_90d','medium','p','model']]],
+   ['wh','dash','score','Outcome measured','The dashboard shows recovered balances and recovery rate by payment method and days past due.','Recovery rates by method and age of balance show which recovery steps bring money back.','Report refresh','Monthly',A,[['a','recovery_rate','61% within 30 days','o','wh']]]
+  ]},
+  {label:'Does not fix it',steps:[
+   ['pay','cms','live','Retries fail','On an example schedule, retries on days 5, 10 and 20 all fail.','Each retry and its result is recorded.','Webhook','Over 3 weeks',A,[['e','retries','3 failed','o','pay']]],
+   ['cms','access','live','Access suspended','As an example policy, access is suspended at day 30.','Suspending access keeps the member from using the club while the balance is unpaid.','Permission update','Day 30',A,[['m','status','suspended Dec 1','o','cms']]],
+   ['cms','coll','live','Placed with collections','As an example policy, the balance goes to an agency at day 60.','Collections is the last step and usually ends the membership for good.','File transfer','Day 60',Sf,[['e','placed','$119.98, Dec 31','o','coll']]],
+   ['coll','fin','live','Agency remits recoveries','The agency pays over what it recovers, minus its fee.','Finance books agency recoveries against the written-off balance.','Monthly statement','Monthly',A,[['e','recovered_to_date','$0','o','coll']]],
+   ['cms','wh','load','Payments loaded','Drafts, returns, suspensions and placements are copied to the warehouse.','The account’s full payment history is in one place.','Scheduled sync','Overnight',A,[]],
+   ['wh','dash','score','Outcome measured','The dashboard shows write-offs and recoveries by join promotion and payment method.','Write-offs by join promotion show which promotions bring in members who stop paying.','Report refresh','Monthly',A,[['a','bad_debt','by join promo and payment method','o','wh']]]
+  ]}
+ ]}
+ ,{key:'hire',label:'Hires a trainer',emp:1,steps:[
+  ['emp','hr','live','Applies for a trainer job','A candidate applies on the careers page, which feeds the recruiting module of the HR system.','The HR system holds every applicant, interview and offer, so hiring managers work from one list instead of email threads.','Careers page integration','Seconds',A,[['m','candidate_id','C-3391','o','hr'],['m','role_applied','personal trainer, Club 14','o','hr']]],
+  ['hr','desk','live','Interview and offer','The fitness manager interviews the candidate and sends an offer through the HR system.','Approvals and the signed offer letter are stored with the candidate record.','Staff action','1–2 weeks',Sf,[['e','offer','accepted Oct 20, $24/hr plus commission','o','hr']]],
+  ['emp','hr','live','Completes onboarding paperwork','The new hire fills in tax and employment-eligibility forms, sets up direct deposit, and uploads CPR and trainer certifications.','The HR system tracks certification expiry dates, so managers are warned before a trainer’s CPR lapses.','Employee self-service','Before day one',A,[['m','employee_id','E-1187','o','hr'],['m','cpr_certification','expires Mar 2028','o','hr']]],
+  ['hr','staff','live','Added to scheduling and time clock','The new hire’s role and pay rate sync to the scheduling system.','Managers can schedule the trainer only after the HR record exists, which keeps unapproved shifts off the schedule.','Sync','Minutes',A,[['m','schedulable_roles','trainer, floor coach','o','staff']]],
+  ['hr','cms','live','Staff login created','The club management system gets a staff account with trainer permissions: sell training packages and look up clients, but no refunds.','Role-based permissions limit what each employee can change in member and billing records.','User provisioning','Minutes',A,[['m','system_role','trainer, Club 14','o','cms']]],
+  ['hr','access','live','Door credential issued','The new hire gets a staff credential for the front door and the staff room at Club 14.','Because the credential is tied to the HR record, it can be shut off on the day employment ends.','Permission update','Minutes',A,[['m','staff_access','Club 14, 5 am to 11 pm','o','access']],1],
+  ['hr','book','live','Trainer profile in booking','A trainer profile with photo and specialties goes into the booking system.','Members can book the trainer as soon as the first shifts are scheduled.','Sync','Minutes',A,[['e','first_bookable_slot','Nov 3, 6 am','o','book']]],
+  ['hr','wh','load','Hiring data loaded','Requisitions, applicants, offers and start dates are copied to the warehouse.','Hiring data sits next to sales and member data for the same clubs.','Scheduled sync','Overnight',A,[]],
+  ['wh','dash','score','Outcome measured','The dashboard shows time to fill, offer acceptance and the share of new trainers still employed at 90 days, by club.','Trainer turnover can be set against each club’s personal-training revenue and member retention.','Report refresh','Monthly',A,[['a','trainer_90d_retention','72%, region, Q3','o','wh']]]
+ ]},
+ {key:'shift',label:'Works a shift',emp:1,steps:[
+  ['wh','staff','act','Schedule built from demand','Arrivals by hour feed next week’s schedule, which the manager adjusts and publishes.','The manager matches coverage to the hours when members arrive, within the club’s labor budget.','Staff decision','Weekly',Sf,[['a','club14_labor_budget','420 hours, week of Nov 2','o','fin'],['e','shift','Tue 2–10 pm, front desk','o','staff']]],
+  ['staff','emp','live','Shift published','The employee sees the schedule in the app and can request swaps.','Swaps go through the app with manager approval, so the schedule matches who actually comes in.','App notification','Minutes',A,[]],
+  ['emp','staff','live','Clocks in','The employee clocks in on the app, inside the club’s geofence, at 1:58 pm.','The time clock records the punch and its location and flags late or early arrivals against the scheduled shift.','App punch','Seconds',A,[['m','employee_id','E-0942','o','hr'],['e','clock_in','Tue 1:58 pm, Club 14','o','staff']]],
+  ['emp','tablet','live','Sells a membership','During the shift, the employee signs up a walk-in on the sales tablet.','The sale is credited to the employee who made it.','Staff action','During the shift',Sf,[['e','sale','premium join, M-205133','o','cms']]],
+  ['tablet','cms','live','Sale credited','The club management system records the agreement with the employee ID as salesperson.','Commission depends on this credit, so it is recorded at the moment of sale.','API call','Seconds',A,[['e','sales_credit','E-0942','o','cms']]],
+  ['emp','staff','live','Clocks out','The employee clocks out at 10:04 pm.','Hours worked, including overtime, come from the punches rather than the schedule.','App punch','Seconds',A,[['e','clock_out','Tue 10:04 pm, 8.1 h','o','staff']]],
+  ['staff','hr','load','Hours sent to payroll','At the end of the pay period, a manager approves the timecards and the hours move to the payroll module.','Manager approval catches missed punches before anyone is paid for them.','Payroll export','Every two weeks',Sf,[['e','period_hours','78.5 h, 2.5 h overtime','o','staff']]],
+  ['cms','hr','load','Commissions calculated','Sales credited to the employee are summed and loaded into payroll.','Commission is paid only on sales whose first payment settled, so a returned payment produces no commission.','Commission export','Every two weeks',A,[['e','commission','$85, 4 settled joins','o','hr']]],
+  ['hr','fin','live','Payroll run and booked','Payroll pays the employee and posts the expense to the general ledger by club and department.','Finance sees labor cost by club in the same period as the revenue it supported.','Journal entry','Payday',A,[['e','payroll','paid Nov 13, posted to Club 14','o','fin']]],
+  ['hr','wh','load','Labor data loaded','Hours, pay and sales credits are copied to the warehouse.','In the warehouse, labor data joins arrivals and sales for the same clubs and hours.','Scheduled sync','Overnight',A,[]],
+  ['wh','dash','score','Outcome measured','The dashboard shows labor cost as a share of revenue, and joins per staffed hour, by club.','Managers compare clubs on joins and revenue per staffed hour as well as on total hours.','Report refresh','Weekly',A,[['a','labor_pct_of_revenue','23%, Club 14, Oct','o','wh']]]
+ ]},
+ {key:'leave',label:'Leaves the job',emp:1,steps:[
+  ['emp','hr','live','Gives two weeks’ notice','A trainer resigns, and the manager enters the last day in the HR system.','Every other system takes the end date from the HR record.','Staff action','Two weeks ahead',Sf,[['m','employee_id','E-0815','o','hr'],['m','end_date','Nov 27','o','hr']]],
+  ['hr','staff','live','Removed from future shifts','Shifts after the end date are released for other staff to claim.','Managers see the open shifts right away.','Sync','Minutes',A,[['e','open_shifts','6 released','o','staff']]],
+  ['hr','book','live','Clients reassigned','The fitness manager moves the trainer’s booked clients to other trainers.','Clients keep their sessions, and their package balances stay in the club management system.','Staff action','Before the end date',Sf,[['e','reassigned','11 clients to 2 trainers','o','book']]],
+  ['hr','access','live','Door access ends','The staff credential stops working at the end of the last shift.','Because the credential is tied to the HR record, it shuts off on the end date without anyone having to remember to cancel it.','Permission update','End date',A,[['m','staff_access','revoked Nov 27, 11 pm','o','access']]],
+  ['hr','cms','live','System login disabled','The employee’s login to the club management system is disabled at the same time.','A former employee can no longer look up member or payment records.','User deprovisioning','End date',A,[['m','system_role','disabled Nov 27','o','cms']],1],
+  ['emp','hr','live','Exit survey','The trainer answers an exit survey and names pay as the main reason for leaving.','Exit reasons are stored alongside tenure, role and pay.','Survey','Last week',A,[['e','exit_reason','pay','o','hr']]],
+  ['hr','fin','live','Final pay','Final pay, including commission on sales that settled before the end date, runs on the next payday.','State law sets how quickly final pay must arrive.','Payroll run','Next payday',A,[['e','final_pay','paid Dec 4','o','fin']]],
+  ['hr','wh','load','Turnover data loaded','Tenure, role, pay and exit reason are copied to the warehouse.','In the warehouse, turnover data joins club performance and member results.','Scheduled sync','Overnight',A,[]],
+  ['wh','model','score','Staff turnover risk','A model flags clubs and roles with high predicted turnover, using tenure, schedule changes and pay relative to similar roles in the area.','The flags point managers to clubs where pay or scheduling may need attention.','Model run','Monthly',A,[['p','club14_trainer_turnover_risk','elevated','p','model']]],
+  ['wh','dash','score','Outcome measured','The dashboard shows annualized turnover by role and club, and member retention at clubs with high trainer turnover.','Linking staff turnover to member retention puts a revenue figure on each departure.','Report refresh','Monthly',A,[['a','front_desk_turnover','68% annualized, region','o','wh']]]
+ ]}
+];
+
+const svg=document.getElementById('map');
+const el=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;};
+const defs=el('defs',{},svg);
+['live','load','score','act','third','future'].forEach(k=>{const m=el('marker',{id:'mk-'+k,viewBox:'0 0 10 10',refX:8,refY:5,markerWidth:7,markerHeight:7,orient:'auto-start-reverse'},defs);el('path',{d:'M0,0 L10,5 L0,10 z',class:'mk-'+k},m);});
+
+const gBands=el('g',{},svg), gEdges=el('g',{},svg), gNodes=el('g',{},svg), gLab=el('g',{},svg), gPk=el('g',{},svg);
+LAYERS.forEach(L=>{
+  el('rect',{x:180,y:L.top,width:832,height:120,rx:10,class:'band'},gBands);
+  const t=el('text',{x:194,y:L.top+20},gBands);
+  const a=el('tspan',{class:'bandnum'},t);a.textContent=L.n+'  '+L.name;
+  const b=el('tspan',{class:'bandblurb',dx:12},t);b.textContent=L.blurb;
+});
+el('rect',{x:1025,y:20,width:162,height:290,rx:10,class:'tpbox'},gBands);
+const th=el('text',{x:1106,y:44,class:'tphead','text-anchor':'middle'},gBands);th.textContent='THIRD-PARTY DATA';
+const ts=el('text',{x:1106,y:62,class:'tpsub','text-anchor':'middle'},gBands);ts.textContent='optional market intelligence';
+
+const nodeEls={},HW={},HH={};
+for(const k in N){
+  const n=N[k];
+  if(n.actor){
+    const g=el('g',{class:'actor'},gNodes);
+    el('circle',{cx:n.x,cy:n.y,r:36,class:'bg'},g);
+    el('circle',{cx:n.x,cy:n.y-11,r:9,class:'fig'},g);
+    el('path',{d:`M${n.x-16},${n.y+20} Q${n.x-16},${n.y+1} ${n.x},${n.y+1} Q${n.x+16},${n.y+1} ${n.x+16},${n.y+20} Z`,class:'fig'},g);
+    const t1=el('text',{x:n.x,y:n.y+58},g);t1.textContent=n.l[0];
+    const t2=el('text',{x:n.x,y:n.y+76},g);t2.textContent=n.l[1];
+    nodeEls[k]=g;HW[k]=40;HH[k]=40;continue;
+  }
+  const w=n.w||156,h=50;HW[k]=w/2+3;HH[k]=h/2+3;
+  const g=el('g',{class:'node'},gNodes);
+  el('rect',{x:n.x-w/2,y:n.y-h/2,width:w,height:h,rx:8,class:'box'},g);
+  if(n.l.length===1){const t=el('text',{x:n.x,y:n.y+5,class:'lbl'},g);t.textContent=n.l[0];}
+  else{const t=el('text',{x:n.x,y:n.y-3,class:'lbl'},g);t.textContent=n.l[0];const u=el('text',{x:n.x,y:n.y+15,class:'lbl'},g);u.textContent=n.l[1];}
+  nodeEls[k]=g;
+}
+const halo=el('circle',{r:15,class:'pk halo',cx:-50,cy:-50},gPk);
+const pk=el('circle',{r:7,class:'pk',cx:-50,cy:-50},gPk);
+
+function clip(k,cx,cy){const n=N[k];let ux=cx-n.x,uy=cy-n.y;const L=Math.hypot(ux,uy)||1;ux/=L;uy/=L;const s=Math.min(ux?HW[k]/Math.abs(ux):1e9,uy?HH[k]/Math.abs(uy):1e9);return [n.x+ux*s,n.y+uy*s];}
+function geom(a,b,i){
+  const A_=N[a],B=N[b];const dx=B.x-A_.x,dy=B.y-A_.y,len=Math.hypot(dx,dy)||1;
+  const off=Math.min(70,len*0.2)*(i%2?-1:1);const nx=-dy/len,ny=dx/len;
+  const cx=(A_.x+B.x)/2+nx*off,cy=(A_.y+B.y)/2+ny*off;
+  const s=clip(a,cx,cy),e=clip(b,cx,cy);
+  const mx=.25*s[0]+.5*cx+.25*e[0],my=.25*s[1]+.5*cy+.25*e[1];
+  return {d:`M${s[0]},${s[1]} Q${cx},${cy} ${e[0]},${e[1]}`,mx,my};
+}
+
+let sc=0,br=0,st=0,timer=null,raf=null,focus=false,edgeEls=[],geo=[];
+const steps=()=>{const s=SC[sc];return s.branches?s.steps.concat(s.branches[br].steps):s.steps;};
+const $=id=>document.getElementById(id);
+const chips=$('chips');
+SC.forEach((s,i)=>{if(s.emp&&!SC[i-1].emp){const l=document.createElement('span');l.className='lab';l.style.marginLeft='12px';l.textContent='Employees';chips.appendChild(l);}const b=document.createElement('button');b.className='chip';b.type='button';b.id='sc-'+s.key;b.textContent=s.label;b.addEventListener('click',()=>{stop();sc=i;br=0;st=0;build();});chips.appendChild(b);});
+
+function build(){
+  [...chips.querySelectorAll('.chip')].forEach((b,i)=>b.setAttribute('aria-pressed',i===sc?'true':'false'));
+  const S=steps();
+  gEdges.textContent='';geo=S.map((s,i)=>geom(s[0],s[1],i));
+  edgeEls=S.map((s,i)=>el('path',{d:geo[i].d},gEdges));
+  const dots=$('dots');dots.textContent='';
+  S.forEach((s,i)=>{const d=document.createElement('button');d.type='button';d.className='dot';d.setAttribute('aria-label','Step '+(i+1)+': '+s[3]);d.appendChild(document.createElement('i'));d.addEventListener('click',()=>{stop();st=i;render(true);});dots.appendChild(d);});
+  // branch selector
+  const s=SC[sc],bw=$('branch');
+  if(s.branches){$('branchq').textContent=s.q;const seg=$('branchseg');seg.textContent='';s.branches.forEach((b,i)=>{const x=document.createElement('button');x.type='button';x.textContent=b.label;x.setAttribute('aria-pressed',i===br?'true':'false');x.addEventListener('click',()=>{stop();br=i;if(st>=s.steps.length)st=s.steps.length;build();});seg.appendChild(x);});}
+  // text version
+  const ol=$('textlist');ol.textContent='';
+  S.forEach(x=>{const li=document.createElement('li');li.append(document.createTextNode(x[3]+'. '));const sp=document.createElement('span');sp.textContent=NAME(x[0])+' → '+NAME(x[1])+' · '+KIND[x[2]]+' · '+x[6]+' · '+x[7]+(x[8]===Sf?' · staff':' · automatic');li.appendChild(sp);ol.appendChild(li);});
+  $('textv').querySelector('summary').textContent='Text version of this flow: '+s.label+(s.branches?' ('+s.branches[br].label.toLowerCase()+')':'');
+  render(true);
+}
+
+function render(animate){
+  const S=steps(),s=S[st],kind=s[2];
+  edgeEls.forEach((e,i)=>{const k=S[i][2],staff=S[i][8]===Sf?' staff':'';
+    const state=i<st?'past k-'+k:i===st?'active k-'+k:'future';
+    e.setAttribute('class','edge '+state+staff+(focus&&i!==st?' hide':''));
+    e.setAttribute('marker-end','url(#mk-'+(i<=st?k:'future')+')');});
+  gEdges.appendChild(edgeEls[st]);
+  const touched=new Set();for(let i=0;i<st;i++){touched.add(S[i][0]);touched.add(S[i][1]);}
+  for(const k in nodeEls){let c=N[k].actor?'actor':'node';if(touched.has(k)&&!focus)c+=' touched';if(k===s[0]||k===s[1])c+=' on k-'+kind;nodeEls[k].setAttribute('class',c);}
+  // edge label
+  gLab.textContent='';const g=geo[st];const lab=s[7]+(s[8]===Sf?' · staff':'');
+  const gl=el('g',{class:'elab k-'+kind},gLab);const tw=lab.length*6.6+18;
+  el('rect',{x:g.mx-tw/2,y:g.my-12,width:tw,height:22,rx:11},gl);const tt=el('text',{x:g.mx,y:g.my+4},gl);tt.textContent=lab;
+  pk.setAttribute('class','pk k-'+kind);halo.setAttribute('class','pk halo k-'+kind);
+  movePacket(edgeEls[st],animate);
+  // panel
+  $('count').textContent='Step '+(st+1)+' of '+S.length;
+  const kb=$('kind');kb.className='kind '+kind;kb.textContent=KIND[kind];
+  $('title').textContent=s[3];
+  $('route').innerHTML='';const b1=document.createElement('b');b1.textContent=NAME(s[0]);const b2=document.createElement('b');b2.textContent=NAME(s[1]);$('route').append(b1,document.createTextNode(' → '),b2);
+  const f=$('facts');f.textContent='';
+  const fact=(l,v,c)=>{const d=document.createElement('span');d.className='fact'+(c?' '+c:'');if(l){const bb=document.createElement('b');bb.textContent=l;d.appendChild(bb);}d.appendChild(document.createTextNode(v));f.appendChild(d);};
+  fact('How',' '+s[6]);fact('When',' '+s[7]);fact('',s[8]===Sf?'Person acts or approves':'Automatic',s[8]===Sf?'staff':'');if(s[10])fact('','In parallel with the previous step');
+  $('body').textContent=s[4];
+  $('value').innerHTML=s[5];
+  // records
+  const rec={},fresh=new Set();for(let i=0;i<=st;i++)S[i][9].forEach(r=>{rec[r[0]+'|'+r[1]]=r;if(i===st)fresh.add(r[0]+'|'+r[1]);});
+  const box=$('recs');box.textContent='';
+  const hd=document.createElement('span');hd.className='vl';hd.textContent='What the systems know so far';box.appendChild(hd);
+  GROUPS.forEach(([gk,gn,gs])=>{const rows=Object.values(rec).filter(r=>r[0]===gk);
+    const grp=document.createElement('div');grp.className='grp';const h=document.createElement('h3');h.textContent=gn;const hs=document.createElement('span');hs.textContent=gs;h.appendChild(hs);grp.appendChild(h);
+    const rw=document.createElement('div');rw.className='rows';
+    if(!rows.length){const n=document.createElement('div');n.className='none';n.textContent='Nothing yet';rw.appendChild(n);}
+    rows.forEach(r=>{const d=document.createElement('div');d.className='row'+(fresh.has(r[0]+'|'+r[1])?' new':'');
+      const top=document.createElement('div');top.className='rtop';const k=document.createElement('span');k.className='rk';k.textContent=r[1];const tg=document.createElement('span');tg.className='tag '+r[3];tg.textContent=TYPE[r[3]];top.append(k,tg);
+      const v=document.createElement('div');v.className='rv';v.textContent=r[2];const src=document.createElement('div');src.className='rs';src.textContent='Owned by: '+NAME(r[4]);
+      d.append(top,v,src);rw.appendChild(d);});
+    grp.appendChild(rw);box.appendChild(grp);});
+  [...$('dots').children].forEach((d,i)=>{d.className='dot'+(i<st?' done':'');if(i===st)d.setAttribute('aria-current','step');else d.removeAttribute('aria-current');});
+  {const sc_=SC[sc];$('branch').hidden=!(sc_.branches&&st>=sc_.steps.length-1);}
+  $('back').disabled=st===0;$('next').disabled=st===S.length-1;
+}
+
+const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function movePacket(path,animate){
+  cancelAnimationFrame(raf);const L=path.getTotalLength();
+  const put=t=>{const p=path.getPointAtLength(L*t);pk.setAttribute('cx',p.x);pk.setAttribute('cy',p.y);halo.setAttribute('cx',p.x);halo.setAttribute('cy',p.y);};
+  if(!animate||reduce){put(1);return;}
+  const t0=performance.now(),D=1100;
+  const f=now=>{let t=Math.min(1,(now-t0)/D);t=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;put(t);if(t<1)raf=requestAnimationFrame(f);};
+  raf=requestAnimationFrame(f);
+}
+function step(d){st=Math.max(0,Math.min(steps().length-1,st+d));render(true);}
+function stop(){clearInterval(timer);timer=null;$('play').textContent='Play';}
+$('back').addEventListener('click',()=>{stop();step(-1);});
+$('next').addEventListener('click',()=>{stop();step(1);});
+$('play').addEventListener('click',()=>{
+  if(timer){stop();return;}
+  if(st===steps().length-1){st=0;render(true);}
+  $('play').textContent='Pause';
+  timer=setInterval(()=>{if(st>=steps().length-1){stop();return;}step(1);},7000);
+});
+const setView=v=>{focus=v;$('vAll').setAttribute('aria-pressed',v?'false':'true');$('vFocus').setAttribute('aria-pressed',v?'true':'false');render(false);};
+$('vAll').addEventListener('click',()=>setView(false));
+$('vFocus').addEventListener('click',()=>setView(true));
+build();
+})();
+</script>
+</body>
+</html>
