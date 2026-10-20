@@ -16,7 +16,7 @@
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:var(--cream);color:var(--ink);font-family:var(--sans);overflow:hidden}
 .app{display:grid;grid-template-rows:auto 1fr auto;height:100vh}
-header{background:var(--red);color:#fff;display:flex;align-items:center;gap:1.1rem;padding:.8rem 2rem}
+header{background:var(--red);color:#fff;display:flex;align-items:center;gap:1.1rem;padding:.5rem 2rem}
 header img{height:3.6rem;width:3.6rem;object-fit:contain;background:#fff;border-radius:50%;padding:.15rem}
 .t1{font-family:var(--slab);font-weight:800;font-size:2rem;line-height:1}
 .t2{font-size:1rem;opacity:.85;margin-top:.25rem}
@@ -59,6 +59,15 @@ main{padding:1.2rem 2rem .6rem;overflow:hidden;display:flex;flex-direction:colum
 body:hover .ctrls{opacity:.85}
 .ctrls button{font:inherit;font-size:.78rem;border:1px solid var(--line);background:#fff;color:var(--brown);border-radius:.4rem;padding:.3rem .6rem;cursor:pointer}
 .ctrls button.on{background:var(--brown);color:#fff;border-color:var(--brown)}
+.qr{display:flex;align-items:center;gap:.7rem;cursor:pointer;margin-left:1.6rem}
+.qr img{height:7.5rem;width:7.5rem;background:#fff;border-radius:.4rem;padding:.2rem}
+.qr div{font-size:.85rem;line-height:1.35;opacity:.9}
+.qr b{font-size:1rem}
+.big{position:fixed;inset:0;background:rgba(43,26,18,.82);display:none;flex-direction:column;align-items:center;justify-content:center;gap:1.4rem;z-index:10;cursor:pointer}
+.big.on{display:flex}
+.big img{height:68vh;width:68vh;background:#fff;border-radius:1.2rem;padding:1.6vh}
+.big div{color:#fff;font-family:var(--slab);font-size:2rem;font-weight:800}
+.empty .qrbig{width:22rem;height:22rem;background:#fff;border-radius:1rem;padding:.6rem;box-shadow:0 4px 18px rgba(74,37,17,.12)}
 footer{height:2.2rem;overflow:hidden;position:relative;border-top:1px solid var(--line);background:#F7F0E5}
 .tick{position:absolute;white-space:nowrap;top:50%;transform:translateY(-50%);font-size:.85rem;color:#9C8673;font-style:italic;will-change:transform}
 .tick span{margin-right:5rem}
@@ -71,10 +80,12 @@ footer{height:2.2rem;overflow:hidden;position:relative;border-top:1px solid var(
     <img id="logo" alt="">
     <div><div class="t1">First Bank of Brunonia</div><div class="t2">Analytics Investment Committee · live submissions</div></div>
     <div class="stat"><div><b id="count">0</b> teams submitted</div><div><span class="live" id="dot"></span><span id="upd">Connecting…</span></div></div>
+    <div class="qr" id="qr" title="Click or press Q to enlarge"><img src="brunonia_qr.png" alt="QR code for the team app" onerror="this.parentNode.style.display='none'"><div><b>Team app</b><br>Scan to join</div></div>
   </header>
   <main id="main"></main>
   <footer><div class="tick" id="tick"></div></footer>
 </div>
+<div class="big" id="big"><img src="brunonia_qr.png" alt="QR code for the team app"><div>Scan to open the team app</div></div>
 <div class="ctrls">
   <button id="sortTime">Order: submitted</button>
   <button id="sortRoll">Order: full rollout</button>
@@ -117,7 +128,8 @@ function demoRows(){
    {at:new Date(now-500000).toISOString(),team:"Wayland Square",useCase:"Base Marketing",data:"Campaign History, Checking Account Activity",technique:"Executive Dashboard",controls:"No additional controls",release:"Big-Bang Release",prod:14,first:18,full:22,prob:.8},
    {at:new Date(now-400000).toISOString(),team:"College Hill",useCase:"Fraud Prevention",data:"Card Transactions, Fraud Events and Alerts, Digital Behavior",technique:"Anomaly Detection",controls:"Human Review Queue, Customer Friction Review, Monitoring and Rollback",release:"Phased Rollout",prod:33,first:39,full:59,prob:.6},
    {at:new Date(now-300000).toISOString(),team:"Federal Hill",useCase:"Customer Experience",data:"Service Interactions, Digital Behavior",technique:"Customer Segmentation",controls:"Data Quality Review",release:"Agile MVP",prod:22,first:26,full:52,prob:.45},
-   {at:new Date(now-200000).toISOString(),team:"Mount Hope",useCase:"External Data Monetization",data:"Card Transactions",technique:"Aggregated Data Product",controls:"Privacy and Legal Review, Data Quality Review",release:"Remediate First",prod:48,first:52,full:56,prob:.3}
+   {at:new Date(now-200000).toISOString(),team:"Mount Hope",useCase:"External Data Monetization",data:"Card Transactions",technique:"Aggregated Data Product",controls:"Privacy and Legal Review, Data Quality Review",release:"Remediate First",prod:48,first:52,full:56,prob:.3},
+   {at:new Date(now-100000).toISOString(),team:"Slater Mill",useCase:"Credit Underwriting",data:"Checking Account Activity, Credit Bureau Snapshot",technique:"Policy Rules",controls:"Champion / Challenger, Monitoring and Rollback",release:"Agile MVP",prod:26,first:30,full:56,prob:.65}
   ];
 }
 function normalize(rows){
@@ -168,7 +180,7 @@ function render(fresh=new Set()){
   $("count").textContent=latest.length;
   document.querySelectorAll(".ctrls button").forEach(b=>b.classList.toggle("on",(b.id==="sortTime"&&sortMode==="time")||(b.id==="sortRoll"&&sortMode==="roll")));
   if(!latest.length){
-    $("main").innerHTML=`<div class="empty">${window.LOGO?`<img src="${window.LOGO}" alt="">`:""}<div class="msg">Waiting for the first team to submit…</div><div>Plans appear here as soon as teams tap Submit.</div></div>`;
+    $("main").innerHTML=`<div class="empty"><img class="qrbig" src="brunonia_qr.png" alt="QR code for the team app" onerror="this.style.display='none'"><div class="msg">Scan to open the team app</div><div>Plans appear here as soon as teams tap Submit.</div></div>`;
     return;
   }
   const rows=sorted().map(t=>{
@@ -200,7 +212,9 @@ function render(fresh=new Set()){
 function setSort(m){sortMode=m;try{localStorage.setItem("brunonia_board_sort",m)}catch(e){}render()}
 $("sortTime").onclick=()=>setSort("time");
 $("sortRoll").onclick=()=>setSort("roll");
-document.addEventListener("keydown",e=>{if(e.key==="s"||e.key==="S")setSort(sortMode==="time"?"roll":"time")});
+const toggleQR=()=>$("big").classList.toggle("on");
+$("qr").onclick=toggleQR; $("big").onclick=toggleQR;
+document.addEventListener("keydown",e=>{if(e.key==="s"||e.key==="S")setSort(sortMode==="time"?"roll":"time");if(e.key==="q"||e.key==="Q")toggleQR();if(e.key==="Escape")$("big").classList.remove("on")});
 
 // ticker
 (function(){
