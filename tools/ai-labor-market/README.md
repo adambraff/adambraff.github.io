@@ -1,27 +1,24 @@
 # AI and the Analyst Labor Market
 
-Interactive supply-and-demand model of how generative AI changes the salary and headcount of analytics/data science workers.
+Interactive supply-and-demand model of how generative AI changes the salary, employment, output, and unit cost of analytics/data science work.
 
 Live: https://adambraff.github.io/tools/ai-labor-market/
 
 ## Model
 
-Demand for analysts is derived from demand for insight, which has constant price elasticity η. AI raises analyst productivity by a factor m (complement case) or lets managers self-serve a share f of the work (substitute case):
+Each analyst FTE produces m units of analysis, so labor cost per analysis is W/m. Demand for analysis has constant price elasticity η, and business users take over a share f of it themselves:
 
-    Q_d = A · (1 − f) · m^(η − 1) · W^(−η)
+    FTE demand = A · (1 − f) · m^(η − 1) · W^(−η)
 
-A productivity gain raises labor demand only when η > 1 (Hicks-Marshall; Jevons applied to analyst hours).
+Before other effects, a productivity gain raises demand for analyst labor only when η > 1 (simplified Hicks-Marshall derived demand; Jevons applied to analyst hours). At η = 0 the work is a fixed pile.
 
-Supply shifts right as AI lets nontechnical people do analytics work:
+Supply shifts out as AI lets more people qualify for analyst roles:
 
-    Q_s = B · (1 + e·θ) · W^(ε)
+    FTE supply = B · (1 + entry) · W^(ε)
 
-Parameter mapping, with AI capability θ ∈ [0,1] and substitute/complement dial x ∈ [−1,1]:
+A and B are calibrated so the baseline clears at W = 100, FTEs = 100. Equilibrium is solved in closed form. Outputs: salary, FTEs, analyst-produced output (FTEs × m), labor cost per analysis (W / m), and spending on analyst labor (W × FTEs).
 
-    m = 1 + 2·θ·max(x, 0)
-    f = 0.75·θ·max(−x, 0)
-
-A and B are calibrated so the pre-AI market clears at W = 100, Q = 100. Equilibrium is solved in closed form.
+All parameters are illustrative assumptions, not calibrated estimates. Results are long-run equilibria and do not distinguish layoffs from slower hiring.
 
 ## Files
 

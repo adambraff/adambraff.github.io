@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: problem-set diagram. Controls column left, the market diagram right, model notes below. */
+/* Layout: desktop = controls left, results right. Phone = results (stats + curves) pinned at top, sliders scroll beneath. */
 :root {
   --bg: #f6f7f9;
   --panel: #ffffff;
@@ -46,13 +46,21 @@ body {
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 28px 48px;
 }
-.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 22px; }
-header h1 { font-family: var(--display); font-weight: 400; font-size: clamp(30px, 4.4vw, 44px); line-height: 1.05; margin: 0 0 6px; text-wrap: balance; }
-header p { margin: 0; color: var(--muted); max-width: 70ch; }
-.main { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 22px; align-items: start; }
-@media (max-width: 860px) { .main { grid-template-columns: 1fr; } }
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 20px; }
+header h1 { font-family: var(--display); font-weight: 400; font-size: clamp(26px, 4.4vw, 44px); line-height: 1.05; margin: 0 0 6px; text-wrap: balance; }
+header p { margin: 0; color: var(--muted); max-width: 72ch; }
+
+.main {
+  display: grid; gap: 18px; align-items: start;
+  grid-template-columns: 340px minmax(0, 1fr);
+  grid-template-areas: "controls results" "controls explain";
+}
+.results { grid-area: results; display: grid; gap: 12px; min-width: 0; }
+.controls { grid-area: controls; }
+.explain { grid-area: explain; min-width: 0; }
+
 .panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 18px; }
-.controls { display: grid; gap: 18px; }
+.controls { display: grid; gap: 16px; }
 .presets { display: flex; flex-wrap: wrap; gap: 6px; }
 .presets button {
   font: 500 13px var(--body); color: var(--ink); background: var(--chip); border: 1px solid var(--rule);
@@ -60,39 +68,72 @@ header p { margin: 0; color: var(--muted); max-width: 70ch; }
 }
 .presets button:hover { border-color: var(--demand); }
 .presets button[aria-pressed="true"] { background: var(--demand); color: var(--panel); border-color: var(--demand); }
-button:focus-visible, input:focus-visible { outline: 2px solid var(--demand); outline-offset: 2px; }
+button:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--demand); outline-offset: 2px; }
 .label-sm { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
 .group { display: grid; gap: 14px; padding-top: 14px; border-top: 1px solid var(--rule); }
 .group h2 { margin: 0; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; display: flex; align-items: center; gap: 8px; }
-.swatch { width: 18px; height: 3px; border-radius: 2px; display: inline-block; }
-.ctl { display: grid; gap: 4px; }
+.swatch { width: 18px; height: 3px; border-radius: 2px; display: inline-block; flex: none; }
+.ctl { display: grid; gap: 2px; }
 .ctl .top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
 .ctl label { font-weight: 500; font-size: 14px; }
-.ctl output { font-family: var(--mono); font-size: 13px; color: var(--ink); white-space: nowrap; }
-.ctl .ends { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+.ctl output { font-family: var(--mono); font-size: 13px; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ctl .ends { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); }
 .ctl .hint { font-size: 12.5px; color: var(--muted); }
-input[type=range] { width: 100%; accent-color: var(--demand); margin: 2px 0; }
+input[type=range] { width: 100%; accent-color: var(--demand); margin: 4px 0; }
 .supply-group input[type=range] { accent-color: var(--supply); }
+details.adv summary { cursor: pointer; font-size: 13px; font-weight: 500; color: var(--muted); }
+details.adv[open] summary { margin-bottom: 10px; }
 
-.right { display: grid; gap: 14px; min-width: 0; }
-.stats { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
-@media (max-width: 520px) { .stats { grid-template-columns: 1fr; } }
-.stat { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 12px 14px; display: grid; gap: 2px; }
-.stat .v { font-family: var(--mono); font-size: 26px; font-weight: 500; font-variant-numeric: tabular-nums; }
-.stat .d { font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; }
+.stat { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 10px 12px; display: grid; gap: 1px; min-width: 0; }
+.stat .v { font-family: var(--mono); font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.stat .d { font-family: var(--mono); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.sm { display: none; }
 .up { color: var(--up); } .down { color: var(--down); } .flat { color: var(--muted); }
-.chart { padding: 10px 10px 4px; }
+.chart { padding: 8px 8px 2px; }
 .chart svg { width: 100%; height: auto; display: block; }
-.verdict { font-size: 15px; margin: 4px 6px 8px; max-width: 75ch; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 6px 6px; }
-.chip { font-family: var(--mono); font-size: 12px; background: var(--chip); border: 1px solid var(--rule); border-radius: 6px; padding: 3px 8px; font-variant-numeric: tabular-nums; }
-.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12.5px; color: var(--muted); margin: 0 6px 8px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; color: var(--muted); margin: 2px 6px 6px; }
 .legend span { display: inline-flex; align-items: center; gap: 6px; }
-.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; }
-.notes h3 { font-family: var(--display); font-weight: 400; font-size: 22px; margin: 0 0 6px; }
-.notes p { margin: 0 0 8px; color: var(--ink); max-width: 65ch; }
-.notes code, .eq { font-family: var(--mono); font-size: 13px; }
+
+.explain { display: grid; gap: 10px; }
+.verdict { font-size: 15px; margin: 0; max-width: 75ch; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font-family: var(--mono); font-size: 12px; background: var(--chip); border: 1px solid var(--rule); border-radius: 6px; padding: 3px 8px; font-variant-numeric: tabular-nums; }
+.caveat { font-size: 12.5px; color: var(--muted); margin: 0; max-width: 75ch; }
+
+details.notes > summary { cursor: pointer; font-family: var(--display); font-size: 22px; list-style-position: outside; }
+.notes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; margin-top: 12px; }
+.notes-grid h3 { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; font-weight: 600; }
+.notes-grid p { margin: 0 0 8px; max-width: 65ch; }
+.notes-grid code, .eq { font-family: var(--mono); font-size: 13px; }
 .eq { display: block; background: var(--chip); border-radius: 6px; padding: 8px 10px; margin: 6px 0 10px; overflow-x: auto; white-space: nowrap; }
+
+/* Phone: pin the results, compress everything */
+@media (max-width: 860px) {
+  body { padding-block: 14px 40px; }
+  .wrap { gap: 12px; }
+  header p { display: none; }
+  header h1 { margin: 0; }
+  .main { grid-template-columns: 1fr; grid-template-areas: "results" "controls" "explain"; gap: 12px; }
+  .results {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+    background: var(--bg); padding-block: 6px 6px; gap: 6px;
+    border-bottom: 1px solid var(--rule);
+  }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+  .stats { gap: 6px; }
+  .stat { padding: 5px 7px; border-radius: 8px; }
+  .stat .label-sm { font-size: 9.5px; letter-spacing: .04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stat .v { font-size: 17px; }
+  .stat .d { font-size: 11px; }
+  .chart { padding: 2px 2px 0; border-radius: 8px; }
+  .legend { font-size: 11px; margin: 0 4px 4px; gap: 4px 10px; }
+  .panel { padding: 14px; }
+  .ctl .hint { display: none; }
+  .legend { display: none; }
+  .lg { display: none; }
+  .sm { display: inline; }
+}
 </style>
 </head>
 <body>
@@ -100,113 +141,119 @@ input[type=range] { width: 100%; accent-color: var(--demand); margin: 2px 0; }
 <div class="wrap">
   <header>
     <h1>AI and the Analyst Labor Market</h1>
-    <p>Move the assumptions and watch the demand and supply curves for analytics talent shift. Faded lines show the market before generative AI (salary and headcount both indexed to 100); bold lines show it after.</p>
+    <p>Move the assumptions and watch supply and demand for analytics talent shift. Faded lines are the baseline (salary and employment indexed to 100); bold lines are your AI scenario, holding everything else constant. All parameters are illustrative assumptions, not calibrated estimates.</p>
   </header>
 
   <div class="main">
+    <section class="results" aria-label="Results">
+      <div class="stats">
+        <div class="stat"><span class="label-sm">Salary</span><span class="v" id="s-w"></span><span class="d" id="s-wd"></span></div>
+        <div class="stat"><span class="label-sm"><span class="lg">Analyst </span>FTEs</span><span class="v" id="s-q"></span><span class="d" id="s-qd"></span></div>
+        <div class="stat"><span class="label-sm"><span class="lg">Analysis </span>output</span><span class="v" id="s-y"></span><span class="d" id="s-yd"></span></div>
+        <div class="stat"><span class="label-sm"><span class="lg">Cost per analysis</span><span class="sm">Unit cost</span></span><span class="v" id="s-c"></span><span class="d" id="s-cd"></span></div>
+      </div>
+      <div class="panel chart">
+        <svg id="plot" viewBox="0 0 720 440" role="img" aria-label="Supply and demand diagram for analytics labor"></svg>
+        <div class="legend">
+          <span><span class="swatch" style="background:var(--demand)"></span>Demand, AI scenario</span>
+          <span><span class="swatch" style="background:var(--supply)"></span>Supply, AI scenario</span>
+          <span><span class="swatch" style="background:var(--ghost)"></span>Baseline</span>
+        </div>
+      </div>
+    </section>
+
     <section class="panel controls" aria-label="Assumptions">
       <div style="display:grid;gap:8px">
         <span class="label-sm">Scenarios</span>
         <div class="presets" id="presets">
-          <button type="button" data-p="adam">The bookie's view</button>
+          <button type="button" data-p="braff">Braff view</button>
           <button type="button" data-p="doom">Layoff doom</button>
-          <button type="button" data-p="shrink">Shrinking business</button>
+          <button type="button" data-p="fewer">More output, fewer analysts</button>
           <button type="button" data-p="flood">Talent flood</button>
-          <button type="button" data-p="none">No AI</button>
-        </div>
-      </div>
-
-      <div class="group">
-        <h2>Technology</h2>
-        <div class="ctl">
-          <div class="top"><label for="theta">AI capability</label><output id="o-theta"></output></div>
-          <input type="range" id="theta" min="0" max="1" step="0.01">
-          <div class="hint">How far the technology has come. Scales every AI effect below.</div>
+          <button type="button" data-p="base">Baseline</button>
         </div>
       </div>
 
       <div class="group">
         <h2><span class="swatch" style="background:var(--demand)"></span>Demand for analysts</h2>
         <div class="ctl">
-          <div class="top"><label for="rel">Substitute or complement</label><output id="o-rel"></output></div>
-          <input type="range" id="rel" min="-1" max="1" step="0.01">
-          <div class="ends"><span>Manager does it himself</span><span>Analyst gets superpowers</span></div>
+          <div class="top"><label for="prod">Analyst productivity gain</label><output id="o-prod"></output></div>
+          <input type="range" id="prod" min="0" max="2" step="0.05">
+          <div class="ends"><span>No change</span><span>3× output</span></div>
         </div>
         <div class="ctl">
-          <div class="top"><label for="eta">Appetite for analytics</label><output id="o-eta"></output></div>
-          <input type="range" id="eta" min="0.2" max="5" step="0.05">
+          <div class="top"><label for="self">Work business users do themselves</label><output id="o-self"></output></div>
+          <input type="range" id="self" min="0" max="0.75" step="0.01">
+          <div class="ends"><span>None</span><span>Three-quarters</span></div>
+        </div>
+        <div class="ctl">
+          <div class="top"><label for="eta">Appetite for analysis</label><output id="o-eta"></output></div>
+          <input type="range" id="eta" min="0" max="4" step="0.05">
           <div class="ends"><span>Fixed pile of work</span><span>Near-infinite work</span></div>
-          <div class="hint">Price elasticity of demand for insight. Above 1, cheaper analysis means more total analyst hours (Jevons).</div>
+          <div class="hint">How much more analysis businesses commission as it gets cheaper. This bundles every limit on using more of it: data access, review capacity, and managers' ability to act on the answers.</div>
         </div>
       </div>
 
       <div class="group supply-group">
         <h2><span class="swatch" style="background:var(--supply)"></span>Supply of analysts</h2>
         <div class="ctl">
-          <div class="top"><label for="entry">New entrants from nontechnical roles</label><output id="o-entry"></output></div>
-          <input type="range" id="entry" min="0" max="1.5" step="0.01">
-          <div class="hint">How much AI lowers the barrier for marketers, ops, and finance people to do analytics work.</div>
+          <div class="top"><label for="entry">More qualified candidates</label><output id="o-entry"></output></div>
+          <input type="range" id="entry" min="0" max="1" step="0.01">
+          <div class="ends"><span>Same pool</span><span>Pool doubles</span></div>
+          <div class="hint">Extra people able to fill analyst roles at today's salary, as AI lowers the bar for marketers, ops, and finance staff.</div>
         </div>
-        <div class="ctl">
-          <div class="top"><label for="eps">Supply elasticity</label><output id="o-eps"></output></div>
-          <input type="range" id="eps" min="0.2" max="5" step="0.05">
-          <div class="ends"><span>Scarce, slow to train</span><span>Easy to enter</span></div>
-        </div>
+        <details class="adv">
+          <summary>Advanced</summary>
+          <div class="ctl">
+            <div class="top"><label for="eps">How strongly the talent pool responds to pay</label><output id="o-eps"></output></div>
+            <input type="range" id="eps" min="0.2" max="5" step="0.05">
+            <div class="ends"><span>Scarce, slow to train</span><span>Easy to enter</span></div>
+          </div>
+        </details>
       </div>
     </section>
 
-    <section class="right" aria-label="Results">
-      <div class="stats">
-        <div class="stat"><span class="label-sm">Salary (W)</span><span class="v" id="s-w"></span><span class="d" id="s-wd"></span></div>
-        <div class="stat"><span class="label-sm">Headcount (Q)</span><span class="v" id="s-q"></span><span class="d" id="s-qd"></span></div>
-        <div class="stat"><span class="label-sm">Total wage bill</span><span class="v" id="s-b"></span><span class="d" id="s-bd"></span></div>
-      </div>
-      <div class="panel chart">
-        <svg id="plot" viewBox="0 0 720 470" role="img" aria-label="Supply and demand diagram for analytics labor"></svg>
-        <div class="legend">
-          <span><span class="swatch" style="background:var(--demand)"></span>Demand after AI (D₁)</span>
-          <span><span class="swatch" style="background:var(--supply)"></span>Supply after AI (S₁)</span>
-          <span><span class="swatch" style="background:var(--ghost)"></span>Before AI (D₀, S₀)</span>
-        </div>
-        <p class="verdict" id="verdict"></p>
-        <div class="chips" id="chips"></div>
-      </div>
+    <section class="explain" aria-label="Interpretation">
+      <p class="verdict" id="verdict"></p>
+      <div class="chips" id="chips"></div>
+      <p class="caveat">Results are a long-run equilibrium after hiring and pay adjust. A lower employment number does not say how much of the change comes from layoffs versus slower hiring.</p>
     </section>
   </div>
 
-  <section class="panel notes" aria-label="How the model works">
-    <div>
-      <h3>Demand is derived</h3>
-      <p>Firms buy insight, and analysts are an input. Insight demand has constant elasticity η. AI multiplies analyst productivity by <code>m</code> on the complement side, and on the substitute side lets managers self-serve a share <code>f</code> of the work.</p>
-      <span class="eq">Q_d = A · (1 − f) · m^(η − 1) · W^(−η)</span>
-      <p>The exponent <code>η − 1</code> carries the whole argument: a productivity gain raises labor demand when η &gt; 1 and lowers it when η &lt; 1. This is the Hicks-Marshall rule, and also Jevons applied to analyst hours.</p>
+  <details class="panel notes">
+    <summary>How the model works</summary>
+    <div class="notes-grid">
+      <div>
+        <h3>Demand is derived</h3>
+        <p>Firms buy analysis, and analysts are an input. Each analyst FTE produces <code>m</code> units of analysis, so labor cost per analysis is <code>W/m</code>. Demand for analysis responds to that cost with elasticity η, and business users take over a share <code>f</code> of it themselves.</p>
+        <span class="eq">FTE demand = A · (1 − f) · m^(η − 1) · W^(−η)</span>
+        <p>The exponent <code>η − 1</code> carries the argument. Before other effects, a productivity gain raises demand for analyst labor when η &gt; 1 and lowers it when η &lt; 1 (a simplified Hicks-Marshall derived-demand result). At η = 0 the work is a fixed pile, and every productivity gain cuts FTEs one for one. The exact threshold of 1 depends on analyst labor being the only cost; adding software, data, and review costs moves it.</p>
+      </div>
+      <div>
+        <h3>Supply shifts too</h3>
+        <p>AI lowers the skill bar, so more people qualify for analyst roles. That shifts supply out by the "more qualified candidates" share at every salary.</p>
+        <span class="eq">FTE supply = B · (1 + entry) · W^(ε)</span>
+        <p>How a demand shift splits between pay and jobs depends on ε relative to η. A demand shift worth x% more FTEs at today's salary raises salaries by about x/(η + ε)% and FTEs by about ε·x/(η + ε)%, so a responsive talent pool turns more of the shift into jobs and less into pay.</p>
+      </div>
+      <div>
+        <h3>Outputs</h3>
+        <p>Analyst FTEs and salary come from the closed-form equilibrium, calibrated so the baseline clears at 100 and 100. Analysis output is FTEs × m and covers only analyst-produced work, excluding what business users do themselves. Cost per analysis is W / m and excludes AI tooling. Spending on analyst labor is W × FTEs.</p>
+        <p>Employment is in full-time equivalents, which assumes hours per analyst stay constant.</p>
+      </div>
     </div>
-    <div>
-      <h3>Supply shifts too</h3>
-      <p>AI lowers the skill barrier, so more nontechnical people can do analytics work. That moves supply right by <code>1 + entry · θ</code>, pushing salaries down and headcount up.</p>
-      <span class="eq">Q_s = B · (1 + e·θ) · W^(ε)</span>
-      <p>Supply elasticity ε governs how the burden splits: inelastic supply turns a demand shift mostly into higher salaries, elastic supply turns it mostly into more jobs.</p>
-    </div>
-    <div>
-      <h3>Parameter mapping</h3>
-      <p>With AI capability θ and the substitute/complement dial x ∈ [−1, 1]:</p>
-      <span class="eq">m = 1 + 2·θ·max(x, 0)</span>
-      <span class="eq">f = 0.75·θ·max(−x, 0)</span>
-      <p>So full capability with a pure complement triples analyst output, and a pure substitute hands up to 75% of the work to managers with a chatbot. A and B are calibrated so the pre-AI market clears at W = 100, Q = 100.</p>
-    </div>
-  </section>
+  </details>
 </div>
 
 <script>
 (function () {
   const presets = {
-    adam:   { theta: 0.7, rel: 0.7,  eta: 2.5, entry: 0.4, eps: 2.0 },
-    doom:   { theta: 0.8, rel: -0.8, eta: 0.6, entry: 0.6, eps: 1.5 },
-    shrink: { theta: 0.7, rel: 0.6,  eta: 0.5, entry: 0.3, eps: 1.0 },
-    flood:  { theta: 0.8, rel: 0.4,  eta: 1.5, entry: 1.3, eps: 3.0 },
-    none:   { theta: 0,   rel: 0.5,  eta: 1.5, entry: 0.4, eps: 1.5 }
+    braff: { prod: 0.9,  self: 0.05, eta: 2.5, entry: 0.3, eps: 2.0 },
+    doom:  { prod: 0,    self: 0.5,  eta: 0.6, entry: 0.5, eps: 1.5 },
+    fewer: { prod: 0.85, self: 0,    eta: 0.5, entry: 0.2, eps: 1.0 },
+    flood: { prod: 0.6,  self: 0,    eta: 1.5, entry: 1.0, eps: 3.0 },
+    base:  { prod: 0,    self: 0,    eta: 1.5, entry: 0,   eps: 1.5 }
   };
-  const ids = ["theta", "rel", "eta", "entry", "eps"];
+  const ids = ["prod", "self", "eta", "entry", "eps"];
   const el = Object.fromEntries(ids.map(i => [i, document.getElementById(i)]));
   const $ = id => document.getElementById(id);
   const svg = $("plot");
@@ -225,16 +272,14 @@ input[type=range] { width: 100%; accent-color: var(--demand); margin: 2px 0; }
   }));
 
   function model(v) {
-    const m = 1 + 2 * v.theta * Math.max(v.rel, 0);
-    const f = 0.75 * v.theta * Math.max(-v.rel, 0);
-    const sup = 1 + v.entry * v.theta;
+    const m = 1 + v.prod, f = v.self, sup = 1 + v.entry;
     const A0 = 100 * Math.pow(100, v.eta);
     const B0 = 100 * Math.pow(100, -v.eps);
     const A1 = A0 * (1 - f) * Math.pow(m, v.eta - 1);
     const B1 = B0 * sup;
     const W1 = Math.exp((Math.log(A1) - Math.log(B1)) / (v.eta + v.eps));
     const Q1 = B1 * Math.pow(W1, v.eps);
-    return { m, f, sup, A0, B0, A1, B1, W1, Q1, dShift: A1 / A0 - 1 };
+    return { m, f, sup, A0, B0, A1, B1, W1, Q1, dShift: A1 / A0 };
   }
 
   function niceMax(x) {
@@ -254,57 +299,69 @@ input[type=range] { width: 100%; accent-color: var(--demand); margin: 2px 0; }
     (parent || svg).appendChild(n);
     return n;
   }
+  function stat(id, val, ratio, goodWhenUp) {
+    $(id).textContent = val;
+    const p = pct(ratio); const e = $(id + "d");
+    e.textContent = p.t;
+    let c = p.c;
+    if (!goodWhenUp && c !== "flat") c = c === "up" ? "down" : "up";
+    e.className = "d " + c;
+  }
 
   function render() {
     const v = Object.fromEntries(ids.map(i => [i, parseFloat(el[i].value)]));
     const r = model(v);
+    const more10 = Math.pow(0.9, -v.eta) - 1;
 
-    $("o-theta").textContent = Math.round(v.theta * 100) + "%";
-    $("o-rel").textContent = v.rel > 0.02 ? "complement " + v.rel.toFixed(2) : v.rel < -0.02 ? "substitute " + (-v.rel).toFixed(2) : "neutral";
-    $("o-eta").textContent = "η = " + v.eta.toFixed(2);
-    $("o-entry").textContent = "supply +" + Math.round((r.sup - 1) * 100) + "%";
+    $("o-prod").textContent = "+" + Math.round(v.prod * 100) + "%";
+    $("o-self").textContent = Math.round(v.self * 100) + "% of work";
+    $("o-eta").textContent = "10% cheaper → +" + Math.round(more10 * 100) + "% more";
+    $("o-entry").textContent = "+" + Math.round(v.entry * 100) + "%";
     $("o-eps").textContent = "ε = " + v.eps.toFixed(2);
 
-    const wr = r.W1 / 100, qr = r.Q1 / 100, br = wr * qr;
-    $("s-w").textContent = r.W1.toFixed(0);
-    $("s-q").textContent = r.Q1.toFixed(0);
-    $("s-b").textContent = (r.W1 * r.Q1 / 100).toFixed(0);
-    [["s-wd", wr], ["s-qd", qr], ["s-bd", br]].forEach(([id, x]) => {
-      const p = pct(x); const e = $(id); e.textContent = p.t + " vs. pre-AI"; e.className = "d " + p.c;
-    });
+    const wr = r.W1 / 100, qr = r.Q1 / 100, yr = qr * r.m, cr = wr / r.m;
+    stat("s-w", r.W1.toFixed(0), wr, true);
+    stat("s-q", r.Q1.toFixed(0), qr, true);
+    stat("s-y", (yr * 100).toFixed(0), yr, true);
+    stat("s-c", (cr * 100).toFixed(0), cr, false);
 
-    const job = qr > 1.02 ? "more analyst jobs" : qr < 0.98 ? "fewer analyst jobs" : "about the same number of analyst jobs";
+    // Verdict
+    const job = qr > 1.02 ? "more analyst FTEs" : qr < 0.98 ? "fewer analyst FTEs" : "about the same number of analyst FTEs";
     const pay = wr > 1.02 ? "higher salaries" : wr < 0.98 ? "lower salaries" : "flat salaries";
-    let why;
-    if (v.theta < 0.01) why = "With no AI, nothing moves.";
-    else if (v.rel < -0.02) why = "Managers self-serve part of the work, so demand for analysts falls at every wage.";
-    else if (v.rel > 0.02 && v.eta > 1) why = "Analysts get more productive and the appetite for insight is elastic, so cheaper analysis creates more total work.";
-    else if (v.rel > 0.02) why = "Analysts get more productive, but with a fixed pile of work the same output needs fewer people.";
-    else why = "AI barely touches analyst productivity here, so the supply side drives the result.";
-    if (v.theta >= 0.01 && r.sup > 1.15) why += " New entrants from nontechnical roles push supply right, which holds salaries down.";
-    $("verdict").textContent = "Result: " + job + " at " + pay + ". " + why;
+    const parts = [];
+    if (r.m > 1.01) {
+      if (v.eta > 1.02) parts.push("Analysts get more productive, and businesses respond to cheaper analysis by commissioning much more of it, which adds analyst work.");
+      else if (v.eta < 0.98) parts.push("Analysts get more productive, but businesses commission only a little more analysis, so the extra output needs fewer people.");
+      else parts.push("Analysts get more productive, and extra analysis commissioned roughly offsets the labor saved.");
+    }
+    if (r.f > 0.01) parts.push("Business users handle " + Math.round(r.f * 100) + "% of the work themselves, which cuts demand for specialists at every salary.");
+    if (v.entry > 0.05) parts.push("More qualified candidates shift supply out, which holds salaries down and adds jobs.");
+    if (!parts.length) parts.push("Nothing has changed from the baseline.");
+    $("verdict").textContent = "Result: " + job + " at " + pay + ", with analyst output at " + yr.toFixed(1) + "× baseline. " + parts.join(" ");
 
     $("chips").innerHTML = "";
-    const chips = [
-      "demand shift at any wage " + pct(1 + r.dShift).t,
-      "supply shift " + pct(r.sup).t,
-      "analyst productivity ×" + r.m.toFixed(2),
-      "manager self-serve " + Math.round(r.f * 100) + "%",
-      v.eta > 1 ? "η > 1: Jevons regime" : "η < 1: fixed-work regime"
-    ];
-    chips.forEach(t => { const s = document.createElement("span"); s.className = "chip"; s.textContent = t; $("chips").appendChild(s); });
+    [
+      "demand for analyst labor at today's salary " + pct(r.dShift).t,
+      "supply at today's salary " + pct(r.sup).t,
+      "spending on analyst labor " + pct(wr * qr).t,
+      v.eta > 1 ? "η > 1: productivity adds analyst work" : v.eta < 1 ? "η < 1: productivity cuts analyst work" : "η = 1: productivity is neutral"
+    ].forEach(t => { const s = document.createElement("span"); s.className = "chip"; s.textContent = t; $("chips").appendChild(s); });
 
     draw(v, r);
   }
 
   function draw(v, r) {
     while (svg.firstChild) svg.removeChild(svg.firstChild);
-    const W = 720, H = 470, ml = 62, mr = 28, mt = 20, mb = 52;
+    const phone = window.innerWidth < 860;
+    const W = 720, H = phone ? 330 : 440;
+    svg.setAttribute("viewBox", "0 0 720 " + H);
+    const ml = 62, mr = 28, mt = 18, mb = 50;
     const pw = W - ml - mr, ph = H - mt - mb;
     const xMax = niceMax(Math.max(100, r.Q1) * 1.7);
     const yMax = niceMax(Math.max(100, r.W1) * 1.7);
     const sx = q => ml + (q / xMax) * pw;
     const sy = w => mt + ph - (w / yMax) * ph;
+    const txt = { "font-family": "IBM Plex Mono, ui-monospace, monospace" };
 
     const defs = node("defs", {});
     const cp = node("clipPath", { id: "plotclip" }, defs);
@@ -312,45 +369,47 @@ input[type=range] { width: 100%; accent-color: var(--demand); margin: 2px 0; }
     const mk = node("marker", { id: "arr", viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" }, defs);
     node("path", { d: "M0,0 L10,5 L0,10 z", fill: "var(--ink)" }, mk);
 
-    const ticks = 5;
-    for (let i = 0; i <= ticks; i++) {
-      const xv = xMax * i / ticks, yv = yMax * i / ticks;
+    for (let i = 0; i <= 5; i++) {
+      const xv = xMax * i / 5, yv = yMax * i / 5;
       node("line", { x1: sx(xv), x2: sx(xv), y1: mt, y2: mt + ph, stroke: "var(--grid)", "stroke-width": 1 });
       node("line", { x1: ml, x2: ml + pw, y1: sy(yv), y2: sy(yv), stroke: "var(--grid)", "stroke-width": 1 });
-      node("text", { x: sx(xv), y: mt + ph + 18, "text-anchor": "middle", fill: "var(--muted)", "font-size": 12, "font-family": "var(--mono)" }, null, Math.round(xv));
-      node("text", { x: ml - 8, y: sy(yv) + 4, "text-anchor": "end", fill: "var(--muted)", "font-size": 12, "font-family": "var(--mono)" }, null, Math.round(yv));
+      node("text", Object.assign({ x: sx(xv), y: mt + ph + 20, "text-anchor": "middle", fill: "var(--muted)", "font-size": 15 }, txt), null, Math.round(xv));
+      node("text", Object.assign({ x: ml - 8, y: sy(yv) + 5, "text-anchor": "end", fill: "var(--muted)", "font-size": 15 }, txt), null, Math.round(yv));
     }
     node("line", { x1: ml, x2: ml + pw, y1: mt + ph, y2: mt + ph, stroke: "var(--ink)", "stroke-width": 1.2 });
     node("line", { x1: ml, x2: ml, y1: mt, y2: mt + ph, stroke: "var(--ink)", "stroke-width": 1.2 });
-    node("text", { x: ml + pw / 2, y: H - 10, "text-anchor": "middle", fill: "var(--ink)", "font-size": 13, "font-family": "var(--body)" }, null, "Analyst headcount (Q, pre-AI = 100)");
-    node("text", { x: 16, y: mt + ph / 2, "text-anchor": "middle", fill: "var(--ink)", "font-size": 13, "font-family": "var(--body)", transform: `rotate(-90 16 ${mt + ph / 2})` }, null, "Salary (W, pre-AI = 100)");
+    node("text", { x: ml + pw / 2, y: H - 6, "text-anchor": "middle", fill: "var(--ink)", "font-size": 16 }, null, "Analyst FTEs (baseline = 100)");
+    node("text", { x: 18, y: mt + ph / 2, "text-anchor": "middle", fill: "var(--ink)", "font-size": 16, transform: `rotate(-90 18 ${mt + ph / 2})` }, null, "Salary (baseline = 100)");
 
+    if (phone) node("text", { x: ml + pw - 6, y: mt + 18, "text-anchor": "end", fill: "var(--muted)", "font-size": 16 }, null, "dashed = baseline");
     const g = node("g", { "clip-path": "url(#plotclip)" });
     function curve(fn, color, width, dash) {
-      let d = "", n = 240;
-      for (let i = 1; i <= n; i++) {
-        const w = yMax * i / n;
+      let d = "";
+      for (let i = 1; i <= 240; i++) {
+        const w = yMax * i / 240;
         const q = fn(w);
         if (!isFinite(q)) continue;
-        const qq = Math.min(q, xMax * 3);
-        d += (d ? " L" : "M") + sx(qq).toFixed(1) + "," + sy(w).toFixed(1);
+        d += (d ? " L" : "M") + sx(Math.min(q, xMax * 3)).toFixed(1) + "," + sy(w).toFixed(1);
       }
       node("path", { d, fill: "none", stroke: color, "stroke-width": width, "stroke-dasharray": dash || "none", "stroke-linecap": "round" }, g);
     }
     const demand = (A, eta) => w => A * Math.pow(w, -eta);
     const supply = (B, eps) => w => B * Math.pow(w, eps);
 
-    const moved = v.theta > 0.001;
+    const moved = Math.abs(r.dShift - 1) > 0.002 || r.sup > 1.002;
     curve(demand(r.A0, v.eta), "var(--ghost)", 2, moved ? "5 4" : null);
     curve(supply(r.B0, v.eps), "var(--ghost)", 2, moved ? "5 4" : null);
-    curve(demand(r.A1, v.eta), "var(--demand)", 3);
-    curve(supply(r.B1, v.eps), "var(--supply)", 3);
+    curve(demand(r.A1, v.eta), "var(--demand)", 3.5);
+    curve(supply(r.B1, v.eps), "var(--supply)", 3.5);
 
-    const dLab = (() => { const q = xMax * 0.92; const w = Math.pow(r.A1 / q, 1 / v.eta); return [q, w]; })();
-    if (dLab[1] > 0 && dLab[1] < yMax) node("text", { x: sx(dLab[0]), y: sy(dLab[1]) - 8, "text-anchor": "middle", fill: "var(--demand)", "font-size": 13, "font-weight": 600 }, null, moved ? "D₁" : "D");
-    const sLab = (() => { const w = yMax * 0.93; const q = r.B1 * Math.pow(w, v.eps); return [q, w]; })();
-    if (sLab[0] < xMax) node("text", { x: sx(sLab[0]) + 8, y: sy(sLab[1]) + 4, fill: "var(--supply)", "font-size": 13, "font-weight": 600 }, null, moved ? "S₁" : "S");
-    else { const q = xMax * 0.93, w = Math.pow(q / r.B1, 1 / v.eps); node("text", { x: sx(q), y: sy(w) + 18, "text-anchor": "middle", fill: "var(--supply)", "font-size": 13, "font-weight": 600 }, null, moved ? "S₁" : "S"); }
+    // Curve labels, placed where each curve sits inside the plot
+    const lab = { fill: "var(--demand)", "font-size": 17, "font-weight": 600 };
+    let dw = yMax * 0.9, dq = r.A1 * Math.pow(dw, -v.eta);
+    if (dq > xMax * 0.92 && v.eta > 0.01) { dq = xMax * 0.92; dw = Math.pow(r.A1 / dq, 1 / v.eta); }
+    if (dq < xMax && dw < yMax) node("text", Object.assign({}, lab, { x: sx(dq) + 8, y: sy(dw) - 6 }), null, "D");
+    let sw = yMax * 0.9, sq = r.B1 * Math.pow(sw, v.eps);
+    if (sq > xMax * 0.92) { sq = xMax * 0.92; sw = Math.pow(sq / r.B1, 1 / v.eps); }
+    node("text", Object.assign({}, lab, { fill: "var(--supply)", x: sx(sq) + 8, y: sy(sw) + 16 }), null, "S");
 
     function guides(q, w, color) {
       node("line", { x1: sx(q), x2: sx(q), y1: sy(w), y2: mt + ph, stroke: color, "stroke-dasharray": "2 4", "stroke-width": 1.2 });
@@ -362,20 +421,21 @@ input[type=range] { width: 100%; accent-color: var(--demand); margin: 2px 0; }
     const dist = Math.hypot(sx(r.Q1) - sx(100), sy(r.W1) - sy(100));
     if (moved && dist > 22 && e1in) {
       const ang = Math.atan2(sy(r.W1) - sy(100), sx(r.Q1) - sx(100));
-      node("line", { x1: sx(100) + Math.cos(ang) * 9, y1: sy(100) + Math.sin(ang) * 9, x2: sx(r.Q1) - Math.cos(ang) * 10, y2: sy(r.W1) - Math.sin(ang) * 10, stroke: "var(--ink)", "stroke-width": 1.4, "marker-end": "url(#arr)" });
+      node("line", { x1: sx(100) + Math.cos(ang) * 9, y1: sy(100) + Math.sin(ang) * 9, x2: sx(r.Q1) - Math.cos(ang) * 10, y2: sy(r.W1) - Math.sin(ang) * 10, stroke: "var(--ink)", "stroke-width": 1.6, "marker-end": "url(#arr)" });
     }
     if (moved) {
-      node("circle", { cx: sx(100), cy: sy(100), r: 5.5, fill: "var(--panel)", stroke: "var(--ghost)", "stroke-width": 2 });
-      node("text", { x: sx(100) - 9, y: sy(100) - 9, "text-anchor": "end", fill: "var(--muted)", "font-size": 12, "font-family": "var(--mono)" }, null, "E₀");
+      node("circle", { cx: sx(100), cy: sy(100), r: 6, fill: "var(--panel)", stroke: "var(--ghost)", "stroke-width": 2 });
     }
     if (e1in) {
-      node("circle", { cx: sx(r.Q1), cy: sy(r.W1), r: 6.5, fill: "var(--ink)", stroke: "var(--panel)", "stroke-width": 2 });
-      const right = sx(r.Q1) < ml + pw - 150;
-      node("text", { x: sx(r.Q1) + (right ? 12 : -12), y: sy(r.W1) - 10, "text-anchor": right ? "start" : "end", fill: "var(--ink)", "font-size": 12.5, "font-family": "var(--mono)", "font-weight": 500 }, null, (moved ? "E₁ " : "E ") + "(" + r.Q1.toFixed(0) + ", " + r.W1.toFixed(0) + ")");
+      node("circle", { cx: sx(r.Q1), cy: sy(r.W1), r: 7.5, fill: "var(--ink)", stroke: "var(--panel)", "stroke-width": 2 });
+      const right = sx(r.Q1) < ml + pw - 160;
+      node("text", Object.assign({ x: sx(r.Q1) + (right ? 13 : -13), y: sy(r.W1) - 11, "text-anchor": right ? "start" : "end", fill: "var(--ink)", "font-size": 16, "font-weight": 500 }, txt), null, "(" + r.Q1.toFixed(0) + ", " + r.W1.toFixed(0) + ")");
     }
   }
 
-  setPreset("adam");
+  let lastPhone = window.innerWidth < 860;
+  window.addEventListener("resize", () => { const p = window.innerWidth < 860; if (p !== lastPhone) { lastPhone = p; render(); } });
+  setPreset("braff");
 })();
 </script>
 
