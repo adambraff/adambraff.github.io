@@ -170,6 +170,7 @@ details.notes > summary { cursor: pointer; font-family: var(--display); font-siz
           <button type="button" data-p="doom">Layoff doom</button>
           <button type="button" data-p="fewer">More output, fewer analysts</button>
           <button type="button" data-p="flood">Talent flood</button>
+          <button type="button" data-p="slop">Slopocalypse</button>
           <button type="button" data-p="base">Baseline</button>
         </div>
       </div>
@@ -177,9 +178,10 @@ details.notes > summary { cursor: pointer; font-family: var(--display); font-siz
       <div class="group">
         <h2><span class="swatch" style="background:var(--demand)"></span>Demand for analysts</h2>
         <div class="ctl">
-          <div class="top"><label for="prod">Analyst productivity gain</label><output id="o-prod"></output></div>
-          <input type="range" id="prod" min="0" max="2" step="0.05">
-          <div class="ends"><span>No change</span><span>3× output</span></div>
+          <div class="top"><label for="prod">Analyst productivity, net of slop</label><output id="o-prod"></output></div>
+          <input type="range" id="prod" min="-0.5" max="2" step="0.05">
+          <div class="ends"><span>Slop halves it</span><span>3× output</span></div>
+          <div class="hint">Useful analysis per analyst. Below zero, analysts use AI to generate decks and memos that colleagues must wade through, so each useful answer costs more than before.</div>
         </div>
         <div class="ctl">
           <div class="top"><label for="self">Work business users do themselves</label><output id="o-self"></output></div>
@@ -227,7 +229,7 @@ details.notes > summary { cursor: pointer; font-family: var(--display); font-siz
         <h3>Demand is derived</h3>
         <p>Firms buy analysis, and analysts are an input. Each analyst FTE produces <code>m</code> units of analysis, so labor cost per analysis is <code>W/m</code>. Demand for analysis responds to that cost with elasticity η, and business users take over a share <code>f</code> of it themselves.</p>
         <span class="eq">FTE demand = A · (1 − f) · m^(η − 1) · W^(−η)</span>
-        <p>The exponent <code>η − 1</code> carries the argument. Before other effects, a productivity gain raises demand for analyst labor when η &gt; 1 and lowers it when η &lt; 1 (a simplified Hicks-Marshall derived-demand result). At η = 0 the work is a fixed pile, and every productivity gain cuts FTEs one for one. The exact threshold of 1 depends on analyst labor being the only cost; adding software, data, and review costs moves it.</p>
+        <p>The exponent <code>η − 1</code> carries the argument. Before other effects, a productivity gain raises demand for analyst labor when η &gt; 1 and lowers it when η &lt; 1 (a simplified Hicks-Marshall derived-demand result). At η = 0 the work is a fixed pile, and every productivity gain cuts FTEs one for one. Slop is <code>m</code> below 1: AI-generated material that costs colleagues reading time lowers useful output per analyst, and the same exponent runs in reverse. The exact threshold of 1 depends on analyst labor being the only cost; adding software, data, and review costs moves it.</p>
       </div>
       <div>
         <h3>Supply shifts too</h3>
@@ -251,6 +253,7 @@ details.notes > summary { cursor: pointer; font-family: var(--display); font-siz
     doom:  { prod: 0,    self: 0.5,  eta: 0.6, entry: 0.5, eps: 1.5 },
     fewer: { prod: 0.85, self: 0,    eta: 0.5, entry: 0.2, eps: 1.0 },
     flood: { prod: 0.6,  self: 0,    eta: 1.5, entry: 1.0, eps: 3.0 },
+    slop:  { prod: -0.35, self: 0,   eta: 1.5, entry: 0.3, eps: 2.0 },
     base:  { prod: 0,    self: 0,    eta: 1.5, entry: 0,   eps: 1.5 }
   };
   const ids = ["prod", "self", "eta", "entry", "eps"];
@@ -313,7 +316,7 @@ details.notes > summary { cursor: pointer; font-family: var(--display); font-siz
     const r = model(v);
     const more10 = Math.pow(0.9, -v.eta) - 1;
 
-    $("o-prod").textContent = "+" + Math.round(v.prod * 100) + "%";
+    $("o-prod").textContent = v.prod < -0.001 ? "−" + Math.round(-v.prod * 100) + "% (slop)" : "+" + Math.round(v.prod * 100) + "%";
     $("o-self").textContent = Math.round(v.self * 100) + "% of work";
     $("o-eta").textContent = "10% cheaper → +" + Math.round(more10 * 100) + "% more";
     $("o-entry").textContent = "+" + Math.round(v.entry * 100) + "%";
@@ -329,6 +332,11 @@ details.notes > summary { cursor: pointer; font-family: var(--display); font-siz
     const job = qr > 1.02 ? "more analyst FTEs" : qr < 0.98 ? "fewer analyst FTEs" : "about the same number of analyst FTEs";
     const pay = wr > 1.02 ? "higher salaries" : wr < 0.98 ? "lower salaries" : "flat salaries";
     const parts = [];
+    if (r.m < 0.99) {
+      if (v.eta > 1.02) parts.push("AI slop drags net productivity down, so each useful analysis costs more and businesses commission less of it, which cuts analyst work.");
+      else if (v.eta < 0.98) parts.push("AI slop drags net productivity down, and because the work still has to get done, firms need more analysts to produce the same useful output.");
+      else parts.push("AI slop drags net productivity down, and the drop in analysis commissioned roughly offsets the extra labor each answer needs.");
+    }
     if (r.m > 1.01) {
       if (v.eta > 1.02) parts.push("Analysts get more productive, and businesses respond to cheaper analysis by commissioning much more of it, which adds analyst work.");
       else if (v.eta < 0.98) parts.push("Analysts get more productive, but businesses commission only a little more analysis, so the extra output needs fewer people.");
@@ -344,7 +352,7 @@ details.notes > summary { cursor: pointer; font-family: var(--display); font-siz
       "demand for analyst labor at today's salary " + pct(r.dShift).t,
       "supply at today's salary " + pct(r.sup).t,
       "spending on analyst labor " + pct(wr * qr).t,
-      v.eta > 1 ? "η > 1: productivity adds analyst work" : v.eta < 1 ? "η < 1: productivity cuts analyst work" : "η = 1: productivity is neutral"
+      v.eta > 1 ? "η > 1: productivity adds analyst work, slop removes it" : v.eta < 1 ? "η < 1: productivity cuts analyst work, slop adds it" : "η = 1: productivity is neutral"
     ].forEach(t => { const s = document.createElement("span"); s.className = "chip"; s.textContent = t; $("chips").appendChild(s); });
 
     draw(v, r);
