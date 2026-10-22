@@ -107,6 +107,9 @@ details.notes > summary { cursor: pointer; font-family: var(--display); font-siz
 .notes-grid p { margin: 0 0 8px; max-width: 65ch; }
 .notes-grid code, .eq { font-family: var(--mono); font-size: 13px; }
 .eq { display: block; background: var(--chip); border-radius: 6px; padding: 8px 10px; margin: 6px 0 10px; overflow-x: auto; white-space: nowrap; }
+.site-footer { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--muted); padding-top: 4px; }
+.site-footer a { color: var(--muted); text-decoration: underline; text-underline-offset: 2px; }
+.site-footer a:hover { color: var(--demand); }
 
 /* Phone: pin the results, compress everything */
 @media (max-width: 860px) {
@@ -244,6 +247,12 @@ details.notes > summary { cursor: pointer; font-family: var(--display); font-siz
       </div>
     </div>
   </details>
+
+  <footer class="site-footer">
+    <span>Adam Braff</span>
+    <a href="https://braff.co/advice">Blog</a>
+    <a href="https://adambraff.github.io/">More tools</a>
+  </footer>
 </div>
 
 <script>
