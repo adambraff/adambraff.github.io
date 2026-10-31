@@ -35,12 +35,12 @@ h1{font-family:var(--display);font-weight:600;font-size:clamp(26px,4vw,36px);lin
 .main{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:24px;align-items:start}
 @media (max-width:860px){.main{grid-template-columns:minmax(0,1fr)}}
 .scroll{overflow-x:auto}
-table{border-collapse:separate;border-spacing:4px;font-variant-numeric:tabular-nums;min-width:640px;width:100%}
+table{table-layout:fixed;border-collapse:separate;border-spacing:4px;font-variant-numeric:tabular-nums;min-width:640px;width:100%}
 th{font-weight:500;font-size:12px;color:var(--muted);text-align:center;padding:4px}
 th.grp{font-size:12px;color:var(--fg)}
 td.rl{font-family:var(--mono);font-size:13px;text-align:center;background:var(--chip);border-radius:6px;width:56px}
 td.rl.y{font-weight:500}
-td.cell{border-radius:8px;padding:8px 6px;text-align:center;color:var(--ink-on);height:74px;vertical-align:middle;position:relative}
+td.cell{border-radius:8px;padding:8px 6px;overflow:hidden;box-sizing:border-box;text-align:center;color:var(--ink-on);height:74px;vertical-align:middle;position:relative}
 .ini{font-family:var(--display);font-weight:600;font-size:24px;line-height:1}
 .sc{font-family:var(--mono);font-size:11.5px;margin-top:4px;opacity:.85}
 .pr{font-family:var(--mono);font-size:11px;opacity:.75}
@@ -103,7 +103,7 @@ document.getElementById("props").innerHTML=PROPS.map((p,i)=>`<div class="prop"><
 const rows=[], cols=[];
 for(let r=0;r<8;r++) rows.push([4,2,1].map(b=>r&b?"Y":"N").join(""));
 for(let c=0;c<4;c++) cols.push([2,1].map(b=>c&b?"Y":"N").join(""));
-let h=`<thead><tr>`+PROPS.slice(0,3).map(p=>`<th rowspan="2">#${p.n}<br>${p.short}</th>`).join("")+
+let h=`<colgroup><col style="width:76px"><col style="width:76px"><col style="width:76px"><col><col><col><col></colgroup><thead><tr>`+PROPS.slice(0,3).map(p=>`<th rowspan="2">#${p.n}<br>${p.short}</th>`).join("")+
  `<th class="grp" colspan="4">#${PROPS[3].n} ${PROPS[3].short} / #${PROPS[4].n} ${PROPS[4].short}</th></tr><tr>`+
  cols.map(c=>`<th>${c[0]==="Y"?"Yes":"No"} / ${c[1]==="Y"?"Yes":"No"}</th>`).join("")+`</tr></thead><tbody>`;
 for(const r of rows){
