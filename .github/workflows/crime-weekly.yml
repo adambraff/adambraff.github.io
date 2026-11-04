@@ -1,0 +1,52 @@
+# Weekly crime summary for 56 Cooke St, Providence.
+# Runs tools/crime-map/weekly.js against the last 7 days of city data and posts the
+# result as an issue assigned to adambraff, which GitHub emails to him.
+name: Weekly crime summary
+
+on:
+  schedule:
+    - cron: '17 12 * * 3'   # Wednesdays 7:17 AM Eastern (8:17 AM during daylight time)
+  workflow_dispatch:         # "Run workflow" button on the Actions tab
+  push:                      # runs once whenever this file itself changes
+    branches: [main]
+    paths: ['.github/workflows/crime-weekly.yml']
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  summary:
+    runs-on: ubuntu-latest
+    env:
+      TZ: America/New_York
+      GH_TOKEN: ${{ github.token }}
+      MAP: https://adambraff.github.io/tools/crime-map/?days=7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/crime-map
+
+      - name: Fetch the last 7 days of city data
+        run: |
+          S=$(date -u -d '7 days ago' +%F)
+          curl -sSf --retry 3 -o tools/crime-map/data.json \
+            "https://data.providenceri.gov/resource/rz3y-pz8v.json?\$select=case_number,location,arrest_date,offense_desc,statute_desc&\$where=arrest_date>='${S}T00:00:00'&\$limit=50000"
+
+      - name: Build the summary
+        run: |
+          node tools/crime-map/weekly.js 7 > summary.txt
+          cat summary.txt
+
+      - name: Post the summary (GitHub emails it)
+        run: |
+          gh issue create --repo "$GITHUB_REPOSITORY" --assignee adambraff \
+            --title "Crime map weekly, $(date '+%b %-d')" --body-file summary.txt
+
+      - name: Report a failure
+        if: failure()
+        run: |
+          gh issue create --repo "$GITHUB_REPOSITORY" --assignee adambraff \
+            --title "Crime map summary failed, $(date '+%b %-d')" \
+            --body "The weekly run failed. Log: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+          Live map: $MAP"
