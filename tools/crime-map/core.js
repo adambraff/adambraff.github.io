@@ -273,10 +273,10 @@
     const o = Object.assign({ radius: 1, half: 0.35, top: 20, home: HOME }, opts || {});
     const cases = new Map();
     for (const r of rows) {
-      const key = r.casenumber || (r.reported_date + r.location + r.offense_desc);
+      const key = r.case_number || (r.arrest_date + r.location + r.offense_desc);
       const sev = severity(r.offense_desc);
       const c = cases.get(key);
-      if (!c) cases.set(key, { id: key, date: r.reported_date, location: r.location || '', offenses: [r.offense_desc], statutes: [r.statute_desc].filter(Boolean), sev });
+      if (!c) cases.set(key, { id: key, date: r.arrest_date, location: r.location || '', offenses: [r.offense_desc], statutes: [r.statute_desc].filter(Boolean), sev });
       else {
         if (!c.offenses.includes(r.offense_desc)) c.offenses.push(r.offense_desc);
         if (r.statute_desc && !c.statutes.includes(r.statute_desc)) c.statutes.push(r.statute_desc);

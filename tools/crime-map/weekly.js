@@ -9,7 +9,7 @@ const rows = JSON.parse(fs.readFileSync(path.join(dir, 'data.json')));
 const URL = `https://adambraff.github.io/tools/crime-map/?days=${days}`;
 
 if (!Array.isArray(rows) || !rows.length) { console.log(`Crime map: the city data API returned no records for the last ${days} days. Map: ${URL}`); process.exit(0); }
-const newest = rows.reduce((m, r) => r.reported_date > m ? r.reported_date : m, '');
+const newest = rows.reduce((m, r) => r.arrest_date > m ? r.arrest_date : m, '');
 const staleDays = (Date.now() - new Date(newest)) / 864e5;
 
 const res = C.analyze(rows, geo, { radius: 1, top: 20, half: 0.35 });

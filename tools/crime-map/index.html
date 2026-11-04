@@ -152,14 +152,14 @@ footer a{color:var(--accent)}
   const since = d => { const t = new Date(Date.now() - d * 864e5); return t.toISOString().slice(0,10) + 'T00:00:00'; };
   async function load(){
     $('status').textContent = 'Loading…';
-    const url = `${API}?$select=casenumber,location,reported_date,offense_desc,statute_desc&$where=reported_date>='${since(+val('days'))}'&$limit=50000`;
+    const url = `${API}?$select=case_number,location,arrest_date,offense_desc,statute_desc&$where=arrest_date>='${since(+val('days'))}'&$limit=50000`;
     const [r, s] = await Promise.all([
       fetch(url).then(x => { if (!x.ok) throw new Error('City data API returned ' + x.status); return x.json(); }),
       geo ? null : fetch('streets.json').then(x => x.json())
     ]);
     if (s) geo = C.Geocoder(s);
     rows = r;
-    maxDate = rows.reduce((m, x) => x.reported_date > m ? x.reported_date : m, '');
+    maxDate = rows.reduce((m, x) => x.arrest_date > m ? x.arrest_date : m, '');
     render();
   }
 
