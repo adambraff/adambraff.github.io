@@ -1,8 +1,8 @@
 # Who will win the 2026 Narcissist Forecasting Contest?
 
-An 8 x 4 matrix of the 32 ways the five open props (13, 22, 23, 24, 25) can resolve, showing the winner of each scenario by lowest Brier score across all 25 props (timely entries only). Rows are the props that resolve first, columns the last two. Win chances treat current Manifold prices as independent probabilities.
+A matrix of the ways the open props can resolve (eight outcomes for props 13, 24 and 25 as of November 15, 2026), showing the winner of each scenario by lowest Brier score across all 25 props (timely entries only). Win chances treat current Manifold prices as independent probabilities.
 
-Data snapshot from the contest tracker as of October 29, 2026.
+Data snapshot from the contest tracker as of November 15, 2026.
 
 Live: https://adambraff.github.io/tools/contest-endgame/
 

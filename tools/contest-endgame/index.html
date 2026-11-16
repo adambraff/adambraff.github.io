@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: one scoreboard grid, 8 rows (props 13, 22, 23) by 4 columns (props 24, 25), legend beside it on wide screens */
+/* Layout: one scoreboard grid, 2 rows (prop 13) by 4 columns (props 24, 25), legend beside it on wide screens */
 :root{
   --bg:#f6f7f4; --panel:#ffffff; --fg:#1d2420; --muted:#5b6660; --rule:#d9ddd6; --chip:#eceee9;
   --display:"Fraunces",Georgia,serif; --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
@@ -60,7 +60,7 @@ footer a{color:inherit}
 <div class="wrap">
   <header>
     <h1>Who will win the 2026 Narcissist Forecasting Contest?</h1>
-    <p class="lede">Five props are still open, so there are 32 ways the contest can end. Each cell shows the winner (lowest Brier score across all 25 props, timely entries only) for one combination of outcomes.</p>
+    <p class="lede">Three props are still open, so there are eight ways the contest can end. The Senate and Greenland props both resolved No. Each cell shows the winner (lowest Brier score across all 25 props, timely entries only) for one combination of outcomes.</p>
     <p class="lede"><a href="https://braff.co/advice/f/announcing-the-2026-narcissist-forecasting-contest">Contest announcement</a> | <a href="https://adambraff.github.io/tools/contest-tracker/">Contest tracker</a></p>
   </header>
 
@@ -68,7 +68,7 @@ footer a{color:inherit}
 
   <div class="main">
     <div>
-      <div class="scroll"><table id="grid" aria-label="Winner for each of the 32 outcomes"></table></div>
+      <div class="scroll"><table id="grid" aria-label="Winner for each of the eight outcomes"></table></div>
       <div class="key" style="margin-top:8px">
         <span>Small print in each cell: winning Brier score | chance of that outcome at current Manifold prices</span>
       </div>
@@ -76,35 +76,33 @@ footer a{color:inherit}
     <aside class="legend" aria-label="Win chances">
       <h2>Chance of winning</h2>
       <div id="legend" style="display:grid;gap:8px"></div>
-      <p class="note">Sums the chance of every cell a person wins, treating the five props as independent and taking Manifold prices as probabilities.</p>
+      <p class="note">Sums the chance of every cell a person wins, treating the three props as independent and taking Manifold prices as probabilities.</p>
     </aside>
   </div>
 
-  <p class="note">Data from the contest tracker as of October 29, 2026, with 20 of 25 props resolved. Market prices: Universum 29%, Senate 35%, Greenland 10%, Thanksgiving 85%, Miss Universe 45%.</p>
+  <p class="note">Data from the contest tracker as of November 15, 2026, with 22 of 25 props resolved. Market prices: Universum 29%, Thanksgiving 92%, Miss Universe 45%.</p>
   <footer>Adam Braff | <a href="https://braff.co/advice">Blog</a> | <a href="https://adambraff.github.io/">More tools</a></footer>
 </div>
 
 <script>
 const PROPS=[
- {n:13,short:"Universum",q:"McKinsey, BCG or Bain in Universum’s US top 20",when:"Any day now",p:.29},
- {n:22,short:"GOP Senate",q:"Republicans keep control of the Senate",when:"Nov 3–4",p:.35},
- {n:23,short:"Greenland",q:"Greenland schedules an independence referendum",when:"By Nov 15",p:.10},
- {n:24,short:"All alive",q:"Eastwood, Shatner and Moreno all alive on Thanksgiving",when:"Nov 26",p:.85},
- {n:25,short:"Venezuela",q:"Venezuela places top five at Miss Universe",when:"Nov 30",p:.45}];
+ {n:13,short:"Universum",q:"McKinsey, BCG or Bain in Universum’s US top 20",p:.29},
+ {n:24,short:"All alive",q:"Eastwood, Shatner and Moreno all alive on Thanksgiving",p:.92},
+ {n:25,short:"Venezuela",q:"Venezuela places top five at Miss Universe",p:.45}];
 const PEOPLE={
  "Chris Coward":["CC","--cc"],"James Bailey":["JB","--jb"],"Kevin Schlottmann":["KS","--ks"],"George Cigale":["GC","--gc"],
  "David Shapiro":["DS","--ds"],"Susan Zuckerman":["SZ","--sz"],"Satwik Kamath":["SK","--sk"],"Lance Wiggs":["LW","--lw"],"Anouk Van Obergen":["AVO","--av"]};
-const OUT=[["YYYYY","James Bailey",0.1547,"Aly Silver",0.0149,0.0039],["YYYYN","Kevin Schlottmann",0.148,"James Bailey",0.0107,0.0047],["YYYNY","Kevin Schlottmann",0.156,"James Bailey",0.0155,0.0007],["YYYNN","Kevin Schlottmann",0.132,"James Bailey",0.0435,0.0008],["YYNYY","James Bailey",0.1307,"Chris Coward",0.0231,0.0349],["YYNYN","James Bailey",0.1347,"Chris Coward",0.0295,0.0427],["YYNNY","James Bailey",0.1475,"Chris Coward",0.0207,0.0062],["YYNNN","James Bailey",0.1515,"Will Swarts",0.0125,0.0075],["YNYYY","David Shapiro",0.1578,"James Bailey",0.0097,0.0072],["YNYYN","James Bailey",0.1715,"Kevin Schlottmann",0.0005,0.0088],["YNYNY","Susan Zuckerman",0.1785,"Kevin Schlottmann",0.0015,0.0013],["YNYNN","Kevin Schlottmann",0.156,"Lance Wiggs",0.0217,0.0016],["YNNYY","James Bailey",0.1435,"Chris Coward",0.0231,0.0649],["YNNYN","James Bailey",0.1475,"Lance Wiggs",0.0261,0.0793],["YNNNY","Satwik Kamath",0.1457,"Susan Zuckerman",0.0048,0.0115],["YNNNN","James Bailey",0.1643,"Lance Wiggs",0.0013,0.014],["NYYYY","Chris Coward",0.1475,"James Bailey",0.0201,0.0095],["NYYYN","Chris Coward",0.1579,"James Bailey",0.0137,0.0116],["NYYNY","Anouk Van Obergen",0.1611,"Chris Coward",0.0008,0.0017],["NYYNN","Lance Wiggs",0.1697,"Kevin Schlottmann",0.0023,0.0021],["NYNYY","Chris Coward",0.1195,"James Bailey",0.0241,0.0855],["NYNYN","Chris Coward",0.1299,"James Bailey",0.0177,0.1046],["NYNNY","Chris Coward",0.1339,"George Cigale",0.0189,0.0151],["NYNNN","Chris Coward",0.1443,"George Cigale",0.0125,0.0185],["NNYYY","Chris Coward",0.1603,"David Shapiro",0.0135,0.0177],["NNYYN","Chris Coward",0.1707,"Lance Wiggs",0.003,0.0216],["NNYNY","Anouk Van Obergen",0.1555,"Chris Coward",0.0192,0.0031],["NNYNN","Lance Wiggs",0.1657,"Anouk Van Obergen",0.0082,0.0038],["NNNYY","Chris Coward",0.1323,"James Bailey",0.0241,0.1589],["NNNYN","Chris Coward",0.1427,"James Bailey",0.0177,0.1942],["NNNNY","Chris Coward",0.1467,"George Cigale",0.0021,0.028],["NNNNN","George Cigale",0.1528,"Lance Wiggs",0.0009,0.0343]];
+const OUT=[["NNN","George Cigale",0.1528,"Lance Wiggs",0.0009,0.0312],["NNY","Chris Coward",0.1467,"George Cigale",0.0021,0.0256],["NYN","Chris Coward",0.1427,"James Bailey",0.0177,0.3593],["NYY","Chris Coward",0.1323,"James Bailey",0.0241,0.2939],["YNN","James Bailey",0.1643,"Lance Wiggs",0.0013,0.0128],["YNY","Satwik Kamath",0.1457,"Susan Zuckerman",0.0048,0.0104],["YYN","James Bailey",0.1475,"Lance Wiggs",0.0261,0.1467],["YYY","James Bailey",0.1435,"Chris Coward",0.0231,0.1201]];
 const byBits=Object.fromEntries(OUT.map(o=>[o[0],o]));
 const pct=p=>p>=0.01?Math.round(p*100)+"%":(p*100).toFixed(1)+"%";
 
 document.getElementById("props").innerHTML=PROPS.map((p,i)=>`<div class="prop"><span class="k">Prop #${p.n}</span><span class="q">${p.q}</span><span class="m">Manifold ${Math.round(p.p*100)}% Yes</span></div>`).join("");
 
 const rows=[], cols=[];
-for(let r=0;r<8;r++) rows.push([4,2,1].map(b=>r&b?"Y":"N").join(""));
+rows.push("N","Y");
 for(let c=0;c<4;c++) cols.push([2,1].map(b=>c&b?"Y":"N").join(""));
-let h=`<colgroup><col style="width:76px"><col style="width:76px"><col style="width:76px"><col><col><col><col></colgroup><thead><tr>`+PROPS.slice(0,3).map(p=>`<th rowspan="2">#${p.n}<br>${p.short}</th>`).join("")+
- `<th class="grp" colspan="4">#${PROPS[3].n} ${PROPS[3].short} / #${PROPS[4].n} ${PROPS[4].short}</th></tr><tr>`+
+let h=`<colgroup><col style="width:96px"><col><col><col><col></colgroup><thead><tr>`+PROPS.slice(0,1).map(p=>`<th rowspan="2">#${p.n}<br>${p.short}</th>`).join("")+
+ `<th class="grp" colspan="4">#${PROPS[1].n} ${PROPS[1].short} / #${PROPS[2].n} ${PROPS[2].short}</th></tr><tr>`+
  cols.map(c=>`<th>${c[0]==="Y"?"Yes":"No"} / ${c[1]==="Y"?"Yes":"No"}</th>`).join("")+`</tr></thead><tbody>`;
 for(const r of rows){
   h+="<tr>"+[...r].map(x=>`<td class="rl ${x==="Y"?"y":""}">${x==="Y"?"Yes":"No"}</td>`).join("");
@@ -118,7 +116,7 @@ document.getElementById("grid").innerHTML=h+"</tbody>";
 
 const tot={}; OUT.forEach(o=>tot[o[1]]=(tot[o[1]]||0)+o[5]);
 const cells={}; OUT.forEach(o=>cells[o[1]]=(cells[o[1]]||0)+1);
-document.getElementById("legend").innerHTML=Object.entries(tot).sort((a,b)=>b[1]-a[1]).map(([n,p])=>{const [ini,tok]=PEOPLE[n];return `<div class="lg"><span class="sw" style="background:var(${tok})">${ini}</span><span>${n}<br><span style="color:var(--muted);font-size:12px">${cells[n]} of 32 outcomes</span></span><span class="p">${pct(p)}</span></div>`}).join("");
+document.getElementById("legend").innerHTML=Object.entries(tot).sort((a,b)=>b[1]-a[1]).map(([n,p])=>{const [ini,tok]=PEOPLE[n];return `<div class="lg"><span class="sw" style="background:var(${tok})">${ini}</span><span>${n}<br><span style="color:var(--muted);font-size:12px">${cells[n]} of 8 outcomes</span></span><span class="p">${pct(p)}</span></div>`}).join("");
 </script>
 
 </body>
