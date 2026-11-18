@@ -311,15 +311,16 @@ function viewRun(){
   if(groups.working.length) out.push($('section',{class:'sec'},$('h2',{class:'label',text:'The machine is working'}),$('div',{class:'list'},groups.working.map(([pid,st])=>
     $('div',{class:'row'},$('div',{class:'who'},$('b',{text:pid}),$('span',{text:S.props[pid].question})),$('div',{class:'txt'},st.what+'. Tell Claude to continue if this has not moved.'),$('a',{class:'btn',href:'#p-'+pid,text:'Open'}))))));
 
-  if(groups.called.length){
+  const called=ledger().filter(r=>!r.outcome);
+  if(called.length){
     out.push($('section',{class:'sec'},$('div',{class:'sechead'},$('h2',{class:'label',text:'Called, waiting to resolve'}),$('a',{class:'btn',href:'#prices',text:'Market prices'})),
       $('div',{class:'legend'},lgd('track mach','width:12px;height:12px;border-radius:50%;background:var(--blue)','Machine'),lgd('','width:12px;height:12px;border-radius:50%;background:var(--you)','You'),lgd('mkt','width:9px;height:9px;background:var(--ink)','Market when the vault opened')),
-      $('div',{class:'list'},groups.called.map(([pid])=>{const v=S.vault[pid], m=S.meta[pid]||{};
-        return $('div',{class:'row'},$('div',{class:'who'},$('b',{text:pid}),$('span',{text:S.props[pid].question})),
-          $('div',{class:'strip'},track([['gap',Math.min(v.adam_clean,v.market),Math.max(v.adam_clean,v.market)],['mach',m.machine],['me',v.adam_clean],['mkt',v.market]])),
-          $('div',{class:'big'},$('b',{style:'color:var(--you)',text:pct(v.adam_clean)}),$('span',{text:'your clean'})),
-          $('div',{class:'trio'},$('div',{},$('b',{text:pct(v.market)}),$('span',{text:'market'})),$('div',{},$('b',{text:pct(v.contest)}),$('span',{text:'contest'})),$('div',{},$('b',{text:signed((v.adam_clean-v.market)*100,1)}),$('span',{text:'you vs market'}))),
-          $('a',{class:'btn',href:'#p-'+pid,text:'Open'}));}))));
+      $('div',{class:'list'},called.map(r=>
+        $('div',{class:'row'},$('div',{class:'who'},$('b',{text:r.pid}),$('span',{text:r.q})),
+          $('div',{class:'strip'},track([['gap',Math.min(r.you,r.market),Math.max(r.you,r.market)],['mach',r.machine],['me',r.you],['mkt',r.market]])),
+          $('div',{class:'big'},$('b',{style:'color:var(--you)',text:pct(r.you)}),$('span',{text:'your clean'})),
+          $('div',{class:'trio'},$('div',{},$('b',{text:pct(r.market)}),$('span',{text:'market'})),$('div',{},$('b',{text:pct(r.contest)}),$('span',{text:'contest'})),$('div',{},$('b',{text:signed((r.you-r.market)*100,1)}),$('span',{text:'you vs market'}))),
+          r.open?$('a',{class:'btn',href:r.open,text:'Open'}):$('span',{class:'muted',style:'flex:0 0 72px;font-size:12.5px',text:r.run||''}))))));
   }
   return out;
 }
