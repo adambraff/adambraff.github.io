@@ -10,4 +10,4 @@ Single self-contained `index.html` with the data embedded, plus `mabel.png`. No 
 
 ## Versions
 
-The pipeline is versioned (currently MABEL 2.0.0). Every forecast on the Track record tab carries the version that produced it, and the How it works tab shows the current schematic and the change log. The same log is in [VERSIONS.md](VERSIONS.md).
+The pipeline is versioned (currently MABEL 2.1.0). Every forecast on the Track record tab carries the version that produced it, and the How it works tab shows the current schematic and the change log. The same log is in [VERSIONS.md](VERSIONS.md).

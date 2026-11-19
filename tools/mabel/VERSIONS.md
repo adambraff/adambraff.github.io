@@ -4,6 +4,11 @@ Every forecast is logged with the version that produced it (`version` in each `r
 `runs/versions.json`, and the Track record page). Bump `VERSION` in `mabel.py` and add an entry here with any
 change to prompts, stages, weights or blending.
 
+## 2.1.0 Wide panel and model routing (2026-11-19) — panel test on loop 4 (`runs/loop4e`)
+- Forecaster panel widened from four to eight: adds Qwen 3.8 Max, Kimi K3.1 Pro, GPT-6 Astra (OpenRouter) and Claude Opus 5.5 (subagent).
+- Claude jobs routed by `JOB_MODEL`: Sonnet 5.5 for status brief, plan revision and conversions; Opus 5.5 for plan, synthesis and light research; Fable 5.2 only for deep research.
+- The tree is built by Opus 5.5 instead of Fable 5.2.
+
 ## 2.0.0 Ensemble (2026-11-19) — loop 4 rerun (`runs/loop4e`), scoring pending
 - The outside view, the scenario tree and four model forecasters each produce a separate number; code averages the three in log-odds (`tools/ensemble.py`).
 - The four forecasters see the status brief, the reference classes and the fact-checked findings, never the tree (`prompts/s5_critic_v3.txt`).
