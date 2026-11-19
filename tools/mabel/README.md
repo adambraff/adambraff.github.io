@@ -7,3 +7,7 @@ The page shows each prop's rules, research plan and final call, the market price
 Unlisted on purpose: there is no tile for it on the homepage, and the page asks search engines not to index it.
 
 Single self-contained `index.html` with the data embedded, plus `mabel.png`. No backend.
+
+## Versions
+
+The pipeline is versioned (currently MABEL 2.0.0). Every forecast on the Track record tab carries the version that produced it, and the How it works tab shows the current schematic and the change log. The same log is in [VERSIONS.md](VERSIONS.md).
