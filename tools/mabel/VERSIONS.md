@@ -4,6 +4,12 @@ Every forecast is logged with the version that produced it (`version` in each `r
 `runs/versions.json`, and the Track record page). Bump `VERSION` in `mabel.py` and add an entry here with any
 change to prompts, stages, weights or blending.
 
+## 3.0.0 Thin harness (2026-11-19) — runs/thin, 18 loop 4 props, machine only
+- Four analysts (Grok 4.7, Gemini 4 Argon, Perplexity Deep Research, Claude Opus 5.5) each go from the validated question to a final number alone, with their own web search (`tools/thin.py`). No shared research, no tree.
+- Forecast is the median of the four.
+- Market firewall is by instruction only. Grok and Gemini reported seeing prediction-market prices on most props; see `market_leaks` in each analyst file.
+- Run beside 2.1.0 on identical questions as a paired test. Cost about $1.77 per prop.
+
 ## 2.1.0 Wide panel and model routing (2026-11-19) — panel test on loop 4 (`runs/loop4e`)
 - Forecaster panel widened from four to eight: adds Qwen 3.8 Max, Kimi K3.1 Pro, GPT-6 Astra (OpenRouter) and Claude Opus 5.5 (subagent).
 - Claude jobs routed by `JOB_MODEL`: Sonnet 5.5 for status brief, plan revision and conversions; Opus 5.5 for plan, synthesis and light research; Fable 5.2 only for deep research.

@@ -10,4 +10,8 @@ Single self-contained `index.html` with the data embedded, plus `mabel.png`. No 
 
 ## Versions
 
-The pipeline is versioned (currently MABEL 2.1.0). Every forecast on the Track record tab carries the version that produced it, and the How it works tab shows the current schematic and the change log. The same log is in [VERSIONS.md](VERSIONS.md).
+The pipeline is versioned (currently MABEL 3.0.0). Every forecast on the Track record tab carries the version that produced it, and the How it works tab shows the current schematic and the change log. The same log is in [VERSIONS.md](VERSIONS.md).
+
+## Ledger
+
+[ledger.csv](ledger.csv) lists every probability the pipeline has produced, one row each, with the version, method, model, inputs, firewall status, lock time and market price at lock. The Ledger tab shows the same rows by prop. Outcome and Brier columns fill in as props resolve.
