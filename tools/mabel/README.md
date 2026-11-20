@@ -18,7 +18,7 @@ The pipeline is versioned (currently MABEL 3.0.0). Every forecast on the Track r
 
 ## Paper portfolio
 
-The Portfolio tab keeps one paper book per version: $100 on every Kalshi prop where the version's forecast beats the price by 5 points after the spread and fee, bought at the hour the forecast locked and held to resolution. Positions are valued daily at the bid.
+The Portfolio tab keeps one paper book per version: $100 on every Kalshi prop where the version's forecast beats the price by 5 points after the spread and fee, bought at the hour the forecast locked and held to resolution. Positions are valued daily at the midpoint of the bid and ask.
 
 ## Analysis behind each number
 
