@@ -596,7 +596,7 @@ function viewAll(){
   return out;
 }
 const usd=x=>(x<0?'−':x>0?'+':'')+'$'+Math.abs(x).toFixed(0);
-const BOOKN={'1.2.0':'v1.2.0 machine clean','2.0.0':'v2.0.0 ensemble','2.1.0':'v2.1.0 panel of eight','3.0.0':'v3.0.0 thin median','operator':'Your clean numbers'};
+const BOOKN={'1.2.0':'v1.2.0 machine clean','2.0.0':'v2.0.0 ensemble','2.1.0':'v2.1.0 panel of eight','3.0.0':'v3.0.0 thin median','operator':'Your Gate 3 calls (paper)'};
 const BOOKC={'1.2.0':'#2a78d6','2.0.0':'#eb6834','2.1.0':'#1baf7a','3.0.0':'#eda100'};
 let BOOKMODE='flat', BOOKSEL=null;
 function viewBook(){
@@ -604,13 +604,13 @@ function viewBook(){
   const out=[$('h1',{text:'Paper portfolio'})];
   if(!keys.length){out.push($('div',{class:'empty',text:'No paper positions yet.'}));return out;}
   const when=new Date(PORT.asof*1000).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
-  const tb=$('table',{},$('tr',{},$('th',{text:'Book'}),$('th',{class:'n',text:'Flat $100'}),$('th',{class:'n',text:'Quarter Kelly'}),$('th',{class:'n',text:'Bets'}),$('th',{class:'n',text:'Staked'})));
-  keys.forEach(k=>{const b=B[k]; tb.append($('tr',{},$('td',{style:'white-space:nowrap'},BOOKC[k]?$('span',{style:'display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:8px;background:'+BOOKC[k]}):null,BOOKN[k]),$('td',{class:'n',style:'font-weight:600',text:usd(b.flat.pnl)}),$('td',{class:'n',text:usd(b.kelly.pnl)}),$('td',{class:'n',text:b.positions.length+' of '+(b.positions.length+b.skipped.length)}),$('td',{class:'n',text:'$'+b.flat.staked.toFixed(0)})));});
+  const tb=$('table',{},$('tr',{},$('th',{text:'Book'}),$('th',{class:'n',text:'Flat $100'}),$('th',{class:'n',text:'Quarter Kelly'}),$('th',{class:'n',text:'Bets placed'}),$('th',{class:'n',text:'Staked'})));
+  keys.forEach(k=>{const b=B[k]; tb.append($('tr',{},$('td',{style:'white-space:nowrap'},BOOKC[k]?$('span',{style:'display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:8px;background:'+BOOKC[k]}):null,BOOKN[k]),$('td',{class:'n',style:'font-weight:600',text:usd(b.flat.pnl)}),$('td',{class:'n',text:usd(b.kelly.pnl)}),$('td',{class:'n',text:b.positions.length+' of '+(b.positions.length+b.skipped.length)+' props'}),$('td',{class:'n',text:'$'+b.flat.staked.toFixed(0)})));});
   out.push($('section',{class:'sec'},$('h2',{text:'Profit and loss as of '+when}),$('div',{class:'tablebox'},tb)));
   // interactive chart: flat or quarter Kelly, hover for a moment in time, pick a book to see its positions
   const ck=keys.filter(k=>BOOKC[k]), mi=BOOKMODE==='kelly'?2:1, pm=BOOKMODE==='kelly'?1:0, sel=ck.includes(BOOKSEL)?BOOKSEL:null;
   const W=innerWidth<600?400:640,H=280,L=50,R=innerWidth<600?100:122,T=14,Bm=30, ts=B[ck[0]].series.map(r=>r[0]), last=ts.length-1;
-  const all=ck.flatMap(k=>B[k].series.map(r=>r[mi])).concat([0]), lo=Math.min(...all), hi=Math.max(...all), pad=(hi-lo||1)*.12, y0=lo-pad, y1=hi+pad;
+  const all=ck.flatMap(k=>B[k].series.map(r=>r[mi])).concat([0]).concat(sel?B[sel].positions.flatMap(p=>(p.series||[]).map(r=>r[pm]).filter(v=>v!=null)):[]), lo=Math.min(...all), hi=Math.max(...all), pad=(hi-lo||1)*.12, y0=lo-pad, y1=hi+pad;
   const X=t=>L+(W-L-R)*(ts.length>1?(t-ts[0])/(ts[last]-ts[0]):.5), Y=v=>T+(H-T-Bm)*(1-(v-y0)/(y1-y0));
   const mag=Math.pow(10,Math.floor(Math.log10((y1-y0)/3))), step=mag*([1,2,5].find(m=>(y1-y0)/(m*mag)<=5)||10);
   let g='';
@@ -620,6 +620,7 @@ function viewBook(){
   const ends=ck.map(k=>({k,v:B[k].series[last][mi]})).sort((a,b)=>b.v-a.v); let ly=-99; ends.forEach(e=>{e.y=Math.max(Y(e.v),ly+14); ly=e.y;});
   ck.forEach(k=>{const sr=B[k].series, dim=sel&&sel!==k; g+='<polyline fill="none" stroke="'+BOOKC[k]+'" stroke-width="'+(sel===k?3:2)+'" stroke-linejoin="round" opacity="'+(dim?.25:1)+'" points="'+sr.map(r=>X(r[0])+','+Y(r[mi])).join(' ')+'"/><circle cx="'+X(ts[last])+'" cy="'+Y(sr[last][mi])+'" r="4" fill="'+BOOKC[k]+'" stroke="#fff" stroke-width="2" opacity="'+(dim?.25:1)+'"/>';});
   ends.forEach(e=>{g+='<text data-book="'+e.k+'" style="cursor:pointer" x="'+(W-R+10)+'" y="'+(e.y+4)+'" font-size="12" font-weight="'+(sel===e.k?700:400)+'" fill="#14161A" opacity="'+(sel&&sel!==e.k?.45:1)+'">v'+e.k+' '+usd(e.v)+'</text>';});
+  g+='<g id="bkPosG"></g>';
   g+='<line id="bkX" y1="'+T+'" y2="'+(H-Bm)+'" stroke="#14161A" stroke-width="1" stroke-dasharray="3 3" visibility="hidden"/>'+ck.map(k=>'<circle class="bkDot" data-k="'+k+'" r="4.5" fill="'+BOOKC[k]+'" stroke="#fff" stroke-width="2" visibility="hidden"/>').join('')+'<rect id="bkHit" x="'+L+'" y="'+T+'" width="'+(W-L-R)+'" height="'+(H-T-Bm)+'" fill="transparent"/>';
   const seg=(val,lab)=>{const b=$('button',{type:'button',class:'btn'+(BOOKMODE===val?' dark':''),style:'min-height:36px;padding:0 12px;font-size:13px',text:lab});b.onclick=()=>{BOOKMODE=val;render();};return b;};
   const pick=(k,lab)=>{const b=$('button',{type:'button',class:'btn'+((sel||'')===(k||'')?' dark':''),style:'min-height:36px;padding:0 12px;font-size:13px',text:lab});b.onclick=()=>{BOOKSEL=k;render();};return b;};
@@ -637,7 +638,15 @@ function viewBook(){
     bars.append($('h3',{style:'font:600 15px var(--f-d);margin:14px 0 8px',text:BOOKN[sel]+', '+(i===last?'now':whenT(ts[i]))}),
       ps.length?$('div',{style:'display:grid;grid-template-columns:auto 1fr auto;gap:5px 10px;align-items:center;font-size:13.5px;max-width:640px'},ps.flatMap(x=>{
         const w=Math.abs(x.v)/mx*50, bar=$('div',{style:'position:relative;height:14px'},$('div',{style:'position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:#8C939D'}),$('div',{title:x.p.prop+': '+usd(x.v),style:'position:absolute;top:0;bottom:0;border-radius:3px;background:'+BOOKC[sel]+';'+(x.v<0?'right:50%;':'left:50%;')+'width:'+w+'%'}));
-        return [DEEP[x.p.prop]?$('a',{href:'#d-'+x.p.prop,text:x.p.prop}):$('span',{text:x.p.prop}),bar,$('span',{class:'num',style:'text-align:right;font-weight:600',text:usd(x.v)})];})):$('p',{class:'muted',text:'No positions open at that time.'}));};
+        const cells=[DEEP[x.p.prop]?$('a',{href:'#d-'+x.p.prop,text:x.p.prop}):$('span',{text:x.p.prop}),bar,$('span',{class:'num',style:'text-align:right;font-weight:600',text:usd(x.v)})];
+        cells.forEach(c=>{c.addEventListener('mouseenter',()=>light(x.p)); c.addEventListener('mouseleave',()=>light(null));}); bar.addEventListener('click',()=>light(x.p)); bar.style.cursor='pointer';
+        return cells;})):$('p',{class:'muted',text:'No positions open at that time.'}),info);};
+  const info=$('div',{class:'muted num',style:'font-size:13px;min-height:20px;margin-top:8px'});
+  const light=p=>{const G=fig.querySelector('#bkPosG'); if(!G)return; if(!p){G.innerHTML='';info.textContent='';return;}
+    const pts=(p.series||[]).map((r,i)=>r[pm]==null?null:[X(ts[i]),Y(r[pm])]).filter(Boolean); if(!pts.length)return; const e=pts[pts.length-1], v=p.series[last][pm];
+    G.innerHTML='<polyline fill="none" stroke="#14161A" stroke-width="2.5" stroke-linejoin="round" points="'+pts.map(q=>q.join(',')).join(' ')+'"/><circle cx="'+pts[0][0]+'" cy="'+pts[0][1]+'" r="3.5" fill="#fff" stroke="#14161A" stroke-width="2"/><circle cx="'+e[0]+'" cy="'+e[1]+'" r="4" fill="#14161A" stroke="#fff" stroke-width="2"/><rect x="'+(e[0]-4-(p.prop.length*6.6+44))+'" y="'+(e[1]-22)+'" width="'+(p.prop.length*6.6+44)+'" height="17" rx="3" fill="#fff" opacity=".9"/><text x="'+(e[0]-8)+'" y="'+(e[1]-9)+'" text-anchor="end" font-size="12" font-weight="700" fill="#14161A">'+p.prop+' '+usd(v)+'</text>';
+    const sz=p[BOOKMODE==='kelly'?'kelly':'flat'];
+    info.textContent=p.prop+': bought '+sz.n+' '+p.side+' at '+Math.round(p.entry*100)+'¢ on '+whenT(p.t)+' for $'+sz.cost.toFixed(0)+'. We say '+Math.round((p.side==='Yes'?p.p:1-p.p)*100)+'%. Now '+(p.result?(p.mark?'won':'lost'):Math.round(p.mark*100)+'¢')+', '+usd(v)+'.';};
   const svg=fig.querySelector('svg'), hit=svg.querySelector('#bkHit'), xl=svg.querySelector('#bkX');
   const move=ev=>{const r=svg.getBoundingClientRect(), x=((ev.touches?ev.touches[0].clientX:ev.clientX)-r.left)/r.width*W; let bi=0,bd=1e9; ts.forEach((t,i)=>{const d=Math.abs(X(t)-x); if(d<bd){bd=d;bi=i;}});
     xl.setAttribute('x1',X(ts[bi])); xl.setAttribute('x2',X(ts[bi])); xl.setAttribute('visibility','visible');
@@ -646,14 +655,14 @@ function viewBook(){
   hit.addEventListener('mousemove',move); hit.addEventListener('touchstart',move,{passive:true}); hit.addEventListener('touchmove',move,{passive:true}); hit.addEventListener('mouseleave',leave);
   svg.querySelectorAll('[data-book]').forEach(t=>t.addEventListener('click',()=>{const k=t.getAttribute('data-book'); BOOKSEL=BOOKSEL===k?null:k; render();}));
   showAt(last);
-  out.push($('section',{class:'sec'},$('h2',{text:'Profit and loss over time'}),controls,fig,tip,bars,$('p',{class:'muted',style:'font-size:13px',text:'Move across the chart to read any moment. Pick a version to see what each of its positions was worth then.'})));
+  out.push($('section',{class:'sec'},$('h2',{text:'Profit and loss over time'}),controls,fig,tip,bars,$('p',{class:'muted',style:'font-size:13px',text:'Move across the chart to read any moment. Pick a version to see what each of its positions was worth then, and point at a position to trace it on the chart.'})));
   out.push($('section',{class:'sec'},$('h2',{text:'Positions'}),$('div',{class:'list'},keys.map(k=>{const b=B[k];
     const t=$('table',{},$('tr',{},$('th',{text:'Prop'}),$('th',{text:'Bought'}),$('th',{class:'n',text:'We say'}),$('th',{class:'n',text:'Price'}),$('th',{class:'n',text:'Edge'}),$('th',{class:'n',text:'Now'}),$('th',{class:'n',text:'P&L'})));
     b.positions.forEach(p=>t.append($('tr',{},$('td',{style:'white-space:nowrap'},DEEP[p.prop]?$('a',{href:'#d-'+p.prop,text:p.prop}):p.prop),$('td',{text:p.side}),$('td',{class:'n',text:Math.round((p.side==='Yes'?p.p:1-p.p)*100)+'%'}),$('td',{class:'n',text:Math.round(p.entry*100)+'¢'}),$('td',{class:'n',text:'+'+Math.round(((p.side==='Yes'?p.p:1-p.p)-p.entry)*100)}),$('td',{class:'n',text:p.result?(p.mark?'won':'lost'):Math.round(p.mark*100)+'¢'}),$('td',{class:'n',style:'font-weight:600',text:usd(p.flat.pnl)}))));
     return $('details',{class:'row',style:'display:block;font-size:14.5px'},$('summary',{style:'color:inherit'},$('b',{style:'font:600 17px var(--f-d)',text:BOOKN[k]}),$('span',{class:'muted num',style:'font-size:13px',text:' · '+b.positions.length+(b.positions.length===1?' bet · ':' bets · ')+usd(b.flat.pnl)})),
       $('div',{class:'tablebox',style:'margin-top:12px'},t),
       b.skipped.length?$('p',{class:'muted',style:'font-size:13px;margin-top:8px',text:'No bet, edge under 5 points after costs: '+b.skipped.map(x=>x.prop).join(', ')+'.'}):null);}))));
-  out.push($('section',{class:'sec'},$('h2',{text:'Rules'}),$('ul',{class:'plain'},['Each version gets its own book, built from the one number it stands behind on each Kalshi prop.','A bet is placed at the hour the forecast locked: Yes at the ask, No at one minus the bid, plus Kalshi’s entry fee.','No bet unless the forecast beats the price by 5 points after the fee.','Flat books stake $100 a bet. Kelly books stake a quarter of the Kelly fraction of $2,000.','Positions are held to resolution and valued each day at the midpoint of the bid and ask.','Every column is stated for the side bought. “We say” is the version’s chance for that side, “Price” is what one contract cost at the lock, and “Edge” is the gap in points before the fee.'].map(x=>$('li',{text:x})))));
+  out.push($('section',{class:'sec'},$('h2',{text:'Rules'}),$('ul',{class:'plain'},['Each version gets its own book, built from the one number it stands behind on each Kalshi prop.','A bet is placed at the hour the forecast locked: Yes at the ask, No at one minus the bid, plus Kalshi’s entry fee.','No bet unless the forecast beats the price by 5 points after the fee, so each book bets on only some of the props its version forecast.','“Your Gate 3 calls” applies the same rules to your own numbers on the Kalshi props you called (impeach and rubio). These are paper bets, separate from your real fills.','Flat books stake $100 a bet. Kelly books stake a quarter of the Kelly fraction of $2,000.','Positions are held to resolution and valued each day at the midpoint of the bid and ask.','Every column is stated for the side bought. “We say” is the version’s chance for that side, “Price” is what one contract cost at the lock, and “Edge” is the gap in points before the fee.'].map(x=>$('li',{text:x})))));
   return out;
 }
 function viewDeep(pid){
