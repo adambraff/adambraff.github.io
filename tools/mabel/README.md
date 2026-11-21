@@ -14,7 +14,7 @@ The pipeline is versioned (currently MABEL 3.0.0). Every forecast on the Track r
 
 ## Ledger
 
-[ledger.csv](ledger.csv) lists every probability the pipeline has produced, one row each, with the version, method, model, inputs, firewall status, lock time and market price at lock. The Ledger tab shows the same rows by prop. Outcome and Brier columns fill in as props resolve.
+[ledger.csv](ledger.csv) lists every probability the pipeline has produced, one row each, with the version, method, model, inputs, firewall status, lock time and market price at lock. Each row of the Track record opens to show the same forecasts for that prop. Outcome and Brier columns fill in as props resolve.
 
 ## Paper portfolio
 
@@ -22,4 +22,4 @@ The Portfolio tab keeps one paper book per version: $100 on every Kalshi prop wh
 
 ## Analysis behind each number
 
-Every Loop 4 prop has a page with the status brief, reference classes, scenario tree, fact check, each forecaster's reasoning, the red team's note and the four independent analysts' write-ups. Open one from the Ledger tab.
+Every Loop 4 prop has a page with the status brief, reference classes, scenario tree, fact check, each forecaster's reasoning, the red team's note and the four independent analysts' write-ups. Open one from the prop name on the Track record.
